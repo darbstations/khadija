@@ -7,6 +7,13 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side, Protecti
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.workbook.protection import WorkbookProtection
+from openpyxl.drawing.image import Image as XLImage
+LOGO="assets/darb_logo.png"; LOGO_RATIO=3.83
+def add_logo(name, w=200, anchor="B1"):
+    ws=wb[name]; img=XLImage(LOGO); img.width=w; img.height=int(w/LOGO_RATIO)
+    ws.add_image(img, anchor)
+    cur=ws.row_dimensions[1].height or 0
+    ws.row_dimensions[1].height=max(cur, int(img.height*0.78)+6)
 
 PWD = "darb2026"
 MONTHS = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"]
@@ -54,8 +61,6 @@ wb=Workbook()
 # ===================== 1) دليل الاستخدام =====================
 ws=wb.active; ws.title="دليل الاستخدام"; ws.sheet_view.showGridLines=False
 ws.column_dimensions["A"].width=3; ws.column_dimensions["B"].width=110
-style_cell(ws["B1"],value="درب  ·  Darb",f=font(22,True,ORANGE),align=right(False),border=False)
-ws.row_dimensions[1].height=30
 style_cell(ws["B2"],value="درب · المنظومة الاستراتيجية لمؤشرات الأداء 2026 — قطاع المحطات والعقار",
            f=font(17,True,NAVY),align=right(False),border=False)
 guide=[("",""),
@@ -644,6 +649,11 @@ order=["دليل الاستخدام","الاستراتيجية","المؤشرا�
  "الاستثمار · المؤشرات","العقار · المؤشرات","التقنية الرقمية · المؤشرات","الموارد البشرية · المؤشرات","قاعدة المؤشرات"]
 for idx,nm in enumerate(order):
     cur=wb.sheetnames.index(nm); wb.move_sheet(nm, idx-cur)
+
+# شعار درب في رأس الأوراق الرئيسية
+for nm,wpx in [("دليل الاستخدام",250),("الاستراتيجية",200),("المؤشرات الحيوية",210),
+               ("لوحة الإدارة التنفيذية",210),("الحوكمة",200)]:
+    add_logo(nm, w=wpx)
 
 wb.security=WorkbookProtection(workbookPassword=PWD, lockStructure=True)
 out="درب-مؤشرات-الأداء-2026.xlsx"; wb.save(out)
