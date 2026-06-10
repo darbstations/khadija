@@ -57,7 +57,7 @@ ws.sheet_view.showGridLines = False
 ws.column_dimensions["A"].width = 3
 ws.column_dimensions["B"].width = 110
 ws.merge_cells("B2:B2")
-style_cell(ws["B2"], value="درب · منظومة مؤشرات الأداء 2026 — ملف موحّد", f=font(18,True,NAVY), fillc=None, align=right(False), border=False)
+style_cell(ws["B2"], value="درب · المنظومة الاستراتيجية لمؤشرات الأداء 2026 — قطاع المحطات والعقار", f=font(17,True,NAVY), fillc=None, align=right(False), border=False)
 guide = [
  ("", ""),
  ("🧭 الفكرة", "ملف واحد يتدرّج من فوق لتحت: الاستراتيجية ← لوحة الإدارة التنفيذية ← مؤشرات كل إدارة ← تقييم كل موظف. كل المؤشرات تغذّي نفس اللوحة تلقائياً."),
@@ -81,7 +81,7 @@ ws.sheet_view.showGridLines = False
 widths = [3,26,42,30];
 for i,w in enumerate(widths,1): ws.column_dimensions[get_column_letter(i)].width = w
 ws.merge_cells("B2:D2")
-style_cell(ws["B2"], value="ركائز واستراتيجية درب 2026", f=font(18,True,WHITE), fillc=NAVY, align=center(False), border=False)
+style_cell(ws["B2"], value="ركائز واستراتيجية درب 2026 — قطاع المحطات والعقار", f=font(16,True,WHITE), fillc=NAVY, align=center(False), border=False)
 ws.row_dimensions[2].height = 32
 hdr = ["","الركيزة / الهدف","الوصف","المستهدف الرقمي 2026"]
 for c,h in enumerate(hdr,1):
@@ -155,19 +155,39 @@ KPIS = [
  (7,"نسبة إنجاز التقارير الدورية في موعدها","%","↑","AVG",1.0,"100%","pct"),
 ]
 
+# ===== طبقات الربط الاستراتيجي (تغذية صاعدة) =====
+PL_GROW, PL_INNO, PL_SUST = "النمو", "الابتكار", "الاستدامة"
+PILLARS = [PL_GROW, PL_INNO, PL_SUST]
+P_GROW1="التوسع في المواقع"; P_FRAN="الامتياز التجاري"; P_REACH="زيادة وصول العملاء"
+P_NEW="إطلاق مشاريع جديدة"; P_DESIGN="تطوير التصاميم والهوية"; P_TECH="التحول التقني"
+P_SAHAT="ساحات درب"; P_TANKI="تطبيق «تانكي»"
+P_CX="تعزيز تجربة العملاء"; P_QUAL="جودة التشغيل"; P_LEASE="منظومة التأجير"; P_PEOPLE="الاستثمار في الموظفين"
+# لكل مؤشر: (الركيزة 5 سنوات, مشروع الخارطة التنفيذية) — بنفس ترتيب KPIS
+LINK = [
+ (PL_GROW,P_GROW1),(PL_GROW,P_FRAN),(PL_GROW,P_REACH),(PL_GROW,P_REACH),(PL_GROW,P_REACH),
+ (PL_SUST,P_LEASE),(PL_GROW,P_FRAN),(PL_GROW,P_FRAN),(PL_SUST,P_QUAL),(PL_SUST,P_QUAL),
+ (PL_SUST,P_QUAL),(PL_SUST,P_QUAL),(PL_SUST,P_QUAL),(PL_SUST,P_QUAL),(PL_SUST,P_QUAL),
+ (PL_SUST,P_QUAL),(PL_SUST,P_QUAL),(PL_SUST,P_QUAL),(PL_SUST,P_QUAL),(PL_SUST,P_QUAL),
+ (PL_INNO,P_TECH),(PL_INNO,P_TECH),(PL_INNO,P_DESIGN),
+ (PL_GROW,P_GROW1),(PL_GROW,P_GROW1),(PL_GROW,P_GROW1),(PL_GROW,P_GROW1),
+ (PL_SUST,P_CX),(PL_SUST,P_CX),(PL_SUST,P_CX),(PL_SUST,P_CX),
+ (PL_SUST,P_CX),(PL_SUST,P_CX),(PL_SUST,P_QUAL),(PL_GROW,P_FRAN),(PL_SUST,P_QUAL),
+]
+assert len(LINK)==len(KPIS), (len(LINK),len(KPIS))
+
 SH_KPI = "الامتياز · المؤشرات"
 # ---------------- 4) مؤشرات الإدارة ----------------
 ws = wb.create_sheet(SH_KPI)
 ws.sheet_view.showGridLines = False
 # الأعمدة: A#  B المحور  C المؤشر  D الوحدة  E القطبية  F التجميع  G المستهدف  H نص المستهدف  I..T الأشهر  U YTD  V نسبة التحقيق  W الحالة
-col_w = [4,20,40,10,8,9,12,16] + [9]*12 + [12,12,14]
+col_w = [4,20,40,10,8,9,12,16] + [9]*12 + [12,12,14,16,22]
 for i,w in enumerate(col_w,1): ws.column_dimensions[get_column_letter(i)].width = w
-ws.merge_cells("A1:W1")
+ws.merge_cells("A1:Y1")
 style_cell(ws["A1"], value="إدارة الامتياز التجاري والمبيعات · مؤشرات الأداء 2026  (36 مؤشر / 8 محاور)", f=font(15,True,WHITE), fillc=NAVY, align=center(False), border=False)
 ws.row_dimensions[1].height = 30
-ws.merge_cells("A2:W2")
-style_cell(ws["A2"], value="🟩 الخلايا الخضراء = إدخال شهري للمسؤول   ·   باقي الأعمدة محسوبة/مقفولة   ·   YTD ونسبة التحقيق والحالة تلقائية", f=font(10,False,NAVY), fillc=GOLD, align=center(False), border=False)
-header = ["#","المحور","المؤشر","الوحدة","القطبية","التجميع","المستهدف","نص المستهدف"] + MONTHS + ["YTD","نسبة التحقيق","الحالة"]
+ws.merge_cells("A2:Y2")
+style_cell(ws["A2"], value="🟩 الخلايا الخضراء = إدخال شهري للمسؤول   ·   باقي الأعمدة محسوبة/مقفولة   ·   كل مؤشر يغذّي ركيزته ومشروعه تلقائياً", f=font(10,False,NAVY), fillc=GOLD, align=center(False), border=False)
+header = ["#","المحور","المؤشر","الوحدة","القطبية","التجميع","المستهدف","نص المستهدف"] + MONTHS + ["YTD","نسبة التحقيق","الحالة","الركيزة (5س)","المشروع (الخارطة)"]
 for c,h in enumerate(header,1):
     style_cell(ws.cell(3,c,h), f=font(10,True,WHITE), fillc=BLUE, align=center())
 ws.row_dimensions[3].height = 34
@@ -208,13 +228,18 @@ for idx,(ax,name,unit,pol,agg,tgt,ttxt,fmt) in enumerate(KPIS):
     # الحالة
     st = (f'=IF($V{r}="","—",IF($V{r}>=1,"✅ محقق",IF($V{r}>=0.85,"🟡 قريب","🔴 تحت الهدف")))')
     style_cell(ws.cell(r,23,st), f=font(10,True), align=center())
+    # وسم الربط الاستراتيجي (تغذية صاعدة) — مقفول
+    style_cell(ws.cell(r,24,LINK[idx][0]), f=font(10,True,BLUE), align=center())
+    style_cell(ws.cell(r,25,LINK[idx][1]), f=font(10), align=right(True))
     ws.row_dimensions[r].height = 26
 DATA_END = DATA_START + len(KPIS) - 1
 protect(ws)
 
-ACH_RANGE  = f"'{SH_KPI}'!$V${DATA_START}:$V${DATA_END}"
-AXIS_RANGE = f"'{SH_KPI}'!$B${DATA_START}:$B${DATA_END}"
-ST_RANGE   = f"'{SH_KPI}'!$W${DATA_START}:$W${DATA_END}"
+ACH_RANGE    = f"'{SH_KPI}'!$V${DATA_START}:$V${DATA_END}"
+AXIS_RANGE   = f"'{SH_KPI}'!$B${DATA_START}:$B${DATA_END}"
+ST_RANGE     = f"'{SH_KPI}'!$W${DATA_START}:$W${DATA_END}"
+PILLAR_RANGE = f"'{SH_KPI}'!$X${DATA_START}:$X${DATA_END}"
+PROJ_RANGE   = f"'{SH_KPI}'!$Y${DATA_START}:$Y${DATA_END}"
 
 # ---------------- 3) لوحة الإدارة التنفيذية ----------------
 ws = wb.create_sheet("لوحة الإدارة التنفيذية")
@@ -223,7 +248,7 @@ wb.move_sheet("لوحة الإدارة التنفيذية", -(len(wb.sheetnames)
 ws.sheet_view.showGridLines = False
 for i,w in enumerate([3,30,16,16,16,16],1): ws.column_dimensions[get_column_letter(i)].width = w
 ws.merge_cells("B2:F2")
-style_cell(ws["B2"], value="درب · لوحة الإدارة التنفيذية 2026", f=font(20,True,WHITE), fillc=NAVY, align=center(False), border=False)
+style_cell(ws["B2"], value="درب · لوحة الإدارة التنفيذية 2026 — المحطات والعقار", f=font(18,True,WHITE), fillc=NAVY, align=center(False), border=False)
 ws.row_dimensions[2].height = 38
 # بطاقات مفتاحية
 ws.merge_cells("B4:C4"); style_cell(ws["B4"], value="مؤشر الإنجاز العام (الامتياز)", f=font(11,True,WHITE), fillc=BLUE, align=center())
@@ -239,6 +264,19 @@ for title,key,clr in cards:
     ws.merge_cells(f"{L}5:{L}6")
     cc+=1
 ws.row_dimensions[4].height=22; ws.row_dimensions[5].height=30
+
+# تجميع الركائز الاستراتيجية (5 سنوات) — أعلى طبقة، أعمدة H..J
+for col,w in zip(["H","I","J"],[26,14,14]): ws.column_dimensions[col].width=w
+style_cell(ws["H4"], value="الأداء حسب الركائز (5 سنوات)", f=font(12,True,WHITE), fillc=NAVY, align=center())
+ws.merge_cells("H4:J4")
+style_cell(ws["H5"], value="الركيزة", f=font(11,True,WHITE), fillc=STEEL, align=center())
+style_cell(ws["I5"], value="الإنجاز", f=font(11,True,WHITE), fillc=STEEL, align=center())
+style_cell(ws["J5"], value="الحالة", f=font(11,True,WHITE), fillc=STEEL, align=center())
+for i,pl in enumerate(PILLARS):
+    r=6+i
+    style_cell(ws.cell(r,8,pl), f=font(11,True), align=right())
+    style_cell(ws.cell(r,9,f'=IFERROR(AVERAGEIFS({ACH_RANGE},{PILLAR_RANGE},"{pl}"),"—")'), f=font(11,True,NAVY), fmt="0%", align=center())
+    style_cell(ws.cell(r,10,f'=IF(ISNUMBER(I{r}),IF(I{r}>=1,"✅",IF(I{r}>=0.85,"🟡","🔴")),"—")'), f=font(11,True), align=center())
 
 # جدول المحاور
 hr=8
@@ -428,6 +466,82 @@ eval_form("الامتياز · الموظف الإداري","الموظف الإ
  ("تحديث بيانات العملاء والمحطات",10,"100% دقة"),
  ("إعداد المراسلات الرسمية",10,"100% في الوقت المحدد"),
 ])
+
+# ---------------- الخارطة التنفيذية (مشاريع 2026 ↔ المؤشرات) ----------------
+RED_IN = "F8CBAD"
+ws = wb.create_sheet("الخارطة التنفيذية")
+ws.sheet_view.showGridLines = False
+for i,w in enumerate([4,15,26,30,40,14,18],1): ws.column_dimensions[get_column_letter(i)].width = w
+ws.merge_cells("A1:G1")
+style_cell(ws["A1"], value="الخارطة التنفيذية 2026 — مشاريع الشركة وربطها بالمؤشرات (قطاع المحطات والعقار)", f=font(15,True,WHITE), fillc=NAVY, align=center(False), border=False)
+ws.row_dimensions[1].height=30
+ws.merge_cells("A2:G2")
+style_cell(ws["A2"], value="المصدر: «رؤية وأهداف 2026» — سحور درب  ·  التغطية: ✅ مرتبط 🟡 جزئي 🔴 فجوة  ·  أداء المؤشرات يُحسب آلياً من المؤشرات المرتبطة", f=font(9,False,NAVY), fillc=GOLD, align=center(False), border=False)
+hdr=["#","الركيزة","المشروع","الإدارة المسؤولة","المؤشرات المرتبطة","التغطية","أداء المؤشرات (مباشر)"]
+for c,h in enumerate(hdr,1):
+    style_cell(ws.cell(3,c,h), f=font(10,True,WHITE), fillc=BLUE, align=center())
+ws.row_dimensions[3].height=30
+STMAP={"ok":("✅ مرتبط",GREEN_IN),"partial":("🟡 مرتبط جزئياً",GOLD),"gap":("🔴 فجوة",RED_IN)}
+PROJ=[
+ ("النمو","التوسع في المواقع","التشغيل + الامتياز + الاستثمار","محطات الامتياز المشغّلة (150) · تشغيل 85 محطة · 190 عقد استثماري","ok"),
+ ("النمو","الامتياز التجاري","الامتياز التجاري","عقود الامتياز الجديدة (167) · إجمالي مبيعات الوقود","ok"),
+ ("النمو","زيادة وصول العملاء","الامتياز + التسويق","إجمالي مبيعات الوقود (718.8M) · تغطية 13 منطقة","ok"),
+ ("الابتكار","إطلاق مشاريع جديدة","غير محددة — مقترح: الاستثمار/التطوير","— لا يوجد مؤشر مخصص —","gap"),
+ ("الابتكار","تطوير التصاميم والهوية","غير محددة — مقترح: التسويق والعلامة","نسبة التزام المحطات بالهوية (55%) فقط","partial"),
+ ("الابتكار","التحول التقني","غير محددة — مقترح: تقنية المعلومات","أتمتة المحطات (90%) · المعيار الشامل (30%)","partial"),
+ ("الابتكار","ساحات درب","العقار","تأجير ساحة درب (≥80%) · 6 علامات جديدة","ok"),
+ ("الابتكار","تطبيق «تانكي»","غير محددة","— لا يوجد مؤشر ولا إدارة مسؤولة —","gap"),
+ ("الاستدامة","تعزيز تجربة العملاء","الامتياز + التشغيل","CSAT (90%) · تقييم قوقل (4.5+) · حل الشكاوى","ok"),
+ ("الاستدامة","جودة التشغيل","التشغيل + الامتياز","جاهزية 99% · السلامة 100% · 15 مؤشر تشغيلي","ok"),
+ ("الاستدامة","منظومة التأجير","العقار","الإشغال (≥60%) · 68 وحدة/شهر · التحصيل (95%+)","ok"),
+ ("الاستدامة","الاستثمار في الموظفين","غير محددة — مقترح: الموارد البشرية","— لا يوجد مؤشر لتطوير/استبقاء الموظفين —","gap"),
+]
+# تجميع الركيزة بدمج الخلايا
+r=4; i=0
+pillar_groups={}
+for p in PROJ: pillar_groups.setdefault(p[0],0); pillar_groups[p[0]]+=1
+done={}
+for pillar,proj,dept,kpis,stt in PROJ:
+    i+=1
+    sttxt,clr=STMAP[stt]
+    style_cell(ws.cell(r,1,i), f=font(10,True), align=center())
+    if pillar not in done:
+        cnt=pillar_groups[pillar]
+        ws.merge_cells(start_row=r,start_column=2,end_row=r+cnt-1,end_column=2)
+        style_cell(ws.cell(r,2,pillar), f=font(12,True,WHITE), fillc=BLUE, align=center())
+        done[pillar]=True
+    style_cell(ws.cell(r,3,proj), f=font(11,True,NAVY), align=right(True))
+    style_cell(ws.cell(r,4,dept), f=font(10), fillc=(RED_IN if "غير محددة" in dept else None), align=right(True))
+    style_cell(ws.cell(r,5,kpis), f=font(10), align=right(True))
+    style_cell(ws.cell(r,6,sttxt), f=font(11,True), fillc=clr, align=center())
+    live=f'=IF(COUNTIFS({PROJ_RANGE},"{proj}")=0,"—",IFERROR(AVERAGEIFS({ACH_RANGE},{PROJ_RANGE},"{proj}"),"—"))'
+    style_cell(ws.cell(r,7,live), f=font(11,True,NAVY), fmt="0%", align=center())
+    ws.row_dimensions[r].height=30
+    r+=1
+# ملخص الفجوات
+r+=1
+ws.merge_cells(start_row=r,start_column=2,end_row=r,end_column=7)
+style_cell(ws.cell(r,2,"⚠️ ملخص الفجوات — مشاريع تحتاج مؤشراً أو إدارة مسؤولة"), f=font(12,True,WHITE), fillc="C00000", align=right())
+r+=1
+gaps=[
+ "🔴 تطبيق «تانكي» — لا مؤشر ولا إدارة مسؤولة (منتج رقمي بلا مالك).",
+ "🔴 الاستثمار في الموظفين — لا مؤشر موظفين ولا إدارة موارد بشرية ضمن الملفات.",
+ "🔴 إطلاق مشاريع جديدة — مبادرة بلا مؤشر مخصص ولا مالك واضح.",
+ "🟡 التحول التقني — مغطّى جزئياً بالأتمتة فقط؛ بلا إدارة تقنية مالكة.",
+ "🟡 تطوير التصاميم والهوية — مغطّى بمؤشر التزام الهوية فقط؛ بلا إدارة تسويق/علامة.",
+]
+for g in gaps:
+    ws.merge_cells(start_row=r,start_column=2,end_row=r,end_column=7)
+    style_cell(ws.cell(r,2,g), f=font(10), align=right(True))
+    ws.row_dimensions[r].height=24
+    r+=1
+protect(ws)
+
+# ---------------- إعادة ترتيب الأوراق (تدرّج من فوق لتحت) ----------------
+def move_to(name, idx):
+    cur=wb.sheetnames.index(name); wb.move_sheet(name, idx-cur)
+move_to("الخارطة التنفيذية", 2)
+move_to("لوحة الإدارة التنفيذية", 3)
 
 # حماية هيكل المصنّف
 wb.security = WorkbookProtection(workbookPassword=PWD, lockStructure=True)
