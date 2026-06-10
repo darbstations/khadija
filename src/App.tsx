@@ -10,6 +10,7 @@ import Projections from "./components/Projections";
 import ScenarioCompare from "./components/ScenarioCompare";
 import ExtendedEconomics from "./components/ExtendedEconomics";
 import ROICalculator from "./components/ROICalculator";
+import TenantTool from "./components/TenantTool";
 import HowItWorks from "./components/HowItWorks";
 
 const TABS = [
@@ -19,7 +20,8 @@ const TABS = [
   { id: "tiers", label: "المستويات وقيمة النقطة", icon: "🎯", el: <TiersAndValue /> },
   { id: "extended", label: "الاقتصاد الموسّع", icon: "🆕", el: <ExtendedEconomics /> },
   { id: "stations", label: "تكلفة المحطات", icon: "🏗️", el: <StationCost /> },
-  { id: "franchise", label: "التحصيل من الامتياز", icon: "🤝", el: <FranchiseCollection /> },
+  { id: "tenants", label: "أداة المستأجرين", icon: "🤝", el: <TenantTool /> },
+  { id: "franchise", label: "التحصيل من الامتياز", icon: "🧾", el: <FranchiseCollection /> },
   { id: "projections", label: "التوقعات السنوية", icon: "📈", el: <Projections /> },
   { id: "roi", label: "حاسبة ROI", icon: "💎", el: <ROICalculator /> },
   { id: "compare", label: "مقارنة السيناريوهات", icon: "🆚", el: <ScenarioCompare /> },

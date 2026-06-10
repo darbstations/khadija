@@ -282,6 +282,42 @@ export function scenarioComparison(s: ScenarioInputs) {
   });
 }
 
+/** الأثر المالي لكل مستأجر (ورقة محرر المستأجرين) */
+export interface TenantImpact {
+  annualRevenue: number;
+  annualProfit: number;
+  pointsCost: number; // تكلفة النقاط على المستأجر/سنة
+  pctOfProfit: number; // % من ربح المستأجر
+  upliftRevenue: number; // الزيادة المتوقعة في الإيراد
+  extraProfit: number; // الربح الإضافي
+  netReturn: number; // صافي العائد للمستأجر
+  roi: number; // العائد على الاستثمار للمستأجر
+}
+
+export function tenantImpact(
+  monthlyRevenue: number,
+  marginPct: number,
+  contributionHalala: number,
+  upliftPct = 0.15
+): TenantImpact {
+  const annualRevenue = monthlyRevenue * 12;
+  const annualProfit = annualRevenue * marginPct;
+  const pointsCost = (annualRevenue * contributionHalala) / 100;
+  const upliftRevenue = annualRevenue * upliftPct;
+  const extraProfit = upliftRevenue * marginPct;
+  const netReturn = extraProfit - pointsCost;
+  return {
+    annualRevenue,
+    annualProfit,
+    pointsCost,
+    pctOfProfit: annualProfit ? pointsCost / annualProfit : 0,
+    upliftRevenue,
+    extraProfit,
+    netReturn,
+    roi: pointsCost ? netReturn / pointsCost : 0,
+  };
+}
+
 // ---------------- أدوات تنسيق ----------------
 const ar = "ar-SA";
 export const fmtInt = (n: number) =>
