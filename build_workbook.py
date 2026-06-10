@@ -209,24 +209,48 @@ RE=[
  ("الجودة والاستدامة","معدل رضا المستأجرين (استبيان ربعي)","%","↑","AVG",0.90,"≥ 90%","pct",PL_SUST,P_CX),
 ]
 
+DIG=[  # إدارة التقنية الرقمية — تُغلق فجوتَي «تطبيق تانكي» و«التحول التقني»
+ ("منتج تانكي","عدد مستخدمي تطبيق «تانكي» النشطين شهرياً (MAU)","مستخدم","↑","LAST",None,"يُحدد لاحقاً","int",PL_INNO,P_TANKI),
+ ("منتج تانكي","نمو تنزيلات تطبيق تانكي","%","↑","AVG",None,"يُحدد لاحقاً","pct",PL_INNO,P_TANKI),
+ ("منتج تانكي","نسبة المعاملات الرقمية عبر تانكي","%","↑","AVG",None,"يُحدد لاحقاً","pct",PL_INNO,P_TANKI),
+ ("منتج تانكي","معدل رضا مستخدمي تطبيق تانكي","نجمة/5","↑","AVG",4.5,"≥ 4.5","num1",PL_INNO,P_TANKI),
+ ("التحول التقني","نسبة أتمتة العمليات الأساسية (شركة)","%","↑","LAST",None,"يُحدد لاحقاً","pct",PL_INNO,P_TECH),
+ ("التحول التقني","نسبة جاهزية الأنظمة (Uptime)","%","↑","AVG",0.995,"≥ 99.5%","pct",PL_INNO,P_TECH),
+ ("التحول التقني","متوسط زمن حل أعطال الأنظمة","ساعة","↓","AVG",4,"≤ 4 ساعات","num1",PL_INNO,P_TECH),
+ ("التحول التقني","نسبة المشاريع التقنية المنجزة في الوقت","%","↑","AVG",0.90,"≥ 90%","pct",PL_INNO,P_TECH),
+]
+HR=[  # إدارة الموارد البشرية — تُغلق فجوة «الاستثمار في الموظفين»
+ ("الاستبقاء","معدل استبقاء الموظفين (Retention)","%","↑","LAST",0.90,"≥ 90%","pct",PL_SUST,P_PEOPLE),
+ ("الاستبقاء","معدل دوران الموظفين (Turnover)","%","↓","AVG",0.10,"≤ 10%","pct",PL_SUST,P_PEOPLE),
+ ("التطوير","متوسط ساعات التدريب لكل موظف","ساعة","↑","SUM",40,"≥ 40 ساعة","num1",PL_SUST,P_PEOPLE),
+ ("التطوير","نسبة الموظفين المشمولين بخطة تطوير","%","↑","LAST",0.80,"≥ 80%","pct",PL_SUST,P_PEOPLE),
+ ("الرضا والانتماء","مؤشر رضا الموظفين (eNPS)","نقطة","↑","AVG",30,"≥ 30","num1",PL_SUST,P_PEOPLE),
+ ("الاستقطاب","نسبة شغل الشواغر خلال 30 يوم","%","↑","AVG",0.85,"≥ 85%","pct",PL_SUST,P_PEOPLE),
+ ("الأداء","نسبة إنجاز تقييمات الأداء في موعدها","%","↑","AVG",1.0,"100%","pct",PL_SUST,P_PEOPLE),
+ ("الامتثال","نسبة السعودة","%","↑","LAST",None,"حسب النطاق","pct",PL_SUST,P_PEOPLE),
+]
+
 # ===================== باني ورقة المؤشرات (محرك موحّد) =====================
+LEAD_KW=["عدد","زيارات","فرص","تحويل","مبيعات","نمو","LEADS","تنزيلات","تدريب","طلب","حملات","استقطاب"]
+def classify(nm):
+    return "🔵 قائد" if any(k in nm for k in LEAD_KW) else "🟣 لاحق"
 def build_kpi_sheet(name, title, records, tagged=True):
     ws=wb.create_sheet(name); ws.sheet_view.showGridLines=False
-    col_w=[4,20,40,10,8,9,12,16]+[9]*12+[12,12,14,16,22]
+    col_w=[4,20,40,10,8,9,12,16]+[9]*12+[12,12,14,16,22]+[12,10,9,14]
     for i,w in enumerate(col_w,1): ws.column_dimensions[get_column_letter(i)].width=w
-    last_col="Y"
+    last_col="AC"
     ws.merge_cells(f"A1:{last_col}1")
     style_cell(ws["A1"],value=title,f=font(15,True,WHITE),fillc=NAVY,align=center(False),border=False)
     ws.row_dimensions[1].height=30
     ws.merge_cells(f"A2:{last_col}2")
-    style_cell(ws["A2"],value="🟩 الخلايا الخضراء = إدخال شهري للمسؤول  ·  باقي الأعمدة محسوبة/مقفولة  ·  كل مؤشر يغذّي ركيزته ومشروعه",
+    style_cell(ws["A2"],value="🟩 الأخضر = إدخال (الأرقام الشهرية + خط الأساس + الوزن)  ·  🔵 قائد/🟣 لاحق  ·  الدرجة الموزونة والحالة تلقائية",
                f=font(10,False,NAVY),fillc=GOLD,align=center(False),border=False)
-    header=["#","المحور","المؤشر","الوحدة","القطبية","التجميع","المستهدف","نص المستهدف"]+MONTHS+["YTD","نسبة التحقيق","الحالة","الركيزة (5س)","المشروع (الخارطة)"]
+    header=["#","المحور","المؤشر","الوحدة","القطبية","التجميع","المستهدف","نص المستهدف"]+MONTHS+["YTD","نسبة التحقيق","الحالة","الركيزة (5س)","المشروع (الخارطة)","خط الأساس 2025","النوع","الوزن %","الدرجة الموزونة"]
     for c,h in enumerate(header,1): style_cell(ws.cell(3,c,h),f=font(10,True,WHITE),fillc=BLUE,align=center())
     ws.row_dimensions[3].height=34; ws.freeze_panes="I4"
     dv=DataValidation(type="decimal",operator="greaterThanOrEqual",formula1="0",allow_blank=True)
     dv.error="أدخل رقماً موجباً فقط"; dv.errorTitle="قيمة غير صحيحة"; ws.add_data_validation(dv)
-    START=4
+    START=4; w_default=round(1.0/len(records),4)
     for idx,rec in enumerate(records):
         axis,nm,unit,pol,agg,tgt,ttxt,fmt,pillar,project=rec
         r=START+idx
@@ -253,8 +277,20 @@ def build_kpi_sheet(name, title, records, tagged=True):
         style_cell(ws.cell(r,23),f=font(10,True),align=center())
         style_cell(ws.cell(r,24,pillar if tagged else ""),f=font(10,True,BLUE),align=center())
         style_cell(ws.cell(r,25,project if tagged else ""),f=font(10),align=right(True))
+        # خانات الحوكمة
+        bc=ws.cell(r,26); style_cell(bc,fillc=GREEN_IN,fmt=FMT[fmt],align=center(),lock=False); dv.add(bc)
+        style_cell(ws.cell(r,27,classify(nm)),f=font(10),align=center())
+        wc=ws.cell(r,28,w_default); style_cell(wc,fillc=GREEN_IN,fmt="0%",align=center(),lock=False)
+        ws.cell(r,29).value=f'=IF($V{r}="","",$AB{r}*MIN($V{r},1))'
+        style_cell(ws.cell(r,29),f=font(10,True,NAVY),fmt="0%",align=center())
         ws.row_dimensions[r].height=26
     END=START+len(records)-1
+    TOT=END+1
+    ws.merge_cells(start_row=TOT,start_column=2,end_row=TOT,end_column=27)
+    style_cell(ws.cell(TOT,2,"الإجمالي الموزون للإدارة"),f=font(11,True,WHITE),fillc=NAVY,align=center())
+    style_cell(ws.cell(TOT,1,""),fillc=NAVY)
+    style_cell(ws.cell(TOT,28,f"=SUM(AB{START}:AB{END})"),f=font(11,True,"FFFF00"),fillc=NAVY,fmt="0%",align=center())
+    style_cell(ws.cell(TOT,29,f"=SUM(AC{START}:AC{END})"),f=font(12,True,"FFFF00"),fillc=NAVY,fmt="0%",align=center())
     protect(ws)
     return START,END
 
@@ -262,7 +298,9 @@ def build_kpi_sheet(name, title, records, tagged=True):
 DEPTS=[("الامتياز التجاري","الامتياز · المؤشرات","إدارة الامتياز التجاري والمبيعات · مؤشرات الأداء 2026  (36 مؤشر / 8 محاور)",FRAN),
        ("التشغيل والمحطات","التشغيل · المؤشرات","إدارة التشغيل والمحطات · مؤشرات الأداء 2026  (16 مؤشر / 7 محاور)",OPS),
        ("الاستثمار","الاستثمار · المؤشرات","إدارة الاستثمار · مؤشرات الأداء 2026  (24 مؤشر / 6 محاور)",INV),
-       ("العقار","العقار · المؤشرات","إدارة العقار · مؤشرات الأداء 2026  (16 مؤشر / 6 محاور)",RE)]
+       ("العقار","العقار · المؤشرات","إدارة العقار · مؤشرات الأداء 2026  (16 مؤشر / 6 محاور)",RE),
+       ("التقنية الرقمية","التقنية الرقمية · المؤشرات","إدارة التقنية الرقمية · مؤشرات الأداء 2026  (8 مؤشرات) — تانكي والتحول التقني",DIG),
+       ("الموارد البشرية","الموارد البشرية · المؤشرات","إدارة الموارد البشرية · مؤشرات الأداء 2026  (8 مؤشرات) — الاستثمار في الموظفين",HR)]
 DEPT_RANGES=[]
 for dep,sh,title,recs in DEPTS:
     s,e=build_kpi_sheet(sh,title,recs)
@@ -347,13 +385,13 @@ PROJ=[
  (PL_GROW,P_REACH,"الامتياز + التشغيل + العقار","مبيعات الوقود · نمو المبيعات · LEADS","ok"),
  (PL_INNO,P_NEW,"العقار (جزئي) — مقترح: إدارة تطوير","الشراكات الاستراتيجية (5) فقط","partial"),
  (PL_INNO,P_DESIGN,"غير محددة — مقترح: التسويق والعلامة","نسبة التزام المحطات بالهوية (55%) فقط","partial"),
- (PL_INNO,P_TECH,"التشغيل + الامتياز — مقترح: تقنية المعلومات","أتمتة المحطات · المعيار الشامل","partial"),
+ (PL_INNO,P_TECH,"التقنية الرقمية + التشغيل","أتمتة العمليات · جاهزية الأنظمة · المعيار الشامل","ok"),
  (PL_INNO,P_SAHAT,"العقار","تأجير ساحة درب (≥80%) · 6 علامات جديدة","ok"),
- (PL_INNO,P_TANKI,"غير محددة","— لا يوجد مؤشر ولا إدارة مسؤولة —","gap"),
+ (PL_INNO,P_TANKI,"التقنية الرقمية","MAU · التنزيلات · المعاملات الرقمية · الرضا","ok"),
  (PL_SUST,P_CX,"الامتياز + التشغيل + العقار + الاستثمار","CSAT · قوقل · الشكاوى · رضا المستأجرين","ok"),
  (PL_SUST,P_QUAL,"التشغيل + الامتياز + الاستثمار","جاهزية 99% · السلامة 100% · الصيانة","ok"),
  (PL_SUST,P_LEASE,"العقار","الإشغال (≥60%) · 68 وحدة/شهر · التحصيل","ok"),
- (PL_SUST,P_PEOPLE,"غير محددة — مقترح: الموارد البشرية","— لا يوجد مؤشر لتطوير/استبقاء الموظفين —","gap"),
+ (PL_SUST,P_PEOPLE,"الموارد البشرية","الاستبقاء · التدريب · eNPS · السعودة","ok"),
 ]
 groups={}
 for p in PROJ: groups[p[0]]=groups.get(p[0],0)+1
@@ -371,12 +409,10 @@ for pillar,proj,dept,kpis,stt in PROJ:
     style_cell(ws.cell(r,7,f'=IF(COUNTIFS({CD},"{proj}")=0,"—",IFERROR(AVERAGEIFS({CV},{CD},"{proj}"),"—"))'),f=font(11,True,NAVY),fmt="0%",align=center())
     ws.row_dimensions[r].height=30; r+=1
 r+=1; ws.merge_cells(start_row=r,start_column=2,end_row=r,end_column=7)
-style_cell(ws.cell(r,2,"⚠️ ملخص الفجوات — مشاريع تحتاج مؤشراً أو إدارة مسؤولة"),f=font(12,True,WHITE),fillc="C00000",align=right()); r+=1
-for g in ["🔴 تطبيق «تانكي» — لا مؤشر ولا إدارة مسؤولة (منتج رقمي بلا مالك).",
-          "🔴 الاستثمار في الموظفين — لا مؤشر موظفين ولا إدارة موارد بشرية ضمن الملفات.",
-          "🟡 إطلاق مشاريع جديدة — يغذّيه مؤشر الشراكات الاستراتيجية فقط؛ يحتاج مالكاً ومؤشرات أوضح.",
-          "🟡 التحول التقني — مغطّى جزئياً (الأتمتة والمعيار الشامل)؛ بلا إدارة تقنية مالكة.",
-          "🟡 تطوير التصاميم والهوية — مغطّى بمؤشر التزام الهوية فقط؛ بلا إدارة تسويق/علامة."]:
+style_cell(ws.cell(r,2,"✅ أُغلقت فجوات تانكي/التحول التقني/الموظفين بإضافة إدارتَي التقنية الرقمية والموارد البشرية · المتبقّي:"),f=font(11,True,WHITE),fillc="538135",align=right()); r+=1
+for g in ["🟡 إطلاق مشاريع جديدة — يغذّيه مؤشر الشراكات الاستراتيجية فقط؛ يحتاج مالكاً (إدارة تطوير/PMO) ومؤشرات أوضح.",
+          "🟡 تطوير التصاميم والهوية — مغطّى بمؤشر التزام الهوية فقط؛ يحتاج إدارة تسويق/علامة مالكة.",
+          "📌 توصية: تثبيت خطوط الأساس 2025 والأوزان (الأعمدة الجديدة) لكل مؤشر لتدقيق المستهدفات."]:
     ws.merge_cells(start_row=r,start_column=2,end_row=r,end_column=7)
     style_cell(ws.cell(r,2,g),f=font(10),align=right(True)); ws.row_dimensions[r].height=24; r+=1
 protect(ws)
@@ -512,12 +548,92 @@ build_kpi_sheet("التشغيل · مدير المحطة","مؤشرات الأد
 build_kpi_sheet("التشغيل · مشرف ميداني","مؤشرات الأداء — مشرف ميداني (شهري · TQM-M-02)",OPS_SUP,tagged=False)
 build_kpi_sheet("التشغيل · عامل التعبئة","مؤشرات الأداء — عامل تعبئة الوقود (شهري · SOP-OM-08)",OPS_FUEL,tagged=False)
 
+# ===================== المؤشرات الحيوية (North Star + Vital Few) =====================
+SH_F='الامتياز · المؤشرات'; SH_I='الاستثمار · المؤشرات'; SH_R='العقار · المؤشرات'
+SH_D='التقنية الرقمية · المؤشرات'; SH_H='الموارد البشرية · المؤشرات'
+ws=wb.create_sheet("المؤشرات الحيوية"); ws.sheet_view.showGridLines=False
+for i,w in enumerate([3,16,18,40,16,14,12,14],1): ws.column_dimensions[get_column_letter(i)].width=w
+ws.merge_cells("B2:H2")
+style_cell(ws["B2"],value="المؤشرات الحيوية — النجمة الشمالية والمؤشرات الاستراتيجية القليلة",f=font(17,True,WHITE),fillc=NAVY,align=center(False),border=False)
+ws.row_dimensions[2].height=34
+# النجمة الشمالية
+ws.merge_cells("B4:D4"); style_cell(ws["B4"],value="🌟 النجمة الشمالية — إجمالي مبيعات الوقود (لتر)",f=font(12,True,WHITE),fillc="538135",align=center())
+ws.merge_cells("B5:C6"); style_cell(ws["B5"],value=f"='{SH_F}'!U6",f=font(26,True,"538135"),fmt="#,##0",align=center())
+style_cell(ws["D5"],value="المستهدف 2026",f=font(10,True),align=center())
+style_cell(ws["D6"],value=f"='{SH_F}'!H6",f=font(12,True,NAVY),align=center())
+ws.merge_cells("E4:H4"); style_cell(ws["E4"],value="نسبة تحقيق النجمة الشمالية",f=font(12,True,WHITE),fillc=BLUE,align=center())
+ws.merge_cells("E5:H6"); style_cell(ws["E5"],value=f"='{SH_F}'!V6",f=font(28,True,NAVY),fmt="0%",align=center())
+ws.row_dimensions[5].height=28
+# جدول المؤشرات الحيوية
+hr=8
+for c,h in zip([2,3,4,5,6,7,8],["الركيزة","الإدارة","المؤشر","المستهدف","YTD","الإنجاز","الحالة"]):
+    style_cell(ws.cell(hr,c,h),f=font(11,True,WHITE),fillc=BLUE,align=center())
+ws.row_dimensions[hr].height=26
+VITAL=[(PL_GROW,"الامتياز",SH_F,6),(PL_GROW,"الامتياز",SH_F,4),(PL_GROW,"الامتياز",SH_F,5),(PL_GROW,"الاستثمار",SH_I,4),
+ (PL_INNO,"الامتياز",SH_F,24),(PL_INNO,"العقار",SH_R,12),(PL_INNO,"التقنية الرقمية",SH_D,4),
+ (PL_SUST,"الامتياز",SH_F,12),(PL_SUST,"الامتياز",SH_F,17),(PL_SUST,"الامتياز",SH_F,32),
+ (PL_SUST,"العقار",SH_R,7),(PL_SUST,"العقار",SH_R,19),(PL_SUST,"الاستثمار",SH_I,11),(PL_SUST,"الموارد البشرية",SH_H,4)]
+vg={}
+for v in VITAL: vg[v[0]]=vg.get(v[0],0)+1
+r=hr+1; doneV={}
+for pillar,dep,sh,row in VITAL:
+    if pillar not in doneV:
+        ws.merge_cells(start_row=r,start_column=2,end_row=r+vg[pillar]-1,end_column=2)
+        style_cell(ws.cell(r,2,pillar),f=font(12,True,WHITE),fillc=STEEL,align=center()); doneV[pillar]=True
+    style_cell(ws.cell(r,3,dep),f=font(10),align=center())
+    style_cell(ws.cell(r,4,f"='{sh}'!C{row}"),f=font(10),align=right(True))
+    style_cell(ws.cell(r,5,f"='{sh}'!H{row}"),f=font(10),align=center())
+    style_cell(ws.cell(r,6,f"='{sh}'!U{row}"),f=font(10,True),align=center())
+    style_cell(ws.cell(r,7,f"='{sh}'!V{row}"),f=font(10,True,NAVY),fmt="0%",align=center())
+    style_cell(ws.cell(r,8,f"='{sh}'!W{row}"),f=font(10,True),align=center())
+    ws.row_dimensions[r].height=24; r+=1
+protect(ws)
+
+# ===================== الحوكمة (RACI + إيقاع + طموحات) =====================
+ws=wb.create_sheet("الحوكمة"); ws.sheet_view.showGridLines=False
+for i,w in enumerate([3,26,26,26,30],1): ws.column_dimensions[get_column_letter(i)].width=w
+ws.merge_cells("B2:E2"); style_cell(ws["B2"],value="حوكمة الأداء — الإيقاع والمسؤوليات وطموحات النمو",f=font(16,True,WHITE),fillc=NAVY,align=center(False),border=False)
+ws.row_dimensions[2].height=30
+r=4
+style_cell(ws.cell(r,2,"⏱️ إيقاع المراجعة (Cadence)"),f=font(12,True,WHITE),fillc=BLUE,align=right()); ws.merge_cells(start_row=r,start_column=2,end_row=r,end_column=5); r+=1
+for c,h in zip([2,3,4,5],["الدورية","النشاط","المسؤول","المخرج"]): style_cell(ws.cell(r,c,h),f=font(10,True,WHITE),fillc=STEEL,align=center())
+r+=1
+for row in [("شهري","مراجعة تشغيلية لمؤشرات كل إدارة","مدير الإدارة","إغلاق الأرقام + خطة تصحيح"),
+            ("ربع سنوي (QBR)","مراجعة استراتيجية + تقييم الأفراد + معايرة المستهدفات","الإدارة التنفيذية","قرارات + تحديث الأوزان"),
+            ("نصف سنوي","مراجعة الخارطة التنفيذية والمشاريع","مكتب الاستراتيجية","تقدّم المشاريع + المخاطر"),
+            ("سنوي","إعادة ضبط OKR وربطها بالركائز الخمسية","الرئيس التنفيذي","خطة العام القادم")]:
+    for c,v in zip([2,3,4,5],row): style_cell(ws.cell(r,c,v),f=font(10),align=right(True))
+    ws.row_dimensions[r].height=30; r+=1
+r+=1
+style_cell(ws.cell(r,2,"👥 مصفوفة RACI"),f=font(12,True,WHITE),fillc=BLUE,align=right()); ws.merge_cells(start_row=r,start_column=2,end_row=r,end_column=5); r+=1
+style_cell(ws.cell(r,2,"R = منفّذ · A = مُساءل · C = مُستشار · I = مُطّلع"),f=font(10,False,NAVY),fillc=GOLD,align=right()); ws.merge_cells(start_row=r,start_column=2,end_row=r,end_column=5); r+=1
+for c,h in zip([2,3,4,5],["المهمة","المسؤول (A)","المنفّذ (R)","يُستشار/يُطّلع"]): style_cell(ws.cell(r,c,h),f=font(10,True,WHITE),fillc=STEEL,align=center())
+r+=1
+for row in [("إدخال الأرقام الشهرية","مدير الإدارة","المسؤول عن المؤشر","المشرف الميداني (C)"),
+            ("اعتماد المستهدفات والأوزان","الإدارة التنفيذية","مكتب الاستراتيجية","مدراء الإدارات (C)"),
+            ("تقييم أداء الموظف","المدير المباشر","المدير المباشر","الموارد البشرية (I)"),
+            ("تجميع لوحة التنفيذيين","مكتب الاستراتيجية","محلل الأداء","الإدارة التنفيذية (I)")]:
+    for c,v in zip([2,3,4,5],row): style_cell(ws.cell(r,c,v),f=font(10),align=right(True))
+    ws.row_dimensions[r].height=26; r+=1
+r+=1
+style_cell(ws.cell(r,2,"🚀 طموحات 3 سنوات (2026 → 2028) — الجسر بين الرؤية الخمسية والسنة"),f=font(12,True,WHITE),fillc=BLUE,align=right()); ws.merge_cells(start_row=r,start_column=2,end_row=r,end_column=5); r+=1
+for c,h in zip([2,3,4,5],["الركيزة","2026","2027","2028"]): style_cell(ws.cell(r,c,h),f=font(10,True,WHITE),fillc=STEEL,align=center())
+r+=1
+for row in [("النمو — المحطات المشغّلة","85 + 150","≈ 320","≈ 450"),
+            ("النمو — العقود الجديدة","167 + 190","تصاعدي","تصاعدي"),
+            ("الابتكار — أتمتة/تانكي","إطلاق وتثبيت","توسّع","نضج رقمي"),
+            ("الاستدامة — رضا وجودة","CSAT 90% · جاهزية 99%","الحفاظ والتحسين","تميّز تشغيلي")]:
+    for c,v in zip([2,3,4,5],row): style_cell(ws.cell(r,c,v),f=font(10),align=right(True if c==2 else False));
+    ws.row_dimensions[r].height=26; r+=1
+style_cell(ws.cell(r+1,2,"📌 الأرقام التقديرية للطموحات الثلاثية تحتاج اعتماد الإدارة التنفيذية وربطها بخطوط الأساس 2025."),f=font(9,False,"808080"),align=right()); ws.merge_cells(start_row=r+1,start_column=2,end_row=r+1,end_column=5)
+protect(ws)
+
 # ===================== ترتيب الأوراق =====================
-order=["دليل الاستخدام","الاستراتيجية","الخارطة التنفيذية","لوحة الإدارة التنفيذية",
+order=["دليل الاستخدام","الاستراتيجية","المؤشرات الحيوية","الخارطة التنفيذية","لوحة الإدارة التنفيذية","الحوكمة",
  "الامتياز · المؤشرات","الامتياز · الموظفون","الامتياز · مدير الإدارة","الامتياز · مسؤول الامتياز",
  "الامتياز · المراقب الميداني","الامتياز · مسؤول التعاقدات","الامتياز · الموظف الإداري",
  "التشغيل · المؤشرات","التشغيل · مدير المحطة","التشغيل · مشرف ميداني","التشغيل · عامل التعبئة",
- "الاستثمار · المؤشرات","العقار · المؤشرات","قاعدة المؤشرات"]
+ "الاستثمار · المؤشرات","العقار · المؤشرات","التقنية الرقمية · المؤشرات","الموارد البشرية · المؤشرات","قاعدة المؤشرات"]
 for idx,nm in enumerate(order):
     cur=wb.sheetnames.index(nm); wb.move_sheet(nm, idx-cur)
 
