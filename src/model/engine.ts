@@ -318,6 +318,65 @@ export function tenantImpact(
   };
 }
 
+/** حاسبة النقطة لكل محطة على حدة — بناءً على هامشها الفعلي */
+export interface StationPointResult {
+  literPrice: number;
+  marginPerLiter: number; // هللة/لتر
+  marginPerRiyal: number; // هللة/ريال
+  pointCostHalala: number; // تكلفة النقطة (هللة/ريال) — القرار
+  pctOfMargin: number; // النسبة المستهلكة من الهامش
+  cashbackPct: number; // الكاش باك الفعلي
+  earnRate: number; // معدل الكسب المكافئ (نقطة/ريال)
+  netMarginPerRiyal: number; // صافي هامش المحطة بعد الولاء
+  monthlyRevenue: number;
+  monthlyCost: number; // تكلفة الولاء الشهرية على المحطة
+  annualCost: number;
+  feasible: "good" | "tight" | "loss";
+  recommendedHalala: number; // الموصى به = نسبة من الهامش
+}
+
+export function stationPointCalc(opts: {
+  literPrice: number;
+  marginHalalaPerLiter: number;
+  litersPerMonth: number;
+  pointCostHalala: number; // تكلفة النقطة المختارة (هللة/ريال)
+  pointValue: number;
+  budgetPctOfMargin?: number; // نسبة الهامش الموصى بتخصيصها (افتراضي 15%)
+}): StationPointResult {
+  const {
+    literPrice,
+    marginHalalaPerLiter,
+    litersPerMonth,
+    pointCostHalala,
+    pointValue,
+    budgetPctOfMargin = 0.15,
+  } = opts;
+  const marginPerRiyal = literPrice ? marginHalalaPerLiter / literPrice : 0;
+  const pctOfMargin = marginPerRiyal ? pointCostHalala / marginPerRiyal : 0;
+  const cashbackPct = pointCostHalala / 100;
+  const earnRate = cashbackPct * pointValue;
+  const netMarginPerRiyal = marginPerRiyal - pointCostHalala;
+  const monthlyRevenue = litersPerMonth * literPrice;
+  const monthlyCost = monthlyRevenue * cashbackPct;
+  const feasible: StationPointResult["feasible"] =
+    netMarginPerRiyal <= 0 ? "loss" : pctOfMargin <= 0.25 ? "good" : pctOfMargin <= 0.5 ? "tight" : "loss";
+  return {
+    literPrice,
+    marginPerLiter: marginHalalaPerLiter,
+    marginPerRiyal,
+    pointCostHalala,
+    pctOfMargin,
+    cashbackPct,
+    earnRate,
+    netMarginPerRiyal,
+    monthlyRevenue,
+    monthlyCost,
+    annualCost: monthlyCost * 12,
+    feasible,
+    recommendedHalala: marginPerRiyal * budgetPctOfMargin,
+  };
+}
+
 // ---------------- أدوات تنسيق ----------------
 const ar = "ar-SA";
 export const fmtInt = (n: number) =>
