@@ -11,8 +11,14 @@ from openpyxl.workbook.protection import WorkbookProtection
 PWD = "darb2026"
 MONTHS = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"]
 
-NAVY="1F3864"; BLUE="2E5496"; STEEL="8EAADB"; GREEN_IN="C6EFCE"; GREY="F2F2F2"
-AXIS="D9E1F2"; GOLD="FFE699"; WHITE="FFFFFF"; RED_IN="F8CBAD"
+# ===== هوية درب: برتقالي + رمادي + أبيض =====
+ORANGE="F47A21"          # برتقالي درب (لون التميّز)
+ORANGE_LT="FDE3D1"       # برتقالي فاتح للتنبيهات
+NAVY="58595B"            # رمادي داكن (العناوين الرئيسية)
+BLUE="808285"            # رمادي درب (العناوين الفرعية)
+STEEL="A7A9AC"           # رمادي فاتح (رؤوس الجداول)
+AXIS="E6E7E8"            # رمادي فاتح جداً
+GREEN_IN="C6EFCE"; GREY="F2F2F2"; GOLD=ORANGE_LT; WHITE="FFFFFF"; RED_IN="F8CBAD"
 thin=Side(style="thin", color="BFBFBF"); BORDER=Border(left=thin,right=thin,top=thin,bottom=thin)
 def font(sz=11,b=False,color="000000"): return Font(name="Arial",size=sz,bold=b,color=color)
 def fill(c): return PatternFill("solid",fgColor=c)
@@ -48,6 +54,8 @@ wb=Workbook()
 # ===================== 1) دليل الاستخدام =====================
 ws=wb.active; ws.title="دليل الاستخدام"; ws.sheet_view.showGridLines=False
 ws.column_dimensions["A"].width=3; ws.column_dimensions["B"].width=110
+style_cell(ws["B1"],value="درب  ·  Darb",f=font(22,True,ORANGE),align=right(False),border=False)
+ws.row_dimensions[1].height=30
 style_cell(ws["B2"],value="درب · المنظومة الاستراتيجية لمؤشرات الأداء 2026 — قطاع المحطات والعقار",
            f=font(17,True,NAVY),align=right(False),border=False)
 guide=[("",""),
@@ -289,8 +297,8 @@ def build_kpi_sheet(name, title, records, tagged=True):
     ws.merge_cells(start_row=TOT,start_column=2,end_row=TOT,end_column=27)
     style_cell(ws.cell(TOT,2,"الإجمالي الموزون للإدارة"),f=font(11,True,WHITE),fillc=NAVY,align=center())
     style_cell(ws.cell(TOT,1,""),fillc=NAVY)
-    style_cell(ws.cell(TOT,28,f"=SUM(AB{START}:AB{END})"),f=font(11,True,"FFFF00"),fillc=NAVY,fmt="0%",align=center())
-    style_cell(ws.cell(TOT,29,f"=SUM(AC{START}:AC{END})"),f=font(12,True,"FFFF00"),fillc=NAVY,fmt="0%",align=center())
+    style_cell(ws.cell(TOT,28,f"=SUM(AB{START}:AB{END})"),f=font(11,True,"F47A21"),fillc=NAVY,fmt="0%",align=center())
+    style_cell(ws.cell(TOT,29,f"=SUM(AC{START}:AC{END})"),f=font(12,True,"F47A21"),fillc=NAVY,fmt="0%",align=center())
     protect(ws)
     return START,END
 
@@ -451,7 +459,7 @@ def eval_form(sheet,role,code,rows):
     style_cell(ws.cell(rr,3,f"=SUM(C{first}:C{last})"),f=font(11,True,WHITE),fillc=NAVY,fmt="0%",align=center())
     style_cell(ws.cell(rr,4,""),fillc=NAVY)
     style_cell(ws.cell(rr,5,"الدرجة:"),f=font(11,True,WHITE),fillc=NAVY,align=center())
-    style_cell(ws.cell(rr,6,f"=SUM(F{first}:F{last})"),f=font(13,True,"FFFF00"),fillc=NAVY,fmt="0%",align=center())
+    style_cell(ws.cell(rr,6,f"=SUM(F{first}:F{last})"),f=font(13,True,"F47A21"),fillc=NAVY,fmt="0%",align=center())
     tc=f"F{rr}"; style_cell(ws.cell(rr,1,""),fillc=NAVY); style_cell(ws.cell(rr,7,""),fillc=NAVY); rr+=1
     style_cell(ws.cell(rr,2,"التقدير"),f=font(11,True,WHITE),fillc=BLUE,align=center())
     style_cell(ws.cell(rr,3,f'=IF({tc}>=0.9,"ممتاز",IF({tc}>=0.8,"جيد جداً",IF({tc}>=0.7,"جيد",IF({tc}>=0.6,"مقبول","ضعيف"))))'),f=font(11,True,NAVY),align=center()); ws.merge_cells(start_row=rr,start_column=3,end_row=rr,end_column=4); rr+=2
@@ -557,8 +565,8 @@ ws.merge_cells("B2:H2")
 style_cell(ws["B2"],value="المؤشرات الحيوية — النجمة الشمالية والمؤشرات الاستراتيجية القليلة",f=font(17,True,WHITE),fillc=NAVY,align=center(False),border=False)
 ws.row_dimensions[2].height=34
 # النجمة الشمالية
-ws.merge_cells("B4:D4"); style_cell(ws["B4"],value="🌟 النجمة الشمالية — إجمالي مبيعات الوقود (لتر)",f=font(12,True,WHITE),fillc="538135",align=center())
-ws.merge_cells("B5:C6"); style_cell(ws["B5"],value=f"='{SH_F}'!U6",f=font(26,True,"538135"),fmt="#,##0",align=center())
+ws.merge_cells("B4:D4"); style_cell(ws["B4"],value="🌟 النجمة الشمالية — إجمالي مبيعات الوقود (لتر)",f=font(12,True,WHITE),fillc=ORANGE,align=center())
+ws.merge_cells("B5:C6"); style_cell(ws["B5"],value=f"='{SH_F}'!U6",f=font(26,True,ORANGE),fmt="#,##0",align=center())
 style_cell(ws["D5"],value="المستهدف 2026",f=font(10,True),align=center())
 style_cell(ws["D6"],value=f"='{SH_F}'!H6",f=font(12,True,NAVY),align=center())
 ws.merge_cells("E4:H4"); style_cell(ws["E4"],value="نسبة تحقيق النجمة الشمالية",f=font(12,True,WHITE),fillc=BLUE,align=center())
