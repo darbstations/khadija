@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ScenarioProvider } from "./context/ScenarioContext";
 import { DarbLogo } from "./components/DarbLogo";
+import ExecutivePresentation from "./components/ExecutivePresentation";
 import ScenarioPanel from "./components/ScenarioPanel";
 import ExecutiveSummary from "./components/ExecutiveSummary";
 import CustomerSimulator from "./components/CustomerSimulator";
@@ -19,6 +20,7 @@ import TenantTool from "./components/TenantTool";
 import HowItWorks from "./components/HowItWorks";
 
 const TABS = [
+  { id: "presentation", label: "العرض التنفيذي", icon: "📑", el: <ExecutivePresentation /> },
   { id: "summary", label: "الملخص التنفيذي", icon: "📊", el: <ExecutiveSummary /> },
   { id: "scenarios", label: "السيناريوهات", icon: "⚙️", el: <ScenarioPanel /> },
   { id: "simulator", label: "محاكي العميل", icon: "🎮", el: <CustomerSimulator /> },
@@ -38,7 +40,7 @@ const TABS = [
 ];
 
 export default function App() {
-  const [active, setActive] = useState("summary");
+  const [active, setActive] = useState("presentation");
   const current = TABS.find((t) => t.id === active) ?? TABS[0];
 
   return (

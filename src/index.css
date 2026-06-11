@@ -59,3 +59,19 @@ input[type="number"] {
     @apply text-right px-3 py-2 border-b border-darb-line/60 text-sm;
   }
 }
+
+@media print {
+  body {
+    background: #fff;
+    color: #111;
+  }
+  header,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+  .card {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}
