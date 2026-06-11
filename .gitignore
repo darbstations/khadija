@@ -1,0 +1,6 @@
+# مخرجات مُولّدة
+preview/
+*.db
+__pycache__/
+*.pyc
+.venv/
