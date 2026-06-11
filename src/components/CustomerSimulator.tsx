@@ -7,7 +7,14 @@ import { Card, Stat, Bar, Badge } from "./ui";
 export default function CustomerSimulator() {
   const { inputs } = useScenario();
   const [monthly, setMonthly] = useState(600);
+  const [tenantMonthly, setTenantMonthly] = useState(200);
   const r = simulateCustomer(inputs, monthly);
+
+  // كسب العميل من المستأجرين (ممول من المستأجر)
+  const tenantPointsYear = tenantMonthly * 12 * inputs.earnPartner;
+  const tenantValue = tenantPointsYear / inputs.pointValue;
+  const totalPointsYear = r.pointsPerYear + tenantPointsYear;
+  const totalValue = r.valueRiyal + tenantValue;
 
   return (
     <div className="space-y-4">
@@ -19,29 +26,82 @@ export default function CustomerSimulator() {
       </div>
 
       <Card>
-        <div className="flex flex-wrap items-end gap-4">
-          <label className="block grow min-w-[220px]">
-            <span className="text-xs font-bold text-darb-ink">
-              💰 الإنفاق الشهري على الوقود (ريال)
-            </span>
+        <div className="grid sm:grid-cols-2 gap-5">
+          <div className="flex flex-wrap items-end gap-3">
+            <label className="block grow min-w-[180px]">
+              <span className="text-xs font-bold text-darb-ink">
+                💰 الإنفاق الشهري على الوقود (ريال)
+              </span>
+              <input
+                type="range"
+                min={100}
+                max={10000}
+                step={100}
+                value={monthly}
+                onChange={(e) => setMonthly(parseInt(e.target.value))}
+                className="w-full mt-2 accent-darb-orange"
+              />
+            </label>
             <input
-              type="range"
-              min={100}
-              max={10000}
-              step={100}
+              type="number"
               value={monthly}
-              onChange={(e) => setMonthly(parseInt(e.target.value))}
-              className="w-full mt-2 accent-darb-orange"
+              onChange={(e) => setMonthly(parseFloat(e.target.value) || 0)}
+              className="w-24 bg-darb-yellow/10 border border-darb-yellow/40 rounded-lg px-3 py-2 font-bold text-left"
+              dir="ltr"
             />
-          </label>
-          <input
-            type="number"
-            value={monthly}
-            onChange={(e) => setMonthly(parseFloat(e.target.value) || 0)}
-            className="w-28 bg-darb-yellow/10 border border-darb-yellow/40 rounded-lg px-3 py-2 font-bold text-left"
-            dir="ltr"
+          </div>
+          <div className="flex flex-wrap items-end gap-3">
+            <label className="block grow min-w-[180px]">
+              <span className="text-xs font-bold text-darb-ink">
+                🛍️ الإنفاق الشهري عند المستأجرين (ريال)
+              </span>
+              <input
+                type="range"
+                min={0}
+                max={5000}
+                step={50}
+                value={tenantMonthly}
+                onChange={(e) => setTenantMonthly(parseInt(e.target.value))}
+                className="w-full mt-2 accent-darb-accent"
+              />
+            </label>
+            <input
+              type="number"
+              value={tenantMonthly}
+              onChange={(e) => setTenantMonthly(parseFloat(e.target.value) || 0)}
+              className="w-24 bg-darb-yellow/10 border border-darb-yellow/40 rounded-lg px-3 py-2 font-bold text-left"
+              dir="ltr"
+            />
+          </div>
+        </div>
+      </Card>
+
+      <Card title="💎 إجمالي النقاط من كل المصادر" subtitle="الوقود (تموّله درب) + المستأجرون (يموّلهم الشريك)">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <Stat
+            label="⛽ نقاط الوقود/سنة"
+            value={fmtInt(r.pointsPerYear)}
+            hint={`${fmtSar(r.valueRiyal)} · تكلفة درب`}
+            tone="warn"
+          />
+          <Stat
+            label="🛍️ نقاط المستأجرين/سنة"
+            value={fmtInt(tenantPointsYear)}
+            hint={`${fmtSar(tenantValue)} · ممولة من الشريك`}
+            tone="good"
+          />
+          <Stat label="💎 إجمالي النقاط/سنة" value={fmtInt(totalPointsYear)} tone="accent" />
+          <Stat
+            label="💰 قيمتها الكلية"
+            value={fmtSar(totalValue)}
+            hint={`+ هدية ترحيب ${fmtInt(inputs.welcomeGift)} نقطة`}
+            tone="accent"
           />
         </div>
+        <p className="text-xs text-darb-mut mt-3">
+          💡 العميل يشعر أنه كسب <b>{fmtSar(totalValue)}</b> سنوياً، لكن درب تدفع فقط حصة الوقود
+          ({fmtSar(r.valueRiyal)}) — والباقي يموّله المستأجرون.
+        </p>
       </Card>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">

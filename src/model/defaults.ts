@@ -136,6 +136,58 @@ export const OBJECTIONS = [
   { q: "لا نثق في حماية بياناتنا", a: "درب ملتزمة بنظام حماية البيانات السعودي (PDPL). لن نشارك أي بيانات حساسة. تستطيع مراجعة العقد قبل التوقيع.", data: "PDPL Compliant · عقد قانوني · مراجعة كاملة" },
 ];
 
+/** أنواع الوقود وأسعارها (يونيو 2026) */
+export const FUEL_TYPES = [
+  { key: "p95", label: "بنزين 95", price: 2.33, margin: 13 },
+  { key: "p91", label: "بنزين 91", price: 2.18, margin: 13 },
+  { key: "diesel", label: "ديزل", price: 1.79, margin: 4 },
+];
+
+/** عيّنة محطات لقاعدة «محطاتي» */
+export const STATION_SAMPLES = [
+  { name: "محطة العليا", city: "الرياض", fuel: "p95", margin: 13, liters: 95000 },
+  { name: "محطة التحلية", city: "جدة", fuel: "p95", margin: 11, liters: 82000 },
+  { name: "محطة الكورنيش", city: "الدمام", fuel: "p91", margin: 12, liters: 88000 },
+  { name: "محطة الطريق السريع", city: "الرياض", fuel: "diesel", margin: 4, liters: 120000 },
+  { name: "محطة الامتياز - أبها", city: "أبها", fuel: "p95", margin: 6, liters: 68000 },
+];
+
+/** قنوات الاستبدال — لكل قناة تكلفة مختلفة على درب */
+export const REDEMPTION_CHANNELS = [
+  {
+    key: "fuel",
+    label: "⛽ خصم بنزين",
+    defaultMix: 0.3,
+    darbCostFactor: 1.0, // خصم مباشر من هامش الوقود الرفيع
+    fundedBy: "درب",
+    note: "خصم مباشر من هامش الوقود — الأغلى على درب",
+  },
+  {
+    key: "tenant",
+    label: "🛍️ عروض وخصومات المستأجرين",
+    defaultMix: 0.35,
+    darbCostFactor: 0.0, // ممولة من المستأجر
+    fundedBy: "المستأجر",
+    note: "يموّلها المستأجر من هامشه العالي — الأرخص والأعلى قيمة",
+  },
+  {
+    key: "external",
+    label: "🎁 شركات خارجية (جرير/أمازون/الفرسان)",
+    defaultMix: 0.2,
+    darbCostFactor: 0.97, // شراء القسائم بخصم جملة ~3%
+    fundedBy: "درب (بخصم جملة)",
+    note: "درب تشتري القسائم بخصم جملة بسيط · تنوّع وجاذبية",
+  },
+  {
+    key: "recharge",
+    label: "📱 كرت شحن",
+    defaultMix: 0.15,
+    darbCostFactor: 0.95, // عمولة المشغّل ~5%
+    fundedBy: "درب (بعمولة المشغّل)",
+    note: "عمولة شركة الاتصالات ~5% · مكافأة سائلة ومحبوبة",
+  },
+];
+
 /** سيناريوهات ثابتة للمقارنة (ورقة مقارنة السيناريوهات) */
 export const COMPARISON_SCENARIOS = [
   { key: "sasco", label: "🔴 ساسكو", pv: 100, w: 0.43, s: 0.43, o: 0.43, cost: 0.43 },

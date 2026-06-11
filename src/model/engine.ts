@@ -377,6 +377,29 @@ export function stationPointCalc(opts: {
   };
 }
 
+/** مزج قنوات الاستبدال → التكلفة المخلوطة على درب */
+export interface RedemptionChannelInput {
+  key: string;
+  label: string;
+  mix: number; // نسبة هذه القناة من إجمالي الاستبدال
+  costFactor: number; // تكلفة درب لكل ريال مستبدل عبر هذه القناة
+  fundedBy: string;
+}
+
+export function redemptionBlend(totalValue: number, channels: RedemptionChannelInput[]) {
+  const rows = channels.map((c) => ({
+    ...c,
+    value: totalValue * c.mix,
+    darbCost: totalValue * c.mix * c.costFactor,
+  }));
+  const totalDarbCost = rows.reduce((a, r) => a + r.darbCost, 0);
+  const blendedFactor = totalValue ? totalDarbCost / totalValue : 0;
+  const allFuelCost = totalValue * 1.0; // لو كل الاستبدال خصم بنزين
+  const savings = allFuelCost - totalDarbCost;
+  const mixSum = channels.reduce((a, c) => a + c.mix, 0);
+  return { rows, totalDarbCost, blendedFactor, savings, allFuelCost, mixSum };
+}
+
 // ---------------- أدوات تنسيق ----------------
 const ar = "ar-SA";
 export const fmtInt = (n: number) =>
