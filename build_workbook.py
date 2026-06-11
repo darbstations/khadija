@@ -8,6 +8,7 @@ from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.workbook.protection import WorkbookProtection
 from openpyxl.drawing.image import Image as XLImage
+from openpyxl.chart import BarChart, Reference
 LOGO="assets/darb_logo.png"; LOGO_RATIO=3.83
 def add_logo(name, w=200, anchor="B1"):
     ws=wb[name]; img=XLImage(LOGO); img.width=w; img.height=int(w/LOGO_RATIO)
@@ -261,18 +262,25 @@ EXEC=[  # بطاقة أداء الإدارة التنفيذية — مؤشرات
 LEAD_KW=["عدد","زيارات","فرص","تحويل","مبيعات","نمو","LEADS","تنزيلات","تدريب","طلب","حملات","استقطاب"]
 def classify(nm):
     return "🔵 قائد" if any(k in nm for k in LEAD_KW) else "🟣 لاحق"
+PERSP=[("مالي",["إيراد","تحصيل","ربح","هامش","مستحق","دوران رأس","تكلفة","عائد","قيمة عقد","استرداد","مبيعات","سداد"]),
+ ("التعلّم والنمو",["تدريب","موظف","استبقاء","eNPS","سعودة","هوية","تطوير","مشاريع جديد","تحول","أتمتة","رقمي","تنزيل","MAU","مستخدم","الشراكات"]),
+ ("العملاء",["عميل","عملاء","رضا","شكاو","قوقل","CSAT","مستأجر","تجربة","وصول"])]
+def perspective(nm):
+    for p,kws in PERSP:
+        if any(k in nm for k in kws): return p
+    return "العمليات الداخلية"
 def build_kpi_sheet(name, title, records, tagged=True):
     ws=wb.create_sheet(name); ws.sheet_view.showGridLines=False
-    col_w=[4,20,40,10,8,9,12,16]+[9]*12+[12,12,14,16,22]+[12,10,9,14]+[13,13,11,15]
+    col_w=[4,20,40,10,8,9,12,16]+[9]*12+[12,12,14,16,22]+[12,10,9,14]+[13,13,11,15]+[18]
     for i,w in enumerate(col_w,1): ws.column_dimensions[get_column_letter(i)].width=w
-    last_col="AG"
+    last_col="AH"
     ws.merge_cells(f"A1:{last_col}1")
     style_cell(ws["A1"],value=title,f=font(15,True,WHITE),fillc=NAVY,align=center(False),border=False)
     ws.row_dimensions[1].height=30
     ws.merge_cells(f"A2:{last_col}2")
     style_cell(ws["A2"],value="🟩 الأخضر = إدخال (الأرقام الشهرية + خط الأساس + الوزن)  ·  🔵 قائد/🟣 لاحق  ·  الدرجة الموزونة والحالة تلقائية",
                f=font(10,False,NAVY),fillc=GOLD,align=center(False),border=False)
-    header=["#","المحور","المؤشر","الوحدة","القطبية","التجميع","المستهدف","نص المستهدف"]+MONTHS+["YTD","نسبة التحقيق","الحالة","الركيزة (5س)","المشروع (الخارطة)","خط الأساس 2025","النوع","الوزن %","الدرجة الموزونة","الخطة حتى تاريخه","التنبؤ السنوي","الانحراف","مؤشر استشرافي"]
+    header=["#","المحور","المؤشر","الوحدة","القطبية","التجميع","المستهدف","نص المستهدف"]+MONTHS+["YTD","نسبة التحقيق","الحالة","الركيزة (5س)","المشروع (الخارطة)","خط الأساس 2025","النوع","الوزن %","الدرجة الموزونة","الخطة حتى تاريخه","التنبؤ السنوي","الانحراف","مؤشر استشرافي","منظور BSC"]
     for c,h in enumerate(header,1): style_cell(ws.cell(3,c,h),f=font(10,True,WHITE),fillc=BLUE,align=center())
     ws.row_dimensions[3].height=34; ws.freeze_panes="I4"
     dv=DataValidation(type="decimal",operator="greaterThanOrEqual",formula1="0",allow_blank=True)
@@ -321,6 +329,7 @@ def build_kpi_sheet(name, title, records, tagged=True):
             f'IF($E{r}="↓",IF($AE{r}<=$G{r},"🟢 على المسار",IF($AE{r}<=$G{r}*1.1,"🟡 متابعة","🔴 خطر")),'
             f'IF($AE{r}>=$G{r},"🟢 على المسار",IF($AE{r}>=$G{r}*0.85,"🟡 متابعة","🔴 خطر"))))')
         style_cell(ws.cell(r,33),f=font(10,True),align=center())
+        style_cell(ws.cell(r,34,perspective(nm)),f=font(9),align=center())
         ws.row_dimensions[r].height=26
     END=START+len(records)-1
     TOT=END+1
@@ -347,12 +356,12 @@ for dep,sh,title,recs in DEPTS:
 
 # ===================== قاعدة المؤشرات (تجميع موحّد) =====================
 cons=wb.create_sheet("قاعدة المؤشرات"); cons.sheet_view.showGridLines=False
-for i,w in enumerate([4,22,42,16,26,12,14],1): cons.column_dimensions[get_column_letter(i)].width=w
-cons.merge_cells("A1:G1")
+for i,w in enumerate([4,22,42,16,26,12,14,18],1): cons.column_dimensions[get_column_letter(i)].width=w
+cons.merge_cells("A1:H1")
 style_cell(cons["A1"],value="قاعدة المؤشرات الموحّدة — مصدر تغذية اللوحة والخارطة والركائز (آلي)",f=font(14,True,WHITE),fillc=NAVY,align=center(False),border=False)
-cons.merge_cells("A2:G2")
+cons.merge_cells("A2:H2")
 style_cell(cons["A2"],value="تُحدَّث آلياً من أوراق المؤشرات — لا تُعدَّل يدوياً",f=font(10,False,NAVY),fillc=GOLD,align=center(False),border=False)
-for c,h in enumerate(["#","الإدارة","المؤشر","الركيزة","المشروع","نسبة التحقيق","الحالة"],1):
+for c,h in enumerate(["#","الإدارة","المؤشر","الركيزة","المشروع","نسبة التحقيق","الحالة","منظور BSC"],1):
     style_cell(cons.cell(3,c,h),f=font(10,True,WHITE),fillc=BLUE,align=center())
 cr=4; seq=1
 for dep,sh,s,e in DEPT_RANGES:
@@ -364,6 +373,7 @@ for dep,sh,s,e in DEPT_RANGES:
         style_cell(cons.cell(cr,5,f"='{sh}'!Y{rr}"),f=font(9),align=right(True))
         style_cell(cons.cell(cr,6,f"='{sh}'!V{rr}"),f=font(9,True,NAVY),fmt="0%",align=center())
         style_cell(cons.cell(cr,7,f"='{sh}'!W{rr}"),f=font(9),align=center())
+        style_cell(cons.cell(cr,8,f"='{sh}'!AH{rr}"),f=font(9),align=center())
         cr+=1; seq+=1
 CEND=cr-1
 protect(cons)
@@ -372,6 +382,7 @@ CC=f"'قاعدة المؤشرات'!$D$4:$D${CEND}"   # الركيزة
 CD=f"'قاعدة المؤشرات'!$E$4:$E${CEND}"   # المشروع
 CV=f"'قاعدة المؤشرات'!$F$4:$F${CEND}"   # نسبة التحقيق
 CS=f"'قاعدة المؤشرات'!$G$4:$G${CEND}"   # الحالة
+CP=f"'قاعدة المؤشرات'!$H$4:$H${CEND}"   # منظور BSC
 
 # ===================== لوحة الإدارة التنفيذية =====================
 ws=wb.create_sheet("لوحة الإدارة التنفيذية"); ws.sheet_view.showGridLines=False
@@ -410,6 +421,20 @@ for i,(dep,sh,s,e) in enumerate(DEPT_RANGES):
     style_cell(ws.cell(r,2,dep),f=font(10),align=right())
     style_cell(ws.cell(r,3,f'=IFERROR(AVERAGEIFS({CV},{CB},"{dep}"),"—")'),f=font(10,True,NAVY),fmt="0%",align=center())
     style_cell(ws.cell(r,4,f'=IF(ISNUMBER(C{r}),IF(C{r}>=1,"✅ محقق",IF(C{r}>=0.85,"🟡 قريب","🔴 تحت الهدف")),"—")'),f=font(10,True),align=center())
+dep_last=dr+2+len(DEPT_RANGES)-1
+# رسوم بيانية بهوية درب
+ch1=BarChart(); ch1.type="col"; ch1.title="الأداء حسب الركائز"; ch1.height=6.5; ch1.width=11; ch1.legend=None
+ch1.add_data(Reference(ws,min_col=9,min_row=6,max_row=8)); ch1.set_categories(Reference(ws,min_col=8,min_row=6,max_row=8))
+ch1.y_axis.numFmt="0%"; ch1.y_axis.majorGridlines=None
+try: ch1.series[0].graphicalProperties.solidFill=ORANGE
+except Exception: pass
+ws.add_chart(ch1,"L4")
+ch2=BarChart(); ch2.type="bar"; ch2.title="الأداء حسب الإدارة"; ch2.height=7.5; ch2.width=11; ch2.legend=None
+ch2.add_data(Reference(ws,min_col=3,min_row=dr+2,max_row=dep_last)); ch2.set_categories(Reference(ws,min_col=2,min_row=dr+2,max_row=dep_last))
+ch2.x_axis.numFmt="0%"
+try: ch2.series[0].graphicalProperties.solidFill="808285"
+except Exception: pass
+ws.add_chart(ch2,"L18")
 protect(ws)
 
 # ===================== الخارطة التنفيذية =====================
@@ -712,8 +737,70 @@ for i in range(len(INIT)+6):  # 7 مبادرات بداية + 6 صفوف فار�
     ws.row_dimensions[r].height=26; r+=1
 protect(ws)
 
+# ===================== خريطة الاستراتيجية (BSC) =====================
+ws=wb.create_sheet("خريطة الاستراتيجية"); ws.sheet_view.showGridLines=False
+for i,w in enumerate([3,24,16,16,52],1): ws.column_dimensions[get_column_letter(i)].width=w
+ws.merge_cells("B2:E2"); style_cell(ws["B2"],value="خريطة الاستراتيجية — منظورات Balanced Scorecard",f=font(16,True,WHITE),fillc=NAVY,align=center(False),border=False)
+ws.row_dimensions[2].height=30
+ws.merge_cells("B3:E3"); style_cell(ws["B3"],value="سلسلة القيمة (سبب ← أثر):  التعلّم والنمو  →  العمليات الداخلية  →  العملاء  →  النتائج المالية",f=font(10,True,NAVY),fillc=GOLD,align=center(),border=False)
+for c,h in zip([2,3,4,5],["المنظور","الأداء (مباشر)","عدد المؤشرات","أبرز المؤشرات/الأهداف"]):
+    style_cell(ws.cell(4,c,h),f=font(11,True,WHITE),fillc=BLUE,align=center())
+PMAP=[("النتائج المالية","مالي","الإيرادات · التحصيل · الهامش · العائد على الاستثمار"),
+      ("العملاء","العملاء","CSAT · تقييم قوقل · رضا المستأجرين · حل الشكاوى"),
+      ("العمليات الداخلية","العمليات الداخلية","الجاهزية · السلامة · الجودة · الزيارات · العقود"),
+      ("التعلّم والنمو","التعلّم والنمو","التدريب · الاستبقاء · الأتمتة · الهوية · المشاريع الجديدة")]
+for i,(label,key,examples) in enumerate(PMAP):
+    r=5+i
+    style_cell(ws.cell(r,2,label),f=font(12,True,WHITE),fillc=STEEL,align=center())
+    style_cell(ws.cell(r,3,f'=IFERROR(AVERAGEIFS({CV},{CP},"{key}"),"—")'),f=font(12,True,ORANGE),fmt="0%",align=center())
+    style_cell(ws.cell(r,4,f'=COUNTIF({CP},"{key}")'),f=font(11,True,NAVY),align=center())
+    style_cell(ws.cell(r,5,examples),f=font(10),align=right(True))
+    ws.row_dimensions[r].height=34
+ws.merge_cells("B10:E10"); style_cell(ws.cell(10,2,"⬆️ كل طبقة تُمكّن الطبقة التي فوقها — الاستثمار في التعلّم والعمليات يقود تجربة العميل ثم النتائج المالية."),f=font(10,False,"808080"),align=right())
+protect(ws)
+
+# ===================== فحص السلامة (QA / Health-Check) =====================
+ws=wb.create_sheet("فحص السلامة"); ws.sheet_view.showGridLines=False
+for i,w in enumerate([3,40,18,30],1): ws.column_dimensions[get_column_letter(i)].width=w
+ws.merge_cells("B2:D2"); style_cell(ws["B2"],value="فحص سلامة المنظومة — تكامل واتساق المؤشرات (آلي)",f=font(16,True,WHITE),fillc=NAVY,align=center(False),border=False)
+ws.row_dimensions[2].height=30
+r=4
+style_cell(ws.cell(r,2,"① ملخص عام"),f=font(12,True,WHITE),fillc=BLUE,align=right()); ws.merge_cells(start_row=r,start_column=2,end_row=r,end_column=4); r+=1
+for label,formula in [("إجمالي المؤشرات في القاعدة",f"={CEND}-3"),
+        ("✅ محقق",f'=COUNTIF({CS},"✅ محقق")'),("🟡 قريب",f'=COUNTIF({CS},"🟡 قريب")'),
+        ("🔴 تحت الهدف",f'=COUNTIF({CS},"🔴 تحت الهدف")'),("— بانتظار بيانات",f'=COUNTIF({CS},"—")')]:
+    style_cell(ws.cell(r,2,label),f=font(10),align=right()); style_cell(ws.cell(r,3,formula),f=font(10,True,NAVY),align=center()); r+=1
+r+=1
+style_cell(ws.cell(r,2,"② تكامل الأوزان لكل إدارة (يجب = 100%)"),f=font(12,True,WHITE),fillc=BLUE,align=right()); ws.merge_cells(start_row=r,start_column=2,end_row=r,end_column=4); r+=1
+for c,h in zip([2,3,4],["الإدارة","مجموع الأوزان","النتيجة"]): style_cell(ws.cell(r,c,h),f=font(10,True,WHITE),fillc=STEEL,align=center())
+r+=1
+for dep,sh,s,e in DEPT_RANGES:
+    wcell=f"'{sh}'!AB{e+1}"
+    style_cell(ws.cell(r,2,dep),f=font(10),align=right())
+    style_cell(ws.cell(r,3,f"={wcell}"),f=font(10,True),fmt="0%",align=center())
+    style_cell(ws.cell(r,4,f'=IF(ROUND({wcell},3)=1,"✅ سليم","⚠️ يحتاج ضبط")'),f=font(10,True),align=center()); r+=1
+r+=1
+style_cell(ws.cell(r,2,"③ اكتمال خطوط الأساس 2025 (المتبقّي بلا إدخال)"),f=font(12,True,WHITE),fillc=BLUE,align=right()); ws.merge_cells(start_row=r,start_column=2,end_row=r,end_column=4); r+=1
+for c,h in zip([2,3,4],["الإدارة","مؤشرات بلا خط أساس","النتيجة"]): style_cell(ws.cell(r,c,h),f=font(10,True,WHITE),fillc=STEEL,align=center())
+r+=1
+for dep,sh,s,e in DEPT_RANGES:
+    bc=f"COUNTBLANK('{sh}'!Z{s}:Z{e})"
+    style_cell(ws.cell(r,2,dep),f=font(10),align=right())
+    style_cell(ws.cell(r,3,f"={bc}"),f=font(10,True,NAVY),align=center())
+    style_cell(ws.cell(r,4,f'=IF({bc}=0,"✅ مكتمل","⏳ "&{bc}&" بانتظار")'),f=font(10),align=center()); r+=1
+r+=1
+style_cell(ws.cell(r,2,"④ تغطية مشاريع الخارطة بالمؤشرات"),f=font(12,True,WHITE),fillc=BLUE,align=right()); ws.merge_cells(start_row=r,start_column=2,end_row=r,end_column=4); r+=1
+for c,h in zip([2,3,4],["المشروع","عدد المؤشرات","النتيجة"]): style_cell(ws.cell(r,c,h),f=font(10,True,WHITE),fillc=STEEL,align=center())
+r+=1
+for proj in [P_GROW1,P_FRAN,P_REACH,P_NEW,P_DESIGN,P_TECH,P_SAHAT,P_TANKI,P_CX,P_QUAL,P_LEASE,P_PEOPLE]:
+    cnt=f'COUNTIF({CD},"{proj}")'
+    style_cell(ws.cell(r,2,proj),f=font(10),align=right())
+    style_cell(ws.cell(r,3,f"={cnt}"),f=font(10,True,NAVY),align=center())
+    style_cell(ws.cell(r,4,f'=IF({cnt}=0,"🔴 فجوة — بلا مؤشر","✅ مغطّى")'),f=font(10,True),align=center()); r+=1
+protect(ws)
+
 # ===================== ترتيب الأوراق =====================
-order=["دليل الاستخدام","الاستراتيجية","المؤشرات الحيوية","الخارطة التنفيذية","لوحة الإدارة التنفيذية","سجل المبادرات","الحوكمة",
+order=["دليل الاستخدام","الاستراتيجية","المؤشرات الحيوية","خريطة الاستراتيجية","الخارطة التنفيذية","لوحة الإدارة التنفيذية","سجل المبادرات","الحوكمة","فحص السلامة",
  "الإدارة التنفيذية · المؤشرات",
  "الامتياز · المؤشرات","الامتياز · الموظفون","الامتياز · مدير الإدارة","الامتياز · مسؤول الامتياز",
  "الامتياز · المراقب الميداني","الامتياز · مسؤول التعاقدات","الامتياز · الموظف الإداري",
