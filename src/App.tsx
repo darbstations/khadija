@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ScenarioProvider } from "./context/ScenarioContext";
+import { DarbLogo } from "./components/DarbLogo";
 import ScenarioPanel from "./components/ScenarioPanel";
 import ExecutiveSummary from "./components/ExecutiveSummary";
 import CustomerSimulator from "./components/CustomerSimulator";
@@ -46,12 +47,10 @@ export default function App() {
         <header className="sticky top-0 z-20 backdrop-blur bg-darb-bg/80 border-b border-darb-line">
           <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-darb-orange to-darb-accent grid place-items-center font-extrabold text-darb-bg">
-                ت
-              </div>
-              <div>
-                <h1 className="text-base font-extrabold leading-none">
-                  تانكي · درب
+              <DarbLogo className="h-10 w-auto" />
+              <div className="border-r border-darb-line pr-3">
+                <h1 className="text-base font-extrabold leading-none text-darb-orange">
+                  تانكي
                 </h1>
                 <p className="text-[11px] text-darb-mut mt-0.5">
                   النموذج المالي التفاعلي · 2026

@@ -234,6 +234,65 @@ def main() -> None:
     for col, w in {"A": 38, "B": 22, "C": 12, "D": 16, "E": 18, "F": 16}.items():
         R.column_dimensions[col].width = w
 
+    # 6.6) ورقة «نموذج المحفظة» — Escrow بمعادلات حقيقية
+    if "نموذج المحفظة" in wb.sheetnames:
+        del wb["نموذج المحفظة"]
+    W = wb.create_sheet("نموذج المحفظة")
+    W.sheet_view.rightToLeft = True
+
+    def wput(coord, value, bold=False, fill=None, fmt=None):
+        c = W[coord]
+        c.value = value
+        c.alignment = RTL
+        c.font = Font(bold=bold, color="FFE8EEFC")
+        if fill:
+            c.fill = fill
+        if fmt:
+            c.number_format = fmt
+        return c
+
+    wput("A1", "درب · نموذج المحفظة المموّلة بالكامل (Escrow) — معادلات حيّة", bold=True)
+    wput("A2", "كل مُصدِر يودع نسبته على مبيعاته هو · النقاط واجهة فوق محفظة بالريال")
+
+    wput("A4", "📥 تغذية المحفظة", bold=True, fill=HEADER)
+    for j, h in enumerate(["المصدر", "قيمة الشراء (﷼)", "نسبة الإيداع %", "المودَع (﷼)"]):
+        c = W.cell(5, j + 1, h); c.font = Font(bold=True, color="FFE8EEFC"); c.fill = HEADER; c.alignment = RTL
+    sources = [("⛽ بنزين (درب)", 600, 0.5), ("☕ كافيه", 200, 4), ("🍔 مطعم", 150, 3), ("🛒 سوبرماركت", 400, 1)]
+    f0 = 6
+    for i, (label, amount, rate) in enumerate(sources):
+        r = f0 + i
+        wput(f"A{r}", label)
+        wput(f"B{r}", amount, fill=YELLOW, fmt="#,##0")
+        wput(f"C{r}", rate, fill=YELLOW, fmt="0.0")
+        wput(f"D{r}", f"=B{r}*C{r}/100", bold=True, fmt="#,##0.00")
+    fn = f0 + len(sources)  # صف الإجمالي
+    wput(f"A{fn}", "📊 إجمالي التغذية", bold=True)
+    wput(f"D{fn}", f"=SUM(D{f0}:D{fn-1})", bold=True, fmt="#,##0.00")
+
+    wput(f"A{fn+2}", "رصيد المحفظة (﷼)", bold=True)
+    wput(f"C{fn+2}", f"=D{fn}", bold=True, fmt="#,##0.00")
+    wput(f"A{fn+3}", "يُعرض للعميل كنقاط")
+    wput(f"C{fn+3}", f"=C{fn+2}*السيناريوهات!C6", bold=True, fmt="#,##0")
+
+    rd = fn + 5
+    wput(f"A{rd}", "🔁 محاكاة استبدال", bold=True, fill=HEADER)
+    wput(f"A{rd+1}", "يُسحب من المحفظة (﷼)"); wput(f"C{rd+1}", 10, fill=YELLOW, fmt="#,##0.00")
+    wput(f"A{rd+2}", "يضيف التاجر تنافساً (﷼)"); wput(f"C{rd+2}", 3, fill=YELLOW, fmt="#,##0.00")
+    wput(f"A{rd+3}", "يحصل العميل (﷼)"); wput(f"C{rd+3}", f"=C{rd+1}+C{rd+2}", bold=True, fmt="#,##0.00")
+    wput(f"A{rd+4}", "القيمة لكل ريال مسحوب"); wput(f"C{rd+4}", f"=C{rd+3}/C{rd+1}", bold=True, fmt="0.00")
+    wput(f"A{rd+5}", "الرصيد بعد الاستبدال (﷼)"); wput(f"C{rd+5}", f"=C{fn+2}-C{rd+1}", bold=True, fmt="#,##0.00")
+
+    bk = rd + 7
+    wput(f"A{bk}", "🕳️ الأموال الخاملة (Breakage)", bold=True, fill=HEADER)
+    wput(f"A{bk+1}", "نسبة الخمول %"); wput(f"C{bk+1}", 12, fill=YELLOW, fmt="0")
+    wput(f"A{bk+2}", "مدة الصلاحية (شهر)"); wput(f"C{bk+2}", 24, fill=YELLOW, fmt="0")
+    wput(f"A{bk+3}", "المتوقع خامل (﷼)"); wput(f"C{bk+3}", f"=C{fn+2}*C{bk+1}/100", bold=True, fmt="#,##0.00")
+    wput(f"A{bk+4}", "المتوقع استبداله فعلاً (﷼)"); wput(f"C{bk+4}", f"=C{fn+2}-C{bk+3}", bold=True, fmt="#,##0.00")
+    wput(f"A{bk+6}", "🔒 النظام لا يخسر: كل ريال يُستبدل كان مودَعاً مسبقاً · لا أحد يموّل وعود غيره")
+
+    for col, w in {"A": 30, "B": 16, "C": 16, "D": 14}.items():
+        W.column_dimensions[col].width = w
+
     # 7) إعادة حساب كاملة عند الفتح
     try:
         wb.calculation.fullCalcOnLoad = True

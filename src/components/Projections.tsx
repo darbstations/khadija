@@ -44,21 +44,21 @@ export default function Projections() {
         <div style={{ width: "100%", height: 320 }}>
           <ResponsiveContainer>
             <BarChart data={data} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#23314f" />
-              <XAxis dataKey="year" tick={{ fill: "#94a3c4", fontSize: 12 }} />
-              <YAxis tick={{ fill: "#94a3c4", fontSize: 12 }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#3b3d41" />
+              <XAxis dataKey="year" tick={{ fill: "#9a9da2", fontSize: 12 }} />
+              <YAxis tick={{ fill: "#9a9da2", fontSize: 12 }} />
               <Tooltip
                 contentStyle={{
-                  background: "#16223c",
-                  border: "1px solid #23314f",
+                  background: "#2b2c2f",
+                  border: "1px solid #3b3d41",
                   borderRadius: 12,
-                  color: "#e8eefc",
+                  color: "#f4f5f6",
                 }}
               />
               <Legend wrapperStyle={{ fontSize: 12 }} />
-              <RBar dataKey="تشغيل" stackId="a" fill="#3dd6c4" radius={[0, 0, 0, 0]} />
-              <RBar dataKey="استثمار" stackId="a" fill="#6d8bd0" />
-              <RBar dataKey="امتياز" stackId="a" fill="#ff8a3d" radius={[6, 6, 0, 0]} />
+              <RBar dataKey="تشغيل" stackId="a" fill="#F18A2B" radius={[0, 0, 0, 0]} />
+              <RBar dataKey="استثمار" stackId="a" fill="#9a9da2" />
+              <RBar dataKey="امتياز" stackId="a" fill="#6D6E70" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

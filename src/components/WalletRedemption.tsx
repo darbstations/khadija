@@ -14,6 +14,8 @@ interface Offer {
   merchant: string;
   walletDraw: number; // ريال يُسحب من المحفظة
   customerValue: number; // القيمة التي يحصلها العميل عند التاجر
+  validityDays: number; // مدة صلاحية العرض
+  active: boolean; // نشط / منتهٍ
 }
 
 export default function WalletRedemption() {
@@ -25,13 +27,22 @@ export default function WalletRedemption() {
     { id: 4, source: "🛒 سوبرماركت", amount: 400, rate: 1 },
   ]);
   const [offers, setOffers] = useState<Offer[]>([
-    { id: 1, merchant: "⛽ درب (خصم بنزين)", walletDraw: 10, customerValue: 10 },
-    { id: 2, merchant: "☕ كافيه", walletDraw: 10, customerValue: 13 },
-    { id: 3, merchant: "🍔 مطعم", walletDraw: 10, customerValue: 12 },
-    { id: 4, merchant: "🎁 جرير (قسيمة)", walletDraw: 10, customerValue: 10.5 },
+    { id: 1, merchant: "⛽ درب (خصم بنزين)", walletDraw: 10, customerValue: 10, validityDays: 90, active: true },
+    { id: 2, merchant: "☕ كافيه", walletDraw: 10, customerValue: 13, validityDays: 30, active: true },
+    { id: 3, merchant: "🍔 مطعم", walletDraw: 10, customerValue: 12, validityDays: 14, active: true },
+    { id: 4, merchant: "🎁 جرير (قسيمة)", walletDraw: 10, customerValue: 10.5, validityDays: 30, active: true },
   ]);
   const [redeemed, setRedeemed] = useState(0); // إجمالي ما سُحب من المحفظة
   const [last, setLast] = useState<{ merchant: string; draw: number; bonus: number; value: number } | null>(null);
+
+  // إعدادات السوق والخمول
+  const [minMultiplier, setMinMultiplier] = useState(1.0); // الحد الأدنى لقيمة العرض (× من المسحوب)
+  const [breakageRate, setBreakageRate] = useState(12); // % نقاط لا تُستبدل
+  const [expiryMonths, setExpiryMonths] = useState(24); // مدة صلاحية المحفظة
+  const [breakagePolicy, setBreakagePolicy] = useState("درب");
+
+  const offerValid = (o: Offer) =>
+    o.active && o.walletDraw > 0 && o.customerValue / o.walletDraw >= minMultiplier;
 
   const funded = purchases.reduce((a, p) => a + (p.amount * p.rate) / 100, 0);
   const balance = funded - redeemed;
@@ -43,10 +54,11 @@ export default function WalletRedemption() {
     setOffers((o) => o.map((x) => (x.id === id ? { ...x, ...patch } : x)));
 
   const sortedOffers = [...offers].sort((a, b) => b.customerValue - a.customerValue);
-  const best = sortedOffers[0]?.id;
+  const best = sortedOffers.find((o) => offerValid(o))?.id;
+  const expectedBreakage = (balance * breakageRate) / 100;
 
   const doRedeem = (o: Offer) => {
-    if (o.walletDraw > balance) return;
+    if (o.walletDraw > balance || !offerValid(o)) return;
     setRedeemed((r) => r + o.walletDraw);
     setLast({ merchant: o.merchant, draw: o.walletDraw, bonus: o.customerValue - o.walletDraw, value: o.customerValue });
   };
@@ -119,6 +131,22 @@ export default function WalletRedemption() {
         title="🏷️ سوق عروض الاستبدال (مناقصة التجار)"
         subtitle="كل تاجر ينزل عرضاً يجذب محفظة العميل · يتنافسون على القيمة"
       >
+        <div className="flex items-center gap-3 flex-wrap mb-3 stat">
+          <span className="text-xs font-bold text-darb-ink">الحد الأدنى لقيمة العرض:</span>
+          <input
+            type="range"
+            min={0.8}
+            max={1.5}
+            step={0.05}
+            value={minMultiplier}
+            onChange={(e) => setMinMultiplier(parseFloat(e.target.value))}
+            className="accent-darb-accent max-w-[180px]"
+          />
+          <Badge tone={minMultiplier >= 1 ? "good" : "warn"}>{fmtNum(minMultiplier, 2)}x من المسحوب</Badge>
+          <span className="text-[11px] text-darb-mut">
+            أي عرض أقل من هذا الحد يُرفض تلقائياً (يمنع سباق التنازل المدمّر)
+          </span>
+        </div>
         {last && (
           <div className="stat mb-3 border-darb-accent/40">
             <div className="text-sm">
@@ -134,10 +162,12 @@ export default function WalletRedemption() {
             <thead>
               <tr>
                 <th className="th">التاجر</th>
-                <th className="th">يُسحب من المحفظة (﷼)</th>
+                <th className="th">يُسحب (﷼)</th>
                 <th className="th">يحصل العميل (﷼)</th>
-                <th className="th">يضيف التاجر (تنافس)</th>
+                <th className="th">يضيف التاجر</th>
                 <th className="th">القيمة/﷼</th>
+                <th className="th">مدة (يوم)</th>
+                <th className="th">نشط</th>
                 <th className="th"></th>
               </tr>
             </thead>
@@ -145,17 +175,21 @@ export default function WalletRedemption() {
               {sortedOffers.map((o) => {
                 const bonus = o.customerValue - o.walletDraw;
                 const mult = o.walletDraw ? o.customerValue / o.walletDraw : 0;
+                const valid = offerValid(o);
+                const rejected = o.active && !valid; // نشط لكن دون الحد الأدنى
                 return (
-                  <tr key={o.id} className={o.id === best ? "bg-darb-good/10" : ""}>
+                  <tr key={o.id} className={o.id === best ? "bg-darb-good/10" : !valid ? "opacity-50" : ""}>
                     <td className="td font-bold">
-                      {o.merchant} {o.id === best && <Badge tone="good">أفضل عرض</Badge>}
+                      {o.merchant}{" "}
+                      {o.id === best && <Badge tone="good">أفضل عرض</Badge>}
+                      {rejected && <Badge tone="bad">دون الحد الأدنى</Badge>}
                     </td>
                     <td className="td">
                       <input
                         type="number"
                         value={o.walletDraw}
                         onChange={(e) => updateO(o.id, { walletDraw: parseFloat(e.target.value) || 0 })}
-                        className="bg-darb-yellow/10 border border-darb-yellow/30 rounded px-2 py-1 w-20 text-left"
+                        className="bg-darb-yellow/10 border border-darb-yellow/30 rounded px-2 py-1 w-16 text-left"
                         dir="ltr"
                       />
                     </td>
@@ -165,7 +199,7 @@ export default function WalletRedemption() {
                         step={0.5}
                         value={o.customerValue}
                         onChange={(e) => updateO(o.id, { customerValue: parseFloat(e.target.value) || 0 })}
-                        className="bg-darb-yellow/10 border border-darb-yellow/30 rounded px-2 py-1 w-20 text-left"
+                        className="bg-darb-yellow/10 border border-darb-yellow/30 rounded px-2 py-1 w-16 text-left"
                         dir="ltr"
                       />
                     </td>
@@ -174,11 +208,28 @@ export default function WalletRedemption() {
                     </td>
                     <td className="td">{fmtNum(mult, 2)}x</td>
                     <td className="td">
+                      <input
+                        type="number"
+                        value={o.validityDays}
+                        onChange={(e) => updateO(o.id, { validityDays: parseInt(e.target.value) || 0 })}
+                        className="bg-darb-panel border border-darb-line rounded px-2 py-1 w-14 text-left"
+                        dir="ltr"
+                      />
+                    </td>
+                    <td className="td">
+                      <input
+                        type="checkbox"
+                        checked={o.active}
+                        onChange={(e) => updateO(o.id, { active: e.target.checked })}
+                        className="accent-darb-accent w-4 h-4"
+                      />
+                    </td>
+                    <td className="td">
                       <button
                         onClick={() => doRedeem(o)}
-                        disabled={o.walletDraw > balance}
+                        disabled={o.walletDraw > balance || !valid}
                         className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition ${
-                          o.walletDraw > balance
+                          o.walletDraw > balance || !valid
                             ? "border-darb-line text-darb-mut/40 cursor-not-allowed"
                             : "border-darb-accent text-darb-accent hover:bg-darb-accent/15"
                         }`}
@@ -209,6 +260,60 @@ export default function WalletRedemption() {
             </button>
           )}
         </div>
+      </Card>
+
+      <Card title="🕳️ الأموال الخاملة (Breakage)" subtitle="مبالغ في المحفظة لا تُستبدل خلال مدة الصلاحية">
+        <div className="grid sm:grid-cols-3 gap-4 mb-3">
+          <div>
+            <div className="flex items-center justify-between text-xs mb-1">
+              <span className="text-darb-mut">نسبة الخمول المتوقعة</span>
+              <b>{breakageRate}%</b>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={40}
+              step={1}
+              value={breakageRate}
+              onChange={(e) => setBreakageRate(parseInt(e.target.value))}
+              className="w-full accent-darb-accent"
+            />
+          </div>
+          <label className="block">
+            <span className="text-xs text-darb-mut">مدة صلاحية المحفظة (شهر)</span>
+            <input
+              type="number"
+              value={expiryMonths}
+              onChange={(e) => setExpiryMonths(parseInt(e.target.value) || 0)}
+              className="w-full mt-1 bg-darb-panel border border-darb-line rounded-lg px-3 py-2 font-bold text-left"
+              dir="ltr"
+            />
+          </label>
+          <label className="block">
+            <span className="text-xs text-darb-mut">المبالغ الخاملة تؤول إلى</span>
+            <select
+              value={breakagePolicy}
+              onChange={(e) => setBreakagePolicy(e.target.value)}
+              className="w-full mt-1 bg-darb-panel border border-darb-line rounded-lg px-3 py-2 font-bold"
+            >
+              <option value="درب">درب (إيراد)</option>
+              <option value="المُصدِر">تُعاد للمُصدِر</option>
+              <option value="تبرّع">تبرّع/مسؤولية مجتمعية</option>
+            </select>
+          </label>
+        </div>
+        <div className="grid sm:grid-cols-2 gap-3">
+          <Stat
+            label={`متوقع خامل من الرصيد الحالي (${breakageRate}%)`}
+            value={fmtSar(expectedBreakage, 2)}
+            hint={`يؤول إلى: ${breakagePolicy} بعد ${expiryMonths} شهر`}
+            tone="accent"
+          />
+          <Stat label="الرصيد المتوقع استبداله فعلاً" value={fmtSar(balance - expectedBreakage, 2)} tone="good" />
+        </div>
+        <p className="text-[11px] text-darb-mut mt-2">
+          ⚠️ الخمول مصدر دخل/أمان، لكن <b>لا تبنِ الربحية عليه</b> — مخاطرة ثقة وتنظيم. اجعله احتياطياً فقط.
+        </p>
       </Card>
 
       <Card>
