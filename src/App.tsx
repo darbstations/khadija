@@ -8,6 +8,7 @@ import StationCost from "./components/StationCost";
 import StationCalculator from "./components/StationCalculator";
 import StationsDB from "./components/StationsDB";
 import Redemption from "./components/Redemption";
+import WalletRedemption from "./components/WalletRedemption";
 import FranchiseCollection from "./components/FranchiseCollection";
 import Projections from "./components/Projections";
 import ScenarioCompare from "./components/ScenarioCompare";
@@ -21,6 +22,7 @@ const TABS = [
   { id: "scenarios", label: "السيناريوهات", icon: "⚙️", el: <ScenarioPanel /> },
   { id: "simulator", label: "محاكي العميل", icon: "🎮", el: <CustomerSimulator /> },
   { id: "redemption", label: "قنوات الاستبدال", icon: "🔁", el: <Redemption /> },
+  { id: "wallet", label: "المحفظة وسوق الاستبدال", icon: "👛", el: <WalletRedemption /> },
   { id: "tiers", label: "المستويات وقيمة النقطة", icon: "🎯", el: <TiersAndValue /> },
   { id: "extended", label: "الاقتصاد الموسّع", icon: "🆕", el: <ExtendedEconomics /> },
   { id: "stations", label: "تكلفة المحطات", icon: "🏗️", el: <StationCost /> },
