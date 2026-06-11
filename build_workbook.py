@@ -490,14 +490,14 @@ protect(ws)
 # ===================== نماذج تقييم الامتياز (5) =====================
 SCALE=[("ممتاز","90% – 100%","تجاوز المستهدف"),("جيد جداً","80% – 89%","حقق المستهدف تقريباً"),
        ("جيد","70% – 79%","حقق معظم المستهدفات"),("مقبول","60% – 69%","يحتاج تحسين"),("ضعيف","أقل من 60%","يحتاج خطة تطوير")]
-def eval_form(sheet,role,code,rows):
+def eval_form(sheet,role,code,rows,dept="الامتياز التجاري"):
     ws=wb.create_sheet(sheet); ws.sheet_view.showGridLines=False
     for i,w in enumerate([4,40,10,34,14,14,22],1): ws.column_dimensions[get_column_letter(i)].width=w
-    ws.merge_cells("A1:G1"); style_cell(ws["A1"],value=f"إدارة الامتياز التجاري · نموذج تقييم الأداء — {role}",f=font(14,True,WHITE),fillc=NAVY,align=center(False),border=False)
+    ws.merge_cells("A1:G1"); style_cell(ws["A1"],value=f"إدارة {dept} · نموذج تقييم الأداء — {role}",f=font(14,True,WHITE),fillc=NAVY,align=center(False),border=False)
     ws.row_dimensions[1].height=28
     ws.merge_cells("A2:G2"); style_cell(ws["A2"],value=f"الكود: {code}  ·  ربع سنوي  ·  🟩 أدخل «نسبة التحقيق» فقط — الدرجة تُحسب تلقائياً",f=font(10,False,NAVY),fillc=GOLD,align=center(False),border=False)
     rr=3
-    for a,b in [("اسم الموظف:","القسم: الامتياز التجاري"),("المدير المباشر:","الربع / السنة:"),("تاريخ التقييم:","حالة التقييم:")]:
+    for a,b in [("اسم الموظف:",f"القسم: {dept}"),("المدير المباشر:","الربع / السنة:"),("تاريخ التقييم:","حالة التقييم:")]:
         style_cell(ws.cell(rr,1,a),f=font(10,True),align=right())
         style_cell(ws.cell(rr,2,""),fillc=GREEN_IN,lock=False); ws.merge_cells(start_row=rr,start_column=2,end_row=rr,end_column=3)
         style_cell(ws.cell(rr,4,b),f=font(10,True),align=right())
@@ -737,6 +737,103 @@ for i in range(len(INIT)+6):  # 7 مبادرات بداية + 6 صفوف فار�
     ws.row_dimensions[r].height=26; r+=1
 protect(ws)
 
+# ===================== نماذج تقييم مدراء باقي الإدارات =====================
+eval_form("الاستثمار · مدير الإدارة","مدير إدارة الاستثمار","IM-01",[
+ ("عقود الاستثمار الجديدة (190)",20,"100%+ من المستهدف الربعي"),("نسبة المواقع ذات العائد المجدي",15,"≥ 80%"),
+ ("متوسط فترة استرداد رأس المال",10,"≤ 5 سنوات"),("التوسع الإقليمي (تغطية 13 منطقة)",15,"100%"),
+ ("متوسط مدة إغلاق عقد الاستثمار",10,"≤ أسبوع"),("اكتمال المستندات النظامية",10,"100%"),
+ ("رضا المستثمرين وشركاء الاستثمار",10,"≥ 80%"),("إنجاز التقارير الدورية",10,"100%")],dept="الاستثمار")
+eval_form("العقار · مدير الإدارة","مدير إدارة العقار","RM-01",[
+ ("نمو الإيرادات الإيجارية",15,"> 8% سنوياً"),("نسبة الإشغال",20,"≥ 60%"),("نسبة التحصيل",15,"> 95%"),
+ ("الوحدات المؤجَّرة شهرياً",15,"68 وحدة/شهر"),("نسبة تأجير ساحة درب",10,"≥ 80%"),
+ ("نسبة تجديد العقود",10,"100%"),("استدامة المستأجرين",10,"≥ 80%"),("رضا المستأجرين",5,"≥ 90%")],dept="العقار")
+eval_form("التقنية · مدير الإدارة","مدير إدارة التقنية الرقمية","DM-01",[
+ ("مستخدمو تطبيق تانكي (MAU)",20,"مستهدف تصاعدي"),("نسبة المعاملات الرقمية",15,"تصاعدي"),
+ ("نسبة الأتمتة على مستوى الشركة",20,"≥ 90%"),("جاهزية الأنظمة (Uptime)",15,"≥ 99.5%"),
+ ("متوسط زمن حل الأعطال",10,"≤ 4 ساعات"),("المشاريع التقنية المنجزة في الوقت",15,"≥ 90%"),
+ ("رضا المستخدمين عن الأنظمة",5,"≥ 4.5")],dept="التقنية الرقمية")
+eval_form("الموارد البشرية · مدير الإدارة","مدير إدارة الموارد البشرية","HM-01",[
+ ("معدل استبقاء الموظفين",20,"≥ 90%"),("معدل دوران الموظفين",15,"≤ 10%"),
+ ("متوسط ساعات التدريب لكل موظف",15,"≥ 40 ساعة"),("الموظفون المشمولون بخطة تطوير",15,"≥ 80%"),
+ ("مؤشر رضا الموظفين (eNPS)",15,"≥ 30"),("شغل الشواغر خلال 30 يوم",10,"≥ 85%"),
+ ("إنجاز تقييمات الأداء في موعدها",10,"100%")],dept="الموارد البشرية")
+
+# ===================== قاموس المؤشرات (KPI Dictionary) =====================
+ws=wb.create_sheet("قاموس المؤشرات"); ws.sheet_view.showGridLines=False
+dcols=[4,18,40,10,26,18,14,22,18,12,18]
+for i,w in enumerate(dcols,1): ws.column_dimensions[get_column_letter(i)].width=w
+ws.merge_cells("A1:K1"); style_cell(ws["A1"],value="قاموس المؤشرات — التعريف الموحّد لكل مؤشر",f=font(15,True,WHITE),fillc=NAVY,align=center(False),border=False)
+ws.row_dimensions[1].height=28
+ws.merge_cells("A2:K2"); style_cell(ws["A2"],value="مرجع التعريف: الوحدة · طريقة القياس · المستهدف · الركيزة · المشروع · المنظور · النوع · المالك",f=font(10,False,NAVY),fillc=GOLD,align=center(False),border=False)
+for c,h in enumerate(["#","الإدارة","المؤشر","الوحدة","طريقة القياس","المستهدف","الركيزة","المشروع","المنظور","النوع","المالك"],1):
+    style_cell(ws.cell(3,c,h),f=font(10,True,WHITE),fillc=BLUE,align=center())
+ws.row_dimensions[3].height=28
+AGGTXT={"SUM":"تجميعي (مجموع شهري)","AVG":"متوسط شهري","LAST":"تراكمي (آخر قيمة)"}
+r=4; seq=1
+for dep,sh,title,recs in DEPTS:
+    for (axis,nm,unit,pol,agg,tgt,ttxt,fmt,pillar,project) in recs:
+        style_cell(ws.cell(r,1,seq),f=font(9),align=center())
+        style_cell(ws.cell(r,2,dep),f=font(9),align=right())
+        style_cell(ws.cell(r,3,nm),f=font(9),align=right(True))
+        style_cell(ws.cell(r,4,unit),f=font(9),align=center())
+        style_cell(ws.cell(r,5,f"{AGGTXT.get(agg,agg)} · (الفعلي÷المستهدف)×100",),f=font(8),align=right(True))
+        style_cell(ws.cell(r,6,ttxt),f=font(9),align=center())
+        style_cell(ws.cell(r,7,pillar),f=font(9),align=center())
+        style_cell(ws.cell(r,8,project),f=font(9),align=right(True))
+        style_cell(ws.cell(r,9,perspective(nm)),f=font(9),align=center())
+        style_cell(ws.cell(r,10,classify(nm)),f=font(9),align=center())
+        style_cell(ws.cell(r,11),fillc=GREEN_IN,align=center(),lock=False)  # المالك — إدخال
+        ws.row_dimensions[r].height=22; r+=1; seq+=1
+protect(ws)
+
+# ===================== سجل المخاطر =====================
+ws=wb.create_sheet("سجل المخاطر"); ws.sheet_view.showGridLines=False
+for i,w in enumerate([4,38,22,12,12,14,34,18,14],1): ws.column_dimensions[get_column_letter(i)].width=w
+ws.merge_cells("A1:I1"); style_cell(ws["A1"],value="سجل المخاطر الاستراتيجية والتشغيلية",f=font(15,True,WHITE),fillc=NAVY,align=center(False),border=False)
+ws.row_dimensions[1].height=28
+ws.merge_cells("A2:I2"); style_cell(ws["A2"],value="🟩 إدخال  ·  الاحتمال/الأثر (1=منخفض 2=متوسط 3=مرتفع)  ·  درجة المخاطرة والمستوى تُحسبان تلقائياً",f=font(10,False,NAVY),fillc=GOLD,align=center(False),border=False)
+for c,h in enumerate(["#","الخطر","المشروع/المجال المتأثر","الاحتمال","الأثر","درجة المخاطرة","الاستجابة/التخفيف","المالك","المستوى"],1):
+    style_cell(ws.cell(3,c,h),f=font(10,True,WHITE),fillc=BLUE,align=center())
+ws.row_dimensions[3].height=28
+dv13=DataValidation(type="whole",operator="between",formula1="1",formula2="3",allow_blank=True); ws.add_data_validation(dv13)
+RISKS=[("تأخّر إطلاق/تبنّي تطبيق تانكي","الابتكار — تطبيق تانكي"),
+ ("ارتفاع دوران الموظفين ونقص الكوادر","الاستدامة — الموظفون"),
+ ("تقلّب هوامش/أسعار الوقود","النمو — المالية"),
+ ("عدم تحقيق مستهدف العقود الجديدة","النمو — الامتياز/الاستثمار"),
+ ("عدم استيفاء اشتراطات وزارة الطاقة","التوسع الإقليمي — الامتثال"),
+ ("حوادث سلامة أو انقطاع تشغيلي بالمحطات","الاستدامة — جودة التشغيل")]
+r=4
+for i in range(len(RISKS)+5):
+    style_cell(ws.cell(r,1,i+1),f=font(10,True),align=center())
+    a,b=RISKS[i] if i<len(RISKS) else ("","")
+    style_cell(ws.cell(r,2,a or None),fillc=GREEN_IN,align=right(True),lock=False)
+    style_cell(ws.cell(r,3,b or None),fillc=GREEN_IN,align=right(True),lock=False)
+    pc=ws.cell(r,4); style_cell(pc,fillc=GREEN_IN,align=center(),lock=False); dv13.add(pc)
+    ic=ws.cell(r,5); style_cell(ic,fillc=GREEN_IN,align=center(),lock=False); dv13.add(ic)
+    style_cell(ws.cell(r,6,f'=IF(OR(D{r}="",E{r}=""),"",D{r}*E{r})'),f=font(10,True,NAVY),align=center())
+    style_cell(ws.cell(r,7),fillc=GREEN_IN,align=right(True),lock=False)
+    style_cell(ws.cell(r,8),fillc=GREEN_IN,align=center(),lock=False)
+    style_cell(ws.cell(r,9,f'=IF(F{r}="","—",IF(F{r}>=6,"🔴 مرتفع",IF(F{r}>=3,"🟡 متوسط","🟢 منخفض")))'),f=font(10,True),align=center())
+    ws.row_dimensions[r].height=26; r+=1
+protect(ws)
+
+# ===================== سجل الإجراءات التصحيحية (PDCA) =====================
+ws=wb.create_sheet("سجل الإجراءات"); ws.sheet_view.showGridLines=False
+for i,w in enumerate([4,14,26,34,34,18,14,14],1): ws.column_dimensions[get_column_letter(i)].width=w
+ws.merge_cells("A1:H1"); style_cell(ws["A1"],value="سجل الإجراءات التصحيحية (PDCA) — متابعة الانحرافات",f=font(15,True,WHITE),fillc=NAVY,align=center(False),border=False)
+ws.row_dimensions[1].height=28
+ws.merge_cells("A2:H2"); style_cell(ws["A2"],value="🟩 لكل مؤشر/انحراف: السبب الجذري ← الإجراء ← المسؤول ← الموعد ← الحالة",f=font(10,False,NAVY),fillc=GOLD,align=center(False),border=False)
+for c,h in enumerate(["#","التاريخ","المؤشر/المجال","الملاحظة / السبب الجذري","الإجراء التصحيحي","المسؤول","الموعد","الحالة"],1):
+    style_cell(ws.cell(3,c,h),f=font(10,True,WHITE),fillc=BLUE,align=center())
+ws.row_dimensions[3].height=28
+dvst=DataValidation(type="list",formula1='"مفتوح,قيد التنفيذ,مكتمل,متأخر"',allow_blank=True); ws.add_data_validation(dvst)
+for i in range(12):
+    r=4+i; style_cell(ws.cell(r,1,i+1),f=font(10,True),align=center())
+    for c in (2,3,4,5,6,7): style_cell(ws.cell(r,c),fillc=GREEN_IN,align=right(True) if c in(3,4,5) else center(),lock=False)
+    sc=ws.cell(r,8); style_cell(sc,fillc=GREEN_IN,align=center(),lock=False); dvst.add(sc)
+    ws.row_dimensions[r].height=24
+protect(ws)
+
 # ===================== خريطة الاستراتيجية (BSC) =====================
 ws=wb.create_sheet("خريطة الاستراتيجية"); ws.sheet_view.showGridLines=False
 for i,w in enumerate([3,24,16,16,52],1): ws.column_dimensions[get_column_letter(i)].width=w
@@ -805,7 +902,9 @@ order=["دليل الاستخدام","الاستراتيجية","المؤشرا�
  "الامتياز · المؤشرات","الامتياز · الموظفون","الامتياز · مدير الإدارة","الامتياز · مسؤول الامتياز",
  "الامتياز · المراقب الميداني","الامتياز · مسؤول التعاقدات","الامتياز · الموظف الإداري",
  "التشغيل · المؤشرات","التشغيل · مدير المحطة","التشغيل · مشرف ميداني","التشغيل · عامل التعبئة",
- "الاستثمار · المؤشرات","العقار · المؤشرات","التقنية الرقمية · المؤشرات","الموارد البشرية · المؤشرات","قاعدة المؤشرات"]
+ "الاستثمار · المؤشرات","الاستثمار · مدير الإدارة","العقار · المؤشرات","العقار · مدير الإدارة",
+ "التقنية الرقمية · المؤشرات","التقنية · مدير الإدارة","الموارد البشرية · المؤشرات","الموارد البشرية · مدير الإدارة",
+ "قاموس المؤشرات","سجل المخاطر","سجل الإجراءات","قاعدة المؤشرات"]
 for idx,nm in enumerate(order):
     cur=wb.sheetnames.index(nm); wb.move_sheet(nm, idx-cur)
 
