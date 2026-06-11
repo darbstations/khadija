@@ -16,6 +16,7 @@ def add_logo(name, w=200, anchor="B1"):
     ws.row_dimensions[1].height=max(cur, int(img.height*0.78)+6)
 
 PWD = "darb2026"
+NREF="'لوحة الإدارة التنفيذية'!$P$2"   # عدد الأشهر المكتملة (شهر التقرير) — للتنبؤ والانحراف
 MONTHS = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"]
 
 # ===== هوية درب: برتقالي + رمادي + أبيض =====
@@ -262,16 +263,16 @@ def classify(nm):
     return "🔵 قائد" if any(k in nm for k in LEAD_KW) else "🟣 لاحق"
 def build_kpi_sheet(name, title, records, tagged=True):
     ws=wb.create_sheet(name); ws.sheet_view.showGridLines=False
-    col_w=[4,20,40,10,8,9,12,16]+[9]*12+[12,12,14,16,22]+[12,10,9,14]
+    col_w=[4,20,40,10,8,9,12,16]+[9]*12+[12,12,14,16,22]+[12,10,9,14]+[13,13,11,15]
     for i,w in enumerate(col_w,1): ws.column_dimensions[get_column_letter(i)].width=w
-    last_col="AC"
+    last_col="AG"
     ws.merge_cells(f"A1:{last_col}1")
     style_cell(ws["A1"],value=title,f=font(15,True,WHITE),fillc=NAVY,align=center(False),border=False)
     ws.row_dimensions[1].height=30
     ws.merge_cells(f"A2:{last_col}2")
     style_cell(ws["A2"],value="🟩 الأخضر = إدخال (الأرقام الشهرية + خط الأساس + الوزن)  ·  🔵 قائد/🟣 لاحق  ·  الدرجة الموزونة والحالة تلقائية",
                f=font(10,False,NAVY),fillc=GOLD,align=center(False),border=False)
-    header=["#","المحور","المؤشر","الوحدة","القطبية","التجميع","المستهدف","نص المستهدف"]+MONTHS+["YTD","نسبة التحقيق","الحالة","الركيزة (5س)","المشروع (الخارطة)","خط الأساس 2025","النوع","الوزن %","الدرجة الموزونة"]
+    header=["#","المحور","المؤشر","الوحدة","القطبية","التجميع","المستهدف","نص المستهدف"]+MONTHS+["YTD","نسبة التحقيق","الحالة","الركيزة (5س)","المشروع (الخارطة)","خط الأساس 2025","النوع","الوزن %","الدرجة الموزونة","الخطة حتى تاريخه","التنبؤ السنوي","الانحراف","مؤشر استشرافي"]
     for c,h in enumerate(header,1): style_cell(ws.cell(3,c,h),f=font(10,True,WHITE),fillc=BLUE,align=center())
     ws.row_dimensions[3].height=34; ws.freeze_panes="I4"
     dv=DataValidation(type="decimal",operator="greaterThanOrEqual",formula1="0",allow_blank=True)
@@ -309,6 +310,17 @@ def build_kpi_sheet(name, title, records, tagged=True):
         wc=ws.cell(r,28,w_default); style_cell(wc,fillc=GREEN_IN,fmt="0%",align=center(),lock=False)
         ws.cell(r,29).value=f'=IF($V{r}="","",$AB{r}*MIN($V{r},1))'
         style_cell(ws.cell(r,29),f=font(10,True,NAVY),fmt="0%",align=center())
+        # التخطيط الزمني والتنبؤ (Plan / Forecast / Variance / Forward-RAG)
+        ws.cell(r,30).value=f'=IF($G{r}="","",IF($F{r}="SUM",IF({NREF}="","",$G{r}/12*{NREF}),$G{r}))'
+        style_cell(ws.cell(r,30),fmt=FMT[fmt],align=center())
+        ws.cell(r,31).value=f'=IF($F{r}="SUM",IF(OR({NREF}="",{NREF}=0),"",IF($U{r}="","",$U{r}/{NREF}*12)),IF($U{r}="","",$U{r}))'
+        style_cell(ws.cell(r,31),f=font(10,True,NAVY),fmt=FMT[fmt],align=center())
+        ws.cell(r,32).value=f'=IF(OR($AE{r}="",$G{r}=""),"",$AE{r}-$G{r})'
+        style_cell(ws.cell(r,32),fmt=FMT[fmt],align=center())
+        ws.cell(r,33).value=(f'=IF(OR($AE{r}="",$G{r}=""),"—",'
+            f'IF($E{r}="↓",IF($AE{r}<=$G{r},"🟢 على المسار",IF($AE{r}<=$G{r}*1.1,"🟡 متابعة","🔴 خطر")),'
+            f'IF($AE{r}>=$G{r},"🟢 على المسار",IF($AE{r}>=$G{r}*0.85,"🟡 متابعة","🔴 خطر"))))')
+        style_cell(ws.cell(r,33),f=font(10,True),align=center())
         ws.row_dimensions[r].height=26
     END=START+len(records)-1
     TOT=END+1
@@ -367,6 +379,12 @@ for i,w in enumerate([3,30,16,16,16,16],1): ws.column_dimensions[get_column_lett
 ws.merge_cells("B2:F2")
 style_cell(ws["B2"],value="درب · لوحة الإدارة التنفيذية 2026 — المحطات والعقار",f=font(18,True,WHITE),fillc=NAVY,align=center(False),border=False)
 ws.row_dimensions[2].height=38
+# ضابط شهر التقرير (يغذّي التنبؤ والانحراف في كل الأوراق)
+ws.column_dimensions["O"].width=22; ws.column_dimensions["P"].width=10
+style_cell(ws["O2"],value="🗓️ الأشهر المكتملة (شهر التقرير):",f=font(10,True,WHITE),fillc=ORANGE,align=right())
+pc=ws["P2"]; style_cell(pc,fillc=GREEN_IN,align=center(),lock=False);
+dvm=DataValidation(type="whole",operator="between",formula1="0",formula2="12",allow_blank=True); ws.add_data_validation(dvm); dvm.add(pc)
+style_cell(ws["O1"],value="اضبط الشهر لتفعيل التنبؤ والانحراف ↙",f=font(9,False,"808080"),align=right(),border=False)
 ws.merge_cells("B4:C4"); style_cell(ws["B4"],value="مؤشر الإنجاز العام للشركة",f=font(11,True,WHITE),fillc=BLUE,align=center())
 ws.merge_cells("B5:C6"); style_cell(ws["B5"],value=f'=IFERROR(AVERAGE({CV}),0)',f=font(30,True,NAVY),fmt="0%",align=center())
 for i,(title,key,clr) in enumerate([("✅ محقق","✅ محقق",GREEN_IN),("🟡 قريب","🟡 قريب",GOLD),("🔴 تحت الهدف","🔴 تحت الهدف",RED_IN)]):
@@ -655,8 +673,47 @@ for row in [("النمو — المحطات المشغّلة","85 + 150","≈ 32
 style_cell(ws.cell(r+1,2,"📌 الأرقام التقديرية للطموحات الثلاثية تحتاج اعتماد الإدارة التنفيذية وربطها بخطوط الأساس 2025."),f=font(9,False,"808080"),align=right()); ws.merge_cells(start_row=r+1,start_column=2,end_row=r+1,end_column=5)
 protect(ws)
 
+# ===================== سجل المبادرات (طبقة التنفيذ — ربط النتائج) =====================
+ws=wb.create_sheet("سجل المبادرات"); ws.sheet_view.showGridLines=False
+cw=[4,34,14,22,24,18,12,12,14,11,14,30]
+for i,w in enumerate(cw,1): ws.column_dimensions[get_column_letter(i)].width=w
+ws.merge_cells("A1:L1")
+style_cell(ws["A1"],value="سجل المبادرات وخطط العمل — الجسر بين المؤشرات والتنفيذ",f=font(15,True,WHITE),fillc=NAVY,align=center(False),border=False)
+ws.row_dimensions[1].height=28
+ws.merge_cells("A2:L2")
+style_cell(ws["A2"],value="🟩 خلايا الإدخال خضراء  ·  كل مبادرة مرتبطة بمشروع/مؤشر  ·  الحالة تُحسب من نسبة الإنجاز",f=font(10,False,NAVY),fillc=GOLD,align=center(False),border=False)
+for c,h in enumerate(["#","المبادرة","الركيزة","المشروع المرتبط","المؤشر/الهدف المرتبط","المالك","البداية","النهاية","الميزانية","الإنجاز %","الحالة","المعالم/الملاحظات"],1):
+    style_cell(ws.cell(3,c,h),f=font(10,True,WHITE),fillc=BLUE,align=center())
+ws.row_dimensions[3].height=30
+dvp=DataValidation(type="list",formula1='"النمو,الابتكار,الاستدامة"',allow_blank=True); ws.add_data_validation(dvp)
+dvpct=DataValidation(type="decimal",operator="between",formula1="0",formula2="1",allow_blank=True); ws.add_data_validation(dvpct)
+INIT=[("إطلاق تطبيق «تانكي»","الابتكار","تطبيق «تانكي»","عدد المستخدمين النشطين (MAU)","التقنية الرقمية"),
+ ("برنامج التحول الرقمي وأتمتة العمليات","الابتكار","التحول التقني","نسبة الأتمتة على مستوى الشركة","التقنية الرقمية"),
+ ("برنامج تطوير واستبقاء الموظفين","الاستدامة","الاستثمار في الموظفين","الاستبقاء + eNPS","الموارد البشرية"),
+ ("خطة افتتاح 30 محطة جديدة","النمو","التوسع في المواقع","عدد المحطات المشغّلة","التشغيل والمحطات"),
+ ("حملة استقطاب 167 عقد امتياز","النمو","الامتياز التجاري","عقود الامتياز الجديدة","الامتياز التجاري"),
+ ("تطوير وتشغيل ساحات درب","الابتكار","ساحات درب","نسبة تأجير ساحة درب","العقار"),
+ ("مشروع تطوير الهوية والتصاميم","الابتكار","تطوير التصاميم والهوية","التزام المحطات بالهوية","التسويق (مقترح)"),]
+r=4
+for i in range(len(INIT)+6):  # 7 مبادرات بداية + 6 صفوف فارغة
+    style_cell(ws.cell(r,1,i+1),f=font(10,True),align=center())
+    vals=INIT[i] if i<len(INIT) else ("","","","","")
+    for c,v in zip([2,3,4,5,6],vals):
+        cell=ws.cell(r,c,v if v else None); style_cell(cell,fillc=GREEN_IN,align=right(True) if c in(2,4,5) else center(),lock=False)
+    if r-3<=len(INIT) or True:
+        dvp.add(ws.cell(r,3))
+    for c in (7,8):  # تواريخ
+        style_cell(ws.cell(r,c),fillc=GREEN_IN,align=center(),lock=False)
+    style_cell(ws.cell(r,9),fillc=GREEN_IN,fmt='#,##0 "ر.س"',align=center(),lock=False)  # ميزانية
+    jc=ws.cell(r,10); style_cell(jc,fillc=GREEN_IN,fmt="0%",align=center(),lock=False); dvpct.add(jc)  # إنجاز%
+    ws.cell(r,11).value=f'=IF($J{r}="","—",IF($J{r}>=1,"✅ مكتملة",IF($J{r}>0,"🟠 جارية","⚪ لم تبدأ")))'
+    style_cell(ws.cell(r,11),f=font(10,True),align=center())
+    style_cell(ws.cell(r,12),fillc=GREEN_IN,align=right(True),lock=False)  # معالم
+    ws.row_dimensions[r].height=26; r+=1
+protect(ws)
+
 # ===================== ترتيب الأوراق =====================
-order=["دليل الاستخدام","الاستراتيجية","المؤشرات الحيوية","الخارطة التنفيذية","لوحة الإدارة التنفيذية","الحوكمة",
+order=["دليل الاستخدام","الاستراتيجية","المؤشرات الحيوية","الخارطة التنفيذية","لوحة الإدارة التنفيذية","سجل المبادرات","الحوكمة",
  "الإدارة التنفيذية · المؤشرات",
  "الامتياز · المؤشرات","الامتياز · الموظفون","الامتياز · مدير الإدارة","الامتياز · مسؤول الامتياز",
  "الامتياز · المراقب الميداني","الامتياز · مسؤول التعاقدات","الامتياز · الموظف الإداري",
