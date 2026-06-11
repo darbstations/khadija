@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<title>تقرير الأداء — درب 2026</title>
+<style>
+  body{font-family:"Segoe UI",Tahoma,Arial,sans-serif;color:#222;margin:30px;}
+  .head{display:flex;align-items:center;gap:16px;border-bottom:3px solid #F47A21;padding-bottom:12px}
+  .head img{height:46px}
+  h1{color:#58595B;font-size:22px;margin:0}
+  .sub{color:#808285;font-size:13px}
+  table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
+  th,td{border:1px solid #ddd;padding:6px 8px;text-align:right}
+  th{background:#58595B;color:#fff}
+  h2{color:#58595B;border-right:4px solid #F47A21;padding-right:8px;font-size:16px;margin-top:22px}
+  .cards{display:flex;gap:14px;margin:14px 0;flex-wrap:wrap}
+  .c{border:1px solid #eee;border-radius:10px;padding:12px 18px;min-width:150px}
+  .c .b{font-size:26px;font-weight:800;color:#F47A21}
+  .c .l{color:#808285;font-size:12px}
+  .ok{color:#2e7d32}.warn{color:#b78103}.bad{color:#c0392b}
+  .noprint{margin:16px 0}
+  @media print{.noprint{display:none}}
+  .btn{background:#F47A21;color:#fff;border:0;border-radius:8px;padding:10px 18px;font-weight:700;cursor:pointer}
+</style></head>
+<body>
+<div class="noprint"><button class="btn" onclick="window.print()">🖨️ طباعة / حفظ PDF</button>
+  <a href="/dashboard" style="margin-right:10px">عودة</a></div>
+<div class="head">
+  <img src="/static/darb_logo.png" alt="درب">
+  <div><h1>تقرير الأداء الاستراتيجي — درب 2026</h1>
+    <div class="sub">قطاع المحطات والعقار · شهر التقرير: {{ nmonths }} {% if nmonths %}أشهر مكتملة{% endif %}</div></div>
+</div>
+<div class="cards">
+  <div class="c"><div class="l">الإنجاز العام</div><div class="b">{{ (overall*100)|round(1) if overall is not none else '—' }}%</div></div>
+  {% for p in pillars %}<div class="c"><div class="l">{{ p.name }}</div><div class="b">{% if p.ach is not none %}{{ (p.ach*100)|round }}%{% else %}—{% endif %}</div></div>{% endfor %}
+</div>
+
+<h2>الأداء حسب الإدارة</h2>
+<table><thead><tr><th>الإدارة</th><th>الإنجاز</th></tr></thead><tbody>
+{% for d in depts %}<tr><td>{{ d.name }}</td><td>{% if d.ach is not none %}{{ (d.ach*100)|round }}%{% else %}—{% endif %}</td></tr>{% endfor %}
+</tbody></table>
+
+<h2>تفصيل المؤشرات</h2>
+<table><thead><tr><th>الإدارة</th><th>المؤشر</th><th>المستهدف</th><th>YTD</th><th>الإنجاز</th><th>الحالة</th></tr></thead><tbody>
+{% for x in calcs %}<tr>
+  <td>{{ x.kpi.department.name }}</td><td>{{ x.kpi.name }}</td><td>{{ x.kpi.target_text }}</td>
+  <td>{{ fmt_value(x.ytd, x.kpi.fmt) }}</td>
+  <td>{% if x.ach is not none %}{{ (x.ach*100)|round }}%{% else %}—{% endif %}</td>
+  <td>{{ x.status }}</td></tr>{% endfor %}
+</tbody></table>
+<p class="sub" style="margin-top:20px">درب · Darb — تم التوليد من منصة مؤشرات الأداء</p>
+</body></html>

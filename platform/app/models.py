@@ -81,3 +81,42 @@ class Setting(Base):
     __tablename__ = "settings"
     key = Column(String, primary_key=True)
     value = Column(String, default="")
+
+class EvalForm(Base):
+    __tablename__ = "eval_forms"
+    id = Column(Integer, primary_key=True)
+    department_id = Column(Integer, ForeignKey("departments.id"))
+    code = Column(String)
+    role = Column(String)
+    department = relationship("Department")
+    items = relationship("EvalItem", back_populates="form", order_by="EvalItem.order", cascade="all,delete-orphan")
+
+class EvalItem(Base):
+    __tablename__ = "eval_items"
+    id = Column(Integer, primary_key=True)
+    form_id = Column(Integer, ForeignKey("eval_forms.id"))
+    order = Column(Integer, default=0)
+    name = Column(String)
+    weight = Column(Float, default=0)        # كسر (0..1)
+    target_text = Column(String, default="")
+    form = relationship("EvalForm", back_populates="items")
+
+class Evaluation(Base):
+    __tablename__ = "evaluations"
+    id = Column(Integer, primary_key=True)
+    form_id = Column(Integer, ForeignKey("eval_forms.id"))
+    employee_name = Column(String, default="")
+    manager_name = Column(String, default="")
+    quarter = Column(String, default="")
+    notes = Column(Text, default="")
+    form = relationship("EvalForm")
+    scores = relationship("EvalScore", back_populates="evaluation", cascade="all,delete-orphan")
+
+class EvalScore(Base):
+    __tablename__ = "eval_scores"
+    id = Column(Integer, primary_key=True)
+    evaluation_id = Column(Integer, ForeignKey("evaluations.id"))
+    item_id = Column(Integer, ForeignKey("eval_items.id"))
+    achievement = Column(Float, nullable=True)   # نسبة التحقيق (0..1.2)
+    evaluation = relationship("Evaluation", back_populates="scores")
+    item = relationship("EvalItem")

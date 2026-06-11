@@ -1,0 +1,13 @@
+services:
+  darb:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DARB_SECRET=change-me-in-prod
+      - DARB_DB_PATH=/data/darb.db
+    volumes:
+      - darb_data:/data
+    restart: unless-stopped
+volumes:
+  darb_data:

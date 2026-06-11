@@ -10,7 +10,8 @@ from sqlalchemy.orm import Session
 from .database import get_db
 from . import models, compute
 from .kpi_data import PILLARS, PROJECTS, PROJECT_PILLAR
-from .auth import (current_user, verify_password, can_edit_definition, can_edit_value, ROLE_LABEL)
+from .auth import (current_user, verify_password, can_edit_definition, can_edit_value, can_eval, ROLE_LABEL)
+from .eval_data import grade as eval_grade
 from .seed import init_db
 
 BASE = os.path.dirname(os.path.abspath(__file__))
@@ -269,6 +270,111 @@ async def risks_save(request: Request, db: Session = Depends(get_db)):
     it.response=form.get("response") or ""; it.owner=form.get("owner") or ""
     db.commit()
     return RedirectResponse("/risks", status_code=302)
+
+# ---------------- تقييم الموظفين ----------------
+@app.get("/evaluations", response_class=HTMLResponse)
+def evaluations(request: Request, db: Session = Depends(get_db)):
+    u = require(request, db)
+    if not u: return RedirectResponse("/login")
+    forms = db.query(models.EvalForm).all()
+    by_dept = {}
+    for f in forms:
+        by_dept.setdefault(f.department.name, []).append(f)
+    evs = db.query(models.Evaluation).order_by(models.Evaluation.id.desc()).all()
+    results = []
+    for ev in evs:
+        total = sum((s.achievement or 0) * (s.item.weight or 0) if (s.achievement or 0) <= 1
+                    else s.item.weight for s in ev.scores)
+        results.append({"ev": ev, "total": total, "grade": eval_grade(total)})
+    return templates.TemplateResponse(request, "evaluations.html", {"request": request, "u": u,
+        "by_dept": by_dept, "results": results, "can_eval": can_eval})
+
+@app.get("/evaluation/{form_id}", response_class=HTMLResponse)
+def evaluation_form(form_id: int, request: Request, db: Session = Depends(get_db)):
+    u = require(request, db)
+    if not u: return RedirectResponse("/login")
+    f = db.query(models.EvalForm).get(form_id)
+    if not f: return RedirectResponse("/evaluations")
+    if not can_eval(u, f.department_id):
+        return templates.TemplateResponse(request, "forbidden.html", {"request": request, "u": u})
+    return templates.TemplateResponse(request, "evaluation_form.html", {"request": request, "u": u, "f": f})
+
+@app.post("/evaluation/{form_id}/save")
+async def evaluation_save(form_id: int, request: Request, db: Session = Depends(get_db)):
+    u = require(request, db)
+    f = db.query(models.EvalForm).get(form_id)
+    if not u or not f or not can_eval(u, f.department_id):
+        return RedirectResponse("/evaluations")
+    form = await request.form()
+    ev = models.Evaluation(form_id=f.id, employee_name=form.get("employee_name") or "",
+        manager_name=form.get("manager_name") or u.full_name, quarter=form.get("quarter") or "",
+        notes=form.get("notes") or "")
+    db.add(ev); db.flush()
+    for it in f.items:
+        raw = (form.get(f"a_{it.id}") or "").strip().replace("%","")
+        val = None
+        if raw != "":
+            try:
+                val = float(raw)
+                if val > 1.5: val = val/100.0    # سمح بإدخال 95 أو 0.95
+            except: val = None
+        db.add(models.EvalScore(evaluation_id=ev.id, item_id=it.id, achievement=val))
+    db.commit()
+    return RedirectResponse(f"/evaluation/view/{ev.id}", status_code=302)
+
+@app.get("/evaluation/view/{eval_id}", response_class=HTMLResponse)
+def evaluation_view(eval_id: int, request: Request, db: Session = Depends(get_db)):
+    u = require(request, db)
+    if not u: return RedirectResponse("/login")
+    ev = db.query(models.Evaluation).get(eval_id)
+    if not ev: return RedirectResponse("/evaluations")
+    rows = []
+    total = 0
+    for s in ev.scores:
+        ach = s.achievement
+        score = (s.item.weight or 0) * min(ach, 1) if ach is not None else 0
+        total += score
+        rows.append({"item": s.item, "ach": ach, "score": score})
+    return templates.TemplateResponse(request, "evaluation_view.html", {"request": request, "u": u,
+        "ev": ev, "rows": rows, "total": total, "grade": eval_grade(total)})
+
+# ---------------- تصدير التقارير ----------------
+@app.get("/report/print", response_class=HTMLResponse)
+def report_print(request: Request, db: Session = Depends(get_db)):
+    u = require(request, db)
+    if not u: return RedirectResponse("/login")
+    calcs, nmonths = all_calcs(db)
+    overall = avg([c["ach"] for c in calcs])
+    depts = db.query(models.Department).all()
+    dept_roll = [{"name": d.name, "ach": avg([c["ach"] for c in calcs if c["kpi"].department_id==d.id])} for d in depts]
+    pillars = [{"name": p, "ach": avg([c["ach"] for c in calcs if c["kpi"].pillar==p])} for p in PILLARS]
+    return templates.TemplateResponse(request, "report_print.html", {"request": request, "u": u,
+        "overall": overall, "depts": dept_roll, "pillars": pillars, "calcs": calcs, "nmonths": nmonths})
+
+@app.get("/export/excel")
+def export_excel(request: Request, db: Session = Depends(get_db)):
+    from fastapi.responses import StreamingResponse
+    import io, openpyxl
+    from openpyxl.styles import Font, PatternFill, Alignment
+    u = require(request, db)
+    if not u: return RedirectResponse("/login")
+    calcs, nmonths = all_calcs(db)
+    wb = openpyxl.Workbook(); ws = wb.active; ws.title = "تقرير الأداء"; ws.sheet_view.rightToLeft = True
+    hdr = ["الإدارة","المؤشر","الوحدة","المستهدف","YTD","نسبة التحقيق","الحالة","الركيزة","المشروع"]
+    nav = Font(bold=True, color="FFFFFF"); fill = PatternFill("solid", fgColor="58595B")
+    for c, h in enumerate(hdr, 1):
+        cell = ws.cell(1, c, h); cell.font = nav; cell.fill = fill; cell.alignment = Alignment(horizontal="center")
+    for i, x in enumerate(calcs, 2):
+        k = x["kpi"]
+        ws.cell(i,1,k.department.name); ws.cell(i,2,k.name); ws.cell(i,3,k.unit)
+        ws.cell(i,4,k.target_text); ws.cell(i,5, round(x["ytd"],2) if x["ytd"] is not None else "")
+        ws.cell(i,6, round(x["ach"],4) if x["ach"] is not None else "").number_format = "0%"
+        ws.cell(i,7,x["status"]); ws.cell(i,8,k.pillar); ws.cell(i,9,k.project)
+    for col, w in zip("ABCDEFGHI", [20,42,10,18,14,12,14,14,22]):
+        ws.column_dimensions[col].width = w
+    buf = io.BytesIO(); wb.save(buf); buf.seek(0)
+    return StreamingResponse(buf, media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=darb-report.xlsx"})
 
 # ---------------- إعداد شهر التقرير ----------------
 @app.post("/settings/report-month")

@@ -7,6 +7,8 @@
     <input type="number" name="report_month" min="0" max="12" value="{{ nmonths }}" style="width:70px" {% if u.role not in ['admin','executive'] %}disabled{% endif %}>
     {% if u.role in ['admin','executive'] %}<button class="btn grey" type="submit">تحديث</button>{% endif %}
   </form>
+  <a class="btn" href="/export/excel">⬇️ تصدير Excel</a>
+  <a class="btn grey" href="/report/print">🖨️ تقرير PDF</a>
 </div>
 
 <div class="cards">

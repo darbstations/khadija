@@ -1,13 +1,26 @@
 # -*- coding: utf-8 -*-
 from .database import Base, engine, SessionLocal
-from . import models, kpi_data
+from . import models, kpi_data, eval_data
 from .auth import hash_password
+
+def seed_eval_forms(db, dept_by_key):
+    if db.query(models.EvalForm).count() > 0:
+        return
+    for dept_key, code, role, items in eval_data.EVAL_FORMS:
+        d = dept_by_key.get(dept_key)
+        if not d: continue
+        f = models.EvalForm(department_id=d.id, code=code, role=role)
+        db.add(f); db.flush()
+        for i, (nm, w, tt) in enumerate(items):
+            db.add(models.EvalItem(form_id=f.id, order=i, name=nm, weight=w/100.0, target_text=tt))
 
 def init_db():
     Base.metadata.create_all(engine)
     db = SessionLocal()
     try:
         if db.query(models.Department).count() > 0:
+            dbk = {d.key: d for d in db.query(models.Department).all()}
+            seed_eval_forms(db, dbk); db.commit()
             return
         dept_by_key = {}
         for name, key, records in kpi_data.DEPARTMENTS:
@@ -36,6 +49,7 @@ def init_db():
         mkuser("emp", "emp123", "employee", "موظف الامتياز", "franchise")
         db.add(models.Setting(key="report_month", value="0"))
         db.add(models.Setting(key="company_name", value="درب · Darb"))
+        seed_eval_forms(db, dept_by_key)
         db.commit()
     finally:
         db.close()

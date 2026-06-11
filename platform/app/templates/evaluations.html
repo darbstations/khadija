@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>تقييم أداء الموظفين</h1>
+<div class="note">اختر النموذج الوظيفي لبدء تقييم — الدرجة والتقدير يُحسبان آلياً بالأوزان. (متاح لمدير الإدارة أو مدير النظام).</div>
+
+<div class="grid2">
+  <div class="panel">
+    <h3>النماذج الوظيفية</h3>
+    {% for dept, forms in by_dept.items() %}
+      <h4 style="color:var(--orange);margin:12px 0 4px">{{ dept }}</h4>
+      {% for f in forms %}
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)">
+          <span>{{ f.role }} <span class="small">({{ f.code }})</span></span>
+          {% if can_eval(u, f.department_id) %}
+            <a class="btn" style="padding:5px 12px" href="/evaluation/{{ f.id }}">تقييم</a>
+          {% else %}<span class="lock">🔒 عرض فقط</span>{% endif %}
+        </div>
+      {% endfor %}
+    {% endfor %}
+  </div>
+  <div class="panel">
+    <h3>التقييمات المنجزة</h3>
+    <table><thead><tr><th>الموظف</th><th>الدور</th><th>الربع</th><th>الدرجة</th><th>التقدير</th></tr></thead><tbody>
+    {% for r in results %}
+      <tr><td><a href="/evaluation/view/{{ r.ev.id }}">{{ r.ev.employee_name or '—' }}</a></td>
+      <td class="small">{{ r.ev.form.role }}</td><td>{{ r.ev.quarter }}</td>
+      <td class="mono">{{ (r.total*100)|round }}%</td>
+      <td><span class="tag {{ 'ok' if r.total>=0.8 else 'warn' if r.total>=0.6 else 'bad' }}">{{ r.grade }}</span></td></tr>
+    {% endfor %}
+    {% if not results %}<tr><td colspan="5" class="small">لا توجد تقييمات بعد.</td></tr>{% endif %}
+    </tbody></table>
+  </div>
+</div>
+{% endblock %}

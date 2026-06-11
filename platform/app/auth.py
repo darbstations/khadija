@@ -27,6 +27,12 @@ def can_edit_definition(user):
     """تعديل المؤشر/المستهدف/الوزن/الهيكل — للأدمن فقط."""
     return user is not None and user.role == "admin"
 
+def can_eval(user, department_id):
+    """تقييم الموظفين — الأدمن أو مدير/تنفيذي الإدارة نفسها."""
+    if user is None: return False
+    if user.role == "admin": return True
+    return user.role in ("manager","executive") and user.department_id == department_id
+
 def can_edit_value(user, kpi: KPI):
     """تغذية الأرقام الشهرية — الأدمن، أو المسؤول عن مؤشره/إدارته فقط (دون المساس بالتعريف)."""
     if user is None: return False

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>نتيجة التقييم</h1>
+<div class="cards">
+  <div class="card"><div class="lbl">الموظف</div><div style="font-size:20px;font-weight:700">{{ ev.employee_name or '—' }}</div><div class="small">{{ ev.form.role }}</div></div>
+  <div class="card"><div class="lbl">الربع</div><div style="font-size:20px;font-weight:700">{{ ev.quarter or '—' }}</div></div>
+  <div class="card {{ 'ok' if total>=0.8 else 'warn' if total>=0.6 else 'bad' }}">
+    <div class="lbl">الدرجة الكلية</div><div class="big">{{ (total*100)|round }}<span style="font-size:18px">%</span></div></div>
+  <div class="card"><div class="lbl">التقدير</div><div class="big" style="color:var(--grey-d)">{{ grade }}</div></div>
+</div>
+<div class="panel">
+<table>
+<thead><tr><th>مؤشر الأداء</th><th>الوزن</th><th>المستهدف</th><th>نسبة التحقيق</th><th>الدرجة المحققة</th></tr></thead>
+<tbody>
+{% for r in rows %}
+<tr>
+  <td>{{ r.item.name }}</td>
+  <td class="mono">{{ (r.item.weight*100)|round }}%</td>
+  <td class="small">{{ r.item.target_text }}</td>
+  <td class="mono">{% if r.ach is not none %}{{ (r.ach*100)|round }}%{% else %}—{% endif %}</td>
+  <td class="mono">{{ (r.score*100)|round(1) }}%</td>
+</tr>
+{% endfor %}
+<tr style="background:#f4f5f7;font-weight:800">
+  <td>المجموع</td><td></td><td></td><td></td><td class="mono" style="color:var(--orange)">{{ (total*100)|round(1) }}%</td>
+</tr>
+</tbody>
+</table>
+<div class="toolbar"><a class="btn grey" href="/evaluations">عودة للتقييمات</a></div>
+</div>
+{% endblock %}

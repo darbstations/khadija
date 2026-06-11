@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>تقييم — {{ f.role }} <span class="small">({{ f.code }} · {{ f.department.name }})</span></h1>
+<form method="post" action="/evaluation/{{ f.id }}/save">
+<div class="panel grid2">
+  <div><label class="small">اسم الموظف</label><input type="text" name="employee_name" required></div>
+  <div><label class="small">المُقيِّم (المدير)</label><input type="text" name="manager_name" value="{{ u.full_name }}"></div>
+  <div><label class="small">الربع / السنة</label><input type="text" name="quarter" placeholder="Q1 2026"></div>
+  <div><label class="small">ملاحظات</label><input type="text" name="notes"></div>
+</div>
+<div class="panel">
+<div class="note">🟩 أدخل «نسبة التحقيق %» لكل مؤشر (مثال: 95). الدرجة الموزونة والمجموع تُحسب تلقائياً.</div>
+<table>
+<thead><tr><th>#</th><th>مؤشر الأداء</th><th>الوزن</th><th>المستهدف</th><th>نسبة التحقيق %</th></tr></thead>
+<tbody>
+{% for it in f.items %}
+<tr>
+  <td>{{ loop.index }}</td>
+  <td>{{ it.name }}</td>
+  <td class="mono">{{ (it.weight*100)|round }}%</td>
+  <td class="small">{{ it.target_text }}</td>
+  <td><input class="feed mono" type="number" name="a_{{ it.id }}" min="0" max="120" step="1" style="width:90px"></td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+<div class="toolbar"><button class="btn" type="submit">💾 احتساب وحفظ التقييم</button></div>
+</div>
+</form>
+{% endblock %}
