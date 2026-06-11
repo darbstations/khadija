@@ -36,6 +36,19 @@ npm run build
 npm run preview
 ```
 
+## Standalone HTML (no install needed)
+
+Two single-file versions exist for opening the dashboard directly in a browser:
+
+- **`dashboard.html`** — loads React/Recharts/SheetJS/Tailwind from CDNs, so it
+  needs internet on first open. Tiny file, easy to share.
+- **`dashboard-offline.html`** — everything inlined (no CDN, no network at all).
+  Regenerate with `npm run build:single`, which writes `dist-single/index.html`;
+  copy that over `dashboard-offline.html` to refresh it.
+
+Both show an upload screen first; pick the station `.xlsx` files, then press
+**بدء التحليل**. Files are processed entirely in the browser.
+
 ## Tech
 
 - [Vite](https://vitejs.dev/) + [React 18](https://react.dev/)
