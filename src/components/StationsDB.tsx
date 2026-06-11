@@ -1,43 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useScenario } from "../context/ScenarioContext";
 import { stationPointCalc, fmtNum, fmtPct, fmtSar, fmtInt } from "../model/engine";
-import { FUEL_TYPES, STATION_SAMPLES } from "../model/defaults";
+import { FUEL_TYPES } from "../model/defaults";
+import { useStations, priceOf, fuelLabel, type StationRow } from "../model/stations";
 import { Card, Stat, Badge } from "./ui";
-
-interface StationRow {
-  id: number;
-  name: string;
-  city: string;
-  fuel: string;
-  margin: number; // هللة/لتر
-  liters: number; // لتر/شهر
-}
-
-const STORAGE = "tanki.stations.v1";
-const priceOf = (fuelKey: string) =>
-  FUEL_TYPES.find((f) => f.key === fuelKey)?.price ?? 2.33;
-const fuelLabel = (k: string) => FUEL_TYPES.find((f) => f.key === k)?.label ?? k;
 
 export default function StationsDB() {
   const { inputs } = useScenario();
   const [budgetPct, setBudgetPct] = useState(15); // % من الهامش يُخصص للولاء
-  const [stations, setStations] = useState<StationRow[]>(() => {
-    try {
-      const s = localStorage.getItem(STORAGE);
-      if (s) return JSON.parse(s);
-    } catch {
-      /* تجاهل */
-    }
-    return STATION_SAMPLES.map((s, idx) => ({ id: idx + 1, ...s }));
-  });
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE, JSON.stringify(stations));
-    } catch {
-      /* تجاهل */
-    }
-  }, [stations]);
+  const { stations, setStations } = useStations();
 
   const calc = (s: StationRow) =>
     stationPointCalc({

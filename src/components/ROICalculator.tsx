@@ -1,12 +1,18 @@
 import { useState } from "react";
 import { useScenario } from "../context/ScenarioContext";
-import { projections, fmtNum, fmtPct } from "../model/engine";
+import { projections, fmtNum, fmtPct, fmtSar } from "../model/engine";
+import { useStations, stationsLoyaltyCost } from "../model/stations";
 import { Card, Stat, NumberInput, Badge } from "./ui";
 
 /** حاسبة ROI تفاعلية — التكاليف تشتق من التوقعات، والإيرادات من افتراضات قابلة للتعديل */
 export default function ROICalculator() {
   const { inputs } = useScenario();
   const p = projections(inputs);
+  const { stations } = useStations();
+  const stationsCost = stationsLoyaltyCost(stations, inputs.pointValue);
+
+  // مصدر تكلفة النقاط: من التوقعات أو من محطاتي الفعلية
+  const [costSource, setCostSource] = useState<"projection" | "stations">("projection");
 
   // افتراضات قابلة للتعديل (مليون ريال / نِسَب)
   const [appDev, setAppDev] = useState(1.45); // تطوير التطبيق (5 سنوات)
@@ -16,7 +22,8 @@ export default function ROICalculator() {
   const [fuelUpliftRevM, setFuelUpliftRevM] = useState(80); // زيادة مبيعات الوقود
   const [otherRevM, setOtherRevM] = useState(53.5); // جذب عملاء + توفير + نمو + بيانات
 
-  const pointsCost5y = p.fiveYearTotal; // تكلفة النقاط من المحرك
+  const stations5yM = (stationsCost.annualCost * 5) / 1_000_000; // محطاتي الفعلية × 5 سنوات
+  const pointsCost5y = costSource === "stations" ? stations5yM : p.fiveYearTotal;
   const totalCost = appDev + team + marketing + pointsCost5y;
   const totalRev = partnerRevM + fuelUpliftRevM + otherRevM;
   const netProfit = totalRev - totalCost;
@@ -47,16 +54,47 @@ export default function ROICalculator() {
         <Stat label="🎯 ROI" value={fmtPct(roi, 0)} tone={roi > 0 ? "good" : "bad"} />
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
         <span className="text-sm text-darb-mut">التقييم النهائي:</span>
         <Badge tone={verdict.tone}>{verdict.t}</Badge>
       </div>
+
+      <Card title="🎁 مصدر تكلفة النقاط (5 سنوات)">
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => setCostSource("projection")}
+            className={`text-xs font-bold px-3 py-2 rounded-lg border transition ${
+              costSource === "projection"
+                ? "border-darb-accent bg-darb-accent/15 text-darb-accent"
+                : "border-darb-line text-darb-mut hover:text-darb-ink"
+            }`}
+          >
+            📈 من التوقعات (نمو المحطات) · {fmtNum(p.fiveYearTotal, 1)} م﷼
+          </button>
+          <button
+            onClick={() => setCostSource("stations")}
+            className={`text-xs font-bold px-3 py-2 rounded-lg border transition ${
+              costSource === "stations"
+                ? "border-darb-accent bg-darb-accent/15 text-darb-accent"
+                : "border-darb-line text-darb-mut hover:text-darb-ink"
+            }`}
+          >
+            ⛽ من «محطاتي» الفعلية × 5 · {fmtNum(stations5yM, 1)} م﷼
+          </button>
+        </div>
+        <p className="text-xs text-darb-mut mt-2">
+          محطاتي: {stations.length} محطة · تكلفة ولاء سنوية {fmtSar(stationsCost.annualCost)} · متوسط
+          كاش باك {fmtPct(stationsCost.blendedCashback)}. أضيفي/عدّلي محطاتك في شاشة «محطاتي» وتنعكس هنا.
+        </p>
+      </Card>
 
       <div className="grid lg:grid-cols-2 gap-4">
         <Card title="💸 التكاليف (5 سنوات · مليون ريال)">
           <div className="space-y-3">
             <div className="stat flex items-center justify-between">
-              <span className="text-sm">🎁 كلفة النقاط (من المحرك)</span>
+              <span className="text-sm">
+                🎁 كلفة النقاط ({costSource === "stations" ? "من محطاتي" : "من التوقعات"})
+              </span>
               <span className="font-bold text-darb-warn">{fmtNum(pointsCost5y, 2)} م﷼</span>
             </div>
             <NumberInput label="💻 تطوير التطبيق" value={appDev} onChange={setAppDev} step={0.1} />

@@ -165,6 +165,70 @@ def main() -> None:
     for col, w in {"A": 34, "B": 16, "C": 16}.items():
         E.column_dimensions[col].width = w
 
+    # 6.5) ورقة جديدة «قنوات الاستبدال» — معادلات حقيقية
+    if "قنوات الاستبدال" in wb.sheetnames:
+        del wb["قنوات الاستبدال"]
+    R = wb.create_sheet("قنوات الاستبدال")
+    R.sheet_view.rightToLeft = True
+
+    def rput(coord, value, bold=False, fill=None, fmt=None):
+        c = R[coord]
+        c.value = value
+        c.alignment = RTL
+        c.font = Font(bold=bold, color="FFE8EEFC")
+        if fill:
+            c.fill = fill
+        if fmt:
+            c.number_format = fmt
+        return c
+
+    rput("A1", "درب · قنوات استبدال النقاط — التكلفة على درب لكل قناة (معادلات حيّة)", bold=True)
+    rput("A3", "إجمالي القيمة المستبدلة سنوياً (ريال)")
+    rput("C3", 1000000, bold=True, fill=YELLOW, fmt="#,##0")
+
+    # ترويسة الجدول
+    headers = ["القناة", "من يموّلها", "النسبة %", "تكلفة درب/ريال %", "القيمة المستبدلة", "تكلفة درب"]
+    for j, h in enumerate(headers):
+        c = R.cell(5, j + 1, h)
+        c.font = Font(bold=True, color="FFE8EEFC")
+        c.fill = HEADER
+        c.alignment = RTL
+
+    channels = [
+        ("⛽ خصم بنزين", "درب", 0.30, 1.00),
+        ("🛍️ عروض المستأجرين", "المستأجر", 0.35, 0.00),
+        ("🎁 شركات خارجية (جرير/أمازون/الفرسان)", "درب (خصم جملة)", 0.20, 0.97),
+        ("📱 كرت شحن", "درب (عمولة المشغّل)", 0.15, 0.95),
+    ]
+    first, last = 6, 6 + len(channels) - 1
+    for idx, (label, funded, mix, cost) in enumerate(channels):
+        r = first + idx
+        rput(f"A{r}", label)
+        rput(f"B{r}", funded)
+        rput(f"C{r}", mix, fill=YELLOW, fmt="0%")        # نسبة (مدخل)
+        rput(f"D{r}", cost, fill=YELLOW, fmt="0%")        # تكلفة درب لكل ريال (مدخل)
+        rput(f"E{r}", f"=$C$3*C{r}", fmt="#,##0.00")      # القيمة المستبدلة (معادلة)
+        rput(f"F{r}", f"=E{r}*D{r}", bold=True, fmt="#,##0.00")  # تكلفة درب (معادلة)
+
+    # الإجمالي
+    tr = last + 1
+    rput(f"A{tr}", "📊 الإجمالي", bold=True)
+    rput(f"C{tr}", f"=SUM(C{first}:C{last})", bold=True, fmt="0%")
+    rput(f"E{tr}", f"=SUM(E{first}:E{last})", bold=True, fmt="#,##0.00")
+    rput(f"F{tr}", f"=SUM(F{first}:F{last})", bold=True, fmt="#,##0.00")
+
+    # مؤشرات
+    rput(f"A{tr+2}", "متوسط تكلفة الريال المستبدل")
+    rput(f"C{tr+2}", f"=F{tr}/E{tr}", bold=True, fmt="0.0%")
+    rput(f"A{tr+3}", "التوفير مقابل الكل-بنزين")
+    rput(f"C{tr+3}", f"=$C$3-F{tr}", bold=True, fmt="#,##0.00")
+    rput(f"A{tr+4}", "تحقق مجموع النسب")
+    rput(f"C{tr+4}", f'=IF(C{tr}=1,"✅ 100%","⚠️ راجع النسب")', bold=True)
+    rput(f"A{tr+6}", "💡 وجّه الاستبدال نحو عروض المستأجرين (تكلفتها صفر) بدل خصم البنزين")
+
+    for col, w in {"A": 38, "B": 22, "C": 12, "D": 16, "E": 18, "F": 16}.items():
+        R.column_dimensions[col].width = w
+
     # 7) إعادة حساب كاملة عند الفتح
     try:
         wb.calculation.fullCalcOnLoad = True
