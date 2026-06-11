@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>إدارة المؤشرات — تعديل المستهدفات والأوزان</h1>
+{% if request.query_params.get('saved') %}<div class="note">✅ تم حفظ التعديلات.</div>{% endif %}
+<div class="note">🛠️ هذه الصفحة لمدير النظام فقط — تعديل المستهدف/الوزن/خط الأساس. (الأرقام الشهرية تُدخل من صفحة كل إدارة).</div>
+<form method="post" action="/admin/kpis/save">
+{% for d in depts %}
+<h2>{{ d.name }}</h2>
+<div class="kpiwrap"><table>
+<thead><tr><th>المؤشر</th><th>الوحدة</th><th>المستهدف (رقم)</th><th>نص المستهدف</th><th>الوزن %</th><th>خط الأساس 2025</th><th>الركيزة/المشروع</th></tr></thead>
+<tbody>
+{% for k in d.kpis %}
+<tr>
+  <td style="min-width:240px">{{ k.name }}</td>
+  <td class="small">{{ k.unit }}</td>
+  <td><input type="text" name="target_{{ k.id }}" value="{{ k.target if k.target is not none else '' }}" style="width:110px"></td>
+  <td><input type="text" name="target_text_{{ k.id }}" value="{{ k.target_text or '' }}" style="width:120px"></td>
+  <td><input type="text" name="weight_{{ k.id }}" value="{{ (k.weight*100)|round(2) if k.weight else '' }}" style="width:70px"></td>
+  <td><input type="text" name="baseline_{{ k.id }}" value="{{ k.baseline if k.baseline is not none else '' }}" style="width:90px"></td>
+  <td class="small">{{ k.pillar }} · {{ k.project }}</td>
+</tr>
+{% endfor %}
+</tbody></table></div>
+{% endfor %}
+<div class="toolbar"><button class="btn" type="submit">💾 حفظ التعديلات</button></div>
+</form>
+{% endblock %}

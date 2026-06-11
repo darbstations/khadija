@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>سجل المبادرات — ربط النتائج بالتنفيذ</h1>
+<div class="panel">
+<table>
+<thead><tr><th>المبادرة</th><th>الركيزة</th><th>المشروع</th><th>المالك</th><th>المدة</th><th>الميزانية</th><th>الإنجاز</th><th>الحالة</th></tr></thead>
+<tbody>
+{% for it in items %}
+<tr>
+  <td>{{ it.name }}</td><td class="small">{{ it.pillar }}</td><td class="small">{{ it.project }}</td>
+  <td>{{ it.owner }}</td><td class="small">{{ it.start }} → {{ it.end }}</td>
+  <td class="mono">{{ '{:,.0f} ر.س'.format(it.budget) if it.budget else '—' }}</td>
+  <td><div class="bar"><i style="width:{{ ((it.progress or 0)*100)|round }}%"></i></div></td>
+  <td>{% set pr=it.progress or 0 %}
+    {% if pr>=1 %}<span class="tag ok">مكتملة</span>{% elif pr>0 %}<span class="tag warn">جارية</span>{% else %}<span class="tag muted">لم تبدأ</span>{% endif %}</td>
+</tr>
+{% endfor %}
+{% if not items %}<tr><td colspan="8" class="small">لا توجد مبادرات بعد — أضف أول مبادرة بالأسفل.</td></tr>{% endif %}
+</tbody>
+</table>
+</div>
+
+<div class="panel">
+<h3>➕ إضافة مبادرة</h3>
+<form method="post" action="/initiatives/save" class="grid2">
+  <div><label class="small">اسم المبادرة</label><input type="text" name="name" required></div>
+  <div><label class="small">المالك</label><input type="text" name="owner"></div>
+  <div><label class="small">الركيزة</label>
+    <select name="pillar"><option value=""></option>{% for p in pillars %}<option>{{ p }}</option>{% endfor %}</select></div>
+  <div><label class="small">المشروع</label>
+    <select name="project"><option value=""></option>{% for p in projects %}<option>{{ p }}</option>{% endfor %}</select></div>
+  <div><label class="small">البداية</label><input type="date" name="start"></div>
+  <div><label class="small">النهاية</label><input type="date" name="end"></div>
+  <div><label class="small">الميزانية (ر.س)</label><input type="text" name="budget"></div>
+  <div><label class="small">نسبة الإنجاز %</label><input type="number" name="progress" min="0" max="100"></div>
+  <div style="grid-column:1/-1"><label class="small">المعالم/الملاحظات</label><textarea name="notes" rows="2"></textarea></div>
+  <div><button class="btn" type="submit">حفظ المبادرة</button></div>
+</form>
+</div>
+{% endblock %}

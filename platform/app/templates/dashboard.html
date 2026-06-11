@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="toolbar">
+  <h1>اللوحة التنفيذية — درب 2026</h1>
+  <form method="post" action="/settings/report-month" class="toolbar" style="margin:0">
+    <span class="small">شهر التقرير (الأشهر المكتملة):</span>
+    <input type="number" name="report_month" min="0" max="12" value="{{ nmonths }}" style="width:70px" {% if u.role not in ['admin','executive'] %}disabled{% endif %}>
+    {% if u.role in ['admin','executive'] %}<button class="btn grey" type="submit">تحديث</button>{% endif %}
+  </form>
+</div>
+
+<div class="cards">
+  <div class="card {{ status_class(overall) }}">
+    <div class="lbl">مؤشر الإنجاز العام للشركة</div>
+    <div class="big">{{ (overall*100)|round(1) if overall is not none else '—' }}<span style="font-size:18px">%</span></div>
+    <div class="small">{{ total }} مؤشر</div>
+  </div>
+  <div class="card ok"><div class="lbl">✅ محقق</div><div class="big">{{ counts.ok }}</div></div>
+  <div class="card warn"><div class="lbl">🟡 قريب</div><div class="big">{{ counts.warn }}</div></div>
+  <div class="card bad"><div class="lbl">🔴 تحت الهدف</div><div class="big">{{ counts.bad }}</div></div>
+  <div class="card"><div class="lbl">— بانتظار بيانات</div><div class="big" style="color:var(--muted)">{{ counts.muted }}</div></div>
+</div>
+
+<div class="grid2">
+  <div class="panel"><h3>الأداء حسب الركائز (5 سنوات)</h3><canvas id="cPillars" height="160"></canvas></div>
+  <div class="panel"><h3>الأداء حسب الإدارة</h3><canvas id="cDepts" height="160"></canvas></div>
+</div>
+
+<div class="grid2">
+  <div class="panel">
+    <h3>منظورات Balanced Scorecard</h3>
+    <table><thead><tr><th>المنظور</th><th>الإنجاز</th><th>عدد المؤشرات</th></tr></thead><tbody>
+    {% for p in persp %}<tr><td>{{ p.name }}</td>
+      <td class="mono">{% if p.ach is not none %}{{ (p.ach*100)|round }}%{% else %}—{% endif %}</td>
+      <td>{{ p.n }}</td></tr>{% endfor %}
+    </tbody></table>
+  </div>
+  <div class="panel">
+    <h3>تغطية مشاريع الخارطة</h3>
+    <table><thead><tr><th>المشروع</th><th>الإنجاز</th><th>مؤشرات</th></tr></thead><tbody>
+    {% for p in projects %}<tr><td>{{ p.name }}</td>
+      <td class="mono">{% if p.ach is not none %}{{ (p.ach*100)|round }}%{% else %}—{% endif %}</td>
+      <td>{% if p.n==0 %}<span class="tag bad">فجوة</span>{% else %}{{ p.n }}{% endif %}</td></tr>{% endfor %}
+    </tbody></table>
+  </div>
+</div>
+
+<script>
+const D = {{ chart_json|safe }};
+const orange='#F47A21', grey='#808285';
+new Chart(document.getElementById('cPillars'),{type:'bar',
+  data:{labels:D.pillars.labels,datasets:[{data:D.pillars.data,backgroundColor:orange}]},
+  options:{plugins:{legend:{display:false}},scales:{y:{max:100,ticks:{callback:v=>v+'%'}}}}});
+new Chart(document.getElementById('cDepts'),{type:'bar',indexAxis:'y',
+  data:{labels:D.depts.labels,datasets:[{data:D.depts.data,backgroundColor:grey}]},
+  options:{plugins:{legend:{display:false}},scales:{x:{max:100,ticks:{callback:v=>v+'%'}}}}});
+</script>
+{% endblock %}

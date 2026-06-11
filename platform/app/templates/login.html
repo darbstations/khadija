@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>دخول · منصة درب</title><link rel="stylesheet" href="/static/style.css"></head>
+<body>
+<form class="login" method="post" action="/login">
+  <img src="/static/darb_logo.png" alt="درب">
+  <h1>منصة درب لمؤشرات الأداء</h1>
+  {% if error %}<div class="err">{{ error }}</div>{% endif %}
+  <input type="text" name="username" placeholder="اسم المستخدم" required>
+  <input type="password" name="password" placeholder="كلمة المرور" required>
+  <button class="btn" style="width:100%" type="submit">دخول</button>
+  <div class="creds">
+    <b>حسابات تجريبية:</b><br>
+    <span class="pill">admin / admin123</span> صلاحيات كاملة<br>
+    <span class="pill">exec / exec123</span> الإدارة التنفيذية<br>
+    <span class="pill">franchise / franchise123</span> مدير إدارة<br>
+    <span class="pill">emp / emp123</span> موظف
+  </div>
+</form>
+</body></html>

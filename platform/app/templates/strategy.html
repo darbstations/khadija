@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>الاستراتيجية والخارطة التنفيذية</h1>
+<div class="grid2">
+  <div class="panel">
+    <h3>الركائز (5 سنوات)</h3>
+    <table><thead><tr><th>الركيزة</th><th>الإنجاز</th><th>مؤشرات</th></tr></thead><tbody>
+    {% for p in pillars %}<tr><td>{{ p.name }}</td>
+      <td><div class="bar"><i style="width:{{ ((p.ach or 0)*100)|round }}%"></i></div></td>
+      <td class="mono">{% if p.ach is not none %}{{ (p.ach*100)|round }}% · {% endif %}{{ p.n }}</td></tr>{% endfor %}
+    </tbody></table>
+    <h3 style="margin-top:18px">منظورات BSC</h3>
+    <table><thead><tr><th>المنظور</th><th>الإنجاز</th><th>مؤشرات</th></tr></thead><tbody>
+    {% for p in persp %}<tr><td>{{ p.name }}</td>
+      <td class="mono">{% if p.ach is not none %}{{ (p.ach*100)|round }}%{% else %}—{% endif %}</td><td>{{ p.n }}</td></tr>{% endfor %}
+    </tbody></table>
+  </div>
+  <div class="panel">
+    <h3>مشاريع الخارطة التنفيذية</h3>
+    <table><thead><tr><th>المشروع</th><th>الركيزة</th><th>الإنجاز</th><th>الحالة</th></tr></thead><tbody>
+    {% for p in projects %}<tr>
+      <td>{{ p.name }}</td><td class="small">{{ p.pillar }}</td>
+      <td class="mono">{% if p.ach is not none %}{{ (p.ach*100)|round }}%{% else %}—{% endif %}</td>
+      <td>{% if p.gap %}<span class="tag bad">فجوة — بلا مؤشر</span>{% else %}<span class="tag ok">مغطّى ({{ p.n }})</span>{% endif %}</td>
+    </tr>{% endfor %}
+    </tbody></table>
+  </div>
+</div>
+{% endblock %}

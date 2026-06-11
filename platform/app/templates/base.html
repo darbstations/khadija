@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}منصة درب لمؤشرات الأداء{% endblock %}</title>
+<link rel="stylesheet" href="/static/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+</head>
+<body>
+{% if u %}
+<header class="topbar">
+  <div class="brand"><img src="/static/darb_logo.png" alt="درب"></div>
+  <nav>
+    <a href="/dashboard">اللوحة التنفيذية</a>
+    <a href="/strategy">الاستراتيجية</a>
+    <a href="/initiatives">المبادرات</a>
+    <a href="/risks">المخاطر</a>
+    {% if u.role == 'admin' %}<a href="/admin/kpis">إدارة المؤشرات</a><a href="/upload">استيراد</a>{% endif %}
+  </nav>
+  <div class="userbox">
+    <span class="uname">{{ u.full_name or u.username }}</span>
+    <span class="role">{{ ROLE_LABEL.get(u.role, u.role) }}</span>
+    <a class="logout" href="/logout">خروج</a>
+  </div>
+</header>
+</header>
+<div class="deptbar">
+  <span class="lbl">الإدارات:</span>
+  {% for d in DEPTS_NAV %}<a href="/department/{{ d.id }}">{{ d.name }}</a>{% endfor %}
+</div>
+{% endif %}
+<main class="container">
+{% block content %}{% endblock %}
+</main>
+<footer class="foot">درب · Darb — منظومة الأداء الاستراتيجية 2026</footer>
+</body>
+</html>

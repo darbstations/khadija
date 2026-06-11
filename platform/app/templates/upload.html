@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>استيراد الأرقام من ملف إكسل</h1>
+{% if msg %}<div class="note">✅ {{ msg }}</div>{% endif %}
+<div class="panel">
+  <p class="small">ارفع ملف «درب-مؤشرات-الأداء-2026.xlsx» (أو أي نسخة معبّأة). يقرأ النظام أوراق المؤشرات ويستورد الأرقام الشهرية بمطابقة اسم المؤشر.</p>
+  <form method="post" action="/upload" enctype="multipart/form-data" class="toolbar">
+    <input type="file" name="file" accept=".xlsx" required>
+    <button class="btn" type="submit">⬆️ استيراد</button>
+  </form>
+</div>
+{% endblock %}
