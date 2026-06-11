@@ -1,0 +1,689 @@
+import { useState, useEffect } from "react";
+import * as XLSX from "xlsx";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, CartesianGrid } from "recharts";
+
+const FILE_GROUPS = {
+  "MK084": ["MK084  3 TO 6.xlsx"],
+  "MK064": ["MK064  3 TO 5.xlsx"],
+  "MK014": ["MK014  3 TO 5.xlsx"],
+  "MK072": ["MK072  3.xlsx", "MK072  4.xlsx", "MK072 May 2026.xlsx"],
+  "MK029": ["MK029  Mar2026.xlsx", "MK029  Apr2026.xlsx", "MK029 May2026.xlsx"],
+  "MK033": ["MK033 MarApr2026.xlsx", "MK033 May2026.xlsx"],
+  "RY075": ["RY075 MarApr2026.xlsx", "RY075  May2026.xlsx"],
+  "MK004": ["MK004 APR2026.xlsx", "MK004 MAY2026.xlsx"],
+  "MK005": ["MK005 3 TO 5.xlsx"],
+  "MK046": ["MK046  3 TO 5.xlsx"],
+  "MK015": ["MK015  3 TO 5.xlsx"],
+  "MK006": ["MK006  3 TO 5.xlsx"],
+  "MK018": ["MK018  3 TO 5.xlsx"],
+  "MK008": ["MK008  3 TO 5.xlsx"],
+  "MK003": ["MK003  APR2026.xlsx", "MK003  MAY2026.xlsx"],
+  "JA056": ["JA056 3 TO 5.xlsx"],
+  "MK210": ["MK210  MAR2026.xlsx", "MK210  APR2026.xlsx", "MK210  MAY2026.xlsx"],
+  "QS055": ["QS055.xlsx"],
+  "EP051": ["EP051.xlsx"],
+  "MK007": ["MK007  MAR2026.xlsx", "MK007  APR2026.xlsx", "MK007 MAY2026.xlsx"],
+  "JA069": ["JA069  3 TO 4.xlsx", "JA069  5.xlsx"],
+  "JA053": ["JA053  3 TO 5.xlsx"],
+  "RY042": ["RY042 3 TO 5.xlsx"],
+  "MK054": ["MK054  3 TO 5.xlsx"],
+  "MK068": ["MK068 3 TO 5.xlsx"],
+  "MK099": ["MK099  3 TO 5.xlsx"],
+  "MK093": ["MK093 3 TO 5.xlsx"],
+  "MK071": ["MK071  3 TO 5.xlsx"],
+  "MK100": ["MK100  3 TO 5.xlsx"],
+};
+
+const FONT = "'Segoe UI', Tahoma, 'Arial', sans-serif";
+const COLORS = ["#38bdf8", "#fbbf24", "#34d399", "#f87171", "#a78bfa", "#f472b6", "#2dd4bf", "#fb923c"];
+const MONTH_NAMES = { 1: "يناير", 2: "فبراير", 3: "مارس", 4: "أبريل", 5: "مايو", 6: "يونيو", 7: "يوليو", 8: "أغسطس", 9: "سبتمبر", 10: "أكتوبر", 11: "نوفمبر", 12: "ديسمبر" };
+const WEEKDAYS = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+
+const KEYWORDS = {
+  date: ["starttime", "start time", "date", "التاريخ", "تاريخ", "trans date", "transaction date", "يوم", "day"],
+  time: ["time", "الوقت", "وقت", "ساعه", "ساعة", "hour"],
+  // المبلغ الإجمالي فقط — بدون "السعر" لأنه سعر اللتر
+  amount: ["responseamount", "totalamount", "amount", "المبلغ", "مبلغ", "القيمة", "قيمة", "الاجمالي", "الإجمالي", "اجمالي", "إجمالي", "total", "net", "المجموع", "sale amount", "sales", "value", "grand"],
+  unitPrice: ["price", "السعر", "سعر", "unit price", "سعر اللتر", "rate"],
+  product: ["fuelname", "fueltype", "fuel name", "fuel type", "product", "المنتج", "منتج", "الصنف", "صنف", "item", "fuel", "وقود", "grade", "نوع المنتج", "material", "نوع الوقود"],
+  payment: ["payment", "الدفع", "دفع", "طريقة الدفع", "وسيلة", "pay", "tender", "mode", "وسيلة الدفع", "نوع الدفع", "طريقة السداد"],
+  qty: ["qty", "quantity", "الكمية", "كمية", "لتر", "liter", "litre", "volume", "اللترات"],
+};
+
+// 🎯 الأسماء المؤكدة من سامية — لها الأولوية المطلقة (مطابقة تامة)
+const EXACT_PRIORITY = {
+  date: ["starttime", "date", "التاريخ"],
+  time: ["time", "الوقت"],
+  amount: ["responseamount", "totalamount", "المبلغ", "الاجمالي", "الإجمالي"],
+  product: ["fuelname", "fueltype", "المنتج"],
+};
+
+function matchColumn(header, type) {
+  if (header == null) return false;
+  const h = String(header).toLowerCase().trim();
+  if (!h) return false;
+  return KEYWORDS[type].some(k => h.includes(k));
+}
+
+function detectColumns(headers) {
+  const map = {};
+  const norm = headers.map(h => h == null ? "" : String(h).toLowerCase().trim());
+  // المرحلة 1: مطابقة تامة للأسماء المؤكدة (StartTime, ResponseAmount, TotalAmount, FuelName, FuelType...)
+  for (const type of Object.keys(KEYWORDS)) {
+    const priorityList = EXACT_PRIORITY[type] || [];
+    for (const key of priorityList) {
+      const i = norm.findIndex((h, idx) => h === key && !Object.values(map).includes(idx));
+      if (i !== -1) { map[type] = i; break; }
+    }
+  }
+  // المرحلة 2: مطابقة جزئية لما تبقى من الأعمدة
+  for (const type of Object.keys(KEYWORDS)) {
+    if (map[type] != null) continue;
+    for (let i = 0; i < headers.length; i++) {
+      if (Object.values(map).includes(i)) continue;
+      if (matchColumn(headers[i], type)) {
+        if (type === "amount" && (matchColumn(headers[i], "qty") || matchColumn(headers[i], "unitPrice"))) continue;
+        map[type] = i;
+        break;
+      }
+    }
+  }
+  return map;
+}
+
+function toNumber(v) {
+  if (v == null || v === "") return null;
+  if (typeof v === "number") return v;
+  const n = parseFloat(String(v).replace(/[^0-9.\-]/g, ""));
+  return isNaN(n) ? null : n;
+}
+
+function extractDate(v) {
+  if (v == null) return null;
+  if (v instanceof Date && !isNaN(v)) return v;
+  if (typeof v === "number") {
+    const d = new Date(Math.round((v - 25569) * 86400 * 1000));
+    return isNaN(d) ? null : d;
+  }
+  const s = String(v).trim();
+  const m = s.match(/(\d{1,4})[\/\-.](\d{1,2})[\/\-.](\d{1,4})/);
+  if (m) {
+    let a = parseInt(m[1]), b = parseInt(m[2]), c = parseInt(m[3]);
+    let day, month, year;
+    if (a > 31) { year = a; month = b; day = c; }
+    else {
+      year = c < 100 ? c + 2000 : c;
+      if (a > 12) { day = a; month = b; }
+      else if (b > 12) { month = a; day = b; }
+      else { day = a; month = b; }
+    }
+    const d = new Date(year, month - 1, day);
+    const t = s.match(/(\d{1,2}):(\d{2})/);
+    if (t) d.setHours(parseInt(t[1]), parseInt(t[2]));
+    if (!isNaN(d)) return d;
+  }
+  const d2 = new Date(s);
+  return isNaN(d2) ? null : d2;
+}
+
+function extractHour(v, dateVal) {
+  if (v != null) {
+    if (v instanceof Date && !isNaN(v)) return v.getHours();
+    if (typeof v === "number") {
+      if (v >= 0 && v < 1) return Math.floor(v * 24);
+      if (v >= 0 && v < 24) return Math.floor(v);
+    }
+    const s = String(v).trim();
+    const m = s.match(/(\d{1,2})[:\.](\d{2})/);
+    if (m) {
+      let h = parseInt(m[1]);
+      if (/pm|م/i.test(s) && h < 12) h += 12;
+      if (/am|ص/i.test(s) && h === 12) h = 0;
+      if (h >= 0 && h <= 23) return h;
+    }
+    const n = parseInt(s);
+    if (!isNaN(n) && n >= 0 && n <= 23) return n;
+  }
+  if (dateVal instanceof Date && (dateVal.getHours() !== 0 || dateVal.getMinutes() !== 0)) return dateVal.getHours();
+  return null;
+}
+
+function findHeaderRow(rows) {
+  let best = 0, bestScore = -1;
+  for (let i = 0; i < Math.min(rows.length, 12); i++) {
+    const row = rows[i] || [];
+    let score = 0;
+    for (const cell of row) {
+      for (const type of Object.keys(KEYWORDS)) {
+        if (matchColumn(cell, type)) { score += 2; break; }
+      }
+      if (cell != null && String(cell).trim() !== "") score += 0.1;
+    }
+    if (score > bestScore) { bestScore = score; best = i; }
+  }
+  return bestScore >= 2 ? best : -1;
+}
+
+function fmt(n, dec = 0) {
+  if (n == null || isNaN(n)) return "—";
+  return n.toLocaleString("en-US", { maximumFractionDigits: dec, minimumFractionDigits: 0 });
+}
+
+const avg = arr => arr.length ? arr.reduce((s, v) => s + v, 0) / arr.length : 0;
+const fmtAxis = v => v >= 1000000 ? (v / 1000000).toFixed(1) + " مليون" : v >= 1000 ? Math.round(v / 1000) + " ألف" : v;
+const tooltipStyle = { background: "#1e293b", border: "1px solid #334155", borderRadius: 8, fontFamily: FONT, direction: "rtl" };
+const pieLabel = ({ percent }) => percent > 0.05 ? `${(percent * 100).toFixed(0)}%` : "";
+
+export default function App() {
+  const [loading, setLoading] = useState(true);
+  const [stations, setStations] = useState({});
+  const [notes, setNotes] = useState([]);
+  const [active, setActive] = useState("overview");
+  const [progress, setProgress] = useState("");
+
+  useEffect(() => {
+    async function load() {
+      const allNotes = [];
+      const result = {};
+      const totalFiles = Object.values(FILE_GROUPS).reduce((s, f) => s + f.length, 0);
+      let fileNum = 0;
+      try {
+      for (const [station, files] of Object.entries(FILE_GROUPS)) {
+        const agg = {
+          rows: 0, skipped: 0, revenue: 0, withAmount: 0,
+          byHour: {}, byProduct: {}, byPayment: {}, byMonth: {}, byWeekday: {},
+          files: [], columnsInfo: [], totalQty: 0, hasQty: false,
+          hourDataAvailable: 0, outOfRange: 0, daysSet: new Set(),
+        };
+        for (const fname of files) {
+                      fileNum++;
+            setProgress(`الملف ${fileNum} من ${totalFiles}: ${fname}`);
+            await new Promise(res => setTimeout(res, 25)); // نسمح للواجهة تتحدث بين الملفات
+          try {
+            const buf = await window.fs.readFile(fname);
+            const wb = XLSX.read(buf, { cellDates: true });
+            let fileRows = 0;
+            for (const sheetName of wb.SheetNames) {
+              const sheet = wb.Sheets[sheetName];
+              const raw = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null });
+              if (!raw.length) continue;
+              const hIdx = findHeaderRow(raw);
+              if (hIdx === -1) {
+                allNotes.push({ type: "warn", text: `${fname} — ورقة "${sheetName}": ما قدرت أحدد صف العناوين، تجاهلت الورقة.` });
+                continue;
+              }
+              const headers = raw[hIdx].map(h => h == null ? "" : String(h).trim());
+              const cols = detectColumns(headers);
+              agg.columnsInfo.push({ file: fname, sheet: sheetName, headers: headers.filter(Boolean), detected: cols });
+
+              // ====== المرحلة 1: قراءة كل الصفوف ======
+              const parsed = [];
+              for (let r = hIdx + 1; r < raw.length; r++) {
+                const row = raw[r];
+                if (!row || row.every(c => c == null || c === "")) continue;
+                const rawAmount = cols.amount != null ? toNumber(row[cols.amount]) : null;
+                const unitPrice = cols.unitPrice != null ? toNumber(row[cols.unitPrice]) : null;
+                const qty = cols.qty != null ? toNumber(row[cols.qty]) : null;
+                const dateVal = cols.date != null ? extractDate(row[cols.date]) : null;
+                const hour = extractHour(cols.time != null ? row[cols.time] : null, dateVal);
+                const product = cols.product != null && row[cols.product] != null ? String(row[cols.product]).trim() : null;
+                const payment = cols.payment != null && row[cols.payment] != null ? String(row[cols.payment]).trim() : null;
+                if (rawAmount == null && unitPrice == null && product == null && payment == null && dateVal == null) continue;
+                parsed.push({ rawAmount, unitPrice, qty, dateVal, hour, product, payment });
+              }
+
+              // ====== المرحلة 2: تحديد طريقة حساب الفاتورة ======
+              const amtVals = parsed.map(p => p.rawAmount).filter(v => v != null && v > 0);
+              const qtyVals = parsed.map(p => p.qty).filter(v => v != null && v > 0);
+              const avgAmt = avg(amtVals), avgQty = avg(qtyVals);
+              let amountMode = "direct";
+              if (cols.amount == null && cols.unitPrice != null && cols.qty != null) {
+                amountMode = "priceTimesQty";
+                allNotes.push({ type: "info", text: `${fname} — ورقة "${sheetName}": ما فيه عمود إجمالي، حسبت الفاتورة = سعر اللتر × الكمية.` });
+              } else if (cols.amount != null && avgAmt > 0 && avgAmt < 5 && qtyVals.length > 0 && avgQty > avgAmt) {
+                // العمود المكتشف كمبلغ هو في الحقيقة سعر اللتر (~2.2 ر.س)
+                amountMode = "amountTimesQty";
+                allNotes.push({ type: "info", text: `${fname} — ورقة "${sheetName}": عمود "${headers[cols.amount]}" طلع سعر اللتر (متوسطه ${avgAmt.toFixed(2)} ر.س) مو الإجمالي — حسبت الفاتورة = السعر × الكمية تلقائيًا. ✅` });
+              }
+
+              // ====== المرحلة 3: التجميع ======
+              for (const p of parsed) {
+                // ⛔ استبعاد نهائي: التحليل فقط لشهر 3 و 4 و 5 من 2026
+                if (p.dateVal) {
+                  const y0 = p.dateVal.getFullYear(), m0 = p.dateVal.getMonth() + 1;
+                  if (y0 !== 2026 || m0 < 3 || m0 > 5) { agg.outOfRange++; continue; }
+                }
+                let amount = null;
+                if (amountMode === "direct") amount = p.rawAmount;
+                else if (amountMode === "priceTimesQty") amount = (p.unitPrice != null && p.qty != null) ? p.unitPrice * p.qty : null;
+                else if (amountMode === "amountTimesQty") amount = (p.rawAmount != null && p.qty != null) ? p.rawAmount * p.qty : null;
+
+                agg.rows++; fileRows++;
+                if (amount != null && amount > 0) { agg.revenue += amount; agg.withAmount++; }
+                else agg.skipped++;
+                if (p.qty != null) { agg.totalQty += p.qty; agg.hasQty = true; }
+                if (p.hour != null) {
+                  agg.hourDataAvailable++;
+                  if (!agg.byHour[p.hour]) agg.byHour[p.hour] = { count: 0, revenue: 0 };
+                  agg.byHour[p.hour].count++;
+                  if (amount != null) agg.byHour[p.hour].revenue += amount;
+                }
+                if (p.product) {
+                  if (!agg.byProduct[p.product]) agg.byProduct[p.product] = { count: 0, revenue: 0 };
+                  agg.byProduct[p.product].count++;
+                  if (amount != null) agg.byProduct[p.product].revenue += amount;
+                }
+                if (p.payment) {
+                  if (!agg.byPayment[p.payment]) agg.byPayment[p.payment] = { count: 0, revenue: 0 };
+                  agg.byPayment[p.payment].count++;
+                  if (amount != null) agg.byPayment[p.payment].revenue += amount;
+                }
+                if (p.dateVal) {
+                  const y = p.dateVal.getFullYear(), mo = p.dateVal.getMonth() + 1, dy = p.dateVal.getDate();
+                  agg.daysSet.add(`${y}-${mo}-${dy}`);
+                  const mk = `${y}-${String(mo).padStart(2, "0")}`;
+                  if (!agg.byMonth[mk]) agg.byMonth[mk] = { count: 0, revenue: 0 };
+                  agg.byMonth[mk].count++;
+                  if (amount != null) agg.byMonth[mk].revenue += amount;
+                  const wd = p.dateVal.getDay();
+                  if (!agg.byWeekday[wd]) agg.byWeekday[wd] = { count: 0, revenue: 0 };
+                  agg.byWeekday[wd].count++;
+                  if (amount != null) agg.byWeekday[wd].revenue += amount;
+                }
+              }
+            }
+            agg.files.push({ name: fname, rows: fileRows });
+            if (fileRows === 0) allNotes.push({ type: "warn", text: `${fname}: ما طلع منه أي صفوف بيانات صالحة.` });
+          } catch (e) {
+            allNotes.push({ type: "error", text: `فشل قراءة ${fname}: ${e.message}` });
+          }
+        }
+        agg.daysCount = agg.daysSet.size;
+        delete agg.daysSet;
+        if (agg.skipped > 0) allNotes.push({ type: "warn", text: `${station}: ${fmt(agg.skipped)} صف بدون مبلغ صالح (محسوبة كزيارات بدون إيراد).` });
+        if (agg.outOfRange > 0) allNotes.push({ type: "info", text: `${station}: تم استبعاد ${fmt(agg.outOfRange)} صف نهائيًا لأن تواريخها خارج نطاق التحليل (مارس – مايو 2026).` });
+        if (agg.rows > 0 && agg.hourDataAvailable === 0) allNotes.push({ type: "warn", text: `${station}: ما لقيت بيانات وقت/ساعة — تحليل أوقات الذروة غير متاح.` });
+        result[station] = agg;
+      }
+      } catch (e) {
+        allNotes.push({ type: "error", text: `⛔ توقف التحليل عند الملف رقم ${fileNum} بسبب خطأ غير متوقع: ${e.message} — النتائج المعروضة جزئية.` });
+      }
+      setStations(result);
+      setNotes(allNotes);
+      setLoading(false);
+    }
+    load();
+  }, []);
+
+  if (loading) return (
+    <div dir="rtl" style={{ fontFamily: FONT }} className="min-h-screen bg-slate-950 flex items-center justify-center text-white">
+      <div className="text-center">
+        <div className="animate-spin w-12 h-12 border-4 border-sky-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+        <p className="text-lg">جاري تحليل الملفات...</p>
+        <p className="text-slate-400 text-sm mt-2">{progress}</p>
+      </div>
+    </div>
+  );
+
+  const stationKeys = Object.keys(stations);
+  const totalRevenue = stationKeys.reduce((s, k) => s + stations[k].revenue, 0);
+  const totalVisits = stationKeys.reduce((s, k) => s + stations[k].rows, 0);
+  const totalWithAmount = stationKeys.reduce((s, k) => s + stations[k].withAmount, 0);
+  const avgInvoice = totalWithAmount ? totalRevenue / totalWithAmount : 0;
+
+  const compareData = stationKeys.map(k => {
+    const st = stations[k];
+    return {
+      name: k,
+      الإيراد: Math.round(st.revenue),
+      الزيارات: st.rows,
+      "متوسط الفاتورة": st.withAmount ? Math.round(st.revenue / st.withAmount * 10) / 10 : 0,
+      "مرور يومي": st.daysCount ? Math.round(st.rows / st.daysCount) : null,
+    };
+  }).sort((a, b) => b.الإيراد - a.الإيراد);
+
+  const allMonths = {};
+  stationKeys.forEach(k => Object.entries(stations[k].byMonth).forEach(([m, v]) => {
+    if (!allMonths[m]) allMonths[m] = 0;
+    allMonths[m] += v.revenue;
+  }));
+  const monthlyData = Object.keys(allMonths).sort().map(m => ({
+    name: MONTH_NAMES[parseInt(m.split("-")[1])] || m,
+    الإيراد: Math.round(allMonths[m]),
+  }));
+
+  const tabs = [{ id: "overview", label: "📊 نظرة عامة" }, ...stationKeys.map(k => ({ id: k, label: k })), { id: "notes", label: `⚠️ ملاحظات (${notes.length})` }];
+
+  function exportReport() {
+    const payload = {
+      generatedAt: new Date().toISOString(),
+      period: "مارس – مايو 2026",
+      totals: { stations: stationKeys.length, revenue: totalRevenue, visits: totalVisits, avgInvoice },
+      monthly: monthlyData,
+      stations: stationKeys.map(k => {
+        const st = stations[k];
+        const hourArr = Array.from({ length: 24 }, (_, h) => ({ hour: h, count: st.byHour[h]?.count || 0, revenue: Math.round(st.byHour[h]?.revenue || 0) }));
+        return {
+          code: k,
+          revenue: Math.round(st.revenue),
+          visits: st.rows,
+          avgInvoice: st.withAmount ? Math.round(st.revenue / st.withAmount * 10) / 10 : 0,
+          dailyTraffic: st.daysCount ? Math.round(st.rows / st.daysCount) : null,
+          daysCount: st.daysCount,
+          byHour: hourArr,
+          byProduct: Object.entries(st.byProduct).map(([n, v]) => ({ name: n, count: v.count, revenue: Math.round(v.revenue) })),
+          byPayment: Object.entries(st.byPayment).map(([n, v]) => ({ name: n, count: v.count, revenue: Math.round(v.revenue) })),
+          byMonth: Object.keys(st.byMonth).sort().map(m => ({ month: m, revenue: Math.round(st.byMonth[m].revenue), count: st.byMonth[m].count })),
+          byWeekday: Object.entries(st.byWeekday).map(([d, v]) => ({ day: +d, visits: v.count, revenue: Math.round(v.revenue) })),
+        };
+      }),
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "darb_report_data.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  return (
+    <div dir="rtl" style={{ fontFamily: FONT }} className="min-h-screen bg-slate-950 text-white p-4">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-wrap justify-between items-center gap-2 mb-1">
+          <h1 className="text-2xl font-bold">⛽ داش بورد محطات درب الوقود</h1>
+          <button onClick={exportReport} className="px-4 py-2 rounded-lg text-sm font-bold bg-emerald-500 hover:bg-emerald-600 text-white transition">
+            📥 تصدير الأرقام للتقرير
+          </button>
+        </div>
+        <p className="text-slate-400 text-sm mb-4">تحليل المبيعات والزيارات — مارس / أبريل / مايو 2026</p>
+
+        <div className="flex flex-wrap gap-2 mb-6">
+          {tabs.map(t => (
+            <button key={t.id} onClick={() => setActive(t.id)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${active === t.id ? "bg-sky-500 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {active === "overview" && (
+          <div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+              <KPI title="عدد المحطات" value={stationKeys.length} icon="🏪" />
+              <KPI title="إجمالي الإيراد" value={fmt(totalRevenue) + " ر.س"} icon="💰" />
+              <KPI title="إجمالي الزيارات" value={fmt(totalVisits)} icon="🚗" />
+              <KPI title="متوسط الفاتورة" value={fmt(avgInvoice, 1) + " ر.س"} icon="🧾" />
+            </div>
+
+            <Card title="مقارنة الإيراد بين المحطات">
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={compareData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                  <XAxis dataKey="name" stroke="#cbd5e1" style={{ fontFamily: FONT, fontSize: 13 }} />
+                  <YAxis stroke="#cbd5e1" width={75} tickFormatter={fmtAxis} style={{ fontFamily: FONT, fontSize: 12 }} />
+                  <Tooltip contentStyle={tooltipStyle} formatter={v => fmt(v)} />
+                  <Bar dataKey="الإيراد" fill="#38bdf8" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </Card>
+
+            <div className="grid md:grid-cols-2 gap-4 mt-4">
+              <Card title="الإجمالي الشهري (كل المحطات)">
+                <ResponsiveContainer width="100%" height={250}>
+                  <BarChart data={monthlyData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                    <XAxis dataKey="name" stroke="#cbd5e1" style={{ fontFamily: FONT, fontSize: 13 }} />
+                    <YAxis stroke="#cbd5e1" width={75} tickFormatter={fmtAxis} style={{ fontFamily: FONT, fontSize: 12 }} />
+                    <Tooltip contentStyle={tooltipStyle} formatter={v => fmt(v)} />
+                    <Bar dataKey="الإيراد" fill="#34d399" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </Card>
+
+              <Card title="متوسط المرور اليومي لكل محطة (سيارة/يوم)">
+                <ResponsiveContainer width="100%" height={250}>
+                  <BarChart data={[...compareData].filter(d => d["مرور يومي"] != null).sort((a, b) => b["مرور يومي"] - a["مرور يومي"])}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                    <XAxis dataKey="name" stroke="#cbd5e1" style={{ fontFamily: FONT, fontSize: 13 }} />
+                    <YAxis stroke="#cbd5e1" style={{ fontFamily: FONT, fontSize: 12 }} />
+                    <Tooltip contentStyle={tooltipStyle} formatter={v => fmt(v) + " سيارة/يوم"} />
+                    <Bar dataKey="مرور يومي" fill="#fbbf24" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </Card>
+            </div>
+
+            <Card title="جدول ملخص المحطات" className="mt-4">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead><tr className="text-slate-400 border-b border-slate-700">
+                    <th className="p-2 text-right">المحطة</th><th className="p-2 text-right">الزيارات</th>
+                    <th className="p-2 text-right">الإيراد</th><th className="p-2 text-right">متوسط الفاتورة</th>
+                    <th className="p-2 text-right">متوسط المرور اليومي 🚗</th>
+                  </tr></thead>
+                  <tbody>
+                    {compareData.map(r => (
+                      <tr key={r.name} className="border-b border-slate-800 hover:bg-slate-800/50 cursor-pointer" onClick={() => setActive(r.name)}>
+                        <td className="p-2 font-bold text-sky-400">{r.name}</td>
+                        <td className="p-2">{fmt(r.الزيارات)}</td>
+                        <td className="p-2">{fmt(r.الإيراد)} ر.س</td>
+                        <td className="p-2">{fmt(r["متوسط الفاتورة"], 1)} ر.س</td>
+                        <td className="p-2">{r["مرور يومي"] != null ? fmt(r["مرور يومي"]) + " سيارة" : "—"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {stationKeys.includes(active) && <StationView name={active} data={stations[active]} />}
+
+        {active === "notes" && (
+          <div className="space-y-3">
+            <Card title="📋 ملاحظات جودة البيانات">
+              {notes.length === 0 ? <p className="text-emerald-400">✅ كل الملفات انقرأت بدون مشاكل!</p> :
+                notes.map((n, i) => (
+                  <div key={i} className={`p-3 rounded-lg mb-2 text-sm ${n.type === "error" ? "bg-red-500/10 border border-red-500/30 text-red-300" : n.type === "info" ? "bg-sky-500/10 border border-sky-500/30 text-sky-200" : "bg-amber-500/10 border border-amber-500/30 text-amber-200"}`}>
+                    {n.type === "error" ? "🔴" : n.type === "info" ? "🔵" : "🟡"} {n.text}
+                  </div>
+                ))}
+            </Card>
+            <Card title="🔍 الأعمدة المكتشفة في كل ملف">
+              {stationKeys.map(k => (
+                <div key={k} className="mb-4">
+                  <h4 className="font-bold text-sky-400 mb-1">{k}</h4>
+                  {stations[k].columnsInfo.map((c, i) => (
+                    <div key={i} className="text-xs text-slate-400 mb-1 bg-slate-800/50 p-2 rounded">
+                      <span className="text-slate-300">{c.file}</span> — ورقة "{c.sheet}": {c.headers.join("، ") || "بدون عناوين"}
+                      <div className="mt-1 text-emerald-400">
+                        تم التعرف: {Object.entries(c.detected).map(([t, idx]) => `${t}→"${c.headers[idx]}"`).join(" | ") || "لا شيء"}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </Card>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function KPI({ title, value, icon }) {
+  return (
+    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
+      <div className="text-2xl mb-1">{icon}</div>
+      <div className="text-slate-400 text-xs">{title}</div>
+      <div className="text-xl font-bold mt-1">{value}</div>
+    </div>
+  );
+}
+
+function Card({ title, children, className = "" }) {
+  return (
+    <div className={`bg-slate-900 border border-slate-800 rounded-xl p-4 ${className}`}>
+      <h3 className="font-bold mb-3 text-slate-200">{title}</h3>
+      {children}
+    </div>
+  );
+}
+
+function PieWithLegend({ data, inner = 0, colorOffset = 0 }) {
+  return (
+    <div className="flex flex-col md:flex-row items-center gap-2">
+      <ResponsiveContainer width="100%" height={230}>
+        <PieChart>
+          <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={inner} outerRadius={85}
+            labelLine={false} label={pieLabel} style={{ fontFamily: FONT, fontSize: 13, fontWeight: 700 }}>
+            {data.map((_, i) => <Cell key={i} fill={COLORS[(i + colorOffset) % COLORS.length]} stroke="#0f172a" strokeWidth={2} />)}
+          </Pie>
+          <Tooltip contentStyle={tooltipStyle} formatter={(v, n, p) => [`${fmt(v)} عملية — ${fmt(p.payload.revenue)} ر.س`, p.payload.name]} />
+        </PieChart>
+      </ResponsiveContainer>
+      <div className="flex flex-col gap-1.5 min-w-[150px] text-sm" style={{ fontFamily: FONT }}>
+        {data.map((d, i) => {
+          const total = data.reduce((s, x) => s + x.value, 0);
+          return (
+            <div key={d.name} className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-sm shrink-0" style={{ background: COLORS[(i + colorOffset) % COLORS.length] }}></span>
+              <span className="text-slate-300 truncate">{d.name}</span>
+              <span className="text-slate-500 mr-auto text-xs">{((d.value / total) * 100).toFixed(1)}%</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function StationView({ name, data }) {
+  const hourData = Array.from({ length: 24 }, (_, h) => ({
+    hour: `${h}:00`,
+    العمليات: data.byHour[h]?.count || 0,
+    الإيراد: Math.round(data.byHour[h]?.revenue || 0),
+  }));
+  const hasHours = data.hourDataAvailable > 0;
+
+  const peakCount = hasHours ? hourData.reduce((a, b) => b.العمليات > a.العمليات ? b : a) : null;
+  const peakRev = hasHours ? hourData.reduce((a, b) => b.الإيراد > a.الإيراد ? b : a) : null;
+
+  const productData = Object.entries(data.byProduct).map(([k, v]) => ({ name: k, value: v.count, revenue: Math.round(v.revenue) })).sort((a, b) => b.value - a.value);
+  const paymentData = Object.entries(data.byPayment).map(([k, v]) => ({ name: k, value: v.count, revenue: Math.round(v.revenue) })).sort((a, b) => b.value - a.value);
+  const monthData = Object.keys(data.byMonth).sort().map(m => ({
+    name: MONTH_NAMES[parseInt(m.split("-")[1])] || m,
+    الإيراد: Math.round(data.byMonth[m].revenue),
+    الزيارات: data.byMonth[m].count,
+  }));
+  const weekdayData = Object.keys(data.byWeekday).map(d => ({
+    name: WEEKDAYS[d],
+    الزيارات: data.byWeekday[d].count,
+    الإيراد: Math.round(data.byWeekday[d].revenue),
+  }));
+
+  const avgInv = data.withAmount ? data.revenue / data.withAmount : 0;
+  const dailyTraffic = data.daysCount ? Math.round(data.rows / data.daysCount) : null;
+
+  return (
+    <div>
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
+        <KPI title="عدد الزيارات" value={fmt(data.rows)} icon="🚗" />
+        <KPI title="إجمالي الإيراد" value={fmt(data.revenue) + " ر.س"} icon="💰" />
+        <KPI title="متوسط الفاتورة" value={fmt(avgInv, 1) + " ر.س"} icon="🧾" />
+        <KPI title="متوسط المرور اليومي" value={dailyTraffic != null ? fmt(dailyTraffic) + " سيارة" : "—"} icon="🛣️" />
+        <KPI title={hasHours ? "ساعة الذروة" : "الملفات"} value={hasHours ? `${peakCount.hour} 🔥` : data.files.length} icon={hasHours ? "⏰" : "📁"} />
+      </div>
+
+      {dailyTraffic != null && (
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 mb-4 text-sm text-slate-300">
+          🛣️ محسوب على <b className="text-amber-400">{fmt(data.daysCount)}</b> يوم فعلي بالبيانات: تقريبًا <b className="text-amber-400">{fmt(dailyTraffic)}</b> سيارة تمر يوميًا (≈ {fmt(Math.round(dailyTraffic / 24))} سيارة بالساعة كمعدل عام).
+        </div>
+      )}
+
+      {hasHours && peakCount && peakRev && (
+        <div className="bg-gradient-to-l from-sky-500/20 to-emerald-500/20 border border-sky-500/30 rounded-xl p-4 mb-4 text-sm">
+          💡 <b>أبرز النتائج:</b> أزحم ساعة من ناحية العمليات هي <b className="text-sky-400">{peakCount.hour}</b> ({fmt(peakCount.العمليات)} عملية)،
+          وأعلى ساعة إيرادًا هي <b className="text-emerald-400">{peakRev.hour}</b> ({fmt(peakRev.الإيراد)} ر.س)
+          {peakCount.hour !== peakRev.hour && " — لاحظي إنها مختلفة! يعني فيه أوقات أقل زحمة لكن فواتيرها أكبر."}
+        </div>
+      )}
+
+      {hasHours && (
+        <div className="grid md:grid-cols-2 gap-4 mb-4">
+          <Card title="⏰ أوقات الذروة — عدد العمليات بالساعة">
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={hourData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                <XAxis dataKey="hour" stroke="#cbd5e1" interval={2} style={{ fontFamily: FONT, fontSize: 11 }} />
+                <YAxis stroke="#cbd5e1" style={{ fontFamily: FONT, fontSize: 12 }} />
+                <Tooltip contentStyle={tooltipStyle} />
+                <Bar dataKey="العمليات" fill="#38bdf8" radius={[3, 3, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </Card>
+          <Card title="💵 الذروة المالية — الإيراد بالساعة">
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={hourData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                <XAxis dataKey="hour" stroke="#cbd5e1" interval={2} style={{ fontFamily: FONT, fontSize: 11 }} />
+                <YAxis stroke="#cbd5e1" width={75} tickFormatter={fmtAxis} style={{ fontFamily: FONT, fontSize: 12 }} />
+                <Tooltip contentStyle={tooltipStyle} formatter={v => fmt(v)} />
+                <Bar dataKey="الإيراد" fill="#34d399" radius={[3, 3, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </Card>
+        </div>
+      )}
+
+      <div className="grid md:grid-cols-2 gap-4 mb-4">
+        {productData.length > 0 && (
+          <Card title="⛽ توزيع المنتجات (حسب عدد العمليات)">
+            <PieWithLegend data={productData} />
+          </Card>
+        )}
+        {paymentData.length > 0 && (
+          <Card title="💳 طرق الدفع">
+            <PieWithLegend data={paymentData} inner={45} colorOffset={3} />
+          </Card>
+        )}
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-4">
+        {monthData.length > 0 && (
+          <Card title="📅 الأداء الشهري">
+            <ResponsiveContainer width="100%" height={230}>
+              <BarChart data={monthData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                <XAxis dataKey="name" stroke="#cbd5e1" style={{ fontFamily: FONT, fontSize: 13 }} />
+                <YAxis stroke="#cbd5e1" width={75} tickFormatter={fmtAxis} style={{ fontFamily: FONT, fontSize: 12 }} />
+                <Tooltip contentStyle={tooltipStyle} formatter={v => fmt(v)} />
+                <Bar dataKey="الإيراد" fill="#a78bfa" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </Card>
+        )}
+        {weekdayData.length > 0 && (
+          <Card title="📆 أيام الأسبوع — أي يوم أقوى؟">
+            <ResponsiveContainer width="100%" height={230}>
+              <BarChart data={weekdayData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                <XAxis dataKey="name" stroke="#cbd5e1" style={{ fontFamily: FONT, fontSize: 11 }} />
+                <YAxis stroke="#cbd5e1" style={{ fontFamily: FONT, fontSize: 12 }} />
+                <Tooltip contentStyle={tooltipStyle} formatter={v => fmt(v)} />
+                <Bar dataKey="الزيارات" fill="#fbbf24" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </Card>
+        )}
+      </div>
+
+      <Card title="📁 الملفات المقروءة" className="mt-4">
+        <div className="text-sm text-slate-400">
+          {data.files.map(f => <div key={f.name}>• {f.name} — {fmt(f.rows)} صف</div>)}
+        </div>
+      </Card>
+    </div>
+  );
+}
