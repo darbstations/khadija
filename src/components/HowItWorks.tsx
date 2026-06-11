@@ -1,3 +1,5 @@
+import { useScenario } from "../context/ScenarioContext";
+import { fmtInt } from "../model/engine";
 import { Card } from "./ui";
 
 const COMPARE = [
@@ -47,6 +49,7 @@ const TENANT_MODELS = [
 ];
 
 export default function HowItWorks() {
+  const { inputs } = useScenario();
   return (
     <div className="space-y-4">
       <div>
@@ -120,7 +123,7 @@ export default function HowItWorks() {
         </div>
         <p className="text-xs text-darb-mut mt-3">
           💬 رسالة التفاوض: «عميل درب يدخل محطتك مجاناً من التطبيق. تموّل مكافأة بسيطة من هامشك
-          مقابل عميل متكرر + بيانات + تسويق داخل التطبيق. النقطة قيمتها ثابتة: 10,000 نقطة = ريال.»
+          مقابل عميل متكرر + بيانات + تسويق داخل التطبيق. النقطة قيمتها ثابتة: {fmtInt(inputs.pointValue)} نقطة = ريال.»
         </p>
       </Card>
 

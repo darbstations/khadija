@@ -13,7 +13,7 @@ export default function ExecutiveSummary() {
       <div>
         <h2 className="text-lg font-extrabold">📊 الملخص التنفيذي</h2>
         <p className="text-xs text-darb-mut">
-          اقتصاد نقاط مُضخّم · إحساس بالثراء + قيمة استبدال واضحة (10,000 نقطة = ريال)
+          نقاط أكبر من المنافس · قيمة استبدال واضحة ({fmtInt(inputs.pointValue)} نقطة = ريال)
         </p>
       </div>
 
@@ -122,7 +122,7 @@ export default function ExecutiveSummary() {
 
       <Card title="🎯 التوصيات الاستراتيجية">
         <ul className="text-sm space-y-2 text-darb-ink/90 leading-relaxed list-disc pr-5">
-          <li>اعتمد النموذج المُضخّم (نقاط كبيرة + 10,000 نقطة = ريال) للإحساس بالثراء.</li>
+          <li>نقاط أكبر من ساسكو ({fmtInt(inputs.pointValue)} نقطة = ريال) دون مبالغة تكشف ضعف القيمة.</li>
           <li>
             الوقود يجذب والشركاء يموّلون: كسب الوقود قليل (~0.5–1%)، والكرم (3–5%) عند الشركاء
             ومموّل منهم.
