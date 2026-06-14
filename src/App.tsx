@@ -12,6 +12,7 @@ import StationsDB from "./components/StationsDB";
 import Redemption from "./components/Redemption";
 import WalletRedemption from "./components/WalletRedemption";
 import OffersMarketplace from "./components/OffersMarketplace";
+import OffersAdmin from "./components/OffersAdmin";
 import FranchiseCollection from "./components/FranchiseCollection";
 import Projections from "./components/Projections";
 import ScenarioCompare from "./components/ScenarioCompare";
@@ -27,6 +28,7 @@ const TABS = [
   { id: "scenarios", label: "السيناريوهات", icon: "⚙️", el: <ScenarioPanel /> },
   { id: "simulator", label: "محاكي العميل", icon: "🎮", el: <CustomerSimulator /> },
   { id: "offers", label: "سوق العروض (العميل)", icon: "🎁", el: <OffersMarketplace /> },
+  { id: "offersadmin", label: "إدارة العروض (درب)", icon: "🛠️", el: <OffersAdmin /> },
   { id: "redemption", label: "قنوات الاستبدال", icon: "🔁", el: <Redemption /> },
   { id: "wallet", label: "المحفظة وسوق الاستبدال", icon: "👛", el: <WalletRedemption /> },
   { id: "tiers", label: "المستويات وقيمة النقطة", icon: "🎯", el: <TiersAndValue /> },

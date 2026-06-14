@@ -1,22 +1,25 @@
 import { useState } from "react";
 import { useScenario } from "../context/ScenarioContext";
 import { fmtInt, fmtSar } from "../model/engine";
-import { OFFER_LOCATIONS, OFFER_CATEGORIES, SAMPLE_OFFERS } from "../model/defaults";
+import { OFFER_LOCATIONS, OFFER_CATEGORIES } from "../model/defaults";
+import { useOffers, visibleOffers, type Offer } from "../model/offers";
 import { Card, Badge } from "./ui";
 
 export default function OffersMarketplace() {
   const { inputs } = useScenario();
+  const { offers: allOffers } = useOffers();
   const [location, setLocation] = useState(OFFER_LOCATIONS[1]);
   const [cat, setCat] = useState("all");
   const [balance, setBalance] = useState(8000); // رصيد العميل (نقطة)
   const [redeemed, setRedeemed] = useState<number[]>([]);
   const [last, setLast] = useState<string | null>(null);
 
-  const offers = SAMPLE_OFFERS.filter(
+  // العميل يرى فقط العروض المعتمدة والنشطة من درب
+  const offers = visibleOffers(allOffers).filter(
     (o) => (location === "كل المواقع" || o.loc === location) && (cat === "all" || o.cat === cat)
   );
 
-  const redeem = (o: (typeof SAMPLE_OFFERS)[number]) => {
+  const redeem = (o: Offer) => {
     if (o.points > balance || redeemed.includes(o.id)) return;
     setBalance((b) => b - o.points);
     setRedeemed((r) => [...r, o.id]);
