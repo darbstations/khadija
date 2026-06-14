@@ -19,7 +19,7 @@
     <a href="/employees">الموظفون</a>
     <a href="/evaluations">تقييم الموظفين</a>
     <a href="/report/print">تقرير/طباعة</a>
-    {% if u.role == 'admin' %}<a href="/admin/kpis">إدارة المؤشرات</a><a href="/upload">استيراد</a>{% endif %}
+    {% if u.role == 'admin' %}<a href="/admin/kpis">إدارة المؤشرات</a><a href="/admin/staff">إدارة الموظفين</a><a href="/upload">استيراد</a>{% endif %}
   </nav>
   <div class="userbox">
     <span class="uname">{{ u.full_name or u.username }}</span>

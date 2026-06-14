@@ -34,4 +34,19 @@
 </div>
 {% if any_edit %}<div class="toolbar"><button class="btn" type="submit">💾 حفظ</button></div>{% endif %}
 </form>
+{% if can_manage %}
+<div class="panel">
+<h3>➕ إضافة مؤشر فردي لهذا الموظف</h3>
+<form method="post" action="/employee/{{ emp.id }}/add_kpi" class="grid2">
+  <div><label class="small">اسم المؤشر</label><input type="text" name="name" required></div>
+  <div><label class="small">الوحدة</label><input type="text" name="unit" placeholder="عدد / % / ..."></div>
+  <div><label class="small">المستهدف (رقم)</label><input type="text" name="target"></div>
+  <div><label class="small">نص المستهدف</label><input type="text" name="target_text"></div>
+  <div><label class="small">التنسيق</label><select name="fmt"><option value="int">عدد</option><option value="pct">نسبة %</option><option value="num1">رقم عشري</option></select></div>
+  <div><label class="small">التجميع</label><select name="agg"><option value="LAST">تراكمي (آخر قيمة)</option><option value="SUM">مجموع شهري</option><option value="AVG">متوسط شهري</option></select></div>
+  <div><label class="small">القطبية</label><select name="polarity"><option value="↑">↑ الأعلى أفضل</option><option value="↓">↓ الأقل أفضل</option></select></div>
+  <div><button class="btn" type="submit">إضافة المؤشر</button></div>
+</form>
+</div>
+{% endif %}
 {% endblock %}

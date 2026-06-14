@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from .database import get_db
 from . import models, compute
 from .kpi_data import PILLARS, PROJECTS, PROJECT_PILLAR
-from .auth import (current_user, verify_password, can_edit_definition, can_edit_value, can_eval, ROLE_LABEL)
+from .auth import (current_user, verify_password, can_edit_definition, can_edit_value, can_eval, ROLE_LABEL, hash_password)
 from .eval_data import grade as eval_grade
 from .seed import init_db
 
@@ -200,8 +200,63 @@ def employee(uid: int, request: Request, db: Session = Depends(get_db)):
         c = kpi_calc(k, nmonths); c["editable"] = can_edit_value(u, k); rows.append(c)
     score, n = emp_score(db, uid, nmonths)
     any_edit = any(r["editable"] for r in rows)
+    can_manage = u.role == "admin" or (u.role in ("manager","executive") and u.department_id == e.department_id)
     return templates.TemplateResponse(request, "employee.html", {"request": request, "u": u, "emp": e,
-        "rows": rows, "any_edit": any_edit, "score": score, "nmonths": nmonths})
+        "rows": rows, "any_edit": any_edit, "score": score, "nmonths": nmonths, "can_manage": can_manage})
+
+def can_manage_staff(user, department_id):
+    if user is None: return False
+    if user.role == "admin": return True
+    return user.role in ("manager","executive") and user.department_id == department_id
+
+@app.post("/employee/{uid}/add_kpi")
+async def employee_add_kpi(uid: int, request: Request, db: Session = Depends(get_db)):
+    u = require(request, db)
+    e = db.query(models.User).get(uid)
+    if not u or not e or not can_manage_staff(u, e.department_id):
+        return RedirectResponse("/employees")
+    form = await request.form()
+    nm = (form.get("name") or "").strip()
+    if nm:
+        def num(x):
+            x=(x or "").strip().replace(",","");
+            try: return float(x)
+            except: return None
+        db.add(models.KPI(department_id=e.department_id, level="individual", owner_user_id=e.id,
+            name=f"{e.full_name} — {nm}", unit=form.get("unit") or "", polarity=form.get("polarity") or "↑",
+            agg=form.get("agg") or "LAST", target=num(form.get("target")),
+            target_text=form.get("target_text") or (form.get("target") or "—"),
+            fmt=form.get("fmt") or "int", section=e.full_name, pillar="", project="",
+            perspective="", kpitype="", weight=0))
+        db.commit()
+    return RedirectResponse(f"/employee/{uid}", status_code=302)
+
+# ---------------- إدارة الموظفين (أدمن) ----------------
+@app.get("/admin/staff", response_class=HTMLResponse)
+def admin_staff(request: Request, db: Session = Depends(get_db)):
+    u = require(request, db)
+    if not u: return RedirectResponse("/login")
+    if not can_edit_definition(u):
+        return templates.TemplateResponse(request, "forbidden.html", {"request": request, "u": u})
+    emps = db.query(models.User).filter(models.User.role.in_(["employee","manager","executive"])).all()
+    depts = db.query(models.Department).all()
+    return templates.TemplateResponse(request, "admin_staff.html", {"request": request, "u": u,
+        "emps": emps, "depts": depts, "saved": request.query_params.get("saved")})
+
+@app.post("/admin/staff/add")
+async def admin_staff_add(request: Request, db: Session = Depends(get_db)):
+    u = require(request, db)
+    if not u or not can_edit_definition(u): return RedirectResponse("/dashboard")
+    form = await request.form()
+    username = (form.get("username") or "").strip()
+    if username and not db.query(models.User).filter_by(username=username).first():
+        h, s = hash_password(form.get("password") or (username+"123"))
+        did = form.get("department_id")
+        db.add(models.User(username=username, full_name=form.get("full_name") or username,
+            pw_hash=h, salt=s, role=form.get("role") or "employee",
+            department_id=int(did) if did else None))
+        db.commit()
+    return RedirectResponse("/admin/staff?saved=1", status_code=302)
 
 @app.post("/employee/{uid}/save")
 async def employee_save(uid: int, request: Request, db: Session = Depends(get_db)):

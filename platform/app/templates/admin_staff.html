@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>إدارة الموظفين والمستخدمين</h1>
+{% if saved %}<div class="note">✅ تم الحفظ.</div>{% endif %}
+<div class="note">أضف موظفاً لأي إدارة، ثم افتح صفحته لإضافة مؤشراته الفردية وتغذيتها. هكذا تُعمَّم المؤشرات الفردية على كل الإدارات.</div>
+<div class="grid2">
+  <div class="panel">
+    <h3>المستخدمون الحاليون</h3>
+    <table><thead><tr><th>الاسم</th><th>المستخدم</th><th>الدور</th><th>الإدارة</th></tr></thead><tbody>
+    {% for e in emps %}
+      <tr><td><a href="/employee/{{ e.id }}">{{ e.full_name }}</a></td>
+      <td class="small mono">{{ e.username }}</td>
+      <td class="small">{{ ROLE_LABEL.get(e.role, e.role) }}</td>
+      <td class="small">{{ e.department.name if e.department else '—' }}</td></tr>
+    {% endfor %}
+    </tbody></table>
+  </div>
+  <div class="panel">
+    <h3>➕ إضافة موظف / مستخدم</h3>
+    <form method="post" action="/admin/staff/add" class="grid2">
+      <div><label class="small">الاسم الكامل</label><input type="text" name="full_name" required></div>
+      <div><label class="small">اسم المستخدم (دخول)</label><input type="text" name="username" required></div>
+      <div><label class="small">كلمة المرور</label><input type="text" name="password" placeholder="افتراضي: اسم المستخدم+123"></div>
+      <div><label class="small">الدور</label><select name="role">
+        <option value="employee">موظف مسؤول عن مؤشر</option>
+        <option value="manager">مدير إدارة</option>
+        <option value="executive">الإدارة التنفيذية</option></select></div>
+      <div style="grid-column:1/-1"><label class="small">الإدارة</label><select name="department_id">
+        {% for d in depts %}<option value="{{ d.id }}">{{ d.name }}</option>{% endfor %}</select></div>
+      <div><button class="btn" type="submit">إضافة المستخدم</button></div>
+    </form>
+  </div>
+</div>
+{% endblock %}
