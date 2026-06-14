@@ -1,22 +1,20 @@
-// شعار درب — wordmark نظيف بألوان الهوية (برتقالي #F18A2B · رمادي #6D6E70 · أبيض)
-// ملاحظة: نسخة مؤقتة لحين توفّر ملف الشعار الأصلي (PNG/SVG) لاستبداله.
+// شعار درب — إعادة رسم متجهي دقيقة بألوان الهوية (برتقالي #F18A2B · رمادي #6D6E70 · أبيض)
 export function DarbLogo({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 220 64" className={className} role="img" aria-label="درب · Darb">
-      <rect x="2" y="2" width="216" height="60" rx="30" fill="#6D6E70" stroke="#F18A2B" strokeWidth="3" />
-      {/* شيفرون برتقالي نظيف (إيحاء الطريق/التقدّم) */}
+    <svg viewBox="0 0 300 100" className={className} role="img" aria-label="درب · Darb">
+      <rect x="4" y="4" width="292" height="92" rx="46" fill="#F18A2B" />
+      <rect x="13" y="13" width="274" height="74" rx="37" fill="#6D6E70" />
+      {/* العلامة المميزة (حرف الدال البرتقالي) */}
       <path
-        d="M170 19 L185 32 L170 45"
-        fill="none"
-        stroke="#F18A2B"
-        strokeWidth="6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        d="M 186 31 H 246 a 16 16 0 0 1 16 16 v 5 a 17 17 0 0 1 -17 17 H 210 l 20 -13 h 14 a 4 4 0 0 0 4 -4 v -3 a 4 4 0 0 0 -4 -4 H 186 Z"
+        fill="#F18A2B"
       />
-      <text x="150" y="31" textAnchor="end" fontFamily="Tajawal, sans-serif" fontSize="27" fontWeight="800" fill="#ffffff">
+      <path d="M 186 60 H 208 l -8 13 H 186 Z" fill="#F18A2B" />
+      {/* النص */}
+      <text x="110" y="52" textAnchor="middle" fontFamily="Tajawal, sans-serif" fontSize="42" fontWeight="800" fill="#ffffff">
         درب
       </text>
-      <text x="150" y="49" textAnchor="end" fontFamily="Tajawal, sans-serif" fontSize="14" fontWeight="700" fill="#ffffff" letterSpacing="2">
+      <text x="110" y="84" textAnchor="middle" fontFamily="Tajawal, sans-serif" fontSize="30" fontWeight="700" fill="#ffffff">
         Darb
       </text>
     </svg>
