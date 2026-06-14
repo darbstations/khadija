@@ -4,3 +4,6 @@ preview/
 __pycache__/
 *.pyc
 .venv/
+
+# أرشيف المعاينة المولّد
+*.zip
