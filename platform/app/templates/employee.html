@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="toolbar">
+  <h1>{{ emp.full_name }} <span class="small">· {{ emp.department.name if emp.department else '' }}</span></h1>
+  <div class="card {{ status_class(score) }}" style="padding:10px 16px">
+    <div class="lbl">الإنجاز الكلي</div>
+    <div style="font-size:24px;font-weight:800">{{ (score*100)|round if score is not none else '—' }}<span style="font-size:14px">%</span></div>
+  </div>
+</div>
+{% if request.query_params.get('saved') %}<div class="note">✅ تم حفظ الأرقام.</div>{% endif %}
+{% if any_edit %}<div class="note">🟩 الخلايا الخضراء قابلة للإدخال — تُدخل المُحقَّق الشهري لمؤشراتك. المستهدف مقفول.</div>
+{% else %}<div class="note">🔒 عرض فقط — لا تملك صلاحية تغذية مؤشرات هذا الموظف.</div>{% endif %}
+
+<form method="post" action="/employee/{{ emp.id }}/save">
+<div class="kpiwrap">
+<table>
+<thead><tr><th>المؤشر</th><th>المستهدف</th>{% for m in MONTHS %}<th>{{ m[:3] }}</th>{% endfor %}<th>YTD</th><th>الإنجاز</th><th>الحالة</th></tr></thead>
+<tbody>
+{% for r in rows %}
+<tr>
+  <td style="min-width:240px">{{ r.kpi.name.split(' — ')[-1] }}<div class="small">{{ r.kpi.section }}</div></td>
+  <td class="small">{{ r.kpi.target_text }}</td>
+  {% for m in range(1,13) %}
+    <td>{% if r.editable %}<input class="feed mono" type="text" name="v_{{ r.kpi.id }}_{{ m }}" value="{{ r.series[m-1] if r.series[m-1] is not none else '' }}" style="width:62px">
+        {% else %}<span class="mono">{{ r.series[m-1] if r.series[m-1] is not none else '' }}</span>{% endif %}</td>
+  {% endfor %}
+  <td class="mono">{{ fmt_value(r.ytd, r.kpi.fmt) }}</td>
+  <td class="mono">{% if r.ach is not none %}{{ (r.ach*100)|round }}%{% else %}—{% endif %}</td>
+  <td><span class="tag {{ r.sclass }}">{{ r.status }}</span></td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{% if any_edit %}<div class="toolbar"><button class="btn" type="submit">💾 حفظ</button></div>{% endif %}
+</form>
+{% endblock %}

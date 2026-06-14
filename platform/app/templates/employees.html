@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>الموظفون — مؤشرات الأداء الفردية</h1>
+<div class="note">إنجاز كل موظف محسوب من مؤشراته الفردية (المُحقَّق ÷ المستهدف). اضغط الاسم لعرض/تغذية مؤشراته.</div>
+<div class="panel">
+<table>
+<thead><tr><th>الموظف</th><th>الإدارة / الشعبة</th><th>عدد المؤشرات</th><th>الإنجاز</th><th>التصنيف</th></tr></thead>
+<tbody>
+{% for r in rows %}
+<tr>
+  <td><a href="/employee/{{ r.u.id }}">{{ r.u.full_name }}</a><div class="small">{{ ROLE_LABEL.get(r.u.role, r.u.role) }}</div></td>
+  <td class="small">{{ r.dept }}</td>
+  <td class="mono">{{ r.n }}</td>
+  <td style="min-width:140px"><div class="bar"><i style="width:{{ ((r.score or 0)*100)|round }}%"></i></div>
+      <span class="small mono">{% if r.score is not none %}{{ (r.score*100)|round }}%{% else %}—{% endif %}</span></td>
+  <td>{% set s=r.score or 0 %}
+    {% if s>=0.8 %}<span class="tag ok">جيد</span>{% elif s>=0.5 %}<span class="tag warn">مقبول</span>{% else %}<span class="tag bad">يحتاج تحسين</span>{% endif %}</td>
+</tr>
+{% endfor %}
+{% if not rows %}<tr><td colspan="5" class="small">لا يوجد موظفون بمؤشرات فردية بعد.</td></tr>{% endif %}
+</tbody>
+</table>
+</div>
+{% endblock %}

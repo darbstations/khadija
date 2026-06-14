@@ -50,7 +50,7 @@ def kpi_calc(kpi, nmonths):
 
 def all_calcs(db):
     nmonths = get_month(db)
-    kpis = db.query(models.KPI).all()
+    kpis = db.query(models.KPI).filter(models.KPI.level == "strategic").all()
     return [kpi_calc(k, nmonths) for k in kpis], nmonths
 
 def avg(achs):
@@ -129,12 +129,15 @@ def department(dept_id: int, request: Request, db: Session = Depends(get_db)):
     nmonths = get_month(db)
     rows = []
     for k in d.kpis:
+        if k.level != "strategic":   # المؤشرات الفردية تظهر في صفحات الموظفين
+            continue
         c = kpi_calc(k, nmonths)
         c["editable"] = can_edit_value(u, k)
         rows.append(c)
     any_edit = any(r["editable"] for r in rows)
+    staff = db.query(models.User).filter_by(department_id=d.id, role="employee").all()
     return templates.TemplateResponse(request, "department.html", {"request": request, "u": u, "dept": d,
-        "rows": rows, "any_edit": any_edit, "nmonths": nmonths})
+        "rows": rows, "any_edit": any_edit, "nmonths": nmonths, "staff": staff})
 
 @app.post("/department/{dept_id}/save")
 async def department_save(dept_id: int, request: Request, db: Session = Depends(get_db)):
@@ -162,6 +165,67 @@ async def department_save(dept_id: int, request: Request, db: Session = Depends(
                     db.add(models.KPIValue(kpi_id=k.id, month=m, actual=val))
     db.commit()
     return RedirectResponse(f"/department/{dept_id}?saved=1", status_code=302)
+
+# ---------------- مؤشرات الموظفين (فردي) ----------------
+def emp_score(db, uid, nmonths):
+    ks = db.query(models.KPI).filter_by(owner_user_id=uid, level="individual").all()
+    achs = [kpi_calc(k, nmonths)["ach"] for k in ks]
+    achs = [a for a in achs if a is not None]
+    return (sum(achs)/len(achs) if achs else None), len(ks)
+
+@app.get("/employees", response_class=HTMLResponse)
+def employees(request: Request, db: Session = Depends(get_db)):
+    u = require(request, db)
+    if not u: return RedirectResponse("/login")
+    nmonths = get_month(db)
+    emps = db.query(models.User).filter_by(role="employee").all()
+    rows = []
+    for e in emps:
+        sc, n = emp_score(db, e.id, nmonths)
+        if n == 0: continue
+        rows.append({"u": e, "dept": e.department.name if e.department else "", "score": sc, "n": n})
+    rows.sort(key=lambda r: (r["score"] is not None, r["score"] or 0), reverse=True)
+    return templates.TemplateResponse(request, "employees.html", {"request": request, "u": u, "rows": rows, "nmonths": nmonths})
+
+@app.get("/employee/{uid}", response_class=HTMLResponse)
+def employee(uid: int, request: Request, db: Session = Depends(get_db)):
+    u = require(request, db)
+    if not u: return RedirectResponse("/login")
+    e = db.query(models.User).get(uid)
+    if not e: return RedirectResponse("/employees")
+    nmonths = get_month(db)
+    ks = db.query(models.KPI).filter_by(owner_user_id=uid, level="individual").order_by(models.KPI.id).all()
+    rows = []
+    for k in ks:
+        c = kpi_calc(k, nmonths); c["editable"] = can_edit_value(u, k); rows.append(c)
+    score, n = emp_score(db, uid, nmonths)
+    any_edit = any(r["editable"] for r in rows)
+    return templates.TemplateResponse(request, "employee.html", {"request": request, "u": u, "emp": e,
+        "rows": rows, "any_edit": any_edit, "score": score, "nmonths": nmonths})
+
+@app.post("/employee/{uid}/save")
+async def employee_save(uid: int, request: Request, db: Session = Depends(get_db)):
+    u = require(request, db)
+    if not u: return RedirectResponse("/login")
+    ks = db.query(models.KPI).filter_by(owner_user_id=uid, level="individual").all()
+    form = await request.form()
+    for k in ks:
+        if not can_edit_value(u, k): continue
+        for m in range(1, 13):
+            f = f"v_{k.id}_{m}"
+            if f in form:
+                raw = (form.get(f) or "").strip().replace(",", "")
+                val = None
+                if raw != "":
+                    try: val = float(raw)
+                    except: val = None
+                ex = db.query(models.KPIValue).filter_by(kpi_id=k.id, month=m).first()
+                if val is None:
+                    if ex: db.delete(ex)
+                elif ex: ex.actual = val
+                else: db.add(models.KPIValue(kpi_id=k.id, month=m, actual=val))
+    db.commit()
+    return RedirectResponse(f"/employee/{uid}?saved=1", status_code=302)
 
 # ---------------- إدارة المؤشرات (أدمن: تعديل المستهدفات والأوزان) ----------------
 @app.get("/admin/kpis", response_class=HTMLResponse)

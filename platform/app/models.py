@@ -40,6 +40,8 @@ class KPI(Base):
     kpitype = Column(String)         # قائد / لاحق
     weight = Column(Float, default=0)
     baseline = Column(Float, nullable=True)
+    level = Column(String, default="strategic")   # strategic | individual
+    section = Column(String, default="")
     owner_user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     department = relationship("Department", back_populates="kpis")
     values = relationship("KPIValue", back_populates="kpi", cascade="all,delete-orphan")

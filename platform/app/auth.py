@@ -37,6 +37,12 @@ def can_edit_value(user, kpi: KPI):
     """تغذية الأرقام الشهرية — الأدمن، أو المسؤول عن مؤشره/إدارته فقط (دون المساس بالتعريف)."""
     if user is None: return False
     if user.role == "admin": return True
+    # المؤشر الفردي: صاحبه فقط، أو مدير/تنفيذي إدارته (إشراف) — لا زملاؤه
+    if getattr(kpi, "level", "strategic") == "individual":
+        if kpi.owner_user_id and kpi.owner_user_id == user.id: return True
+        if user.role in ("manager", "executive") and user.department_id == kpi.department_id: return True
+        return False
+    # المؤشر الاستراتيجي للإدارة: المسؤول/المدير/التنفيذي ضمن نفس الإدارة
     if kpi.owner_user_id and kpi.owner_user_id == user.id: return True
     if user.department_id and user.department_id == kpi.department_id and user.role in ("executive","manager","employee"):
         return True
