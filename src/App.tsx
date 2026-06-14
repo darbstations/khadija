@@ -5,6 +5,8 @@ import ExecutivePresentation from "./components/ExecutivePresentation";
 import ScenarioPanel from "./components/ScenarioPanel";
 import ExecutiveSummary from "./components/ExecutiveSummary";
 import CustomerSimulator from "./components/CustomerSimulator";
+import CustomerJourney from "./components/CustomerJourney";
+import Bundles from "./components/Bundles";
 import TiersAndValue from "./components/TiersAndValue";
 import StationCost from "./components/StationCost";
 import StationCalculator from "./components/StationCalculator";
@@ -27,6 +29,8 @@ const TABS = [
   { id: "summary", label: "الملخص التنفيذي", icon: "📊", el: <ExecutiveSummary /> },
   { id: "scenarios", label: "السيناريوهات", icon: "⚙️", el: <ScenarioPanel /> },
   { id: "simulator", label: "محاكي العميل", icon: "🎮", el: <CustomerSimulator /> },
+  { id: "journey", label: "رحلة العميل", icon: "🧭", el: <CustomerJourney /> },
+  { id: "bundles", label: "باقات درب", icon: "🪪", el: <Bundles /> },
   { id: "offers", label: "سوق العروض (العميل)", icon: "🎁", el: <OffersMarketplace /> },
   { id: "offersadmin", label: "إدارة العروض (درب)", icon: "🛠️", el: <OffersAdmin /> },
   { id: "redemption", label: "قنوات الاستبدال", icon: "🔁", el: <Redemption /> },
