@@ -1,0 +1,137 @@
+import { useState } from "react";
+import { useScenario } from "../context/ScenarioContext";
+import { fmtInt, fmtSar } from "../model/engine";
+import { OFFER_LOCATIONS, OFFER_CATEGORIES, SAMPLE_OFFERS } from "../model/defaults";
+import { Card, Badge } from "./ui";
+
+export default function OffersMarketplace() {
+  const { inputs } = useScenario();
+  const [location, setLocation] = useState(OFFER_LOCATIONS[1]);
+  const [cat, setCat] = useState("all");
+  const [balance, setBalance] = useState(8000); // رصيد العميل (نقطة)
+  const [redeemed, setRedeemed] = useState<number[]>([]);
+  const [last, setLast] = useState<string | null>(null);
+
+  const offers = SAMPLE_OFFERS.filter(
+    (o) => (location === "كل المواقع" || o.loc === location) && (cat === "all" || o.cat === cat)
+  );
+
+  const redeem = (o: (typeof SAMPLE_OFFERS)[number]) => {
+    if (o.points > balance || redeemed.includes(o.id)) return;
+    setBalance((b) => b - o.points);
+    setRedeemed((r) => [...r, o.id]);
+    setLast(`✅ استبدلت «${o.title}» من ${o.merchant} مقابل ${fmtInt(o.points)} نقطة`);
+  };
+
+  const catColor = (k: string) =>
+    ({ restaurant: "bg-darb-orange/15 text-darb-orange", cafe: "bg-amber-400/15 text-amber-300", wash: "bg-sky-400/15 text-sky-300", service: "bg-darb-mut/20 text-darb-ink", grocery: "bg-darb-good/15 text-darb-good" }[k] || "bg-darb-line text-darb-mut");
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <h2 className="text-lg font-extrabold">🎁 سوق العروض · استبدل نقاطك</h2>
+        <p className="text-xs text-darb-mut">عروض متاجر المحطة قربك — مطاعم · كافيهات · مغاسل · خدمة · بقالة</p>
+      </div>
+
+      {/* بطاقة الرصيد */}
+      <div className="rounded-2xl bg-gradient-to-bl from-darb-orange/25 to-darb-card border border-darb-line p-5 flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <div className="text-xs text-darb-mut">رصيد نقاطك</div>
+          <div className="text-3xl font-extrabold text-darb-orange">{fmtInt(balance)} نقطة</div>
+          <div className="text-xs text-darb-mut mt-1">≈ {fmtSar(balance / inputs.pointValue)} للاستبدال</div>
+        </div>
+        <button
+          onClick={() => { setBalance(8000); setRedeemed([]); setLast(null); }}
+          className="no-print text-xs font-bold px-3 py-2 rounded-lg border border-darb-line hover:border-darb-orange text-darb-mut hover:text-darb-orange transition"
+        >
+          ↺ إعادة التجربة
+        </button>
+      </div>
+
+      {last && (
+        <div className="stat border-darb-good/40 text-sm text-darb-good">{last}</div>
+      )}
+
+      {/* الموقع + الفئات */}
+      <Card>
+        <div className="flex items-center gap-2 flex-wrap mb-3">
+          <span className="text-sm">📍</span>
+          <select
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            className="bg-darb-panel border border-darb-line rounded-lg px-3 py-2 text-sm font-bold"
+          >
+            {OFFER_LOCATIONS.map((l) => (
+              <option key={l} value={l}>{l}</option>
+            ))}
+          </select>
+          <span className="text-[11px] text-darb-mut">العروض تظهر حسب موقعك</span>
+        </div>
+        <div className="flex gap-1.5 flex-wrap">
+          {OFFER_CATEGORIES.map((c) => (
+            <button
+              key={c.key}
+              onClick={() => setCat(c.key)}
+              className={`text-xs font-bold px-3 py-1.5 rounded-full border transition ${
+                cat === c.key ? "border-darb-orange bg-darb-orange/15 text-darb-orange" : "border-darb-line text-darb-mut hover:text-darb-ink"
+              }`}
+            >
+              {c.emoji} {c.label}
+            </button>
+          ))}
+        </div>
+      </Card>
+
+      {/* شبكة العروض */}
+      {offers.length === 0 ? (
+        <Card><p className="text-sm text-darb-mut text-center py-6">لا توجد عروض في هذا الموقع/الفئة.</p></Card>
+      ) : (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {offers.map((o) => {
+            const done = redeemed.includes(o.id);
+            const afford = o.points <= balance;
+            return (
+              <div key={o.id} className={`card flex flex-col ${done ? "opacity-60" : ""}`}>
+                <div className="flex items-start justify-between">
+                  <div className="text-3xl">{o.emoji}</div>
+                  <span className={`pill ${catColor(o.cat)}`}>
+                    {OFFER_CATEGORIES.find((c) => c.key === o.cat)?.label}
+                  </span>
+                </div>
+                <div className="mt-2 font-extrabold text-darb-ink">{o.title}</div>
+                <div className="text-xs text-darb-mut">{o.merchant}</div>
+                <div className="text-[11px] text-darb-mut mt-1">📍 {o.loc}</div>
+                <div className="flex items-center justify-between mt-3 pt-3 border-t border-darb-line">
+                  <div>
+                    <div className="font-extrabold text-darb-orange">{fmtInt(o.points)} نقطة</div>
+                    <div className="text-[10px] text-darb-mut">القيمة {fmtSar(o.value)}</div>
+                  </div>
+                  {done ? (
+                    <Badge tone="good">✅ مُستبدل</Badge>
+                  ) : (
+                    <button
+                      onClick={() => redeem(o)}
+                      disabled={!afford}
+                      className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition ${
+                        afford ? "border-darb-orange text-darb-orange hover:bg-darb-orange/15" : "border-darb-line text-darb-mut/40 cursor-not-allowed"
+                      }`}
+                    >
+                      {afford ? "استبدل" : "نقاط غير كافية"}
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      <Card>
+        <p className="text-sm text-darb-ink/90 leading-relaxed">
+          💡 العروض يصدرها كل متجر بنفسه ويسعّرها بالنقاط · تظهر للعميل <b>حسب موقعه</b> (محطته الأقرب) ·
+          والاستبدال يُخصم من رصيد نقاطه ويُموّل عبر <b>نموذج المحفظة</b> (التاجر يستلم من المحفظة + يجذب عميلاً).
+        </p>
+      </Card>
+    </div>
+  );
+}

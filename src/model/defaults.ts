@@ -188,6 +188,38 @@ export const REDEMPTION_CHANNELS = [
   },
 ];
 
+/** سوق عروض الاستبدال (واجهة العميل · موجّه بالموقع) */
+export const OFFER_LOCATIONS = [
+  "كل المواقع",
+  "محطة العليا · الرياض",
+  "محطة التحلية · جدة",
+  "محطة الكورنيش · الدمام",
+];
+
+export const OFFER_CATEGORIES = [
+  { key: "all", label: "الكل", emoji: "✨" },
+  { key: "restaurant", label: "مطاعم", emoji: "🍔" },
+  { key: "cafe", label: "كافيهات", emoji: "☕" },
+  { key: "wash", label: "مغاسل", emoji: "🚿" },
+  { key: "service", label: "مراكز خدمة", emoji: "🔧" },
+  { key: "grocery", label: "بقالة", emoji: "🛒" },
+];
+
+export const SAMPLE_OFFERS = [
+  { id: 1, merchant: "كافيه أرابيكا", title: "قهوة مختصة مجاناً", cat: "cafe", emoji: "☕", loc: "محطة العليا · الرياض", points: 1200, value: 16 },
+  { id: 2, merchant: "برجر هاوس", title: "خصم 20 ﷼ على وجبة", cat: "restaurant", emoji: "🍔", loc: "محطة العليا · الرياض", points: 1500, value: 20 },
+  { id: 3, merchant: "ماجيك واش", title: "غسلة خارجية مجانية", cat: "wash", emoji: "🚿", loc: "محطة العليا · الرياض", points: 1000, value: 25 },
+  { id: 4, merchant: "ستاربكس", title: "مشروب متوسط مجاناً", cat: "cafe", emoji: "☕", loc: "محطة العليا · الرياض", points: 1800, value: 18 },
+  { id: 5, merchant: "مركز الخدمة السريعة", title: "تغيير زيت بخصم 30 ﷼", cat: "service", emoji: "🔧", loc: "محطة التحلية · جدة", points: 2500, value: 30 },
+  { id: 6, merchant: "بقالة درب", title: "قسيمة شراء 10 ﷼", cat: "grocery", emoji: "🛒", loc: "محطة التحلية · جدة", points: 2000, value: 10 },
+  { id: 7, merchant: "دانكن", title: "دونت + قهوة", cat: "cafe", emoji: "☕", loc: "محطة التحلية · جدة", points: 1100, value: 14 },
+  { id: 8, merchant: "كودو", title: "وجبة عائلية بخصم 40 ﷼", cat: "restaurant", emoji: "🍔", loc: "محطة التحلية · جدة", points: 3000, value: 40 },
+  { id: 9, merchant: "شاورما الطازج", title: "ساندويتش مجاني", cat: "restaurant", emoji: "🍔", loc: "محطة الكورنيش · الدمام", points: 800, value: 12 },
+  { id: 10, merchant: "سباركل", title: "غسلة كاملة بخصم 50%", cat: "wash", emoji: "🚿", loc: "محطة الكورنيش · الدمام", points: 1300, value: 20 },
+  { id: 11, merchant: "إطارات برو", title: "فحص إطارات مجاني", cat: "service", emoji: "🔧", loc: "محطة الكورنيش · الدمام", points: 600, value: 15 },
+  { id: 12, merchant: "سوبرماركت العثيم", title: "خصم 25 ﷼", cat: "grocery", emoji: "🛒", loc: "محطة الكورنيش · الدمام", points: 4000, value: 25 },
+];
+
 /** معايير المنافسين — برامج ولاء الوقود (بيانات بحثية 2026) */
 export const BENCHMARKS = [
   { name: "🐚 Shell (Go+)", region: "عالمي", method: "نقطة/لتر", earn: "≈ 1 نقطة/لتر", redeem: "500 نقطة = £2.50", eff: "~0.5–1%" },
