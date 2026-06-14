@@ -3,13 +3,13 @@ import type { ScenarioInputs } from "./types";
 /** القيم الموصى بها (نسخة v5) — مبنية على أسعار يونيو 2026 وهوامش درب الفعلية */
 export const DEFAULT_INPUTS: ScenarioInputs = {
   // 1
-  pointValue: 100,
-  earnWhite: 1, // 1% — كل ريال = نقطة
-  earnSilver: 1, // 1% (المستويات تتميّز بالمنافع لا بالكسب)
-  earnOrange: 1, // 1%
-  costPerRiyalHalala: 1,
+  pointValue: 200,
+  earnWhite: 1, // كل ريال = نقطة · النقطة = نص هللة → 0.5%
+  earnSilver: 1,
+  earnOrange: 1,
+  costPerRiyalHalala: 0.5,
   literPrice: 2.33, // بنزين 95 — يونيو 2026
-  welcomeGift: 500,
+  welcomeGift: 1000,
   // 2
   silverThreshold: 3600,
   orangeThreshold: 14400,
@@ -27,8 +27,8 @@ export const DEFAULT_INPUTS: ScenarioInputs = {
   // 4 — الاقتصاد الموسّع
   dieselPrice: 1.79, // الديزل — يناير 2026
   dieselMarginHalala: 4,
-  earnDiesel: 0.5, // 0.5% (هامش الديزل ضعيف)
-  earnPartner: 4, // ~4% ممولة من الشريك
+  earnDiesel: 0.5, // 0.25% (هامش الديزل ضعيف)
+  earnPartner: 8, // ~4% ممولة من الشريك
   partnerContributionHalala: 1, // الشريك يدفع 1 هللة/ريال لدرب
 };
 
