@@ -14,6 +14,7 @@ import WalletRedemption from "./components/WalletRedemption";
 import FranchiseCollection from "./components/FranchiseCollection";
 import Projections from "./components/Projections";
 import ScenarioCompare from "./components/ScenarioCompare";
+import Benchmark from "./components/Benchmark";
 import ExtendedEconomics from "./components/ExtendedEconomics";
 import ROICalculator from "./components/ROICalculator";
 import TenantTool from "./components/TenantTool";
@@ -36,6 +37,7 @@ const TABS = [
   { id: "projections", label: "التوقعات السنوية", icon: "📈", el: <Projections /> },
   { id: "roi", label: "حاسبة ROI", icon: "💎", el: <ROICalculator /> },
   { id: "compare", label: "مقارنة السيناريوهات", icon: "🆚", el: <ScenarioCompare /> },
+  { id: "benchmark", label: "معايير المنافسين", icon: "🌍", el: <Benchmark /> },
   { id: "how", label: "كيف يعمل + التوسع", icon: "📚", el: <HowItWorks /> },
 ];
 

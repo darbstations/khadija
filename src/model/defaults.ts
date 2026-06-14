@@ -188,6 +188,22 @@ export const REDEMPTION_CHANNELS = [
   },
 ];
 
+/** معايير المنافسين — برامج ولاء الوقود (بيانات بحثية 2026) */
+export const BENCHMARKS = [
+  { name: "🐚 Shell (Go+)", region: "عالمي", method: "نقطة/لتر", earn: "≈ 1 نقطة/لتر", redeem: "500 نقطة = £2.50", eff: "~0.5–1%" },
+  { name: "⛽ ADNOC Rewards", region: "الإمارات", method: "نقاط/درهم", earn: "حتى 3 نقاط/درهم + 25% محفظة", redeem: "دفع مباشر بالنقاط", eff: "غير معلنة رسمياً" },
+  { name: "🟢 Emarat (EmCan)", region: "الإمارات", method: "متدرّج/لتر", earn: "برونزي 2 · فضي 3 · ذهبي 4 /لتر", redeem: "عروض ومكافآت", eff: "متدرّج" },
+  { name: "🔴 TotalEnergies (Club)", region: "عالمي", method: "قيمة/لتر", earn: "15 سنت/لتر + 2.5% متجر", redeem: "وقود مجاني/غسيل", eff: "~0.6–0.7%" },
+  { name: "🔵 ساسكو", region: "السعودية", method: "نقاط/ريال", earn: "0.43 نقطة/ريال", redeem: "100 نقطة = ريال", eff: "~0.43%" },
+];
+
+export const BENCHMARK_SOURCES = [
+  { label: "ADNOC Rewards", url: "https://www.adnocdistribution.ae/en/rewards" },
+  { label: "Emarat EmCan", url: "https://www.emcan.com/en/faq" },
+  { label: "TotalEnergies Club", url: "https://totalenergies.co.za/service-stations/loyalty-programmes/club-totalenergies" },
+  { label: "Shell Go+", url: "https://www.canadaloyalty.com/en/programs/shell-go-plus" },
+];
+
 /** سيناريوهات ثابتة للمقارنة (ورقة مقارنة السيناريوهات) */
 export const COMPARISON_SCENARIOS = [
   { key: "sasco", label: "🔴 ساسكو", pv: 100, w: 0.43, s: 0.43, o: 0.43, cost: 0.43 },
