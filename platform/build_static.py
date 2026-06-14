@@ -211,13 +211,38 @@ function vDept(id){ const d=deptById[id]; const ks=DATA.kpis.filter(k=>k.deptId=
   h+=`<div class="kpiwrap"><table><thead><tr><th>المؤشر</th><th>المستهدف</th>`+MONTHS.map(m=>`<th>${m.slice(0,3)}</th>`).join('')+`<th>YTD</th><th>الإنجاز</th><th>الحالة</th></tr></thead><tbody>`;
   ks.forEach(k=>{ h+=`<tr><td style="min-width:230px">${k.name}<div class="small">${k.unit} · ${k.pillar}</div></td><td class="small">${k.ttext}</td>`;
     for(let m=1;m<=12;m++) h+=inputCell(k,m); h+=rowCells(k)+`</tr>`; });
-  h+=`</tbody></table></div>`; return h; }
+  h+=`</tbody></table></div>`;
+  // موظفو هذه الإدارة (ربط)
+  const emps=DATA.users.filter(u=>u.role==='employee'&&u.deptId===id);
+  if(emps.length){
+    h+=`<div class="panel"><h3>👥 موظفو ${d.name} (${emps.length}) — مؤشرات فردية</h3>
+      <table><thead><tr><th>الموظف</th><th>المؤشرات</th><th>الإنجاز</th><th></th></tr></thead><tbody>`+
+      emps.map(u=>{const [sc,n]=empScore(u);return `<tr><td><a href="#" onclick="go('employee','${u.u}');return false">${u.name}</a></td><td class="mono">${n}</td><td class="mono">${sc===null?'—':Math.round(sc*100)+'%'}</td><td><a class="small" href="#" onclick="go('employee','${u.u}');return false">فتح ›</a></td></tr>`;}).join('')+
+      `</tbody></table></div>`;
+  } else {
+    h+=`<div class="note">👥 لا يوجد موظفون بمؤشرات فردية في هذه الإدارة بعد — تُضاف عند توفّر تقاريرها.</div>`;
+  }
+  return h; }
 
 // ---- الموظفون ----
 function empScore(u){ const ks=DATA.kpis.filter(k=>k.level==='individual'&&k.owner===u.u); const a=ks.map(ach); return [avg(a),ks.length]; }
 function vEmployees(){ const emps=DATA.users.filter(u=>u.role==='employee');
+  let rows=emps.map(u=>{const [sc,n]=empScore(u);return {u,sc,n};}).filter(r=>r.n>0);
+  let h=`<h1>الموظفون — المؤشرات الفردية</h1>`;
+  // مجموعات حسب الإدارة
+  const groups={}; rows.forEach(r=>{const dn=deptById[r.u.deptId].name; (groups[dn]=groups[dn]||[]).push(r);});
+  Object.keys(groups).forEach(dn=>{
+    const g=groups[dn].sort((a,b)=>(b.sc||0)-(a.sc||0));
+    h+=`<div class="panel"><h3>${dn} (${g.length} موظف)</h3><table><thead><tr><th>الموظف</th><th>المؤشرات</th><th>الإنجاز</th><th>التصنيف</th></tr></thead><tbody>`;
+    g.forEach(r=>{const s=r.sc||0; const t=s>=0.8?['جيد','ok']:s>=0.5?['مقبول','warn']:['يحتاج تحسين','bad'];
+      h+=`<tr><td><a href="#" onclick="go('employee','${r.u.u}');return false">${r.u.name}</a></td><td class="mono">${r.n}</td><td class="mono">${r.sc===null?'—':Math.round(r.sc*100)+'%'}</td><td><span class="tag ${t[1]}">${t[0]}</span></td></tr>`;});
+    h+=`</tbody></table></div>`;
+  });
+  if(!rows.length) h+=`<div class="note">لا يوجد موظفون بمؤشرات فردية بعد.</div>`;
+  return h; }
+function _vEmployees_old(){ const emps=DATA.users.filter(u=>u.role==='employee');
   let rows=emps.map(u=>{const [sc,n]=empScore(u);return {u,sc,n};}).filter(r=>r.n>0).sort((a,b)=>(b.sc||0)-(a.sc||0));
-  let h=`<h1>الموظفون — المؤشرات الفردية</h1><div class="panel"><table><thead><tr><th>الموظف</th><th>الإدارة</th><th>المؤشرات</th><th>الإنجاز</th><th>التصنيف</th></tr></thead><tbody>`;
+  let h=`<h1>الموظفون</h1><div class="panel"><table><tbody>`;
   rows.forEach(r=>{const s=r.sc||0; const t=s>=0.8?['جيد','ok']:s>=0.5?['مقبول','warn']:['يحتاج تحسين','bad'];
     h+=`<tr><td><a href="#" onclick="go('employee','${r.u.u}');return false">${r.u.name}</a></td><td class="small">${deptById[r.u.deptId].name}</td><td class="mono">${r.n}</td><td class="mono">${r.sc===null?'—':Math.round(r.sc*100)+'%'}</td><td><span class="tag ${t[1]}">${t[0]}</span></td></tr>`;});
   h+=`</tbody></table></div>`; return h; }
