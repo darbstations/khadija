@@ -9,7 +9,8 @@ interface Ctx {
 }
 
 const ScenarioCtx = createContext<Ctx | null>(null);
-const STORAGE_KEY = "tanki.inputs.v5";
+// عند تغيير القيم الموصى بها نرفع الإصدار لتُحمَّل تلقائياً (تتجاهل المحفوظ القديم)
+const STORAGE_KEY = "tanki.inputs.v6";
 
 export function ScenarioProvider({ children }: { children: ReactNode }) {
   const [inputs, setInputs] = useState<ScenarioInputs>(() => {
