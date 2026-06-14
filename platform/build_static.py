@@ -263,7 +263,9 @@ document.getElementById('lp').addEventListener('keydown',e=>{if(e.key==='Enter')
 </body></html>"""
 
 out = HTML.replace("__CSS__", css).replace("__LOGO__", logo_b64).replace("__DATA__", json.dumps(DATA, ensure_ascii=False))
-path = os.path.join(HERE, "..", "darب-منصة.html".replace("ب","ب"))
-path = os.path.join(HERE, "..", "darb-platform.html")
-open(path,"w",encoding="utf-8").write(out)
-print("saved:", os.path.abspath(path), len(out),"bytes | kpis:",len(kpis),"users:",len(users))
+# نسخة جذر للتنزيل + نسخة docs/ للنشر على GitHub Pages
+for rel in ["../darb-platform.html", "../index.html", "../docs/index.html"]:
+    p = os.path.join(HERE, rel)
+    os.makedirs(os.path.dirname(p), exist_ok=True)
+    open(p, "w", encoding="utf-8").write(out)
+print("saved darb-platform.html + index.html + docs/index.html | bytes:", len(out), "| kpis:", len(kpis), "| users:", len(users))
