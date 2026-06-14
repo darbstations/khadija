@@ -11,10 +11,10 @@ export default function ScenarioPanel() {
   // مؤشرات حيّة تطابق معادلات IF في ورقة السيناريوهات
   const ratio = (rate: number) => rate / i.pointValue;
   const stPV: Status =
-    i.pointValue <= 500
-      ? { text: "⚠️ تضخيم منخفض", tone: "warn" }
+    i.pointValue <= 50
+      ? { text: "⚠️ منخفض جداً", tone: "warn" }
       : i.pointValue <= 2000
-      ? { text: "✅ موصى به", tone: "good" }
+      ? { text: "✅ مناسب", tone: "good" }
       : i.pointValue <= 10000
       ? { text: "⚠️ تضخيم عالٍ", tone: "warn" }
       : { text: "🔴 مبالغ فيه", tone: "bad" };
