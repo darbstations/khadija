@@ -74,6 +74,23 @@ HTML = r"""<!DOCTYPE html>
 select.nav{padding:7px;border-radius:8px;border:1px solid #ccc}
 .savebar{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px;text-align:center}
 .ok2{color:var(--ok)}.bad2{color:var(--bad)}.warn2{color:var(--warn)}
+.tree2{background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px;margin-top:10px}
+.tree2 .node{margin:2px 0}
+.row2{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:9px;cursor:pointer}
+.row2:hover{background:#fafbfc}
+.row2 .tw{color:var(--grey);width:14px;display:inline-block;font-size:12px}
+.row2 .nm{font-weight:700;color:var(--greyd,#58595B)}
+.row2 .nm a{color:inherit}
+.row2 .sub{color:var(--grey);font-size:12px}
+.row2.kpi .nm{font-weight:500;color:#333}
+.row2 .pctv{margin-right:auto;font-weight:800;font-variant-numeric:tabular-nums}
+.row2 .pctv.ok{color:var(--ok)}.row2 .pctv.warn{color:var(--warn)}.row2 .pctv.bad{color:var(--bad)}.row2 .pctv.muted{color:#9aa0a6}
+.row2 .mini{height:7px;width:80px;background:#eceef0;border-radius:6px;overflow:hidden}.row2 .mini i{display:block;height:100%;background:var(--orange)}
+.row2 .chip{font-size:11px;padding:1px 8px;border-radius:20px;background:#eef0f2;color:#555}
+.tree2 .lvl{font-size:10px;color:#fff;border-radius:5px;padding:1px 6px}
+.tree2 .b0{background:#58595B}.tree2 .b1{background:#808285}.tree2 .b2{background:#9a9c9f}.tree2 .b3{background:var(--orange)}
+.tree2 .children{margin-right:20px;border-right:2px dashed #d8dadd;padding-right:6px;display:none}
+.tree2 .open>.children{display:block}
 </style></head><body>
 
 <div id="login" class="login">
@@ -140,6 +157,7 @@ function startApp(){ document.getElementById('login').classList.add('hidden'); d
   document.getElementById('urole').textContent=RL[USER.role]||USER.role;
   buildNav(); go('dashboard'); }
 function buildNav(){ let h='<a href="#" onclick="go(\'dashboard\');return false">اللوحة</a>'+
+  '<a href="#" onclick="go(\'tree\');return false">العرض الهرمي</a>'+
   '<a href="#" onclick="go(\'strategy\');return false">الاستراتيجية</a>'+
   '<a href="#" onclick="go(\'employees\');return false">الموظفون</a>';
   document.getElementById('nav').innerHTML=h;
@@ -149,10 +167,41 @@ function buildNav(){ let h='<a href="#" onclick="go(\'dashboard\');return false"
 // ---- توجيه ----
 function go(view,arg){ const c=document.getElementById('content'); window.scrollTo(0,0);
   if(view==='dashboard') c.innerHTML=vDashboard();
+  else if(view==='tree') c.innerHTML=vTree();
   else if(view==='strategy') c.innerHTML=vStrategy();
   else if(view==='dept') c.innerHTML=vDept(arg);
   else if(view==='employees') c.innerHTML=vEmployees();
   else if(view==='employee') c.innerHTML=vEmployee(arg); }
+function tg(el){var p=el.parentElement;p.classList.toggle('open');var a=el.querySelector('.tw');if(a&&a.textContent.trim()!=='•')a.textContent=p.classList.contains('open')?'▾':'▸';}
+function deptAch(id){ return avg(strat().filter(k=>k.deptId===id).map(ach)); }
+function pctTxt(x){ return x===null?'—':Math.round(x*100)+'%'; }
+function clsOf(x){ return statusOf(x)[1]; }
+function barCol(x){ const c=clsOf(x); return c==='bad'?'#c0392b':(c==='warn'?'#b78103':'#F47A21'); }
+function vTree(){
+  const overall=avg(strat().map(ach));
+  let h=`<h1>العرض الهرمي — درب</h1><div class="note">التصنيف: الشركة ← الإدارات ← موظفو كل إدارة · والإدارة التنفيذية تحتها المدراء فقط. اضغط ▸ للفتح/الطي.</div>`;
+  h+=`<div class="tree2"><div class="node open"><div class="row2" onclick="tg(this)"><span class="tw">▾</span><span class="lvl b0">شركة</span><span class="nm">درب — قطاع المحطات والعقار</span><span class="pctv ${clsOf(overall)}">${pctTxt(overall)}</span><span class="mini"><i style="width:${Math.round((overall||0)*100)}%"></i></span></div><div class="children">`;
+  DATA.departments.forEach(d=>{
+    const a=deptAch(d.id);
+    if(d.key==='exec'){
+      const mgrs=DATA.users.filter(u=>u.role==='manager');
+      h+=`<div class="node open"><div class="row2" onclick="tg(this)"><span class="tw">▾</span><span class="lvl b1">تنفيذية</span><span class="nm">🏛️ ${d.name}</span><span class="sub">· المدراء فقط</span><span class="pctv">—</span></div><div class="children">`;
+      mgrs.forEach(m=>{ const md=deptById[m.deptId]; const ma=deptAch(m.deptId);
+        h+=`<div class="node"><div class="row2"><span class="tw">•</span><span class="lvl b3" style="background:#6d6e71">مدير</span><span class="nm"><a href="#" onclick="go('dept',${m.deptId});return false">${m.name}</a></span><span class="sub">· ${md?md.name:''}</span><span class="pctv ${clsOf(ma)}">${pctTxt(ma)}</span></div></div>`; });
+      h+=`</div></div>`;
+    } else {
+      const emps=DATA.users.filter(u=>u.role==='employee'&&u.deptId===d.id);
+      h+=`<div class="node"><div class="row2" onclick="tg(this)"><span class="tw">▸</span><span class="lvl b2">إدارة</span><span class="nm"><a href="#" onclick="event.stopPropagation();go('dept',${d.id});return false">${d.name}</a></span><span class="sub">· ${emps.length} موظف</span><span class="pctv ${clsOf(a)}">${pctTxt(a)}</span><span class="mini"><i style="width:${Math.round((a||0)*100)}%;background:${barCol(a)}"></i></span></div><div class="children">`;
+      if(emps.length){
+        emps.forEach(e=>{ const eks=DATA.kpis.filter(k=>k.level==='individual'&&k.owner===e.u); const es=avg(eks.map(ach));
+          h+=`<div class="node"><div class="row2" onclick="tg(this)"><span class="tw">▸</span><span class="lvl b3">موظف</span><span class="nm"><a href="#" onclick="event.stopPropagation();go('employee','${e.u}');return false">${e.name}</a></span><span class="sub">· ${eks.length} مؤشر</span><span class="pctv ${clsOf(es)}">${pctTxt(es)}</span></div><div class="children">`;
+          eks.forEach(k=>{ const av=ach(k); h+=`<div class="node"><div class="row2 kpi"><span class="tw">•</span><span class="nm">${k.name}</span><span class="chip">${k.ttext}</span><span class="pctv ${clsOf(av)}">${pctTxt(av)}</span></div></div>`; });
+          h+=`</div></div>`; });
+      } else { h+=`<div class="node"><div class="row2"><span class="sub" style="padding-right:20px">👥 لا يوجد موظفون بعد — يُضافون عند توفّر تقاريرهم</span></div></div>`; }
+      h+=`</div></div>`;
+    }
+  });
+  h+=`</div></div></div>`; return h; }
 
 // ---- لوحة ----
 function vDashboard(){ const ks=strat(); const a=ks.map(ach); const overall=avg(a);
