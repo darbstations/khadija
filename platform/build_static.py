@@ -12,10 +12,9 @@ logo_b64 = "data:image/png;base64," + base64.b64encode(open(os.path.join(HERE,"a
 departments, kpis, users, seed = [], [], [], {}
 kid = 1
 DEPT_ID = {}
-DEPT_W=round(1.0/len(K.DEPARTMENTS),4)
 for i,(name,key,recs) in enumerate(K.DEPARTMENTS, start=1):
     DEPT_ID[key]=i
-    departments.append({"id":i,"key":key,"name":name,"w":DEPT_W})
+    departments.append({"id":i,"key":key,"name":name,"w":K.DEPT_WEIGHTS.get(key,0)})
     kw=round(1.0/len(recs),4) if recs else 0
     for (axis,nm,unit,pol,agg,tgt,ttxt,fmt,pillar,project) in recs:
         kpis.append({"id":kid,"deptId":i,"name":nm,"unit":unit,"pol":pol,"agg":agg,

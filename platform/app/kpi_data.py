@@ -12,6 +12,13 @@ PROJECT_PILLAR = {P_GROW1:PL_GROW,P_FRAN:PL_GROW,P_REACH:PL_GROW,P_NEW:PL_INNO,P
                   P_TECH:PL_INNO,P_SAHAT:PL_INNO,P_TANKI:PL_INNO,P_CX:PL_SUST,P_QUAL:PL_SUST,
                   P_LEASE:PL_SUST,P_PEOPLE:PL_SUST}
 
+# أوزان الإدارات في الإنجاز العام للشركة (حسب الأهمية الاستراتيجية — المجموع 100%)
+# التنفيذية = 0 لأنها طبقة تجميع مؤسسية (تفادي الازدواج). محرّكات النمو/الإيراد أعلى وزناً.
+DEPT_WEIGHTS = {
+  "exec": 0.00, "franchise": 0.22, "operations": 0.20, "investment": 0.18,
+  "realestate": 0.15, "marketing": 0.10, "digital": 0.08, "hr": 0.07,
+}
+
 # تصنيف قائد/لاحق ومنظور BSC
 LEAD_KW=["عدد","زيارات","فرص","تحويل","مبيعات","نمو","LEADS","تنزيلات","تدريب","طلب","حملات","استقطاب"]
 def classify(nm): return "قائد" if any(k in nm for k in LEAD_KW) else "لاحق"

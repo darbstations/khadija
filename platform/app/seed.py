@@ -45,9 +45,8 @@ def init_db():
             seed_eval_forms(db, dbk); seed_marketing_staff(db, dbk); db.commit()
             return
         dept_by_key = {}
-        dept_w = round(1.0/len(kpi_data.DEPARTMENTS), 4)
         for name, key, records in kpi_data.DEPARTMENTS:
-            d = models.Department(name=name, key=key, weight=dept_w)
+            d = models.Department(name=name, key=key, weight=kpi_data.DEPT_WEIGHTS.get(key, 0))
             db.add(d); db.flush()
             dept_by_key[key] = d
             n = len(records); w = round(1.0/n, 4) if n else 0
