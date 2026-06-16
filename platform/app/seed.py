@@ -13,13 +13,14 @@ def seed_marketing_staff(db, dept_by_key):
         u = models.User(username=username, pw_hash=h, salt=s, role="employee",
                         full_name=full, department_id=mk.id)
         db.add(u); db.flush()
+        ew = round(1.0/len(items), 4) if items else 0
         for nm, fmt, tgt, ach in items:
             pol = "↑"
             k = models.KPI(department_id=mk.id, order=0, axis=section, name=f"{full} — {nm}",
                            unit="", polarity=pol, agg="LAST", target=tgt,
                            target_text=("100%" if (fmt=="pct" and tgt==1.0) else (str(tgt) if tgt is not None else "—")),
                            fmt=fmt, pillar="", project="", perspective="", kpitype="",
-                           weight=0, level="individual", section=section, owner_user_id=u.id)
+                           weight=ew, level="individual", section=section, owner_user_id=u.id)
             db.add(k); db.flush()
             if ach is not None:
                 db.add(models.KPIValue(kpi_id=k.id, month=6, actual=float(ach)))
@@ -44,8 +45,9 @@ def init_db():
             seed_eval_forms(db, dbk); seed_marketing_staff(db, dbk); db.commit()
             return
         dept_by_key = {}
+        dept_w = round(1.0/len(kpi_data.DEPARTMENTS), 4)
         for name, key, records in kpi_data.DEPARTMENTS:
-            d = models.Department(name=name, key=key)
+            d = models.Department(name=name, key=key, weight=dept_w)
             db.add(d); db.flush()
             dept_by_key[key] = d
             n = len(records); w = round(1.0/n, 4) if n else 0

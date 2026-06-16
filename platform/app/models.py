@@ -8,6 +8,7 @@ class Department(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     key = Column(String, unique=True, nullable=False)
+    weight = Column(Float, default=0)   # وزن الإدارة داخل الشركة (كسر)
     kpis = relationship("KPI", back_populates="department", order_by="KPI.order")
 
 class User(Base):

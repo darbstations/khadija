@@ -12,13 +12,15 @@ logo_b64 = "data:image/png;base64," + base64.b64encode(open(os.path.join(HERE,"a
 departments, kpis, users, seed = [], [], [], {}
 kid = 1
 DEPT_ID = {}
+DEPT_W=round(1.0/len(K.DEPARTMENTS),4)
 for i,(name,key,recs) in enumerate(K.DEPARTMENTS, start=1):
     DEPT_ID[key]=i
-    departments.append({"id":i,"key":key,"name":name})
+    departments.append({"id":i,"key":key,"name":name,"w":DEPT_W})
+    kw=round(1.0/len(recs),4) if recs else 0
     for (axis,nm,unit,pol,agg,tgt,ttxt,fmt,pillar,project) in recs:
         kpis.append({"id":kid,"deptId":i,"name":nm,"unit":unit,"pol":pol,"agg":agg,
             "target":tgt,"ttext":ttxt,"fmt":fmt,"pillar":pillar,"project":project,
-            "persp":K.perspective(nm),"level":"strategic","owner":None,"section":axis})
+            "persp":K.perspective(nm),"level":"strategic","owner":None,"section":axis,"w":kw})
         kid+=1
 
 # مستخدمون
@@ -33,10 +35,11 @@ for key,title in mgr_titles.items():
 mkid = DEPT_ID["marketing"]
 for username,full,role,section,items in MS.STAFF:
     users.append({"u":username,"name":full,"role":"employee","deptId":mkid,"pass":username+"123","title":role})
+    ew=round(1.0/len(items),4) if items else 0
     for nm,fmt,tgt,ach in items:
         kpis.append({"id":kid,"deptId":mkid,"name":nm,"unit":"","pol":"↑","agg":"LAST",
             "target":tgt,"ttext":("100%" if (fmt=="pct" and tgt==1.0) else (str(tgt) if tgt is not None else "—")),
-            "fmt":fmt,"pillar":"","project":"","persp":"","level":"individual","owner":username,"section":full})
+            "fmt":fmt,"pillar":"","project":"","persp":"","level":"individual","owner":username,"section":full,"w":ew})
         if ach is not None: seed[str(kid)]={"6":float(ach)}
         kid+=1
 
@@ -118,7 +121,10 @@ function fmtv(v,f){ if(v===null||v===undefined||v==='') return '—'; v=parseFlo
   if(f==='pct') return Math.round(v*100)+'%'; if(f==='int') return v.toLocaleString('en-US',{maximumFractionDigits:0});
   if(f==='num1') return v.toLocaleString('en-US',{maximumFractionDigits:1}); if(f==='rial') return v.toLocaleString('en-US',{maximumFractionDigits:0})+' ر.س'; return v; }
 function avg(arr){ const n=arr.filter(x=>x!==null); return n.length? n.reduce((a,b)=>a+b,0)/n.length : null; }
+const deptW={}; DATA.departments.forEach(d=>deptW[d.id]=d.w||0);
+function wavg(items){ var v=items.filter(x=>x[0]!==null&&x[0]!==undefined).map(x=>[Math.min(x[0],1),x[1]||0]); if(!v.length)return null; var tw=v.reduce((a,b)=>a+b[1],0); if(tw<=0)return v.reduce((a,b)=>a+b[0],0)/v.length; return v.reduce((a,b)=>a+b[0]*b[1],0)/tw; }
 const strat=()=>DATA.kpis.filter(k=>k.level==='strategic');
+function companyOverall(){ return wavg(DATA.departments.map(d=>[deptAch(d.id), deptW[d.id]])); }
 
 // ---- صلاحيات ----
 function canEdit(k){ if(!USER) return false; if(USER.role==='admin') return true;
@@ -167,17 +173,17 @@ function vDeptStaff(id){ const d=deptById[id];
   h+=`<h1>${d.name} — الموظفون (${emps.length})</h1>`;
   if(!emps.length){ h+=`<div class="note">👥 لا يوجد موظفون بمؤشرات فردية في هذه الإدارة بعد — يُضافون عند توفّر تقاريرهم.</div>`; return h; }
   h+=`<div class="cards">`;
-  emps.forEach(e=>{ const eks=DATA.kpis.filter(k=>k.level==='individual'&&k.owner===e.u); const s=avg(eks.map(ach));
+  emps.forEach(e=>{ const eks=DATA.kpis.filter(k=>k.level==='individual'&&k.owner===e.u); const s=wavg(eks.map(k=>[ach(k),k.w]));
     const t=(s||0)>=0.8?['جيد','ok']:(s||0)>=0.5?['مقبول','warn']:['يحتاج تحسين','bad'];
     h+=`<a class="card" href="#" onclick="go('employee','${e.u}');return false"><div class="lbl">${e.title||''}</div><div style="font-size:17px;font-weight:800;color:#fff">${e.name}</div><div class="big ${clsOf(s)}" style="font-size:28px">${pctTxt(s)}</div><div class="small">${eks.length} مؤشر · <span class="tag ${t[1]}">${t[0]}</span></div></a>`; });
   h+=`</div>`; return h; }
 function tg(el){var p=el.parentElement;p.classList.toggle('open');var a=el.querySelector('.tw');if(a&&a.textContent.trim()!=='•')a.textContent=p.classList.contains('open')?'▾':'▸';}
-function deptAch(id){ return avg(strat().filter(k=>k.deptId===id).map(ach)); }
+function deptAch(id){ return wavg(strat().filter(k=>k.deptId===id).map(k=>[ach(k),k.w])); }
 function pctTxt(x){ return x===null?'—':Math.round(x*100)+'%'; }
 function clsOf(x){ return statusOf(x)[1]; }
 function barCol(x){ const c=clsOf(x); return c==='bad'?'#c0392b':(c==='warn'?'#b78103':'#F47A21'); }
 function vTree(){
-  const overall=avg(strat().map(ach));
+  const overall=companyOverall();
   let h=`<h1>العرض الهرمي — درب</h1><div class="note">التصنيف: الشركة ← الإدارات ← موظفو كل إدارة · والإدارة التنفيذية تحتها المدراء فقط. اضغط ▸ للفتح/الطي.</div>`;
   h+=`<div class="tree2"><div class="node open"><div class="row2" onclick="tg(this)"><span class="tw">▾</span><span class="lvl b0">شركة</span><span class="nm">درب — قطاع المحطات والعقار</span><span class="pctv ${clsOf(overall)}">${pctTxt(overall)}</span><span class="mini"><i style="width:${Math.round((overall||0)*100)}%"></i></span></div><div class="children">`;
   DATA.departments.forEach(d=>{
@@ -192,7 +198,7 @@ function vTree(){
       const emps=DATA.users.filter(u=>u.role==='employee'&&u.deptId===d.id);
       h+=`<div class="node"><div class="row2" onclick="tg(this)"><span class="tw">▸</span><span class="lvl b2">إدارة</span><span class="nm"><a href="#" onclick="event.stopPropagation();go('dept',${d.id});return false">${d.name}</a></span><span class="sub">· ${emps.length} موظف</span><span class="pctv ${clsOf(a)}">${pctTxt(a)}</span><span class="mini"><i style="width:${Math.round((a||0)*100)}%;background:${barCol(a)}"></i></span></div><div class="children">`;
       if(emps.length){
-        emps.forEach(e=>{ const eks=DATA.kpis.filter(k=>k.level==='individual'&&k.owner===e.u); const es=avg(eks.map(ach));
+        emps.forEach(e=>{ const eks=DATA.kpis.filter(k=>k.level==='individual'&&k.owner===e.u); const es=wavg(eks.map(k=>[ach(k),k.w]));
           h+=`<div class="node"><div class="row2" onclick="tg(this)"><span class="tw">▸</span><span class="lvl b3">موظف</span><span class="nm"><a href="#" onclick="event.stopPropagation();go('employee','${e.u}');return false">${e.name}</a></span><span class="sub">· ${eks.length} مؤشر</span><span class="pctv ${clsOf(es)}">${pctTxt(es)}</span></div><div class="children">`;
           eks.forEach(k=>{ const av=ach(k); h+=`<div class="node"><div class="row2 kpi"><span class="tw">•</span><span class="nm">${k.name}</span><span class="chip">${k.ttext}</span><span class="pctv ${clsOf(av)}">${pctTxt(av)}</span></div></div>`; });
           h+=`</div></div>`; });
@@ -203,17 +209,19 @@ function vTree(){
   h+=`</div></div></div>`; return h; }
 
 // ---- لوحة ----
-function vDashboard(){ const ks=strat(); const a=ks.map(ach); const overall=avg(a);
+function vDashboard(){ const ks=strat(); const a=ks.map(ach); const overall=companyOverall();
   let cnt={ok:0,warn:0,bad:0,muted:0}; a.forEach(x=>{cnt[statusOf(x)[1]]++;});
-  const roll=(keyf,keys)=>keys.map(key=>({name:key,ach:avg(ks.filter(k=>keyf(k)===key).map(ach))}));
+  const gw=k=>(k.w||0)*(deptW[k.deptId]||0);
+  const roll=(keyf,keys)=>keys.map(key=>({name:key,ach:wavg(ks.filter(k=>keyf(k)===key).map(k=>[ach(k),gw(k)]))}));
   const pil=roll(k=>k.pillar,DATA.pillars);
-  const dep=DATA.departments.map(d=>({name:d.name,id:d.id,ach:avg(ks.filter(k=>k.deptId===d.id).map(ach))}));
+  const dep=DATA.departments.map(d=>({name:d.name,id:d.id,ach:deptAch(d.id)}));
   const per=roll(k=>k.persp,DATA.perspectives);
-  const proj=DATA.projects.map(p=>({name:p,ach:avg(ks.filter(k=>k.project===p).map(ach)),n:ks.filter(k=>k.project===p).length}));
+  const proj=DATA.projects.map(p=>({name:p,ach:wavg(ks.filter(k=>k.project===p).map(k=>[ach(k),gw(k)])),n:ks.filter(k=>k.project===p).length}));
+  const have=a.filter(x=>x!==null).length;
   const pct=x=>x===null?'—':Math.round(x*100)+'%';
   const bar=x=>`<div class="bar"><i style="width:${Math.round((x||0)*100)}%"></i></div>`;
   let h=`<h1>اللوحة التنفيذية — درب 2026</h1><div class="cards">
-   <div class="card ${statusOf(overall)[1]}"><div class="lbl">الإنجاز العام</div><div class="big">${pct(overall)}</div><div class="small">${ks.length} مؤشر</div></div>
+   <div class="card ${statusOf(overall)[1]}"><div class="lbl">الإنجاز العام</div><div class="big">${pct(overall)}</div><div class="small">موزون · تغطية ${have}/${ks.length}</div></div>
    <div class="card ok"><div class="lbl">✅ محقق</div><div class="big">${cnt.ok}</div></div>
    <div class="card warn"><div class="lbl">🟡 قريب</div><div class="big">${cnt.warn}</div></div>
    <div class="card bad"><div class="lbl">🔴 تحت الهدف</div><div class="big">${cnt.bad}</div></div>
@@ -230,7 +238,8 @@ function vDashboard(){ const ks=strat(); const a=ks.map(ach); const overall=avg(
 
 // ---- استراتيجية ----
 function vStrategy(){ const ks=strat(); const pct=x=>x===null?'—':Math.round(x*100)+'%';
-  const roll=(keyf,key)=>avg(ks.filter(k=>keyf(k)===key).map(ach));
+  const gw=k=>(k.w||0)*(deptW[k.deptId]||0);
+  const roll=(keyf,key)=>wavg(ks.filter(k=>keyf(k)===key).map(k=>[ach(k),gw(k)]));
   let h=`<h1>الاستراتيجية والخارطة التنفيذية</h1><div class="grid2">
    <div class="panel"><h3>الركائز (5 سنوات)</h3><table><tbody>`+
    DATA.pillars.map(p=>`<tr><td>${p}</td><td class="mono">${pct(roll(k=>k.pillar,p))}</td></tr>`).join('')+`</tbody></table>
@@ -270,7 +279,7 @@ function vDept(id){ const d=deptById[id]; const ks=DATA.kpis.filter(k=>k.deptId=
   return h; }
 
 // ---- الموظفون ----
-function empScore(u){ const ks=DATA.kpis.filter(k=>k.level==='individual'&&k.owner===u.u); const a=ks.map(ach); return [avg(a),ks.length]; }
+function empScore(u){ const ks=DATA.kpis.filter(k=>k.level==='individual'&&k.owner===u.u); return [wavg(ks.map(k=>[ach(k),k.w])),ks.length]; }
 function vEmployees(){ const emps=DATA.users.filter(u=>u.role==='employee');
   let rows=emps.map(u=>{const [sc,n]=empScore(u);return {u,sc,n};}).filter(r=>r.n>0);
   let h=`<h1>الموظفون — المؤشرات الفردية</h1>`;

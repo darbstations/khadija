@@ -3,6 +3,21 @@
 <h1>إدارة المؤشرات — تعديل المستهدفات والأوزان</h1>
 {% if request.query_params.get('saved') %}<div class="note">✅ تم حفظ التعديلات.</div>{% endif %}
 <div class="note">🛠️ هذه الصفحة لمدير النظام فقط — تعديل المستهدف/الوزن/خط الأساس. (الأرقام الشهرية تُدخل من صفحة كل إدارة).</div>
+
+<div class="panel">
+  <h3>⚖️ ميزان الإدارات — وزن كل إدارة في الإنجاز العام للشركة</h3>
+  <div class="small">يُلغي تشوّه عدد المؤشرات — يُفضّل أن يكون المجموع 100%.</div>
+  <form method="post" action="/admin/dept-weights" class="grid2" style="margin-top:10px">
+    {% for d in depts %}
+    <div style="display:flex;align-items:center;gap:8px">
+      <label class="small" style="min-width:140px">{{ d.name }}</label>
+      <input type="text" name="dw_{{ d.id }}" value="{{ (d.weight*100)|round(1) if d.weight else '' }}" style="width:80px"><span class="small">%</span>
+    </div>
+    {% endfor %}
+    <div><button class="btn" type="submit">💾 حفظ أوزان الإدارات</button></div>
+  </form>
+</div>
+
 <form method="post" action="/admin/kpis/save">
 {% for d in depts %}
 <h2>{{ d.name }}</h2>

@@ -15,7 +15,7 @@
   <div class="card {{ status_class(overall) }}">
     <div class="lbl">مؤشر الإنجاز العام للشركة</div>
     <div class="big">{{ (overall*100)|round(1) if overall is not none else '—' }}<span style="font-size:18px">%</span></div>
-    <div class="small">{{ total }} مؤشر</div>
+    <div class="small">موزون · تغطية {{ have }}/{{ total }} مؤشر</div>
   </div>
   <div class="card ok"><div class="lbl">✅ محقق</div><div class="big">{{ counts.ok }}</div></div>
   <div class="card warn"><div class="lbl">🟡 قريب</div><div class="big">{{ counts.warn }}</div></div>

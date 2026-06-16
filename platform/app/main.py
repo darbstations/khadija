@@ -59,6 +59,18 @@ def avg(achs):
     nums = [a for a in achs if a is not None]
     return sum(nums)/len(nums) if nums else None
 
+def wavg(items):
+    """متوسط موزون مع تسقيف التحقيق عند 100% — items: [(ach, weight)] (يتجاهل None، ويرجع للمتساوي لو الأوزان صفر)."""
+    valid = [(min(a, 1.0), (w or 0)) for a, w in items if a is not None]
+    if not valid: return None
+    tw = sum(w for _, w in valid)
+    if tw <= 0: return sum(a for a, _ in valid) / len(valid)
+    return sum(a * w for a, w in valid) / tw
+
+def coverage(calcs):
+    tot = len(calcs); have = sum(1 for c in calcs if c["ach"] is not None)
+    return (have, tot)
+
 # ---------------- المصادقة ----------------
 @app.get("/", response_class=HTMLResponse)
 def root(request: Request):
@@ -91,27 +103,24 @@ def dashboard(request: Request, db: Session = Depends(get_db)):
     u = require(request, db)
     if not u: return RedirectResponse("/login")
     calcs, nmonths = all_calcs(db)
-    achs = [c["ach"] for c in calcs]
-    overall = avg(achs)
     counts = {"ok":0,"warn":0,"bad":0,"muted":0}
     for c in calcs: counts[c["sclass"]] += 1
-    def rollup(keyfn, keys):
-        out = []
-        for k in keys:
-            sub = [c["ach"] for c in calcs if keyfn(c)==k]
-            out.append({"name": k, "ach": avg(sub), "n": len([c for c in calcs if keyfn(c)==k])})
-        return out
-    pillars = rollup(lambda c: c["kpi"].pillar, PILLARS)
     depts = db.query(models.Department).all()
-    dept_roll = []
-    for d in depts:
-        sub = [c["ach"] for c in calcs if c["kpi"].department_id==d.id]
-        dept_roll.append({"id": d.id, "name": d.name, "ach": avg(sub), "n": len(sub)})
+    deptw = {d.id: (d.weight or 0) for d in depts}
+    def gw(c): return (c["kpi"].weight or 0) * deptw.get(c["kpi"].department_id, 0)   # وزن عام = وزن المؤشر × وزن الإدارة
+    def dept_score(did): return wavg([(c["ach"], c["kpi"].weight or 0) for c in calcs if c["kpi"].department_id==did])
+    dept_roll = [{"id": d.id, "name": d.name, "ach": dept_score(d.id),
+                  "n": len([c for c in calcs if c["kpi"].department_id==d.id])} for d in depts]
+    overall = wavg([(dept_score(d.id), deptw.get(d.id, 0)) for d in depts])  # موزون بالإدارة (يلغي تشوّه العدد)
+    def rollup(keyfn, keys):
+        return [{"name": k, "ach": wavg([(c["ach"], gw(c)) for c in calcs if keyfn(c)==k]),
+                 "n": len([c for c in calcs if keyfn(c)==k])} for k in keys]
+    pillars = rollup(lambda c: c["kpi"].pillar, PILLARS)
     persp = rollup(lambda c: c["kpi"].perspective, PERSPECTIVES)
-    projects = []
-    for p in PROJECTS:
-        sub=[c["ach"] for c in calcs if c["kpi"].project==p]
-        projects.append({"name":p,"pillar":PROJECT_PILLAR.get(p,""),"ach":avg(sub),"n":len(sub)})
+    projects = [{"name": p, "pillar": PROJECT_PILLAR.get(p, ""),
+                 "ach": wavg([(c["ach"], gw(c)) for c in calcs if c["kpi"].project==p]),
+                 "n": len([c for c in calcs if c["kpi"].project==p])} for p in PROJECTS]
+    have, tot = coverage(calcs)
     chart = {
         "pillars": {"labels": [p["name"] for p in pillars], "data": [round((p["ach"] or 0)*100,1) for p in pillars]},
         "depts": {"labels": [d["name"] for d in dept_roll], "data": [round((d["ach"] or 0)*100,1) for d in dept_roll]},
@@ -119,7 +128,8 @@ def dashboard(request: Request, db: Session = Depends(get_db)):
     }
     return templates.TemplateResponse(request, "dashboard.html", {"request": request, "u": u, "overall": overall,
         "counts": counts, "pillars": pillars, "depts": dept_roll, "persp": persp, "projects": projects,
-        "nmonths": nmonths, "chart_json": json.dumps(chart, ensure_ascii=False), "total": len(calcs)})
+        "nmonths": nmonths, "chart_json": json.dumps(chart, ensure_ascii=False), "total": len(calcs),
+        "have": have})
 
 # ---------------- العرض الهرمي ----------------
 @app.get("/tree", response_class=HTMLResponse)
@@ -128,9 +138,9 @@ def tree(request: Request, db: Session = Depends(get_db)):
     if not u: return RedirectResponse("/login")
     nmonths = get_month(db)
     sc = [kpi_calc(k, nmonths) for k in db.query(models.KPI).filter(models.KPI.level=="strategic").all()]
-    overall = avg([c["ach"] for c in sc])
     depts = db.query(models.Department).all()
-    dept_ach = {d.id: avg([c["ach"] for c in sc if c["kpi"].department_id==d.id]) for d in depts}
+    dept_ach = {d.id: wavg([(c["ach"], c["kpi"].weight or 0) for c in sc if c["kpi"].department_id==d.id]) for d in depts}
+    overall = wavg([(dept_ach.get(d.id), d.weight or 0) for d in depts])
     managers = db.query(models.User).filter_by(role="manager").all()
     nodes = []
     for d in depts:
@@ -143,7 +153,7 @@ def tree(request: Request, db: Session = Depends(get_db)):
             for e in emps:
                 eks = db.query(models.KPI).filter_by(owner_user_id=e.id, level="individual").order_by(models.KPI.id).all()
                 rows = [kpi_calc(k, nmonths) for k in eks]
-                enodes.append({"user": e, "ach": avg([r["ach"] for r in rows]), "kpis": rows})
+                enodes.append({"user": e, "ach": wavg([(r["ach"], r["kpi"].weight or 0) for r in rows]), "kpis": rows})
             nodes.append({"kind": "dept", "dept": d, "ach": dept_ach.get(d.id), "emps": enodes})
     return templates.TemplateResponse(request, "tree.html", {"request": request, "u": u,
         "overall": overall, "nodes": nodes})
@@ -182,8 +192,9 @@ def department_staff(dept_id: int, request: Request, db: Session = Depends(get_d
     if d.key == "exec":
         for m in db.query(models.User).filter_by(role="manager").all():
             md = m.department
-            sc = [kpi_calc(k, nmonths)["ach"] for k in db.query(models.KPI).filter_by(department_id=m.department_id, level="strategic").all()] if md else []
-            items.append({"kind": "manager", "user": m, "dept": md, "ach": avg(sc), "n": None})
+            ks = db.query(models.KPI).filter_by(department_id=m.department_id, level="strategic").all() if md else []
+            items.append({"kind": "manager", "user": m, "dept": md,
+                          "ach": wavg([(kpi_calc(k, nmonths)["ach"], k.weight or 0) for k in ks]), "n": None})
     else:
         for e in db.query(models.User).filter_by(department_id=d.id, role="employee").all():
             eks = db.query(models.KPI).filter_by(owner_user_id=e.id, level="individual").all()
@@ -221,9 +232,8 @@ async def department_save(dept_id: int, request: Request, db: Session = Depends(
 # ---------------- مؤشرات الموظفين (فردي) ----------------
 def emp_score(db, uid, nmonths):
     ks = db.query(models.KPI).filter_by(owner_user_id=uid, level="individual").all()
-    achs = [kpi_calc(k, nmonths)["ach"] for k in ks]
-    achs = [a for a in achs if a is not None]
-    return (sum(achs)/len(achs) if achs else None), len(ks)
+    sc = wavg([(kpi_calc(k, nmonths)["ach"], k.weight or 0) for k in ks])
+    return sc, len(ks)
 
 @app.get("/employees", response_class=HTMLResponse)
 def employees(request: Request, db: Session = Depends(get_db)):
@@ -365,16 +375,30 @@ async def admin_kpis_save(request: Request, db: Session = Depends(get_db)):
     db.commit()
     return RedirectResponse("/admin/kpis?saved=1", status_code=302)
 
+@app.post("/admin/dept-weights")
+async def admin_dept_weights(request: Request, db: Session = Depends(get_db)):
+    u = require(request, db)
+    if not u or not can_edit_definition(u): return RedirectResponse("/dashboard")
+    form = await request.form()
+    for d in db.query(models.Department).all():
+        f = f"dw_{d.id}"
+        if f in form:
+            raw = (form.get(f) or "").strip().replace(",", "")
+            d.weight = (float(raw)/100.0) if raw != "" else 0
+    db.commit()
+    return RedirectResponse("/admin/kpis?saved=1", status_code=302)
+
 # ---------------- الاستراتيجية / الخارطة ----------------
 @app.get("/strategy", response_class=HTMLResponse)
 def strategy(request: Request, db: Session = Depends(get_db)):
     u = require(request, db)
     if not u: return RedirectResponse("/login")
     calcs, _ = all_calcs(db)
+    deptw = {d.id: (d.weight or 0) for d in db.query(models.Department).all()}
+    def gw(c): return (c["kpi"].weight or 0) * deptw.get(c["kpi"].department_id, 0)
     def roll(keyfn, k):
-        sub=[c["ach"] for c in calcs if keyfn(c)==k];
-        n=[c for c in calcs if keyfn(c)==k]
-        return avg(sub), len(n)
+        sub=[(c["ach"], gw(c)) for c in calcs if keyfn(c)==k]
+        return wavg(sub), len(sub)
     pillars=[{"name":p, **dict(zip(("ach","n"), roll(lambda c:c["kpi"].pillar,p)))} for p in PILLARS]
     persp=[{"name":p, **dict(zip(("ach","n"), roll(lambda c:c["kpi"].perspective,p)))} for p in PERSPECTIVES]
     projects=[]
