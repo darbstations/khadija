@@ -71,26 +71,6 @@ HTML = r"""<!DOCTYPE html>
 <style>__CSS__
 .hidden{display:none!important}
 .navwrap{position:sticky;top:0;z-index:5}
-select.nav{padding:7px;border-radius:8px;border:1px solid #ccc}
-.savebar{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px;text-align:center}
-.ok2{color:var(--ok)}.bad2{color:var(--bad)}.warn2{color:var(--warn)}
-.tree2{background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px;margin-top:10px}
-.tree2 .node{margin:2px 0}
-.row2{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:9px;cursor:pointer}
-.row2:hover{background:#fafbfc}
-.row2 .tw{color:var(--grey);width:14px;display:inline-block;font-size:12px}
-.row2 .nm{font-weight:700;color:var(--greyd,#58595B)}
-.row2 .nm a{color:inherit}
-.row2 .sub{color:var(--grey);font-size:12px}
-.row2.kpi .nm{font-weight:500;color:#333}
-.row2 .pctv{margin-right:auto;font-weight:800;font-variant-numeric:tabular-nums}
-.row2 .pctv.ok{color:var(--ok)}.row2 .pctv.warn{color:var(--warn)}.row2 .pctv.bad{color:var(--bad)}.row2 .pctv.muted{color:#9aa0a6}
-.row2 .mini{height:7px;width:80px;background:#eceef0;border-radius:6px;overflow:hidden}.row2 .mini i{display:block;height:100%;background:var(--orange)}
-.row2 .chip{font-size:11px;padding:1px 8px;border-radius:20px;background:#eef0f2;color:#555}
-.tree2 .lvl{font-size:10px;color:#fff;border-radius:5px;padding:1px 6px}
-.tree2 .b0{background:#58595B}.tree2 .b1{background:#808285}.tree2 .b2{background:#9a9c9f}.tree2 .b3{background:var(--orange)}
-.tree2 .children{margin-right:20px;border-right:2px dashed #d8dadd;padding-right:6px;display:none}
-.tree2 .open>.children{display:block}
 </style></head><body>
 
 <div id="login" class="login">
