@@ -22,8 +22,7 @@ import openpyxl
 warnings.filterwarnings("ignore")
 
 WB = "workbook/khadija-supply-chain-kpis-2026.xlsx"
-FULL = "📊 ملخص آلي + KPIs"
-COND = "📊 لوحة مُكثّفة (٩ مؤشرات)"
+DASH = "📊 مؤشرات الأداء (٩)"   # اللوحة الوحيدة بعد دمج المتكرر
 PRODUCT_POINTS = 300
 
 # يناير 2+1=3 أيام ، فبراير 3+2=5 أيام
@@ -96,32 +95,31 @@ def main():
     exc = ExcelCompiler(path)
 
     # (sheet, cell, label, expected)
+    # كل الفحوص على اللوحة الوحيدة (٩ مؤشرات): K1 توفر صف7 ، K4 فواقد صف14
     cases = [
-        (FULL, "G7", "اللوحة الأصلية · توفر يناير", round(avail(1), 6)),
-        (FULL, "H7", "اللوحة الأصلية · توفر فبراير", round(avail(2), 6)),
-        (FULL, "I7", "اللوحة الأصلية · توفر مارس(فارغ)", 1.0),
-        (FULL, "G18", "اللوحة الأصلية · فواقد يناير", loss(1)),
-        (FULL, "H18", "اللوحة الأصلية · فواقد فبراير", loss(2)),
-        (FULL, "I18", "اللوحة الأصلية · فواقد مارس", 0),
-        (COND, "G7", "المُكثّفة · توفر الوقود", round(avail(1), 6)),
-        (COND, "G9", "المُكثّفة · مواد مخزنية", 0.5),
-        (COND, "G11", "المُكثّفة · أوامر الشراء", 0.5),
-        (COND, "G14", "المُكثّفة · فواقد", 105.0),
-        (COND, "G19", "المُكثّفة · أيام المخزون", 3.5),
-        (COND, "G22", "المُكثّفة · امتثال/سلامة", 0.75),
-        (COND, "G25", "المُكثّفة · التزام الجدول", 0.75),
-        (COND, "G27", "المُكثّفة · الأسطول المملوك", 0.75),
+        ("G7", "توفر الوقود · يناير (31يوم)", round(avail(1), 6)),
+        ("H7", "توفر الوقود · فبراير (28يوم)", round(avail(2), 6)),
+        ("I7", "توفر الوقود · مارس (فارغ)", 1.0),
+        ("G14", "فواقد الوقود · يناير", loss(1)),
+        ("H14", "فواقد الوقود · فبراير", loss(2)),
+        ("I14", "فواقد الوقود · مارس (÷صفر)", 0),
+        ("G9", "توفر المواد المخزنية", 0.5),
+        ("G11", "إصدار أوامر الشراء", 0.5),
+        ("G19", "أيام المخزون", 3.5),
+        ("G22", "الامتثال والسلامة", 0.75),
+        ("G25", "التزام جدول النقل", 0.75),
+        ("G27", "استخدام الأسطول المملوك", 0.75),
         # حالة المحاور المُجمَّعة (أسوأ حالة بين مؤشرات المحور)
-        (COND, "F5", "محور خدمة العميل", "🔴"),
-        (COND, "F12", "محور التكاليف", "✅"),
-        (COND, "F17", "محور السيولة المالية", "🟡"),
-        (COND, "F20", "محور السلامة والامتثال", "🔴"),
-        (COND, "F23", "محور الكفاءة التشغيلية", "🔴"),
+        ("F5", "محور خدمة العميل", "🔴"),
+        ("F12", "محور التكاليف", "✅"),
+        ("F17", "محور السيولة المالية", "🟡"),
+        ("F20", "محور السلامة والامتثال", "🔴"),
+        ("F23", "محور الكفاءة التشغيلية", "🔴"),
     ]
     ok = True
-    print(f"{'sheet':<10}{'cell':<5}{'label':<34}{'actual':>10}{'expected':>10}")
-    for sheet, cell, label, exp in cases:
-        val = exc.evaluate(f"'{sheet}'!{cell}")
+    print(f"{'cell':<5}{'label':<34}{'actual':>10}{'expected':>10}")
+    for cell, label, exp in cases:
+        val = exc.evaluate(f"'{DASH}'!{cell}")
         if isinstance(exp, str):
             passed = str(val) == exp
         else:
@@ -130,9 +128,8 @@ def main():
             except (TypeError, ValueError):
                 passed = False
         ok &= passed
-        tag = "FULL" if sheet == FULL else "COND"
         shown = round(val, 6) if isinstance(val, float) else val
-        print(f"{tag:<10}{cell:<5}{label:<34}{str(shown):>10}{str(exp):>10}  {'✅' if passed else '❌'}")
+        print(f"{cell:<5}{label:<34}{str(shown):>10}{str(exp):>10}  {'✅' if passed else '❌'}")
 
     print("\nRESULT:", "✅ ALL FORMULAS CORRECT & FUNCTIONAL" if ok else "❌ FAILURES DETECTED")
     return 0 if ok else 1

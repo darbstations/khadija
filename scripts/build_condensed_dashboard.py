@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-يضيف ورقة «📊 لوحة مُكثّفة (٩ مؤشرات)» إلى مصنّف خديجة، بدمج المؤشرات المتكرّرة
-(التي تؤدي نفس الهدف) مع الإبقاء على اللوحة الأصلية ذات الـ١٣ مؤشراً دون مساس.
+يبني لوحة «📊 مؤشرات الأداء (٩)» الموحّدة في مصنّف خديجة بدمج المؤشرات المتكرّرة
+(التي تؤدي نفس الهدف)، ثم يحذف لوحة الـ١٣ القديمة فتصبح هذه هي اللوحة الوحيدة.
 
 قرارات الدمج:
   • عدد الانقطاعات (2)  → مطوي داخل «توفر الوقود» (الشدّة بدل التكرار).
@@ -10,7 +10,8 @@
   • Fill Rate (5)       → محذوف (كان تجميعة لمؤشري المواد المخزنية + أوامر الشراء).
   • حوادث النقل (10)    → مطوية داخل «الامتثال والسلامة» (نسبة الرحلات بلا حادث/مخالفة).
 
-النتيجة: ١٣ → ٩ مؤشرات نظيفة عبر نفس المحاور الخمسة. الدوال تشير لنفس صفحات الإدخال.
+النتيجة: ١٣ → ٩ مؤشرات نظيفة عبر المحاور الخمسة، مع حالة مُجمَّعة لكل محور، وخلية
+إدخال محلية «عدد نقاط المنتج» (F31). النسخة ذات الـ١٣ محفوظة في سجل Git.
 """
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment
@@ -25,6 +26,8 @@ ORANGE, ORANGE2, GRAY, CREAM = "FFC04E0E", "FFF3741F", "FF3D3D3D", "FFFEF0E6"
 WHITE, YELLOW, BLUE = "FFFFFFFF", "FFFFF9D6", "FF1565C0"
 F = "DIN Next LT Arabic"
 MONTHS = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"]
+SHEET = "📊 مؤشرات الأداء (٩)"     # اسم اللوحة (صارت الوحيدة بعد دمج المتكرر)
+INPUT_ROW = 31                      # صف خلية إدخال «عدد نقاط المنتج» (F31) داخل اللوحة
 
 
 # آخر صف بيانات لكل ورقة (يجب أن تتطابق كل نطاقات COUNTIFS/SUMIFS في الحجم)
@@ -37,9 +40,9 @@ def mrange(sheet, col, m):  # شرط الشهر على عمود تاريخ
             f"'{sheet}'!{col}5:{col}{end},\"<\"&DATE(2026,{m}+1,1)")
 
 
-def fa_avail(m):   # توفر الوقود
+def fa_avail(m):   # توفر الوقود (يشير لخلية الإدخال المحلية F{INPUT_ROW})
     return (f"=IFERROR(1-(SUMIFS('{OUT}'!F5:F104,{mrange(OUT,'B',m)})"
-            f"/('{DASH}'!$F$38*DAY(DATE(2026,{m}+1,1)-1))),1)")
+            f"/($F${INPUT_ROW}*DAY(DATE(2026,{m}+1,1)-1))),1)")
 def fa_stock(m):   # توفر المواد المخزنية ≤3 أيام
     base=mrange(ORD,'C',m)
     return (f"=IFERROR(COUNTIFS({base},'{ORD}'!D5:D204,\"مواد مخزنية\",'{ORD}'!I5:I204,\"*ضمن*\")"
@@ -98,9 +101,10 @@ def status_formula(p, a, direction):
 
 def main():
     wb = openpyxl.load_workbook(WB)
-    if "📊 لوحة مُكثّفة (٩ مؤشرات)" in wb.sheetnames:
-        del wb["📊 لوحة مُكثّفة (٩ مؤشرات)"]
-    ws = wb.create_sheet("📊 لوحة مُكثّفة (٩ مؤشرات)", 1)
+    for nm in ("📊 لوحة مُكثّفة (٩ مؤشرات)", SHEET):
+        if nm in wb.sheetnames:
+            del wb[nm]
+    ws = wb.create_sheet(SHEET, 0)        # اللوحة الوحيدة → أول تبويب
     ws.sheet_view.rightToLeft = True
 
     widths = [4,38,9,13,8,14] + [9]*12
@@ -115,7 +119,7 @@ def main():
 
     # العنوان والعنوان الفرعي
     ws.merge_cells("A1:R1"); style(ws["A1"], ORANGE, WHITE, True, 15)
-    ws["A1"] = "📊 لوحة المؤشرات المُكثّفة — بعد دمج المتكرر (٩ مؤشرات)"
+    ws["A1"] = "📊 مؤشرات أداء سلاسل الإمداد ٢٠٢٦ (٩ مؤشرات)"
     ws.row_dimensions[1].height = 28
     ws.merge_cells("A2:R2"); style(ws["A2"], CREAM, GRAY, False, 9)
     ws["A2"] = ("دُمج المتكرر: عدد الانقطاعات←التوفر · الدوران←أيام المخزون · "
@@ -163,12 +167,17 @@ def main():
         ws.cell(axis_row,6).value = (f'=IF(COUNTIF(F{first}:F{r-1},"*🔴*")>0,"🔴",'
                                      f'IF(COUNTIF(F{first}:F{r-1},"*🟡*")>0,"🟡","✅"))')
 
-    # تذييل المقاييس التشخيصية
+    # تذييل: ملاحظة الدمج + خلية إدخال «عدد نقاط المنتج» المحلية
     note_r = r+1
     ws.merge_cells(f"A{note_r}:R{note_r}")
     style(ws.cell(note_r,1), None, GRAY, False, 8, "right", italic=True)
-    ws.cell(note_r,1).value = ("ℹ️ المقاييس المطوية متاحة كتشخيص في اللوحة الأصلية: عدد الانقطاعات، "
-                               "دوران المخزون، عدد الحوادث الجسيمة، ونسبة استيفاء الطلبات (Fill Rate).")
+    ws.cell(note_r,1).value = ("ℹ️ دُمجت ٤ مؤشرات متكررة ضمن هذه التسعة: عدد الانقطاعات←التوفر، "
+                               "الدوران←أيام المخزون، Fill Rate (حُذف)، حوادث النقل←الامتثال/السلامة.")
+    ws.merge_cells(f"A{INPUT_ROW}:E{INPUT_ROW}")
+    style(ws.cell(INPUT_ROW,1), None, GRAY, True, 9, "right")
+    ws.cell(INPUT_ROW,1).value = "عدد نقاط المنتج (محطات × منتجات) — لحساب «توفر الوقود»"
+    style(ws.cell(INPUT_ROW,6), YELLOW, BLUE, True, 11)
+    ws.cell(INPUT_ROW,6).value = 300
 
     # تنسيق شرطي لعمود الحالة (مطابق للأصل) — يشمل صفوف المحاور (تبدأ من F5)
     last = r
@@ -178,20 +187,25 @@ def main():
         ws.conditional_formatting.add(f"F5:F{last}",
             Rule(type="expression", formula=[f'ISNUMBER(SEARCH("{emo}",F5))'], dxf=dxf))
 
-    polish_original_targets(wb)
+    # تحديث ربط ورقة مؤشرات الإدارة للترقيم الجديد، ثم حذف لوحة الـ١٣ (دُمجت في التسعة)
+    patch_management_mapping(wb)
+    if DASH in wb.sheetnames:
+        del wb[DASH]
+    wb.active = 0
     wb.save(WB)
-    print("condensed dashboard added; sheets:", wb.sheetnames)
+    print("single 9-KPI dashboard built; sheets:", wb.sheetnames)
 
 
-def polish_original_targets(wb):
-    """يحوّل عمود «الهدف» في اللوحة الأصلية إلى أرقام فعلية (بنفس صيغة خلية الخطة) بدل النص."""
-    ws = wb[DASH]
-    plan_rows = [6,8,10,12,14,17,19,22,24,27,29,32,34]
-    targets   = [0.995,5,1,0.95,0.98,100,0.02,3,10,0,0.95,0.95,0.6]
-    for row,val in zip(plan_rows,targets):
-        c = ws.cell(row,4)            # العمود D = الهدف
-        c.value = val
-        c.number_format = ws.cell(row,7).number_format  # نفس صيغة خلية يناير (الخطة)
+def patch_management_mapping(wb):
+    """يحدّث عمود «يقابله في اللوحة» في ورقة مؤشرات الإدارة لترقيم اللوحة الجديدة (٩)."""
+    name = "📋 مؤشرات الإدارة"
+    if name not in wb.sheetnames:
+        return
+    ws = wb[name]
+    mapping = ["K1 — حُدِّثت طريقة الحساب", "K4 — حُدِّثت طريقة الحساب",
+               "K6 — مطابقة", "K2 — مطابقة", "K3 — مطابقة"]
+    for i, txt in enumerate(mapping):
+        ws.cell(4 + i, 8).value = txt   # العمود H، الصفوف 4..8
 
 
 if __name__ == "__main__":
