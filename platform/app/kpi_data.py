@@ -19,6 +19,21 @@ DEPT_WEIGHTS = {
   "realestate": 0.15, "marketing": 0.10, "digital": 0.08, "hr": 0.07,
 }
 
+# أولوية المؤشر داخل إدارته → وزن نسبي: رئيسي=3 · مهم=2 · متابعة=1
+_PRIO_LOW = ["تقارير","التقارير","أرشفة","مستندات","تحديث","مراسلات","توثيق","قاعدة بيانات","المعيار الشامل","المراسلات"]
+_PRIO_HIGH = ["عقد","عقود","محطات","محطة","مبيعات","إيراد","تحصيل","العائد","الإشغال","MAU",
+  "استبقاء","جاهزية","السلامة","الوصول","المتابعين","الاستحواذ","نمو","رضا","تحويل","التفاعل","التزام الهوية","الإيجار"]
+def priority(name):
+    if any(k in name for k in _PRIO_LOW): return 1
+    if any(k in name for k in _PRIO_HIGH): return 3
+    return 2
+def priority_label(p): return {3:"🔴 رئيسي", 2:"🟠 مهم", 1:"🟡 متابعة"}.get(p, "🟠 مهم")
+def kpi_weights(records):
+    """أوزان مطبّعة داخل الإدارة حسب الأولوية (مجموعها 1)."""
+    prios = [priority(r[1]) for r in records]   # r[1] = اسم المؤشر
+    tot = sum(prios) or 1
+    return [round(p/tot, 5) for p in prios]
+
 # تصنيف قائد/لاحق ومنظور BSC
 LEAD_KW=["عدد","زيارات","فرص","تحويل","مبيعات","نمو","LEADS","تنزيلات","تدريب","طلب","حملات","استقطاب"]
 def classify(nm): return "قائد" if any(k in nm for k in LEAD_KW) else "لاحق"

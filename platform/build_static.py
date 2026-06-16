@@ -15,11 +15,12 @@ DEPT_ID = {}
 for i,(name,key,recs) in enumerate(K.DEPARTMENTS, start=1):
     DEPT_ID[key]=i
     departments.append({"id":i,"key":key,"name":name,"w":K.DEPT_WEIGHTS.get(key,0)})
-    kw=round(1.0/len(recs),4) if recs else 0
-    for (axis,nm,unit,pol,agg,tgt,ttxt,fmt,pillar,project) in recs:
+    kws=K.kpi_weights(recs)
+    for j,(axis,nm,unit,pol,agg,tgt,ttxt,fmt,pillar,project) in enumerate(recs):
         kpis.append({"id":kid,"deptId":i,"name":nm,"unit":unit,"pol":pol,"agg":agg,
             "target":tgt,"ttext":ttxt,"fmt":fmt,"pillar":pillar,"project":project,
-            "persp":K.perspective(nm),"level":"strategic","owner":None,"section":axis,"w":kw})
+            "persp":K.perspective(nm),"level":"strategic","owner":None,"section":axis,
+            "w":kws[j],"prio":K.priority_label(K.priority(nm))})
         kid+=1
 
 # مستخدمون
@@ -265,7 +266,7 @@ function vDept(id){ const d=deptById[id]; const ks=DATA.kpis.filter(k=>k.deptId=
   h+= editable?`<div class="note">🟩 الخلايا الخضراء قابلة للإدخال (تُحفظ تلقائياً في متصفحك). المستهدف مقفول.</div>`
     :`<div class="note">🔒 عرض فقط — لا تملك صلاحية تغذية هذه الإدارة.</div>`;
   h+=`<div class="kpiwrap"><table><thead><tr><th>المؤشر</th><th>المستهدف</th>`+MONTHS.map(m=>`<th>${m.slice(0,3)}</th>`).join('')+`<th>YTD</th><th>الإنجاز</th><th>الحالة</th></tr></thead><tbody>`;
-  ks.forEach(k=>{ h+=`<tr><td style="min-width:230px">${k.name}<div class="small">${k.unit} · ${k.pillar}</div></td><td class="small">${k.ttext}</td>`;
+  ks.forEach(k=>{ h+=`<tr><td style="min-width:230px">${k.name}<div class="small">${k.prio||''} · وزن ${Math.round((k.w||0)*100)}% · ${k.unit}</div></td><td class="small">${k.ttext}</td>`;
     for(let m=1;m<=12;m++) h+=inputCell(k,m); h+=rowCells(k)+`</tr>`; });
   h+=`</tbody></table></div>`;
   // زر يندرج لصفحة موظفي الإدارة المستقلة

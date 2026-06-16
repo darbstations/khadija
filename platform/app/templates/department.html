@@ -19,7 +19,7 @@
 <tbody>
 {% for r in rows %}
 <tr>
-  <td style="min-width:230px">{{ r.kpi.name }}<div class="small">{{ r.kpi.unit }} · {{ r.kpi.pillar }}</div></td>
+  <td style="min-width:230px">{{ r.kpi.name }}<div class="small">{{ r.kpi.kpitype }} · وزن {{ (r.kpi.weight*100)|round }}% · {{ r.kpi.unit }}</div></td>
   <td class="small">{{ r.kpi.target_text }}</td>
   {% for m in range(1,13) %}
     <td>

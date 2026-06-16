@@ -49,14 +49,14 @@ def init_db():
             d = models.Department(name=name, key=key, weight=kpi_data.DEPT_WEIGHTS.get(key, 0))
             db.add(d); db.flush()
             dept_by_key[key] = d
-            n = len(records); w = round(1.0/n, 4) if n else 0
+            ws = kpi_data.kpi_weights(records)
             for i, rec in enumerate(records):
                 axis, nm, unit, pol, agg, tgt, ttxt, fmt, pillar, project = rec
                 db.add(models.KPI(
                     department_id=d.id, order=i, axis=axis, name=nm, unit=unit,
                     polarity=pol, agg=agg, target=tgt, target_text=ttxt, fmt=fmt,
                     pillar=pillar, project=project, perspective=kpi_data.perspective(nm),
-                    kpitype=kpi_data.classify(nm), weight=w))
+                    kpitype=kpi_data.priority_label(kpi_data.priority(nm)), weight=ws[i]))
         # المستخدمون (صلاحيات)
         def mkuser(username, pw, role, full, dept_key=None):
             h, s = hash_password(pw)
