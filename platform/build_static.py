@@ -22,17 +22,17 @@ for i,(name,key,recs) in enumerate(K.DEPARTMENTS, start=1):
         kid+=1
 
 # مستخدمون
-users.append({"u":"admin","name":"مدير النظام","role":"admin","deptId":None,"pass":"admin123"})
-users.append({"u":"exec","name":"الرئيس التنفيذي","role":"executive","deptId":DEPT_ID["exec"],"pass":"exec123"})
+users.append({"u":"admin","name":"مدير النظام","role":"admin","deptId":None,"pass":"admin123","title":"مدير النظام"})
+users.append({"u":"exec","name":"الرئيس التنفيذي","role":"executive","deptId":DEPT_ID["exec"],"pass":"exec123","title":"الرئيس التنفيذي"})
 mgr_titles={"franchise":"مدير الامتياز","operations":"مدير التشغيل","investment":"مدير الاستثمار",
  "realestate":"مدير العقار","digital":"مدير التقنية","hr":"مدير الموارد البشرية","marketing":"مدير التسويق"}
 for key,title in mgr_titles.items():
-    users.append({"u":key,"name":title,"role":"manager","deptId":DEPT_ID[key],"pass":key+"123"})
+    users.append({"u":key,"name":title,"role":"manager","deptId":DEPT_ID[key],"pass":key+"123","title":title})
 
 # موظفو التسويق + مؤشراتهم الفردية
 mkid = DEPT_ID["marketing"]
 for username,full,role,section,items in MS.STAFF:
-    users.append({"u":username,"name":full,"role":"employee","deptId":mkid,"pass":username+"123"})
+    users.append({"u":username,"name":full,"role":"employee","deptId":mkid,"pass":username+"123","title":role})
     for nm,fmt,tgt,ach in items:
         kpis.append({"id":kid,"deptId":mkid,"name":nm,"unit":"","pol":"↑","agg":"LAST",
             "target":tgt,"ttext":("100%" if (fmt=="pct" and tgt==1.0) else (str(tgt) if tgt is not None else "—")),
@@ -150,8 +150,27 @@ function go(view,arg){ const c=document.getElementById('content'); window.scroll
   else if(view==='tree') c.innerHTML=vTree();
   else if(view==='strategy') c.innerHTML=vStrategy();
   else if(view==='dept') c.innerHTML=vDept(arg);
+  else if(view==='deptstaff') c.innerHTML=vDeptStaff(arg);
   else if(view==='employees') c.innerHTML=vEmployees();
   else if(view==='employee') c.innerHTML=vEmployee(arg); }
+// صفحة موظفي إدارة مستقلة (التنفيذية = المدراء)
+function vDeptStaff(id){ const d=deptById[id];
+  let h=`<div class="toolbar"><a class="btn grey" href="#" onclick="go('dept',${id});return false">‹ رجوع لمؤشرات ${d.name}</a></div>`;
+  if(d.key==='exec'){
+    const mgrs=DATA.users.filter(u=>u.role==='manager');
+    h+=`<h1>🏛️ ${d.name} — المدراء</h1><div class="note">المدراء هم موظفو الإدارة التنفيذية. اضغط مديراً لعرض إدارته.</div><div class="cards">`;
+    mgrs.forEach(m=>{ const a=deptAch(m.deptId);
+      h+=`<a class="card" href="#" onclick="go('dept',${m.deptId});return false"><div class="lbl">${m.title||'مدير'}</div><div style="font-size:18px;font-weight:800;color:#fff">${m.name}</div><div class="big ${clsOf(a)}" style="font-size:26px">${pctTxt(a)}</div><div class="small">إدارة ${deptById[m.deptId].name} ›</div></a>`; });
+    h+=`</div>`; return h;
+  }
+  const emps=DATA.users.filter(u=>u.role==='employee'&&u.deptId===id);
+  h+=`<h1>${d.name} — الموظفون (${emps.length})</h1>`;
+  if(!emps.length){ h+=`<div class="note">👥 لا يوجد موظفون بمؤشرات فردية في هذه الإدارة بعد — يُضافون عند توفّر تقاريرهم.</div>`; return h; }
+  h+=`<div class="cards">`;
+  emps.forEach(e=>{ const eks=DATA.kpis.filter(k=>k.level==='individual'&&k.owner===e.u); const s=avg(eks.map(ach));
+    const t=(s||0)>=0.8?['جيد','ok']:(s||0)>=0.5?['مقبول','warn']:['يحتاج تحسين','bad'];
+    h+=`<a class="card" href="#" onclick="go('employee','${e.u}');return false"><div class="lbl">${e.title||''}</div><div style="font-size:17px;font-weight:800;color:#fff">${e.name}</div><div class="big ${clsOf(s)}" style="font-size:28px">${pctTxt(s)}</div><div class="small">${eks.length} مؤشر · <span class="tag ${t[1]}">${t[0]}</span></div></a>`; });
+  h+=`</div>`; return h; }
 function tg(el){var p=el.parentElement;p.classList.toggle('open');var a=el.querySelector('.tw');if(a&&a.textContent.trim()!=='•')a.textContent=p.classList.contains('open')?'▾':'▸';}
 function deptAch(id){ return avg(strat().filter(k=>k.deptId===id).map(ach)); }
 function pctTxt(x){ return x===null?'—':Math.round(x*100)+'%'; }
@@ -241,16 +260,13 @@ function vDept(id){ const d=deptById[id]; const ks=DATA.kpis.filter(k=>k.deptId=
   ks.forEach(k=>{ h+=`<tr><td style="min-width:230px">${k.name}<div class="small">${k.unit} · ${k.pillar}</div></td><td class="small">${k.ttext}</td>`;
     for(let m=1;m<=12;m++) h+=inputCell(k,m); h+=rowCells(k)+`</tr>`; });
   h+=`</tbody></table></div>`;
-  // موظفو هذه الإدارة (ربط)
-  const emps=DATA.users.filter(u=>u.role==='employee'&&u.deptId===id);
-  if(emps.length){
-    h+=`<div class="panel"><h3>👥 موظفو ${d.name} (${emps.length}) — مؤشرات فردية</h3>
-      <table><thead><tr><th>الموظف</th><th>المؤشرات</th><th>الإنجاز</th><th></th></tr></thead><tbody>`+
-      emps.map(u=>{const [sc,n]=empScore(u);return `<tr><td><a href="#" onclick="go('employee','${u.u}');return false">${u.name}</a></td><td class="mono">${n}</td><td class="mono">${sc===null?'—':Math.round(sc*100)+'%'}</td><td><a class="small" href="#" onclick="go('employee','${u.u}');return false">فتح ›</a></td></tr>`;}).join('')+
-      `</tbody></table></div>`;
-  } else {
-    h+=`<div class="note">👥 لا يوجد موظفون بمؤشرات فردية في هذه الإدارة بعد — تُضاف عند توفّر تقاريرها.</div>`;
-  }
+  // زر يندرج لصفحة موظفي الإدارة المستقلة
+  const isExec=d.key==='exec';
+  const cnt= isExec ? DATA.users.filter(u=>u.role==='manager').length : DATA.users.filter(u=>u.role==='employee'&&u.deptId===id).length;
+  const label= isExec ? `🏛️ المدراء (${cnt}) ›` : `👥 موظفو الإدارة (${cnt}) ›`;
+  h+=`<div class="panel" style="display:flex;align-items:center;justify-content:space-between">
+    <div><h3 style="margin:0">${isExec?'مدراء الإدارات':'موظفو '+d.name}</h3><div class="small">صفحة مستقلة بأداء كل ${isExec?'مدير':'موظف'} ومؤشراته</div></div>
+    <a class="btn" href="#" onclick="go('deptstaff',${id});return false">${label}</a></div>`;
   return h; }
 
 // ---- الموظفون ----
