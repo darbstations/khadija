@@ -77,14 +77,18 @@ def build_test_file(path):
     wb.save(path)
 
 
-def avail(m):
-    s = sum((e - b).days for b, e in OUTAGES if b.year == 2026 and b.month == m)
-    return 1 - s / (PRODUCT_POINTS * calendar.monthrange(2026, m)[1])
+def outage_count(m):  # K1: عدد الانقطاعات الشهرية
+    return sum(1 for b, e in OUTAGES if b.year == 2026 and b.month == m)
 
 
-def loss(m):
+def loss(m):          # K4: إجمالي الفاقد ÷ عدد الردود
     ls = [l for d, q, l in RETURNS if d.month == m]
     return sum(ls) / len(ls) if ls else 0
+
+
+def avg_days(typ):    # K2/K3: متوسط أيام المعالجة (يناير) لنوع طلب
+    ds = [(f - c).days for c, t, f in ORDERS if t == typ and c.month == 1]
+    return sum(ds) / len(ds) if ds else 0
 
 
 def main():
@@ -94,20 +98,18 @@ def main():
     build_test_file(path)
     exc = ExcelCompiler(path)
 
-    # (sheet, cell, label, expected)
-    # كل الفحوص على اللوحة الوحيدة (٩ مؤشرات): K1 توفر صف7 ، K4 فواقد صف14
+    # كل الفحوص على اللوحة الوحيدة (٩ مؤشرات) بأهدافها التشغيلية الجديدة
     cases = [
-        ("G7", "توفر الوقود · يناير (31يوم)", round(avail(1), 6)),
-        ("H7", "توفر الوقود · فبراير (28يوم)", round(avail(2), 6)),
-        ("I7", "توفر الوقود · مارس (فارغ)", 1.0),
+        ("G7", "عدد الانقطاعات · يناير", outage_count(1)),
+        ("H7", "عدد الانقطاعات · فبراير", outage_count(2)),
+        ("I7", "عدد الانقطاعات · مارس", 0),
+        ("G9", "أيام تسليم المواد المخزنية", avg_days("مواد مخزنية")),
+        ("G11", "أيام إصدار أوامر الشراء", avg_days("أمر شراء")),
         ("G14", "فواقد الوقود · يناير", loss(1)),
         ("H14", "فواقد الوقود · فبراير", loss(2)),
-        ("I14", "فواقد الوقود · مارس (÷صفر)", 0),
-        ("G9", "توفر المواد المخزنية", 0.5),
-        ("G11", "إصدار أوامر الشراء", 0.5),
         ("G19", "أيام المخزون", 3.5),
-        ("G22", "الامتثال والسلامة", 0.75),
-        ("G25", "التزام جدول النقل", 0.75),
+        ("G22", "المخالفات/الحوادث · يناير", 1),
+        ("G25", "الرحلات المتأخرة · يناير", 1),
         ("G27", "استخدام الأسطول المملوك", 0.75),
         # حالة المحاور المُجمَّعة (أسوأ حالة بين مؤشرات المحور)
         ("F5", "محور خدمة العميل", "🔴"),
