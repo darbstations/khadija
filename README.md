@@ -11,6 +11,7 @@
 | `workbook/khadija-supply-chain-kpis-2026.xlsx` | المصنّف الرئيسي (مُحدَّث ليطابق مرجع الإدارة) |
 | `workbook/source-management-kpis.xlsx` | القائمة الرسمية لمؤشرات الإدارة (٥ مؤشرات) كما وردت |
 | `scripts/update_management_kpis.py` | السكربت الذي طبّق التحديث (لإعادة الإنتاج والتوثيق) |
+| `scripts/verify_formulas.py` | تحقق وظيفي يثبت صحة الدوال عبر محرّك Excel حقيقي (pycel) |
 
 > النسخة الأصلية من المصنّف (قبل التحديث) محفوظة في سجل Git ضمن أول commit.
 
@@ -68,3 +69,15 @@ python3 scripts/update_management_kpis.py
 
 السكربت يقرأ القائمة الرسمية من `workbook/source-management-kpis.xlsx` ويطبّق التحديثات على
 `workbook/khadija-supply-chain-kpis-2026.xlsx`.
+
+## التحقق من صحة الدوال
+
+```bash
+pip install openpyxl pycel
+python3 scripts/verify_formulas.py
+```
+
+يحقن السكربت بيانات تجريبية لعدة أشهر (بما فيها حالات حدّية: يناير ٣١ يوماً، فبراير ٢٨،
+وشهر فارغ)، ثم يُقيّم خلايا اللوحة فعلياً عبر محرّك **pycel** ويقارنها بحساب مستقل. النتيجة
+المؤكَّدة: توفر الوقود `0.999677 / 0.999405 / 1.0`، فواقد الوقود `105 / 70 / 0`، وخلايا
+الحالة `✅ +0.5%` و`✅ -12.5%` — جميعها مطابقة، والمؤشرات غير المُعدّلة تعمل دون كسر.
