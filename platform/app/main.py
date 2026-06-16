@@ -164,9 +164,32 @@ def department(dept_id: int, request: Request, db: Session = Depends(get_db)):
         c["editable"] = can_edit_value(u, k)
         rows.append(c)
     any_edit = any(r["editable"] for r in rows)
-    staff = db.query(models.User).filter_by(department_id=d.id, role="employee").all()
+    if d.key == "exec":
+        staff_count = db.query(models.User).filter_by(role="manager").count()
+    else:
+        staff_count = db.query(models.User).filter_by(department_id=d.id, role="employee").count()
     return templates.TemplateResponse(request, "department.html", {"request": request, "u": u, "dept": d,
-        "rows": rows, "any_edit": any_edit, "nmonths": nmonths, "staff": staff})
+        "rows": rows, "any_edit": any_edit, "nmonths": nmonths, "staff_count": staff_count})
+
+@app.get("/department/{dept_id}/staff", response_class=HTMLResponse)
+def department_staff(dept_id: int, request: Request, db: Session = Depends(get_db)):
+    u = require(request, db)
+    if not u: return RedirectResponse("/login")
+    d = db.query(models.Department).get(dept_id)
+    if not d: return RedirectResponse("/dashboard")
+    nmonths = get_month(db)
+    items = []
+    if d.key == "exec":
+        for m in db.query(models.User).filter_by(role="manager").all():
+            md = m.department
+            sc = [kpi_calc(k, nmonths)["ach"] for k in db.query(models.KPI).filter_by(department_id=m.department_id, level="strategic").all()] if md else []
+            items.append({"kind": "manager", "user": m, "dept": md, "ach": avg(sc), "n": None})
+    else:
+        for e in db.query(models.User).filter_by(department_id=d.id, role="employee").all():
+            eks = db.query(models.KPI).filter_by(owner_user_id=e.id, level="individual").all()
+            ach_list = [kpi_calc(k, nmonths)["ach"] for k in eks]
+            items.append({"kind": "emp", "user": e, "ach": avg(ach_list), "n": len(eks)})
+    return templates.TemplateResponse(request, "dept_staff.html", {"request": request, "u": u, "dept": d, "items": items})
 
 @app.post("/department/{dept_id}/save")
 async def department_save(dept_id: int, request: Request, db: Session = Depends(get_db)):

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="toolbar"><a class="btn grey" href="/department/{{ dept.id }}">‹ رجوع لمؤشرات {{ dept.name }}</a></div>
+{% if dept.key=='exec' %}
+  <h1>🏛️ {{ dept.name }} — المدراء</h1>
+  <div class="note">المدراء هم موظفو الإدارة التنفيذية. اضغط مديراً لعرض إدارته ومؤشراتها.</div>
+  <div class="cards">
+  {% for it in items %}
+    <a class="card" href="/department/{{ it.dept.id if it.dept else dept.id }}">
+      <div class="lbl">{{ it.user.full_name }}</div>
+      <div style="font-size:17px;font-weight:800;color:#fff">{{ it.dept.name if it.dept else '' }}</div>
+      <div class="big {{ status_class(it.ach) }}" style="font-size:26px">{{ pctf(it.ach) }}</div>
+      <div class="small">عرض الإدارة ›</div>
+    </a>
+  {% endfor %}
+  </div>
+{% else %}
+  <h1>{{ dept.name }} — الموظفون ({{ items|length }})</h1>
+  {% if not items %}
+    <div class="note">👥 لا يوجد موظفون بمؤشرات فردية في هذه الإدارة بعد — يُضافون عند توفّر تقاريرهم.</div>
+  {% else %}
+  <div class="cards">
+    {% for it in items %}
+    <a class="card" href="/employee/{{ it.user.id }}">
+      <div class="lbl">{{ it.user.full_name }}</div>
+      <div class="big {{ status_class(it.ach) }}" style="font-size:28px">{{ pctf(it.ach) }}</div>
+      <div class="small">{{ it.n }} مؤشر ·
+        {% set s = it.ach or 0 %}
+        {% if s>=0.8 %}<span class="tag ok">جيد</span>{% elif s>=0.5 %}<span class="tag warn">مقبول</span>{% else %}<span class="tag bad">يحتاج تحسين</span>{% endif %}
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endif %}
+{% endblock %}
