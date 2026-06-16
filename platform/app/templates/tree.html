@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>العرض الهرمي — درب</h1>
+<div class="note">التصنيف: الشركة ← الإدارات ← موظفو كل إدارة · والإدارة التنفيذية تحتها المدراء فقط. اضغط ▸ للفتح/الطي.</div>
+<div class="tree2">
+  <div class="node open">
+    <div class="row2" onclick="tg(this)">
+      <span class="tw">▾</span><span class="lvl b0">شركة</span>
+      <span class="nm">درب — قطاع المحطات والعقار</span>
+      <span class="pctv {{ status_class(overall) }}">{{ pctf(overall) }}</span>
+      <span class="mini"><i style="width:{{ barw(overall) }}%"></i></span>
+    </div>
+    <div class="children">
+    {% for n in nodes %}
+      {% if n.kind == 'exec' %}
+        <div class="node open">
+          <div class="row2" onclick="tg(this)">
+            <span class="tw">▾</span><span class="lvl b1">تنفيذية</span>
+            <span class="nm">🏛️ {{ n.dept.name }}</span><span class="sub">· المدراء فقط</span>
+            <span class="pctv muted">{{ pctf(n.ach) }}</span>
+          </div>
+          <div class="children">
+          {% for m in n.managers %}
+            <div class="node"><div class="row2">
+              <span class="tw">•</span><span class="lvl b3" style="background:#6d6e71">مدير</span>
+              <span class="nm"><a href="/department/{{ m.dept.id }}">{{ m.user.full_name }}</a></span>
+              <span class="sub">· {{ m.dept.name if m.dept else '' }}</span>
+              <span class="pctv {{ status_class(m.ach) }}">{{ pctf(m.ach) }}</span>
+            </div></div>
+          {% endfor %}
+          </div>
+        </div>
+      {% else %}
+        <div class="node">
+          <div class="row2" onclick="tg(this)">
+            <span class="tw">▸</span><span class="lvl b2">إدارة</span>
+            <span class="nm"><a href="/department/{{ n.dept.id }}" onclick="event.stopPropagation()">{{ n.dept.name }}</a></span>
+            <span class="sub">· {{ n.emps|length }} موظف</span>
+            <span class="pctv {{ status_class(n.ach) }}">{{ pctf(n.ach) }}</span>
+            <span class="mini"><i style="width:{{ barw(n.ach) }}%"></i></span>
+          </div>
+          <div class="children">
+          {% if n.emps %}
+            {% for e in n.emps %}
+            <div class="node">
+              <div class="row2" onclick="tg(this)">
+                <span class="tw">▸</span><span class="lvl b3">موظف</span>
+                <span class="nm"><a href="/employee/{{ e.user.id }}" onclick="event.stopPropagation()">{{ e.user.full_name }}</a></span>
+                <span class="sub">· {{ e.kpis|length }} مؤشر</span>
+                <span class="pctv {{ status_class(e.ach) }}">{{ pctf(e.ach) }}</span>
+              </div>
+              <div class="children">
+                {% for r in e.kpis %}
+                <div class="node"><div class="row2 kpi">
+                  <span class="tw">•</span><span class="nm">{{ r.kpi.name.split(' — ')[-1] }}</span>
+                  <span class="chip">{{ r.kpi.target_text }}</span>
+                  <span class="pctv {{ r.sclass }}">{{ (r.ach*100)|round|int ~ '%' if r.ach is not none else '—' }}</span>
+                </div></div>
+                {% endfor %}
+              </div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="node"><div class="row2"><span class="sub" style="padding-right:20px">👥 لا يوجد موظفون بعد — يُضافون عند توفّر تقاريرهم</span></div></div>
+          {% endif %}
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+    </div>
+  </div>
+</div>
+<script>
+function tg(el){var p=el.parentElement;p.classList.toggle('open');var a=el.querySelector('.tw');if(a&&a.textContent.trim()!=='•')a.textContent=p.classList.contains('open')?'▾':'▸';}
+</script>
+{% endblock %}

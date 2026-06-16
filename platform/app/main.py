@@ -33,6 +33,8 @@ templates.env.globals["DEPTS_NAV"] = [SimpleNamespace(id=d.id, name=d.name) for 
 _s.close()
 
 PERSPECTIVES = ["مالي","العملاء","العمليات الداخلية","التعلّم والنمو"]
+templates.env.globals["pctf"] = lambda x: "—" if x is None else f"{round(x*100)}%"
+templates.env.globals["barw"] = lambda x: round((x or 0)*100)
 
 def get_month(db):
     s = db.query(models.Setting).get("report_month")
@@ -118,6 +120,33 @@ def dashboard(request: Request, db: Session = Depends(get_db)):
     return templates.TemplateResponse(request, "dashboard.html", {"request": request, "u": u, "overall": overall,
         "counts": counts, "pillars": pillars, "depts": dept_roll, "persp": persp, "projects": projects,
         "nmonths": nmonths, "chart_json": json.dumps(chart, ensure_ascii=False), "total": len(calcs)})
+
+# ---------------- العرض الهرمي ----------------
+@app.get("/tree", response_class=HTMLResponse)
+def tree(request: Request, db: Session = Depends(get_db)):
+    u = require(request, db)
+    if not u: return RedirectResponse("/login")
+    nmonths = get_month(db)
+    sc = [kpi_calc(k, nmonths) for k in db.query(models.KPI).filter(models.KPI.level=="strategic").all()]
+    overall = avg([c["ach"] for c in sc])
+    depts = db.query(models.Department).all()
+    dept_ach = {d.id: avg([c["ach"] for c in sc if c["kpi"].department_id==d.id]) for d in depts}
+    managers = db.query(models.User).filter_by(role="manager").all()
+    nodes = []
+    for d in depts:
+        if d.key == "exec":
+            mgrs = [{"user": m, "dept": m.department, "ach": dept_ach.get(m.department_id)} for m in managers]
+            nodes.append({"kind": "exec", "dept": d, "ach": dept_ach.get(d.id), "managers": mgrs})
+        else:
+            emps = db.query(models.User).filter_by(department_id=d.id, role="employee").all()
+            enodes = []
+            for e in emps:
+                eks = db.query(models.KPI).filter_by(owner_user_id=e.id, level="individual").order_by(models.KPI.id).all()
+                rows = [kpi_calc(k, nmonths) for k in eks]
+                enodes.append({"user": e, "ach": avg([r["ach"] for r in rows]), "kpis": rows})
+            nodes.append({"kind": "dept", "dept": d, "ach": dept_ach.get(d.id), "emps": enodes})
+    return templates.TemplateResponse(request, "tree.html", {"request": request, "u": u,
+        "overall": overall, "nodes": nodes})
 
 # ---------------- تغذية مؤشرات إدارة ----------------
 @app.get("/department/{dept_id}", response_class=HTMLResponse)
