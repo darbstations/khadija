@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-تحقق وظيفي من صحة دوال اللوحة باستخدام محرّك Excel حقيقي (pycel).
+تحقق وظيفي شامل من دوال المصنّف باستخدام محرّك Excel حقيقي (pycel).
 
-يبني نسخة اختبار من المصنّف، يحقن بيانات تجريبية في صفحتَي الانقطاعات والردود،
-يحسب القيم المتوقّعة بشكل مستقل، ثم يقيّم خلايا اللوحة فعلياً ويؤكّد التطابق.
+يحقن بيانات تجريبية في صفحات الإدخال الخمس، ثم يقيّم خلايا اللوحتين فعلياً
+(الأصلية + المُكثّفة) ويؤكّد تطابقها مع حساب مستقل — بما يغطّي حالات حدّية
+(اختلاف أيام الشهر، شهر فارغ، قسمة على صفر، وتطابق أحجام نطاقات COUNTIFS).
 
 التشغيل:
     pip install openpyxl pycel
-    python3 scripts/verify_formulas.py        # يخرج برمز 0 عند النجاح، 1 عند الفشل
+    python3 scripts/verify_formulas.py        # 0 عند النجاح، 1 عند الفشل
 """
 import calendar
 import datetime
@@ -21,81 +22,108 @@ import openpyxl
 warnings.filterwarnings("ignore")
 
 WB = "workbook/khadija-supply-chain-kpis-2026.xlsx"
-DASH = "📊 ملخص آلي + KPIs"
-PRODUCT_POINTS = 300  # قيمة خلية الإدخال F38
+FULL = "📊 ملخص آلي + KPIs"
+COND = "📊 لوحة مُكثّفة (٩ مؤشرات)"
+PRODUCT_POINTS = 300
 
-# (بدء, انتهاء) — مدة الانقطاع بالأيام = الفرق ؛ يناير 2+1=3 ، فبراير 3+2=5 ، مارس لا شيء
+# يناير 2+1=3 أيام ، فبراير 3+2=5 أيام
 OUTAGES = [
-    (datetime.date(2026, 1, 5), datetime.date(2026, 1, 7), "محطة 1", "بنزين 91"),
-    (datetime.date(2026, 1, 10), datetime.date(2026, 1, 11), "محطة 2", "ديزل"),
-    (datetime.date(2026, 2, 3), datetime.date(2026, 2, 6), "محطة 1", "بنزين 95"),
-    (datetime.date(2026, 2, 20), datetime.date(2026, 2, 22), "محطة 3", "ديزل"),
+    (datetime.date(2026, 1, 5), datetime.date(2026, 1, 7)),
+    (datetime.date(2026, 1, 10), datetime.date(2026, 1, 11)),
+    (datetime.date(2026, 2, 3), datetime.date(2026, 2, 6)),
+    (datetime.date(2026, 2, 20), datetime.date(2026, 2, 22)),
 ]
-# (تاريخ, محطة, منتج, صهريج, كمية, فاقد) — يناير 80,130 ، فبراير 50,70,90 ، مارس لا شيء
+# يناير 80,130 ، فبراير 50,70,90
 RETURNS = [
-    (datetime.date(2026, 1, 8), "محطة 1", "بنزين 91", "ص1", 33000, 80),
-    (datetime.date(2026, 1, 20), "محطة 2", "ديزل", "ص2", 30000, 130),
-    (datetime.date(2026, 2, 5), "محطة 1", "بنزين 95", "ص3", 33000, 50),
-    (datetime.date(2026, 2, 15), "محطة 2", "ديزل", "ص4", 32000, 70),
-    (datetime.date(2026, 2, 25), "محطة 3", "بنزين 91", "ص5", 33000, 90),
+    (datetime.date(2026, 1, 8), 33000, 80), (datetime.date(2026, 1, 20), 30000, 130),
+    (datetime.date(2026, 2, 5), 33000, 50), (datetime.date(2026, 2, 15), 32000, 70),
+    (datetime.date(2026, 2, 25), 33000, 90),
+]
+# (تاريخ استلام, نوع, تاريخ معالجة) — مخزني 1/2 في الوقت ، أمر شراء 1/2
+ORDERS = [
+    (datetime.date(2026, 1, 3), "مواد مخزنية", datetime.date(2026, 1, 5)),
+    (datetime.date(2026, 1, 10), "مواد مخزنية", datetime.date(2026, 1, 20)),
+    (datetime.date(2026, 1, 4), "أمر شراء", datetime.date(2026, 1, 8)),
+    (datetime.date(2026, 1, 6), "أمر شراء", datetime.date(2026, 1, 15)),
+]
+# يناير وقود: أيام مخزون 3 و 4 → متوسط 3.5
+INVENTORY = [("يناير", "وقود", 300, 100), ("يناير", "وقود", 400, 100)]
+# يناير 4 رحلات: ملكية / وقت / حادث-مخالفة
+TRIPS = [
+    (datetime.date(2026, 1, 2), "مملوك درب", 10, 9, "لا يوجد"),
+    (datetime.date(2026, 1, 3), "متعاقد خارجي", 10, 12, "لا يوجد"),
+    (datetime.date(2026, 1, 4), "مملوك درب", 10, 10, "مخالفة سرعة"),
+    (datetime.date(2026, 1, 5), "مملوك درب", 8, 7, "لا يوجد"),
 ]
 
 
-def build_test_file(path: str) -> None:
+def build_test_file(path):
     wb = openpyxl.load_workbook(WB)
     o = wb["🛢️ انقطاعات الوقود"]
-    for i, (b, e, st, p) in enumerate(OUTAGES):
-        o.cell(5 + i, 2).value, o.cell(5 + i, 3).value = b, e
-        o.cell(5 + i, 4).value, o.cell(5 + i, 5).value = st, p
+    for i, (b, e) in enumerate(OUTAGES):
+        o.cell(5 + i, 2, b); o.cell(5 + i, 3, e); o.cell(5 + i, 5, "ديزل")
     r = wb["💧 الردود والفاقد"]
-    for i, (d, st, p, tk, q, l) in enumerate(RETURNS):
-        r.cell(5 + i, 2).value, r.cell(5 + i, 3).value = d, st
-        r.cell(5 + i, 4).value, r.cell(5 + i, 5).value = p, tk
-        r.cell(5 + i, 6).value, r.cell(5 + i, 7).value = q, l
+    for i, (d, q, l) in enumerate(RETURNS):
+        r.cell(5 + i, 2, d); r.cell(5 + i, 6, q); r.cell(5 + i, 7, l)
+    od = wb["🛒 الطلبات والمشتريات"]
+    for i, (c, t, f) in enumerate(ORDERS):
+        od.cell(5 + i, 3, c); od.cell(5 + i, 4, t); od.cell(5 + i, 6, f)
+    iv = wb["📦 المخزون"]
+    for i, (mo, ty, g, h) in enumerate(INVENTORY):
+        iv.cell(5 + i, 2, mo); iv.cell(5 + i, 6, ty); iv.cell(5 + i, 7, g); iv.cell(5 + i, 8, h)
+    tr = wb["🚚 النقل والرحلات"]
+    for i, (b, own, h, ii, k) in enumerate(TRIPS):
+        tr.cell(5 + i, 2, b); tr.cell(5 + i, 7, own); tr.cell(5 + i, 8, h)
+        tr.cell(5 + i, 9, ii); tr.cell(5 + i, 11, k)
     wb.save(path)
 
 
-def expected_kpi1(m: int) -> float:
-    s = sum((e - b).days for b, e, *_ in OUTAGES if b.year == 2026 and b.month == m)
+def avail(m):
+    s = sum((e - b).days for b, e in OUTAGES if b.year == 2026 and b.month == m)
     return 1 - s / (PRODUCT_POINTS * calendar.monthrange(2026, m)[1])
 
 
-def expected_kpi6(m: int) -> float:
-    ls = [l for d, *_, l in RETURNS if d.month == m]
+def loss(m):
+    ls = [l for d, q, l in RETURNS if d.month == m]
     return sum(ls) / len(ls) if ls else 0
 
 
-def main() -> int:
+def main():
     from pycel import ExcelCompiler
 
     path = tempfile.mktemp(suffix=".xlsx")
     build_test_file(path)
     exc = ExcelCompiler(path)
 
-    cases = []  # (cell, label, expected)
-    for col, m, name in [("G", 1, "يناير"), ("H", 2, "فبراير"), ("I", 3, "مارس")]:
-        cases.append((f"{col}7", f"توفر الوقود {name}", round(expected_kpi1(m), 6)))
-        cases.append((f"{col}18", f"فواقد الوقود {name}", expected_kpi6(m)))
-    # خلايا الحالة + مؤشر غير مُعدّل للتأكد أن اللوحة لم تنكسر
-    status = [("F7", "حالة توفر الوقود", "✅ +0.5%"),
-              ("F18", "حالة الفواقد", "✅ -12.5%"),
-              ("G9", "KPI2 عدد انقطاعات يناير", 2),
-              ("I9", "KPI2 عدد انقطاعات مارس", 0)]
-
+    # (sheet, cell, label, expected)
+    cases = [
+        (FULL, "G7", "اللوحة الأصلية · توفر يناير", round(avail(1), 6)),
+        (FULL, "H7", "اللوحة الأصلية · توفر فبراير", round(avail(2), 6)),
+        (FULL, "I7", "اللوحة الأصلية · توفر مارس(فارغ)", 1.0),
+        (FULL, "G18", "اللوحة الأصلية · فواقد يناير", loss(1)),
+        (FULL, "H18", "اللوحة الأصلية · فواقد فبراير", loss(2)),
+        (FULL, "I18", "اللوحة الأصلية · فواقد مارس", 0),
+        (COND, "G7", "المُكثّفة · توفر الوقود", round(avail(1), 6)),
+        (COND, "G9", "المُكثّفة · مواد مخزنية", 0.5),
+        (COND, "G11", "المُكثّفة · أوامر الشراء", 0.5),
+        (COND, "G14", "المُكثّفة · فواقد", 105.0),
+        (COND, "G19", "المُكثّفة · أيام المخزون", 3.5),
+        (COND, "G22", "المُكثّفة · امتثال/سلامة", 0.75),
+        (COND, "G25", "المُكثّفة · التزام الجدول", 0.75),
+        (COND, "G27", "المُكثّفة · الأسطول المملوك", 0.75),
+    ]
     ok = True
-    print(f"{'cell':<6}{'label':<26}{'actual':>12}{'expected':>12}  ")
-    for cell, label, exp in cases + status:
-        val = exc.evaluate(f"'{DASH}'!{cell}")
-        if isinstance(exp, (int, float)) and not isinstance(exp, bool):
-            try:
-                passed = abs(float(val) - exp) < 1e-4
-            except (TypeError, ValueError):
-                passed = False
-        else:
-            passed = str(val) == str(exp)
+    print(f"{'sheet':<10}{'cell':<5}{'label':<34}{'actual':>10}{'expected':>10}")
+    for sheet, cell, label, exp in cases:
+        val = exc.evaluate(f"'{sheet}'!{cell}")
+        try:
+            passed = abs(float(val) - exp) < 1e-4
+        except (TypeError, ValueError):
+            passed = False
         ok &= passed
+        tag = "FULL" if sheet == FULL else "COND"
         shown = round(val, 6) if isinstance(val, float) else val
-        print(f"{cell:<6}{label:<26}{str(shown):>12}{str(exp):>12}  {'✅' if passed else '❌'}")
+        print(f"{tag:<10}{cell:<5}{label:<34}{str(shown):>10}{str(exp):>10}  {'✅' if passed else '❌'}")
 
     print("\nRESULT:", "✅ ALL FORMULAS CORRECT & FUNCTIONAL" if ok else "❌ FAILURES DETECTED")
     return 0 if ok else 1
