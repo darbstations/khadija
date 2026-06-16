@@ -132,15 +132,19 @@ def main():
 
     r = 5
     for axis, kpis in KPIS_BY_AXIS:
-        ws.merge_cells(f"A{r}:R{r}")
+        axis_row = r
+        ws.merge_cells(f"A{r}:E{r}")
         style(ws.cell(r,1), ORANGE2, WHITE, True, 11, "right"); ws.cell(r,1).value="  ◀ "+axis
+        ws.merge_cells(f"G{r}:R{r}"); style(ws.cell(r,7), ORANGE2)
         r += 1
+        first = r
         for (num,name,unit,tval,tdisp,direction,fmt,fn) in kpis:
             p, a = r, r+1
             ws.merge_cells(f"A{p}:A{a}"); style(ws.cell(p,1), CREAM, GRAY, True, 10); ws.cell(p,1).value=num
             ws.merge_cells(f"B{p}:B{a}"); style(ws.cell(p,2), CREAM, GRAY, True, 9, "right"); ws.cell(p,2).value=name
             ws.merge_cells(f"C{p}:C{a}"); style(ws.cell(p,3), CREAM, GRAY, False, 9); ws.cell(p,3).value=unit
-            ws.merge_cells(f"D{p}:D{a}"); style(ws.cell(p,4), CREAM, BLUE, True, 9); ws.cell(p,4).value=tdisp
+            # الهدف = الرقم الفعلي (بنفس صيغة خلايا الخطة) بدل نص ≥/≤
+            ws.merge_cells(f"D{p}:D{a}"); style(ws.cell(p,4), CREAM, BLUE, True, 9, fmt=fmt); ws.cell(p,4).value=tval
             style(ws.cell(p,5), CREAM, GRAY, False, 9); ws.cell(p,5).value="خطة"
             style(ws.cell(a,5), WHITE, GRAY, False, 9); ws.cell(a,5).value="فعلي"
             style(ws.cell(p,6), CREAM); style(ws.cell(a,6), WHITE)
@@ -154,6 +158,10 @@ def main():
                 if fn is not None:
                     ws.cell(a,col).value = fn(m)
             r += 2
+        # حالة المحور الإجمالية في عمود F لصف المحور (أسوأ حالة بين مؤشراته)
+        style(ws.cell(axis_row,6), ORANGE2, WHITE, True, 12)
+        ws.cell(axis_row,6).value = (f'=IF(COUNTIF(F{first}:F{r-1},"*🔴*")>0,"🔴",'
+                                     f'IF(COUNTIF(F{first}:F{r-1},"*🟡*")>0,"🟡","✅"))')
 
     # تذييل المقاييس التشخيصية
     note_r = r+1
@@ -162,16 +170,28 @@ def main():
     ws.cell(note_r,1).value = ("ℹ️ المقاييس المطوية متاحة كتشخيص في اللوحة الأصلية: عدد الانقطاعات، "
                                "دوران المخزون، عدد الحوادث الجسيمة، ونسبة استيفاء الطلبات (Fill Rate).")
 
-    # تنسيق شرطي لعمود الحالة (مطابق للأصل)
+    # تنسيق شرطي لعمود الحالة (مطابق للأصل) — يشمل صفوف المحاور (تبدأ من F5)
     last = r
     colors = [("✅","FFE8F5E9","FF2E7D32"),("🟡","FFFFF8E1","FFF9A825"),("🔴","FFFFEBEE","FFC62828")]
     for emo,bg,fc in colors:
         dxf = DifferentialStyle(fill=PatternFill(bgColor=bg), font=Font(color=fc))
-        ws.conditional_formatting.add(f"F6:F{last}",
-            Rule(type="expression", formula=[f'ISNUMBER(SEARCH("{emo}",F6))'], dxf=dxf))
+        ws.conditional_formatting.add(f"F5:F{last}",
+            Rule(type="expression", formula=[f'ISNUMBER(SEARCH("{emo}",F5))'], dxf=dxf))
 
+    polish_original_targets(wb)
     wb.save(WB)
     print("condensed dashboard added; sheets:", wb.sheetnames)
+
+
+def polish_original_targets(wb):
+    """يحوّل عمود «الهدف» في اللوحة الأصلية إلى أرقام فعلية (بنفس صيغة خلية الخطة) بدل النص."""
+    ws = wb[DASH]
+    plan_rows = [6,8,10,12,14,17,19,22,24,27,29,32,34]
+    targets   = [0.995,5,1,0.95,0.98,100,0.02,3,10,0,0.95,0.95,0.6]
+    for row,val in zip(plan_rows,targets):
+        c = ws.cell(row,4)            # العمود D = الهدف
+        c.value = val
+        c.number_format = ws.cell(row,7).number_format  # نفس صيغة خلية يناير (الخطة)
 
 
 if __name__ == "__main__":

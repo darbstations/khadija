@@ -111,15 +111,24 @@ def main():
         (COND, "G22", "المُكثّفة · امتثال/سلامة", 0.75),
         (COND, "G25", "المُكثّفة · التزام الجدول", 0.75),
         (COND, "G27", "المُكثّفة · الأسطول المملوك", 0.75),
+        # حالة المحاور المُجمَّعة (أسوأ حالة بين مؤشرات المحور)
+        (COND, "F5", "محور خدمة العميل", "🔴"),
+        (COND, "F12", "محور التكاليف", "✅"),
+        (COND, "F17", "محور السيولة المالية", "🟡"),
+        (COND, "F20", "محور السلامة والامتثال", "🔴"),
+        (COND, "F23", "محور الكفاءة التشغيلية", "🔴"),
     ]
     ok = True
     print(f"{'sheet':<10}{'cell':<5}{'label':<34}{'actual':>10}{'expected':>10}")
     for sheet, cell, label, exp in cases:
         val = exc.evaluate(f"'{sheet}'!{cell}")
-        try:
-            passed = abs(float(val) - exp) < 1e-4
-        except (TypeError, ValueError):
-            passed = False
+        if isinstance(exp, str):
+            passed = str(val) == exp
+        else:
+            try:
+                passed = abs(float(val) - exp) < 1e-4
+            except (TypeError, ValueError):
+                passed = False
         ok &= passed
         tag = "FULL" if sheet == FULL else "COND"
         shown = round(val, 6) if isinstance(val, float) else val
