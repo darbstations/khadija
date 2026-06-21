@@ -52,11 +52,14 @@ def init_db():
             ws = kpi_data.kpi_weights(records)
             for i, rec in enumerate(records):
                 axis, nm, unit, pol, agg, tgt, ttxt, fmt, pillar, project = rec
-                db.add(models.KPI(
+                k = models.KPI(
                     department_id=d.id, order=i, axis=axis, name=nm, unit=unit,
                     polarity=pol, agg=agg, target=tgt, target_text=ttxt, fmt=fmt,
                     pillar=pillar, project=project, perspective=kpi_data.perspective(nm),
-                    kpitype=kpi_data.priority_label(kpi_data.priority(nm)), weight=ws[i]))
+                    kpitype=kpi_data.priority_label(kpi_data.priority(nm)), weight=ws[i])
+                db.add(k); db.flush()
+                if nm in kpi_data.SEED_ACTUALS:   # القيم المُحقَّقة من الملفات
+                    db.add(models.KPIValue(kpi_id=k.id, month=6, actual=float(kpi_data.SEED_ACTUALS[nm])))
         # المستخدمون (صلاحيات)
         def mkuser(username, pw, role, full, dept_key=None):
             h, s = hash_password(pw)

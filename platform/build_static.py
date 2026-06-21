@@ -53,6 +53,8 @@ for k in kpis:
     if k["level"]!="strategic": continue
     if k["deptId"]==mkid and k["name"] in MKT_ACH:
         seed[str(k["id"])]={"6":float(MKT_ACH[k["name"]])}; continue
+    if k["name"] in getattr(K,"SEED_ACTUALS",{}):   # القيم المُحقَّقة للتقنية من الملف
+        seed[str(k["id"])]={"6":float(K.SEED_ACTUALS[k["name"]])}; continue
     base=k["target"]; mv={}
     for m in range(1,7):
         if base is None: v=random.choice([60,120,500,2000])
