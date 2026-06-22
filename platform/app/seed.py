@@ -25,6 +25,14 @@ def seed_marketing_staff(db, dept_by_key):
             if ach is not None:
                 db.add(models.KPIValue(kpi_id=k.id, month=6, actual=float(ach)))
 
+def seed_initiatives(db):
+    if db.query(models.Initiative).count() > 0:
+        return
+    for nm, qty, qtype, done, pct in getattr(kpi_data, "IT_PROJECTS", []):
+        db.add(models.Initiative(name=nm, pillar=kpi_data.PL_INNO, project=kpi_data.P_TECH,
+            kpi_link="نسبة إنجاز محفظة مشاريع التحول الرقمي", owner="إدارة التقنية",
+            progress=float(pct), notes=f"{done} من {qty} {qtype}"))
+
 def seed_eval_forms(db, dept_by_key):
     if db.query(models.EvalForm).count() > 0:
         return
@@ -42,7 +50,7 @@ def init_db():
     try:
         if db.query(models.Department).count() > 0:
             dbk = {d.key: d for d in db.query(models.Department).all()}
-            seed_eval_forms(db, dbk); seed_marketing_staff(db, dbk); db.commit()
+            seed_eval_forms(db, dbk); seed_marketing_staff(db, dbk); seed_initiatives(db); db.commit()
             return
         dept_by_key = {}
         for name, key, records in kpi_data.DEPARTMENTS:
@@ -77,6 +85,7 @@ def init_db():
         db.add(models.Setting(key="company_name", value="درب · Darb"))
         seed_eval_forms(db, dept_by_key)
         seed_marketing_staff(db, dept_by_key)
+        seed_initiatives(db)
         db.commit()
     finally:
         db.close()

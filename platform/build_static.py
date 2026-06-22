@@ -65,7 +65,8 @@ for k in kpis:
 
 DATA={"pillars":K.PILLARS,"projects":K.PROJECTS,"projectPillar":K.PROJECT_PILLAR,
  "perspectives":["مالي","العملاء","العمليات الداخلية","التعلّم والنمو"],
- "departments":departments,"kpis":kpis,"users":users,"seed":seed}
+ "departments":departments,"kpis":kpis,"users":users,"seed":seed,
+ "itProjects":[{"name":n,"qty":q,"qtype":t,"done":d,"pct":p} for (n,q,t,d,p) in K.IT_PROJECTS]}
 
 css = open(os.path.join(HERE,"app/static/style.css"),encoding="utf-8").read()
 
@@ -278,6 +279,14 @@ function vDept(id){ const d=deptById[id]; const ks=DATA.kpis.filter(k=>k.deptId=
   h+=`<div class="panel" style="display:flex;align-items:center;justify-content:space-between">
     <div><h3 style="margin:0">${isExec?'مدراء الإدارات':'موظفو '+d.name}</h3><div class="small">صفحة مستقلة بأداء كل ${isExec?'مدير':'موظف'} ومؤشراته</div></div>
     <a class="btn" href="#" onclick="go('deptstaff',${id});return false">${label}</a></div>`;
+  // سجل مشاريع التقنية (تغذّي مؤشر إنجاز المحفظة)
+  if(d.key==='digital' && DATA.itProjects && DATA.itProjects.length){
+    h+=`<div class="panel"><h3>📁 سجل مشاريع التقنية (${DATA.itProjects.length}) — تغذّي مؤشر «إنجاز المحفظة»</h3>
+      <table><thead><tr><th>المشروع</th><th>الكمية</th><th>المنجز</th><th>نسبة الإنجاز</th></tr></thead><tbody>`+
+      DATA.itProjects.map(p=>{const t=(p.pct>=0.7?'ok':p.pct>0?'warn':'bad');
+        return `<tr><td>${p.name}</td><td class="mono">${p.qty} ${p.qtype}</td><td class="mono">${p.done}</td><td><div class="bar" style="display:inline-block;width:90px"><i style="width:${Math.round(p.pct*100)}%;background:${t==='bad'?'#e06666':t==='warn'?'#ffd54a':'#3fb27f'}"></i></div> <span class="mono">${Math.round(p.pct*100)}%</span></td></tr>`;}).join('')+
+      `</tbody></table></div>`;
+  }
   return h; }
 
 // ---- الموظفون ----
