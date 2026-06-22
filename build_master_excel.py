@@ -176,7 +176,36 @@ C(ws,rr,pc,"الأداء حسب منظور BSC",f=font(11,True,WHITE),fillc=BLUE
 for p in ["مالي","العملاء","العمليات الداخلية","التعلّم والنمو"]:
     C(ws,rr,pc,p,f=font(9),al="right"); C(ws,rr,pc+1,f'=IFERROR(AVERAGEIFS({ACH_RANGE},{PERSP_RANGE},"{p}"),"—")',f=font(9,True,NAVY),fmt="0%",al="center"); rr+=1
 
-for s in wb.worksheets: s.sheet_view.rightToLeft=True
+# =========================================================
+# 4) ورقة سجل المبادرات والمشاريع (مشاريع التقنية بنسبة إنجاز محسوبة)
+# =========================================================
+ws=wb.create_sheet("سجل المشاريع"); ws.sheet_view.rightToLeft=True; ws.sheet_view.showGridLines=False
+for i,w in enumerate([4,40,12,14,12,14,16,34],1): ws.column_dimensions[get_column_letter(i)].width=w
+ws.merge_cells("A1:H1"); C(ws,1,1,"سجل المبادرات والمشاريع — مشاريع إدارة التقنية (تغذّي مؤشر «إنجاز المحفظة»)",
+  f=font(14,True,WHITE),fillc=NAVY,al="center",border=False); ws.row_dimensions[1].height=26
+for c,h in enumerate(["#","المشروع","الكمية","نوع الكمية","المنجز","نسبة الإنجاز","الإدارة","المؤشر المرتبط"],1):
+    C(ws,2,c,h,f=font(10,True,WHITE),fillc=BLUE,al="center")
+projects = getattr(K,"IT_PROJECTS",[])
+r=3
+for i,(nm,qty,qtype,done,pct) in enumerate(projects,1):
+    C(ws,r,1,i,f=font(9,True),al="center")
+    C(ws,r,2,nm,f=font(9),al="right",wrap=True)
+    C(ws,r,3,qty,f=font(9),al="center")
+    C(ws,r,4,qtype,f=font(9),al="center")
+    C(ws,r,5,done,fillc=GREEN_IN,al="center",lock=False)   # المنجز = إدخال
+    ws.cell(r,6).value=f'=IFERROR(E{r}/C{r},0)'             # نسبة الإنجاز = دالة حقيقية
+    C(ws,r,6,f=font(9,True,NAVY),fmt="0%",al="center")
+    C(ws,r,7,"إدارة التقنية",f=font(9),al="center")
+    C(ws,r,8,"نسبة إنجاز محفظة مشاريع التحول الرقمي",f=font(8,color="666666"),al="right",wrap=True)
+    ws.row_dimensions[r].height=24; r+=1
+# إجمالي المحفظة (دالة)
+C(ws,r,2,"إجمالي إنجاز المحفظة (مرجّح بالكمية)",f=font(10,True,WHITE),fillc=ORANGE,al="right")
+C(ws,r,3,f'=SUM(C3:C{r-1})',f=font(10,True,WHITE),fillc=ORANGE,al="center")
+C(ws,r,5,f'=SUM(E3:E{r-1})',f=font(10,True,WHITE),fillc=ORANGE,al="center")
+ws.cell(r,6).value=f'=IFERROR(E{r}/C{r},0)'; C(ws,r,6,f=font(11,True,"FFFFFF"),fillc=ORANGE,fmt="0%",al="center")
+C(ws,r,4,"",fillc=ORANGE); C(ws,r,7,"",fillc=ORANGE); C(ws,r,8,"",fillc=ORANGE); C(ws,r,1,"",fillc=ORANGE)
+ws.sheet_view.rightToLeft=True
+
 out="درب-سجل-المؤشرات-الموحّد-2026.xlsx"
 wb.save(out)
-print("saved:",out,os.path.getsize(out),"bytes | KPIs:",REG_END-3)
+print("saved:",out,os.path.getsize(out),"bytes | KPIs:",REG_END-3,"| مشاريع:",len(projects))
