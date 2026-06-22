@@ -1,211 +1,196 @@
 # -*- coding: utf-8 -*-
-"""يبني ملفاً موحّداً يجمع كل المؤشرات + المستهدفات + المشاريع + الاستراتيجية في قالب واحد بدلّات حقيقية.
-   المصدر: platform/app/kpi_data.py (نفس بيانات المنصة)."""
-import os
+"""ملف إكسل احترافي موحّد: استراتيجية + مستهدفات 2026 + لوحة + جدول مستقل لكل إدارة + سجل مشاريع.
+   دلّات حقيقية · RTL · مرتّب. المصدر: platform/app/kpi_data.py"""
+import os, sys
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side, Protection
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.drawing.image import Image as XLImage
-
-import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "platform"))
 from app import kpi_data as K
 
-MONTHS = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"]
 ORANGE="F47A21"; NAVY="58595B"; BLUE="808285"; STEEL="A7A9AC"; GREEN_IN="C6EFCE"
-GOLD="FDE3D1"; WHITE="FFFFFF"; LIGHT="EDEEF0"
+GOLD="FDE3D1"; WHITE="FFFFFF"; LIGHT="F2F3F5"
 thin=Side(style="thin", color="D9D9D9"); BORDER=Border(left=thin,right=thin,top=thin,bottom=thin)
 FMT={"pct":"0%","int":"#,##0","num1":"0.0","rial":'#,##0 "ر.س"'}
-def font(sz=10,b=False,color="222222"): return Font(name="Tajawal",size=sz,bold=b,color=color)
+PERSPS=["مالي","العملاء","العمليات الداخلية","التعلّم والنمو"]
+def F_(sz=10,b=False,color="222222"): return Font(name="Tajawal",size=sz,bold=b,color=color)
 def fill(c): return PatternFill("solid",fgColor=c)
 def C(ws,r,c,v=None,*,f=None,fillc=None,al="right",fmt=None,lock=True,wrap=False,border=True):
     cell=ws.cell(r,c)
     if v is not None: cell.value=v
-    cell.font=f or font()
+    cell.font=f or F_()
     if fillc: cell.fill=fill(fillc)
     cell.alignment=Alignment(horizontal=al,vertical="center",wrap_text=wrap)
     if fmt: cell.number_format=fmt
     cell.protection=Protection(locked=lock)
     if border: cell.border=BORDER
     return cell
+def rtl(ws): ws.sheet_view.rightToLeft=True; ws.sheet_view.showGridLines=False
 
-wb=Workbook()
+wb=Workbook(); wb.remove(wb.active)
 LOGO=os.path.join(os.path.dirname(os.path.abspath(__file__)),"platform/app/static/darb_logo.png")
+def logo(ws,anchor="B1",w=150):
+    try:
+        im=XLImage(LOGO); im.width=w; im.height=int(w/3.83); ws.add_image(im,anchor); ws.row_dimensions[1].height=46
+    except Exception: pass
 
-# =========================================================
-# 1) ورقة سجل المؤشرات الموحّد (القالب الأساس بالدلّات الحقيقية)
-# =========================================================
-REG="سجل المؤشرات"
-ws=wb.active; ws.title=REG; ws.sheet_view.rightToLeft=True; ws.sheet_view.showGridLines=False
-headers=["#","الإدارة","المحور","المؤشر","الوحدة","القطبية","التجميع","الأولوية","الوزن %",
-         "المستهدف","نص المستهدف","الركيزة","المشروع","منظور BSC"]+MONTHS+["YTD","نسبة التحقيق","الحالة"]
-widths=[4,18,18,40,9,8,8,12,8,12,16,12,22,16]+[9]*12+[12,12,14]
-for i,w in enumerate(widths,1): ws.column_dimensions[get_column_letter(i)].width=w
-NC=len(headers); last=get_column_letter(NC)
-ws.merge_cells(f"A1:{last}1")
-C(ws,1,1,"درب · سجل مؤشرات الأداء الموحّد 2026 — كل المؤشرات والمستهدفات والمشاريع والاستراتيجية",
-  f=font(14,True,WHITE),fillc=NAVY,al="center",border=False)
-ws.row_dimensions[1].height=28
-ws.merge_cells(f"A2:{last}2")
-C(ws,2,1,"🟩 الأشهر = إدخال  ·  YTD ونسبة التحقيق والحالة دلّات حقيقية تُحسب تلقائياً  ·  قيم التقنية والتسويق مُعبّأة فعلياً",
-  f=font(9,False,NAVY),fillc=GOLD,al="center",border=False)
-for c,h in enumerate(headers,1): C(ws,3,c,h,f=font(9,True,WHITE),fillc=BLUE,al="center")
-ws.row_dimensions[3].height=30
-ws.freeze_panes="O4"
-dv=DataValidation(type="decimal",operator="greaterThanOrEqual",formula1="0",allow_blank=True); ws.add_data_validation(dv)
-
-# أعمدة: A1 B2 C3 D4 E5 F6 G7 H8 I9 J10 K11 L12 M13 N14 ; أشهر O15..Z26 ; YTD AA27 ach AB28 status AC29
-MO=15; AA="AA"; AB="AB"
-r=4; seq=1
-for name,key,records in K.DEPARTMENTS:
-    ws_w=K.kpi_weights(records)
+# ============ جداول الإدارات (كل إدارة ورقة مستقلة) ============
+# أعمدة: A# B محور C مؤشر D وحدة E قطبية F أولوية G وزن% H مستهدف I نص المستهدف J ركيزة K مشروع L منظور M المُحقَّق N نسبة التحقيق O الحالة
+HEAD=["#","المحور","المؤشر","الوحدة","القطبية","الأولوية","الوزن %","المستهدف","نص المستهدف","الركيزة","المشروع","منظور BSC","المُحقَّق","نسبة التحقيق","الحالة"]
+WID=[4,16,40,9,7,12,8,12,16,12,22,15,12,12,14]
+DEPT_RANGES=[]
+def safe_title(name): return name[:31]
+for dname,key,records in K.DEPARTMENTS:
+    ws=wb.create_sheet(safe_title(dname)); rtl(ws)
+    for i,w in enumerate(WID,1): ws.column_dimensions[get_column_letter(i)].width=w
+    last=get_column_letter(len(HEAD))
+    ws.merge_cells(f"A1:{last}1"); C(ws,1,1,f"إدارة {dname} · مؤشرات الأداء 2026",f=F_(13,True,WHITE),fillc=NAVY,al="center",border=False); ws.row_dimensions[1].height=24
+    ws.merge_cells(f"A2:{last}2"); C(ws,2,1,"🟩 أدخل «المُحقَّق» · نسبة التحقيق والحالة دلّات حقيقية تُحسب تلقائياً",f=F_(9,False,NAVY),fillc=GOLD,al="center",border=False)
+    for c,h in enumerate(HEAD,1): C(ws,3,c,h,f=F_(9,True,WHITE),fillc=BLUE,al="center")
+    ws.row_dimensions[3].height=28
+    dv=DataValidation(type="decimal",operator="greaterThanOrEqual",formula1="0",allow_blank=True); ws.add_data_validation(dv)
+    weights=K.kpi_weights(records); start=4
     for i,(axis,nm,unit,pol,agg,tgt,ttxt,fmt,pillar,project) in enumerate(records):
-        C(ws,r,1,seq,f=font(9,True),al="center")
-        C(ws,r,2,name,f=font(9),al="right")
-        C(ws,r,3,axis,f=font(9),al="right",wrap=True)
-        C(ws,r,4,nm,f=font(9),al="right",wrap=True)
-        C(ws,r,5,unit,al="center")
-        C(ws,r,6,pol,al="center")
-        C(ws,r,7,agg,al="center")
-        C(ws,r,8,K.priority_label(K.priority(nm)),f=font(8),al="center")
-        C(ws,r,9,ws_w[i],fmt="0%",al="center")
-        C(ws,r,10,tgt if tgt is not None else "",fmt=FMT[fmt] if tgt is not None else None,al="center")
-        C(ws,r,11,ttxt,f=font(8,color="666666"),al="center",wrap=True)
-        C(ws,r,12,pillar,f=font(9,color=ORANGE),al="center")
-        C(ws,r,13,project,f=font(8),al="right",wrap=True)
-        C(ws,r,14,K.perspective(nm),f=font(8),al="center")
-        # أشهر — إدخال (تعبئة المُحقَّق في يونيو إن وُجد)
-        for m in range(12):
-            cc=ws.cell(r,MO+m);
-            val = float(K.SEED_ACTUALS[nm]) if (m==5 and nm in K.SEED_ACTUALS) else None
-            C(ws,r,MO+m,val,fillc=GREEN_IN,fmt=FMT[fmt],al="center",lock=False)
-            dv.add(cc)
-        rng=f"$O{r}:$Z{r}"
-        ws.cell(r,27).value=(f'=IF($G{r}="SUM",IF(COUNT({rng})=0,"",SUM({rng})),'
-            f'IF($G{r}="AVG",IFERROR(AVERAGE({rng}),""),'
-            f'IF($G{r}="LAST",IFERROR(LOOKUP(2,1/({rng}<>""),{rng}),""),"")))')
-        C(ws,r,27,f=font(9,True),fmt=FMT[fmt],al="center")
-        ws.cell(r,28).value=(f'=IF($J{r}="","",IF($AA{r}="","",'
-            f'IF($J{r}=0,IF($AA{r}<=0,1,0),'
-            f'IF($F{r}="↓",IFERROR($J{r}/$AA{r},0),IFERROR($AA{r}/$J{r},0)))))')
-        C(ws,r,28,f=font(9,True,NAVY),fmt="0%",al="center")
-        ws.cell(r,29).value=f'=IF($AB{r}="","—",IF($AB{r}>=1,"✅ محقق",IF($AB{r}>=0.85,"🟡 قريب","🔴 تحت الهدف")))'
-        C(ws,r,29,f=font(9,True),al="center")
+        r=start+i
+        C(ws,r,1,i+1,f=F_(9,True),al="center")
+        C(ws,r,2,axis,f=F_(9),al="right",wrap=True)
+        C(ws,r,3,nm,f=F_(9),al="right",wrap=True)
+        C(ws,r,4,unit,al="center")
+        C(ws,r,5,pol,al="center")
+        C(ws,r,6,K.priority_label(K.priority(nm)),f=F_(8),al="center")
+        C(ws,r,7,weights[i],fmt="0%",al="center")
+        C(ws,r,8,tgt if tgt is not None else "",fmt=FMT[fmt] if tgt is not None else None,al="center")
+        C(ws,r,9,ttxt,f=F_(8,color="666666"),al="center",wrap=True)
+        C(ws,r,10,pillar,f=F_(9,color=ORANGE),al="center")
+        C(ws,r,11,project,f=F_(8),al="right",wrap=True)
+        C(ws,r,12,K.perspective(nm),f=F_(8),al="center")
+        ach_v=K.SEED_ACTUALS.get(nm)
+        C(ws,r,13,ach_v if ach_v is not None else None,fillc=GREEN_IN,fmt=FMT[fmt],al="center",lock=False)
+        dv.add(ws.cell(r,13))
+        ws.cell(r,14).value=(f'=IF($H{r}="","",IF($M{r}="","",IF($H{r}=0,IF($M{r}<=0,1,0),'
+            f'IF($E{r}="↓",IFERROR($H{r}/$M{r},0),IFERROR($M{r}/$H{r},0)))))')
+        C(ws,r,14,f=F_(9,True,NAVY),fmt="0%",al="center")
+        ws.cell(r,15).value=f'=IF($N{r}="","—",IF($N{r}>=1,"✅ محقق",IF($N{r}>=0.85,"🟡 قريب","🔴 تحت الهدف")))'
+        C(ws,r,15,f=F_(9,True),al="center")
         ws.row_dimensions[r].height=24
-        r+=1; seq+=1
-REG_END=r-1
-ws.auto_filter.ref=f"A3:{last}{REG_END}"
-ACH_RANGE=f"'{REG}'!$AB$4:$AB${REG_END}"
-DEPT_RANGE=f"'{REG}'!$B$4:$B${REG_END}"
-PIL_RANGE=f"'{REG}'!$L$4:$L${REG_END}"
-PROJ_RANGE=f"'{REG}'!$M$4:$M${REG_END}"
-ST_RANGE=f"'{REG}'!$AC$4:$AC${REG_END}"
-PERSP_RANGE=f"'{REG}'!$N$4:$N${REG_END}"
+    end=start+len(records)-1
+    ws.auto_filter.ref=f"A3:{last}{end}"
+    ws.freeze_panes="A4"
+    DEPT_RANGES.append((dname,safe_title(dname),start,end))
 
-# =========================================================
-# 2) ورقة الاستراتيجية والركائز + المشاريع (بدلّات أداء حيّة)
-# =========================================================
-ws=wb.create_sheet("الاستراتيجية", 0); ws.sheet_view.rightToLeft=True; ws.sheet_view.showGridLines=False
+# ============ قاعدة المؤشرات (تجميع — للوحة والاستراتيجية) ============
+cons=wb.create_sheet("قاعدة المؤشرات"); rtl(cons)
+for i,w in enumerate([4,20,42,16,24,16,12,14,10],1): cons.column_dimensions[get_column_letter(i)].width=w
+for c,h in enumerate(["#","الإدارة","المؤشر","الركيزة","المشروع","منظور BSC","نسبة التحقيق","الحالة","الوزن"],1):
+    C(cons,1,c,h,f=F_(9,True,WHITE),fillc=BLUE,al="center")
+cr=2; seq=1
+for dname,sh,s,e in DEPT_RANGES:
+    for rr in range(s,e+1):
+        C(cons,cr,1,seq,f=F_(8),al="center")
+        C(cons,cr,2,dname,f=F_(8),al="right")
+        C(cons,cr,3,f"='{sh}'!C{rr}",f=F_(8),al="right")
+        C(cons,cr,4,f"='{sh}'!J{rr}",f=F_(8),al="center")
+        C(cons,cr,5,f"='{sh}'!K{rr}",f=F_(8),al="right")
+        C(cons,cr,6,f"='{sh}'!L{rr}",f=F_(8),al="center")
+        C(cons,cr,7,f"='{sh}'!N{rr}",f=F_(8,True,NAVY),fmt="0%",al="center")
+        C(cons,cr,8,f"='{sh}'!O{rr}",f=F_(8),al="center")
+        C(cons,cr,9,f"='{sh}'!G{rr}",f=F_(8),fmt="0%",al="center")
+        cr+=1; seq+=1
+CE=cr-1
+ACH=f"'قاعدة المؤشرات'!$G$2:$G${CE}"; DEPC=f"'قاعدة المؤشرات'!$B$2:$B${CE}"
+PILC=f"'قاعدة المؤشرات'!$D$2:$D${CE}"; PROJC=f"'قاعدة المؤشرات'!$E$2:$E${CE}"
+PERC=f"'قاعدة المؤشرات'!$F$2:$F${CE}"; STC=f"'قاعدة المؤشرات'!$H$2:$H${CE}"
+
+# ============ الاستراتيجية والمستهدفات ============
+ws=wb.create_sheet("الاستراتيجية والمستهدفات"); rtl(ws)
 for i,w in enumerate([3,26,40,30,14],1): ws.column_dimensions[get_column_letter(i)].width=w
-try:
-    img=XLImage(LOGO); img.width=150; img.height=int(150/3.83); ws.add_image(img,"B1"); ws.row_dimensions[1].height=46
-except Exception: pass
-ws.merge_cells("B2:E2"); C(ws,2,2,"درب · الاستراتيجية والركائز 2026 — قطاع المحطات والعقار",f=font(15,True,WHITE),fillc=NAVY,al="center",border=False)
-ws.row_dimensions[2].height=26
-for c,h in enumerate(["","الركيزة (5 سنوات)","الوصف","مستهدف 2026"],1): C(ws,4,c,h,f=font(10,True,WHITE),fillc=BLUE,al="center")
+logo(ws,"B1")
+ws.merge_cells("B2:E2"); C(ws,2,2,"درب · الاستراتيجية ومستهدفات 2026 — قطاع المحطات والعقار",f=F_(15,True,WHITE),fillc=NAVY,al="center",border=False); ws.row_dimensions[2].height=26
+for c,h in enumerate(["","الركيزة (5 سنوات) / الهدف","الوصف","مستهدف 2026"],1): C(ws,4,c,h,f=F_(10,True,WHITE),fillc=BLUE,al="center")
 strat=[("النمو","ركيزة","التوسع في المواقع وزيادة الوصول وتنمية الإيراد.",""),
  ("التوسع في المواقع","","افتتاح وتشغيل محطات جديدة.","التشغيل 85 · الامتياز 150 محطة"),
  ("الامتياز والعقود","","تنمية الإيراد عبر الامتياز والاستثمار.","الامتياز 167 · الاستثمار 190 عقد"),
- ("زيادة وصول العملاء","","رفع المبيعات والتغطية.","718.8M لتر · 13 منطقة"),
+ ("زيادة وصول العملاء","","رفع المبيعات والتغطية الجغرافية.","718.8M لتر · 13 منطقة · 59 مدينة"),
  ("الابتكار","ركيزة","مشاريع جديدة وتحول تقني وهوية وتانكي.",""),
- ("التحول التقني وتانكي","","أتمتة 164 محطة · D365 · تطبيق تانكي (التسويق).","أتمتة 90% · تانكي تصاعدي"),
+ ("التحول التقني","","أتمتة 164 محطة · D365 · جاهزية الأنظمة.","أتمتة 90% · جاهزية 99%"),
+ ("ساحات درب وتانكي","","تشغيل ساحات درب ونمو تطبيق تانكي (التسويق).","تأجير ساحة ≥80% · تانكي تصاعدي"),
  ("الاستدامة","ركيزة","جودة التشغيل وتجربة العميل والموظفين.",""),
- ("جودة التشغيل وتجربة العميل","","جاهزية وأمن سيبراني ورضا.","جاهزية 99% · CSAT 90%"),
- ("الاستثمار في الموظفين","","التوطين والتدريب والاستبقاء.","6 دورات · استبقاء 90%"),]
+ ("تجربة العميل وجودة التشغيل","","رضا وأمن سيبراني وجاهزية.","CSAT 90% · جاهزية 99%"),
+ ("منظومة التأجير","","الإشغال والتحصيل واستدامة المستأجرين.","إشغال ≥60% · 246 علامة"),
+ ("الاستثمار في الموظفين","","التوطين والتدريب والاستبقاء.","6 دورات · استبقاء 90% · سعودة"),]
 r=5
 for nm,kind,desc,tgt in strat:
     isr=kind=="ركيزة"
-    C(ws,r,2,nm,f=font(11,True,WHITE if isr else NAVY),fillc=BLUE if isr else None,al="right",wrap=True)
-    C(ws,r,3,desc,f=font(9,False,WHITE if isr else "222222"),fillc=BLUE if isr else None,al="right",wrap=True)
-    C(ws,r,4,tgt,f=font(9,True,WHITE if isr else ORANGE),fillc=BLUE if isr else None,al="right",wrap=True)
-    C(ws,r,1,"",fillc=BLUE if isr else None)
-    ws.row_dimensions[r].height=24; r+=1
-# المشاريع (الخارطة) بدلّات أداء حيّة من السجل
-r+=1; C(ws,r,2,"الخارطة التنفيذية — المشاريع",f=font(12,True,WHITE),fillc=ORANGE,al="center"); ws.merge_cells(start_row=r,start_column=2,end_row=r,end_column=5); r+=1
-for c,h in zip([2,3,4,5],["المشروع","الركيزة","عدد المؤشرات","الأداء (حي)"]): C(ws,r,c,h,f=font(10,True,WHITE),fillc=BLUE,al="center")
+    C(ws,r,2,nm,f=F_(11,True,WHITE if isr else NAVY),fillc=BLUE if isr else None,al="right",wrap=True)
+    C(ws,r,3,desc,f=F_(9,False,WHITE if isr else "222222"),fillc=BLUE if isr else None,al="right",wrap=True)
+    C(ws,r,4,tgt,f=F_(9,True,WHITE if isr else ORANGE),fillc=BLUE if isr else None,al="right",wrap=True)
+    C(ws,r,1,"",fillc=BLUE if isr else None); ws.row_dimensions[r].height=24; r+=1
+r+=1; C(ws,r,2,"الخارطة التنفيذية — المشاريع (أداء حي)",f=F_(12,True,WHITE),fillc=ORANGE,al="center"); ws.merge_cells(start_row=r,start_column=2,end_row=r,end_column=5); r+=1
+for c,h in zip([2,3,4,5],["المشروع","الركيزة","عدد المؤشرات","الأداء (حي)"]): C(ws,r,c,h,f=F_(10,True,WHITE),fillc=BLUE,al="center")
 r+=1
 for p in K.PROJECTS:
-    C(ws,r,2,p,f=font(9),al="right",wrap=True)
-    C(ws,r,3,K.PROJECT_PILLAR.get(p,""),f=font(9),al="center")
-    C(ws,r,4,f'=COUNTIF({PROJ_RANGE},"{p}")',f=font(9,True),al="center")
-    C(ws,r,5,f'=IFERROR(AVERAGEIFS({ACH_RANGE},{PROJ_RANGE},"{p}"),"—")',f=font(9,True,NAVY),fmt="0%",al="center")
-    r+=1
+    C(ws,r,2,p,f=F_(9),al="right",wrap=True); C(ws,r,3,K.PROJECT_PILLAR.get(p,""),f=F_(9),al="center")
+    C(ws,r,4,f'=COUNTIF({PROJC},"{p}")',f=F_(9,True),al="center")
+    C(ws,r,5,f'=IFERROR(AVERAGEIFS({ACH},{PROJC},"{p}"),"—")',f=F_(9,True,NAVY),fmt="0%",al="center"); r+=1
 
-# =========================================================
-# 3) ورقة اللوحة الموجزة (دلّات تجميع حقيقية)
-# =========================================================
-ws=wb.create_sheet("اللوحة الموجزة", 1); ws.sheet_view.rightToLeft=True; ws.sheet_view.showGridLines=False
-for i,w in enumerate([3,28,16,16,16],1): ws.column_dimensions[get_column_letter(i)].width=w
-ws.merge_cells("B2:E2"); C(ws,2,2,"اللوحة الموجزة — تجميع حي من سجل المؤشرات",f=font(15,True,WHITE),fillc=NAVY,al="center",border=False); ws.row_dimensions[2].height=28
-# بطاقات
-C(ws,4,2,"الإنجاز العام",f=font(11,True,WHITE),fillc=BLUE,al="center")
-C(ws,5,2,f'=IFERROR(AVERAGE({ACH_RANGE}),0)',f=font(22,True,ORANGE),fmt="0%",al="center")
+# ============ اللوحة الموجزة ============
+ws=wb.create_sheet("اللوحة الموجزة"); rtl(ws)
+for i,w in enumerate([3,28,14,16,16],1): ws.column_dimensions[get_column_letter(i)].width=w
+ws.merge_cells("B2:E2"); C(ws,2,2,"اللوحة الموجزة — تجميع حي من جداول الإدارات",f=F_(15,True,WHITE),fillc=NAVY,al="center",border=False); ws.row_dimensions[2].height=26
+C(ws,4,2,"الإنجاز العام",f=F_(11,True,WHITE),fillc=BLUE,al="center")
+C(ws,5,2,f'=IFERROR(AVERAGE({ACH}),0)',f=F_(22,True,ORANGE),fmt="0%",al="center")
 for i,(lbl,key) in enumerate([("✅ محقق","✅ محقق"),("🟡 قريب","🟡 قريب"),("🔴 تحت الهدف","🔴 تحت الهدف")]):
-    c=3+i; C(ws,4,c,lbl,f=font(10,True,WHITE),fillc=STEEL,al="center")
-    C(ws,5,c,f'=COUNTIF({ST_RANGE},"{key}")',f=font(18,True,NAVY),al="center")
-# حسب الإدارة
-hr=7; C(ws,hr,2,"الأداء حسب الإدارة",f=font(12,True,WHITE),fillc=ORANGE,al="center"); ws.merge_cells(start_row=hr,start_column=2,end_row=hr,end_column=4)
-for c,h in zip([2,3,4],["الإدارة","الأداء","عدد المؤشرات"]): C(ws,hr+1,c,h,f=font(10,True,WHITE),fillc=STEEL,al="center")
+    c=3+i; C(ws,4,c,lbl,f=F_(10,True,WHITE),fillc=STEEL,al="center"); C(ws,5,c,f'=COUNTIF({STC},"{key}")',f=F_(18,True,NAVY),al="center")
+hr=7; C(ws,hr,2,"الأداء حسب الإدارة",f=F_(12,True,WHITE),fillc=ORANGE,al="center"); ws.merge_cells(start_row=hr,start_column=2,end_row=hr,end_column=3)
+for c,h in zip([2,3],["الإدارة","الأداء"]): C(ws,hr+1,c,h,f=F_(10,True,WHITE),fillc=STEEL,al="center")
 rr=hr+2
-for name,key,records in K.DEPARTMENTS:
-    C(ws,rr,2,name,f=font(9),al="right")
-    C(ws,rr,3,f'=IFERROR(AVERAGEIFS({ACH_RANGE},{DEPT_RANGE},"{name}"),"—")',f=font(9,True,NAVY),fmt="0%",al="center")
-    C(ws,rr,4,f'=COUNTIF({DEPT_RANGE},"{name}")',f=font(9),al="center")
-    rr+=1
-# حسب الركيزة + المنظور (يمين)
-pc=6
-ws.column_dimensions[get_column_letter(pc)].width=16; ws.column_dimensions[get_column_letter(pc+1)].width=14
-C(ws,hr,pc,"الأداء حسب الركيزة",f=font(12,True,WHITE),fillc=ORANGE,al="center"); ws.merge_cells(start_row=hr,start_column=pc,end_row=hr,end_column=pc+1)
-for c,h in zip([pc,pc+1],["الركيزة","الأداء"]): C(ws,hr+1,c,h,f=font(10,True,WHITE),fillc=STEEL,al="center")
+for dname,sh,s,e in DEPT_RANGES:
+    C(ws,rr,2,dname,f=F_(9),al="right"); C(ws,rr,3,f'=IFERROR(AVERAGEIFS({ACH},{DEPC},"{dname}"),"—")',f=F_(9,True,NAVY),fmt="0%",al="center"); rr+=1
+# ركيزة + منظور (يمين)
+pc=4; C(ws,hr,pc,"حسب الركيزة",f=F_(12,True,WHITE),fillc=ORANGE,al="center"); ws.merge_cells(start_row=hr,start_column=pc,end_row=hr,end_column=pc+1)
+for c,h in zip([pc,pc+1],["الركيزة","الأداء"]): C(ws,hr+1,c,h,f=F_(10,True,WHITE),fillc=STEEL,al="center")
 rr=hr+2
 for p in K.PILLARS:
-    C(ws,rr,pc,p,f=font(9),al="right"); C(ws,rr,pc+1,f'=IFERROR(AVERAGEIFS({ACH_RANGE},{PIL_RANGE},"{p}"),"—")',f=font(9,True,NAVY),fmt="0%",al="center"); rr+=1
-rr+=1
-C(ws,rr,pc,"الأداء حسب منظور BSC",f=font(11,True,WHITE),fillc=BLUE,al="center"); ws.merge_cells(start_row=rr,start_column=pc,end_row=rr,end_column=pc+1); rr+=1
-for p in ["مالي","العملاء","العمليات الداخلية","التعلّم والنمو"]:
-    C(ws,rr,pc,p,f=font(9),al="right"); C(ws,rr,pc+1,f'=IFERROR(AVERAGEIFS({ACH_RANGE},{PERSP_RANGE},"{p}"),"—")',f=font(9,True,NAVY),fmt="0%",al="center"); rr+=1
+    C(ws,rr,pc,p,f=F_(9),al="right"); C(ws,rr,pc+1,f'=IFERROR(AVERAGEIFS({ACH},{PILC},"{p}"),"—")',f=F_(9,True,NAVY),fmt="0%",al="center"); rr+=1
+rr+=1; C(ws,rr,pc,"حسب منظور BSC",f=F_(11,True,WHITE),fillc=BLUE,al="center"); ws.merge_cells(start_row=rr,start_column=pc,end_row=rr,end_column=pc+1); rr+=1
+for p in PERSPS:
+    C(ws,rr,pc,p,f=F_(9),al="right"); C(ws,rr,pc+1,f'=IFERROR(AVERAGEIFS({ACH},{PERC},"{p}"),"—")',f=F_(9,True,NAVY),fmt="0%",al="center"); rr+=1
 
-# =========================================================
-# 4) ورقة سجل المبادرات والمشاريع (مشاريع التقنية بنسبة إنجاز محسوبة)
-# =========================================================
-ws=wb.create_sheet("سجل المشاريع"); ws.sheet_view.rightToLeft=True; ws.sheet_view.showGridLines=False
-for i,w in enumerate([4,40,12,14,12,14,16,34],1): ws.column_dimensions[get_column_letter(i)].width=w
-ws.merge_cells("A1:H1"); C(ws,1,1,"سجل المبادرات والمشاريع — مشاريع إدارة التقنية (تغذّي مؤشر «إنجاز المحفظة»)",
-  f=font(14,True,WHITE),fillc=NAVY,al="center",border=False); ws.row_dimensions[1].height=26
-for c,h in enumerate(["#","المشروع","الكمية","نوع الكمية","المنجز","نسبة الإنجاز","الإدارة","المؤشر المرتبط"],1):
-    C(ws,2,c,h,f=font(10,True,WHITE),fillc=BLUE,al="center")
-projects = getattr(K,"IT_PROJECTS",[])
+# ============ سجل المشاريع (كل إدارة) ============
+ws=wb.create_sheet("سجل المشاريع"); rtl(ws)
+for i,w in enumerate([4,20,40,10,12,10,14,30],1): ws.column_dimensions[get_column_letter(i)].width=w
+ws.merge_cells("A1:H1"); C(ws,1,1,"سجل مشاريع الشركة — لكل إدارة مشاريعها (نسبة الإنجاز = المنجز ÷ الكمية)",f=F_(14,True,WHITE),fillc=NAVY,al="center",border=False); ws.row_dimensions[1].height=24
+for c,h in enumerate(["#","الإدارة","المشروع","الكمية","نوع الكمية","المنجز","نسبة الإنجاز","المؤشر المرتبط"],1): C(ws,2,c,h,f=F_(10,True,WHITE),fillc=BLUE,al="center")
 r=3
-for i,(nm,qty,qtype,done,pct) in enumerate(projects,1):
-    C(ws,r,1,i,f=font(9,True),al="center")
-    C(ws,r,2,nm,f=font(9),al="right",wrap=True)
-    C(ws,r,3,qty,f=font(9),al="center")
-    C(ws,r,4,qtype,f=font(9),al="center")
-    C(ws,r,5,done,fillc=GREEN_IN,al="center",lock=False)   # المنجز = إدخال
-    ws.cell(r,6).value=f'=IFERROR(E{r}/C{r},0)'             # نسبة الإنجاز = دالة حقيقية
-    C(ws,r,6,f=font(9,True,NAVY),fmt="0%",al="center")
-    C(ws,r,7,"إدارة التقنية",f=font(9),al="center")
-    C(ws,r,8,"نسبة إنجاز محفظة مشاريع التحول الرقمي",f=font(8,color="666666"),al="right",wrap=True)
-    ws.row_dimensions[r].height=24; r+=1
-# إجمالي المحفظة (دالة)
-C(ws,r,2,"إجمالي إنجاز المحفظة (مرجّح بالكمية)",f=font(10,True,WHITE),fillc=ORANGE,al="right")
-C(ws,r,3,f'=SUM(C3:C{r-1})',f=font(10,True,WHITE),fillc=ORANGE,al="center")
-C(ws,r,5,f'=SUM(E3:E{r-1})',f=font(10,True,WHITE),fillc=ORANGE,al="center")
-ws.cell(r,6).value=f'=IFERROR(E{r}/C{r},0)'; C(ws,r,6,f=font(11,True,"FFFFFF"),fillc=ORANGE,fmt="0%",al="center")
-C(ws,r,4,"",fillc=ORANGE); C(ws,r,7,"",fillc=ORANGE); C(ws,r,8,"",fillc=ORANGE); C(ws,r,1,"",fillc=ORANGE)
-ws.sheet_view.rightToLeft=True
+def proj_block(dept, items, kpi_link):
+    global r
+    ws.merge_cells(start_row=r,start_column=1,end_row=r,end_column=8)
+    C(ws,r,1,f"▾ مشاريع {dept}",f=F_(10,True,WHITE),fillc=ORANGE,al="right"); r+=1
+    for i,(nm,qty,qtype,done,pct) in enumerate(items,1):
+        C(ws,r,1,i,f=F_(9,True),al="center"); C(ws,r,2,dept,f=F_(9),al="center")
+        C(ws,r,3,nm,f=F_(9),al="right",wrap=True); C(ws,r,4,qty,al="center"); C(ws,r,5,qtype,al="center")
+        C(ws,r,6,done,fillc=GREEN_IN,al="center",lock=False)
+        ws.cell(r,7).value=f'=IFERROR(F{r}/D{r},0)'; C(ws,r,7,f=F_(9,True,NAVY),fmt="0%",al="center")
+        C(ws,r,8,kpi_link,f=F_(8,color="666666"),al="right",wrap=True); ws.row_dimensions[r].height=22; r+=1
+proj_block("إدارة التقنية", getattr(K,"IT_PROJECTS",[]), "نسبة إنجاز محفظة مشاريع التحول الرقمي")
+# أماكن لمشاريع بقية الإدارات (تُعبّأ عند توفّرها)
+for dname,sh,s,e in DEPT_RANGES:
+    if dname=="التقنية الرقمية": continue
+    ws.merge_cells(start_row=r,start_column=1,end_row=r,end_column=8)
+    C(ws,r,1,f"▾ مشاريع {dname}",f=F_(10,True,WHITE),fillc=STEEL,al="right"); r+=1
+    for _ in range(3):
+        for c in range(1,9): C(ws,r,c,None,fillc=GREEN_IN if c in (3,4,5,6) else None,lock=(c not in (3,4,5,6)))
+        ws.cell(r,7).value=f'=IFERROR(F{r}/D{r},0)'; C(ws,r,7,f=F_(9,True,NAVY),fmt="0%",al="center")
+        C(ws,r,2,dname,f=F_(9),al="center"); r+=1
 
-out="درب-سجل-المؤشرات-الموحّد-2026.xlsx"
+# ترتيب الأوراق
+order=["الاستراتيجية والمستهدفات","اللوحة الموجزة"]+[sh for _,sh,_,_ in DEPT_RANGES]+["سجل المشاريع","قاعدة المؤشرات"]
+wb._sheets.sort(key=lambda s: order.index(s.title) if s.title in order else 99)
+for s in wb.worksheets: rtl(s)
+cons.sheet_state="hidden"
+
+out="درب-المؤشرات-والمشاريع-الموحّد-2026.xlsx"
 wb.save(out)
-print("saved:",out,os.path.getsize(out),"bytes | KPIs:",REG_END-3,"| مشاريع:",len(projects))
+print("saved:",out,os.path.getsize(out),"bytes | إدارات:",len(DEPT_RANGES),"| مؤشرات:",CE-1)
