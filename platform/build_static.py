@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """يبني منصة درب كملف HTML واحد تفاعلي (يعمل في المتصفح بدون خادم، حفظ في localStorage)."""
-import os, json, base64, random
+import os, json, base64, random, hashlib
+
+PW_SALT = "darb-kpi-2026"
+def pw_hash(pw): return hashlib.sha256((PW_SALT + ":" + pw).encode("utf-8")).hexdigest()
 
 import app.kpi_data as K
 import app.marketing_staff as MS
@@ -64,7 +67,12 @@ for k in kpis:
         mv[str(m)]=v
     seed[str(k["id"])]=mv
 
+# أمان: لا تُخزَّن كلمات المرور كنص صريح في الصفحة — تُحوَّل إلى بصمة SHA-256
+for _u in users:
+    _u["passh"] = pw_hash(_u.pop("pass"))
+
 DATA={"pillars":K.PILLARS,"projects":K.PROJECTS,"projectPillar":K.PROJECT_PILLAR,
+ "pwSalt":PW_SALT,
  "perspectives":["مالي","العملاء","العمليات الداخلية","التعلّم والنمو"],
  "departments":departments,"kpis":kpis,"users":users,"seed":seed,
  "itProjects":[{"name":n,"qty":q,"qtype":t,"done":d,"pct":p} for (n,q,t,d,p) in K.IT_PROJECTS]}
@@ -87,11 +95,6 @@ HTML = r"""<!DOCTYPE html>
   <input id="lu" type="text" placeholder="اسم المستخدم" autocomplete="username">
   <input id="lp" type="password" placeholder="كلمة المرور" autocomplete="current-password">
   <button class="btn" style="width:100%" onclick="doLogin()">دخول</button>
-  <div class="creds"><b>حسابات:</b><br>
-    <span class="pill">admin / admin123</span> صلاحيات كاملة<br>
-    <span class="pill">exec / exec123</span> تنفيذي ·
-    <span class="pill">marketing / marketing123</span> مدير<br>
-    <span class="pill">amani / amani123</span> موظفة تسويق</div>
 </div>
 
 <div id="app" class="hidden">
@@ -136,8 +139,12 @@ function canEdit(k){ if(!USER) return false; if(USER.role==='admin') return true
   return USER.deptId===k.deptId && ['executive','manager','employee'].includes(USER.role); }
 
 // ---- دخول ----
-function doLogin(){ const u=document.getElementById('lu').value.trim(), p=document.getElementById('lp').value;
-  const f=DATA.users.find(x=>x.u===u&&x.pass===p); const e=document.getElementById('loginErr');
+async function sha256Hex(s){ const buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+async function doLogin(){ const u=document.getElementById('lu').value.trim(), p=document.getElementById('lp').value;
+  const e=document.getElementById('loginErr');
+  const h=await sha256Hex(DATA.pwSalt+':'+p);
+  const f=DATA.users.find(x=>x.u===u&&x.passh===h);
   if(!f){ e.textContent='بيانات الدخول غير صحيحة'; e.classList.remove('hidden'); return; }
   USER=f; sessionStorage.setItem('darb_user',u); startApp(); }
 function logout(){ USER=null; sessionStorage.removeItem('darb_user'); document.getElementById('app').classList.add('hidden'); document.getElementById('login').classList.remove('hidden'); }
