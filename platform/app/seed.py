@@ -77,7 +77,7 @@ def init_db():
         mkuser("exec", "exec123", "executive", "الرئيس التنفيذي", "exec")
         role_titles = {"franchise":"مدير الامتياز","operations":"مدير التشغيل","investment":"مدير الاستثمار",
                        "realestate":"مدير العقار","digital":"مدير التقنية","hr":"مدير الموارد البشرية",
-                       "marketing":"مدير التسويق"}
+                       "marketing":"مدير التسويق","quality":"مدير الجودة"}
         for key, title in role_titles.items():
             mkuser(key, key+"123", "manager", title, key)
         mkuser("emp", "emp123", "employee", "موظف الامتياز", "franchise")
