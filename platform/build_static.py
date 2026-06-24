@@ -31,7 +31,7 @@ users.append({"u":"admin","name":"مدير النظام","role":"admin","deptId"
 users.append({"u":"exec","name":"الرئيس التنفيذي","role":"executive","deptId":DEPT_ID["exec"],"pass":"exec123","title":"الرئيس التنفيذي"})
 mgr_titles={"franchise":"مدير الامتياز","operations":"مدير التشغيل","investment":"مدير الاستثمار",
  "realestate":"مدير العقار","digital":"مدير التقنية","hr":"مدير الموارد البشرية","marketing":"مدير التسويق",
- "quality":"مدير الجودة","legal":"المدير القانوني"}
+ "quality":"مدير الجودة","legal":"المدير القانوني","finance":"المدير المالي"}
 for key,title in mgr_titles.items():
     users.append({"u":key,"name":title,"role":"manager","deptId":DEPT_ID[key],"pass":key+"123","title":title})
 
