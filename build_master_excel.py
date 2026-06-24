@@ -205,8 +205,47 @@ for dname,sh,s,e in DEPT_RANGES:
         ws.cell(r,7).value=f'=IFERROR(F{r}/D{r},0)'; C(ws,r,7,f=F_(9,True,NAVY),fmt="0%",al="center")
         C(ws,r,2,dname,f=F_(9),al="center"); r+=1
 
+# ============ بيانات الباوربي (جدول مسطّح بقيَم حقيقية — جاهز لـ Power BI/التحليل) ============
+# Power BI لا يعيد حساب معادلات الإكسل، لذا نوفّر نسخة مسطّحة بقيَم محسوبة مسبقاً.
+flat=wb.create_sheet("بيانات الباوربي"); rtl(flat)
+FH=["الإدارة","المحور","المؤشر","الوحدة","القطبية","الأولوية","الوزن","المستهدف","المُحقَّق","نسبة التحقيق","الحالة","الركيزة","المشروع","منظور BSC"]
+for i,w in enumerate([18,16,42,9,7,11,8,12,12,13,15,12,22,16],1): flat.column_dimensions[get_column_letter(i)].width=w
+for c,h in enumerate(FH,1): C(flat,1,c,h,f=F_(10,True,WHITE),fillc=NAVY,al="center")
+flat.row_dimensions[1].height=26
+def ach_calc(pol,tgt,act):
+    if tgt is None or act is None: return None
+    if tgt==0: return 1.0 if act<=0 else 0.0
+    if act==0: return 0.0
+    return (tgt/act) if pol=="↓" else (act/tgt)
+def status_txt(a):
+    if a is None: return "—"
+    if a>=1: return "✅ محقق"
+    if a>=0.85: return "🟡 قريب"
+    return "🔴 تحت الهدف"
+fr=2
+for dname,key,records in K.DEPARTMENTS:
+    weights=K.kpi_weights(records)
+    for i,(axis,nm,unit,pol,agg,tgt,ttxt,fmt,pillar,project) in enumerate(records):
+        act=K.SEED_ACTUALS.get(nm); a=ach_calc(pol,tgt,act)
+        C(flat,fr,1,dname,f=F_(9),al="right")
+        C(flat,fr,2,axis,f=F_(9),al="right")
+        C(flat,fr,3,nm,f=F_(9),al="right")
+        C(flat,fr,4,unit,al="center")
+        C(flat,fr,5,pol,al="center")
+        C(flat,fr,6,K.priority_label(K.priority(nm)),f=F_(8),al="center")
+        C(flat,fr,7,weights[i],fmt="0%",al="center")
+        C(flat,fr,8,tgt if tgt is not None else None,al="center")
+        C(flat,fr,9,act if act is not None else None,al="center")
+        C(flat,fr,10,a if a is not None else None,fmt="0%",al="center")
+        C(flat,fr,11,status_txt(a),f=F_(9),al="center")
+        C(flat,fr,12,pillar,f=F_(9),al="center")
+        C(flat,fr,13,project,f=F_(8),al="right")
+        C(flat,fr,14,K.perspective(nm),f=F_(8),al="center")
+        fr+=1
+flat.freeze_panes="A2"; flat.auto_filter.ref=f"A1:N{fr-1}"
+
 # ترتيب الأوراق
-order=["الاستراتيجية والمستهدفات","اللوحة الموجزة"]+[sh for _,sh,_,_ in DEPT_RANGES]+["الإدارة المالية","سجل المشاريع","قاعدة المؤشرات"]
+order=["الاستراتيجية والمستهدفات","اللوحة الموجزة","بيانات الباوربي"]+[sh for _,sh,_,_ in DEPT_RANGES]+["الإدارة المالية","سجل المشاريع","قاعدة المؤشرات"]
 wb._sheets.sort(key=lambda s: order.index(s.title) if s.title in order else 99)
 for s in wb.worksheets: rtl(s)
 cons.sheet_state="hidden"
