@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "pla
 from app import kpi_data as K
 
 ORANGE="F47A21"; NAVY="58595B"; BLUE="808285"; STEEL="A7A9AC"; GREEN_IN="C6EFCE"
-GOLD="FDE3D1"; WHITE="FFFFFF"; LIGHT="F2F3F5"
+GOLD="FDE3D1"; WHITE="FFFFFF"; LIGHT="F2F3F5"; RED="C00000"; RED_FILL="F8D7DA"
 thin=Side(style="thin", color="D9D9D9"); BORDER=Border(left=thin,right=thin,top=thin,bottom=thin)
 FMT={"pct":"0%","int":"#,##0","num1":"0.0","rial":'#,##0 "ر.س"'}
 PERSPS=["مالي","العملاء","العمليات الداخلية","التعلّم والنمو"]
@@ -79,6 +79,24 @@ for dname,key,records in K.DEPARTMENTS:
     ws.auto_filter.ref=f"A3:{last}{end}"
     ws.freeze_panes="A4"
     DEPT_RANGES.append((dname,safe_title(dname),start,end))
+
+# ============ الإدارة المالية (فارغة — بانتظار الاعتماد · مؤشَّرة بالأحمر) ============
+fin=wb.create_sheet("الإدارة المالية"); rtl(fin)
+fin.sheet_properties.tabColor=RED
+for i,w in enumerate(WID,1): fin.column_dimensions[get_column_letter(i)].width=w
+lastF=get_column_letter(len(HEAD))
+fin.merge_cells(f"A1:{lastF}1"); C(fin,1,1,"الإدارة المالية · مؤشرات الأداء 2026",f=F_(13,True,WHITE),fillc=RED,al="center",border=False); fin.row_dimensions[1].height=24
+fin.merge_cells(f"A2:{lastF}2"); C(fin,2,1,"⛔ فارغة — لم تُعتمد مؤشرات الإدارة المالية بعد (القالب جاهز للتعبئة عند الاعتماد)",f=F_(10,True,RED),fillc=RED_FILL,al="center",border=False); fin.row_dimensions[2].height=22
+for c,h in enumerate(HEAD,1): C(fin,3,c,h,f=F_(9,True,WHITE),fillc=RED,al="center")
+fin.row_dimensions[3].height=28
+# صفوف فارغة بخلفية حمراء فاتحة توضّح أنّ القالب جاهز لكنه فارغ
+for i in range(8):
+    r=4+i
+    for c in range(1,len(HEAD)+1): C(fin,r,c,None,fillc=RED_FILL)
+    C(fin,r,1,i+1,f=F_(9,True,RED),al="center",fillc=RED_FILL)
+    C(fin,r,3,"— بانتظار اعتماد المؤشر —",f=F_(9,color=RED),al="right",fillc=RED_FILL)
+    fin.row_dimensions[r].height=24
+fin.freeze_panes="A4"
 
 # ============ قاعدة المؤشرات (تجميع — للوحة والاستراتيجية) ============
 cons=wb.create_sheet("قاعدة المؤشرات"); rtl(cons)
@@ -148,6 +166,8 @@ for c,h in zip([2,3],["الإدارة","الأداء"]): C(ws,hr+1,c,h,f=F_(10,T
 rr=hr+2
 for dname,sh,s,e in DEPT_RANGES:
     C(ws,rr,2,dname,f=F_(9),al="right"); C(ws,rr,3,f'=IFERROR(AVERAGEIFS({ACH},{DEPC},"{dname}"),"—")',f=F_(9,True,NAVY),fmt="0%",al="center"); rr+=1
+# الإدارة المالية — فارغة (أحمر)
+C(ws,rr,2,"الإدارة المالية",f=F_(9,True,RED),fillc=RED_FILL,al="right"); C(ws,rr,3,"⛔ فارغة",f=F_(9,True,RED),fillc=RED_FILL,al="center"); rr+=1
 # ركيزة + منظور (يمين)
 pc=4; C(ws,hr,pc,"حسب الركيزة",f=F_(12,True,WHITE),fillc=ORANGE,al="center"); ws.merge_cells(start_row=hr,start_column=pc,end_row=hr,end_column=pc+1)
 for c,h in zip([pc,pc+1],["الركيزة","الأداء"]): C(ws,hr+1,c,h,f=F_(10,True,WHITE),fillc=STEEL,al="center")
@@ -186,7 +206,7 @@ for dname,sh,s,e in DEPT_RANGES:
         C(ws,r,2,dname,f=F_(9),al="center"); r+=1
 
 # ترتيب الأوراق
-order=["الاستراتيجية والمستهدفات","اللوحة الموجزة"]+[sh for _,sh,_,_ in DEPT_RANGES]+["سجل المشاريع","قاعدة المؤشرات"]
+order=["الاستراتيجية والمستهدفات","اللوحة الموجزة"]+[sh for _,sh,_,_ in DEPT_RANGES]+["الإدارة المالية","سجل المشاريع","قاعدة المؤشرات"]
 wb._sheets.sort(key=lambda s: order.index(s.title) if s.title in order else 99)
 for s in wb.worksheets: rtl(s)
 cons.sheet_state="hidden"
