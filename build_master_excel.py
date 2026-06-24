@@ -29,6 +29,17 @@ def C(ws,r,c,v=None,*,f=None,fillc=None,al="right",fmt=None,lock=True,wrap=False
     return cell
 def rtl(ws): ws.sheet_view.rightToLeft=True; ws.sheet_view.showGridLines=False
 
+# بيانات تجريبية واقعية (deterministic) لتعبئة الفراغات — تُستبدل بالأرقام الفعلية لاحقاً
+import hashlib
+DEMO=True
+def eff_actual(nm,pol,tgt):
+    if nm in K.SEED_ACTUALS: return K.SEED_ACTUALS[nm]      # رقم حقيقي من الملفات
+    if not DEMO or tgt is None or tgt==0: return None        # اترك بلا رقم (أهداف «صفر» أو غير محدّدة)
+    frac=(int(hashlib.md5(nm.encode("utf-8")).hexdigest(),16)%1000)/1000.0
+    factor=(0.85+frac*0.33) if pol=="↓" else (0.72+frac*0.33)  # تشتيت لإظهار أخضر/أصفر/أحمر
+    val=tgt*factor
+    return round(val) if tgt>=1000 else round(val,1) if tgt>=10 else round(val,3)
+
 wb=Workbook(); wb.remove(wb.active)
 LOGO=os.path.join(os.path.dirname(os.path.abspath(__file__)),"platform/app/static/darb_logo.png")
 def logo(ws,anchor="B1",w=150):
@@ -47,7 +58,7 @@ for dname,key,records in K.DEPARTMENTS:
     for i,w in enumerate(WID,1): ws.column_dimensions[get_column_letter(i)].width=w
     last=get_column_letter(len(HEAD))
     ws.merge_cells(f"A1:{last}1"); C(ws,1,1,f"إدارة {dname} · مؤشرات الأداء 2026",f=F_(13,True,WHITE),fillc=NAVY,al="center",border=False); ws.row_dimensions[1].height=24
-    ws.merge_cells(f"A2:{last}2"); C(ws,2,1,"🟩 أدخل «المُحقَّق» · نسبة التحقيق والحالة دلّات حقيقية تُحسب تلقائياً",f=F_(9,False,NAVY),fillc=GOLD,al="center",border=False)
+    ws.merge_cells(f"A2:{last}2"); C(ws,2,1,"🟩 عمود «المُحقَّق» أرقام تجريبية — استبدلها بالفعلية · نسبة التحقيق والحالة دلّات تُحسب تلقائياً",f=F_(9,False,NAVY),fillc=GOLD,al="center",border=False)
     for c,h in enumerate(HEAD,1): C(ws,3,c,h,f=F_(9,True,WHITE),fillc=BLUE,al="center")
     ws.row_dimensions[3].height=28
     dv=DataValidation(type="decimal",operator="greaterThanOrEqual",formula1="0",allow_blank=True); ws.add_data_validation(dv)
@@ -66,7 +77,7 @@ for dname,key,records in K.DEPARTMENTS:
         C(ws,r,10,pillar,f=F_(9,color=ORANGE),al="center")
         C(ws,r,11,project,f=F_(8),al="right",wrap=True)
         C(ws,r,12,K.perspective(nm),f=F_(8),al="center")
-        ach_v=K.SEED_ACTUALS.get(nm)
+        ach_v=eff_actual(nm,pol,tgt)
         C(ws,r,13,ach_v if ach_v is not None else None,fillc=GREEN_IN,fmt=FMT[fmt],al="center",lock=False)
         dv.add(ws.cell(r,13))
         ws.cell(r,14).value=(f'=IF($H{r}="","",IF($M{r}="","",IF($H{r}=0,IF($M{r}<=0,1,0),'
@@ -226,7 +237,7 @@ fr=2
 for dname,key,records in K.DEPARTMENTS:
     weights=K.kpi_weights(records)
     for i,(axis,nm,unit,pol,agg,tgt,ttxt,fmt,pillar,project) in enumerate(records):
-        act=K.SEED_ACTUALS.get(nm); a=ach_calc(pol,tgt,act)
+        act=eff_actual(nm,pol,tgt); a=ach_calc(pol,tgt,act)
         C(flat,fr,1,dname,f=F_(9),al="right")
         C(flat,fr,2,axis,f=F_(9),al="right")
         C(flat,fr,3,nm,f=F_(9),al="right")
