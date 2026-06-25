@@ -27,6 +27,12 @@ def C(ws,r,c,v=None,*,f=None,fillc=None,al="right",fmt=None,lock=True,wrap=False
     cell.protection=Protection(locked=lock)
     if border: cell.border=BORDER
     return cell
+# مؤشرات «المعالم» (مهام لمرة واحدة) — تُعلَّم بعلامة مميزة بدل أولوية الأداء
+_MILESTONE_KW=["اكتمال المستندات","اكتمال أرشفة","أرشفة الملفات","اعتماد الهيكل","اكتمال الأوصاف",
+  "ترسيخ القيم","أتمتة عمليات الموارد","تفعيل الأنظمة الأساسية"]
+def is_milestone(nm): return any(k in nm for k in _MILESTONE_KW)
+def prio_label(nm): return "🏁 معلم" if is_milestone(nm) else K.priority_label(K.priority(nm))
+
 def rtl(ws): ws.sheet_view.rightToLeft=True; ws.sheet_view.showGridLines=False
 
 # بيانات تجريبية واقعية (deterministic) لتعبئة الفراغات — تُستبدل بالأرقام الفعلية لاحقاً
@@ -70,7 +76,7 @@ for dname,key,records in K.DEPARTMENTS:
         C(ws,r,3,nm,f=F_(9),al="right",wrap=True)
         C(ws,r,4,unit,al="center")
         C(ws,r,5,pol,al="center")
-        C(ws,r,6,K.priority_label(K.priority(nm)),f=F_(8),al="center")
+        C(ws,r,6,prio_label(nm),f=F_(8),al="center")
         C(ws,r,7,weights[i],fmt="0%",al="center")
         C(ws,r,8,tgt if tgt is not None else "",fmt=FMT[fmt] if tgt is not None else None,al="center")
         C(ws,r,9,ttxt,f=F_(8,color="666666"),al="center",wrap=True)
@@ -80,10 +86,11 @@ for dname,key,records in K.DEPARTMENTS:
         ach_v=eff_actual(nm,pol,tgt)
         C(ws,r,13,ach_v if ach_v is not None else None,fillc=GREEN_IN,fmt=FMT[fmt],al="center",lock=False)
         dv.add(ws.cell(r,13))
-        ws.cell(r,14).value=(f'=IF($H{r}="","",IF($M{r}="","",IF($H{r}=0,IF($M{r}<=0,1,0),'
-            f'IF($E{r}="↓",IFERROR($H{r}/$M{r},0),IFERROR($M{r}/$H{r},0)))))')
+        # نسبة التحقيق — مع سقف 100% (MIN) لمنع تضخّم المتوسط
+        ws.cell(r,14).value=(f'=IF($H{r}="","",IF($M{r}="","",MIN(1,IF($H{r}=0,IF($M{r}<=0,1,0),'
+            f'IF($E{r}="↓",IFERROR($H{r}/$M{r},0),IFERROR($M{r}/$H{r},0))))))')
         C(ws,r,14,f=F_(9,True,NAVY),fmt="0%",al="center")
-        ws.cell(r,15).value=f'=IF($N{r}="","—",IF($N{r}>=1,"✅ محقق",IF($N{r}>=0.85,"🟡 قريب","🔴 تحت الهدف")))'
+        ws.cell(r,15).value=f'=IF($N{r}="","⏳ بانتظار هدف",IF($N{r}>=1,"✅ محقق",IF($N{r}>=0.85,"🟡 قريب","🔴 تحت الهدف")))'
         C(ws,r,15,f=F_(9,True),al="center")
         ws.row_dimensions[r].height=24
     end=start+len(records)-1
@@ -94,7 +101,7 @@ for dname,key,records in K.DEPARTMENTS:
 # ============ قاعدة المؤشرات (تجميع — للوحة والاستراتيجية) ============
 cons=wb.create_sheet("قاعدة المؤشرات"); rtl(cons)
 for i,w in enumerate([4,20,42,16,24,16,12,14,10],1): cons.column_dimensions[get_column_letter(i)].width=w
-for c,h in enumerate(["#","الإدارة","المؤشر","الركيزة","المشروع","منظور BSC","نسبة التحقيق","الحالة","الوزن"],1):
+for c,h in enumerate(["#","الإدارة","المؤشر","الركيزة","المشروع","منظور BSC","نسبة التحقيق","الحالة","الوزن","و×ن","الوزن المتاح"],1):
     C(cons,1,c,h,f=F_(9,True,WHITE),fillc=BLUE,al="center")
 cr=2; seq=1
 for dname,sh,s,e in DEPT_RANGES:
@@ -108,11 +115,15 @@ for dname,sh,s,e in DEPT_RANGES:
         C(cons,cr,7,f"='{sh}'!N{rr}",f=F_(8,True,NAVY),fmt="0%",al="center")
         C(cons,cr,8,f"='{sh}'!O{rr}",f=F_(8),al="center")
         C(cons,cr,9,f"='{sh}'!G{rr}",f=F_(8),fmt="0%",al="center")
+        # أعمدة الترجيح: و×ن = الوزن×التحقيق (للمؤشرات المُعبّأة فقط) · الوزن المتاح = الوزن إن وُجد رقم
+        C(cons,cr,10,f'=IF($G{cr}="",0,$G{cr}*$I{cr})',f=F_(8),al="center")
+        C(cons,cr,11,f'=IF($G{cr}="",0,$I{cr})',f=F_(8),al="center")
         cr+=1; seq+=1
 CE=cr-1
 ACH=f"'قاعدة المؤشرات'!$G$2:$G${CE}"; DEPC=f"'قاعدة المؤشرات'!$B$2:$B${CE}"
 PILC=f"'قاعدة المؤشرات'!$D$2:$D${CE}"; PROJC=f"'قاعدة المؤشرات'!$E$2:$E${CE}"
 PERC=f"'قاعدة المؤشرات'!$F$2:$F${CE}"; STC=f"'قاعدة المؤشرات'!$H$2:$H${CE}"
+WXN=f"'قاعدة المؤشرات'!$J$2:$J${CE}"; WAV=f"'قاعدة المؤشرات'!$K$2:$K${CE}"  # و×ن · الوزن المتاح
 
 # ============ الاستراتيجية والمستهدفات ============
 ws=wb.create_sheet("الاستراتيجية والمستهدفات"); rtl(ws)
@@ -146,19 +157,33 @@ for p in K.PROJECTS:
     C(ws,r,4,f'=COUNTIF({PROJC},"{p}")',f=F_(9,True),al="center")
     C(ws,r,5,f'=IFERROR(AVERAGEIFS({ACH},{PROJC},"{p}"),"—")',f=F_(9,True,NAVY),fmt="0%",al="center"); r+=1
 
+# خريطة وزن كل إدارة (ميزان الإدارات)
+DW_BY_NAME={name:K.DEPT_WEIGHTS.get(key,0) for name,key,_ in K.DEPARTMENTS}
+EXEC_NAME="الإدارة التنفيذية"
+
 # ============ اللوحة الموجزة ============
 ws=wb.create_sheet("اللوحة الموجزة"); rtl(ws)
 for i,w in enumerate([3,28,14,16,16],1): ws.column_dimensions[get_column_letter(i)].width=w
-ws.merge_cells("B2:E2"); C(ws,2,2,"اللوحة الموجزة — تجميع حي من جداول الإدارات",f=F_(15,True,WHITE),fillc=NAVY,al="center",border=False); ws.row_dimensions[2].height=26
-C(ws,4,2,"الإنجاز العام",f=F_(11,True,WHITE),fillc=BLUE,al="center")
-C(ws,5,2,f'=IFERROR(AVERAGE({ACH}),0)',f=F_(22,True,ORANGE),fmt="0%",al="center")
+for col in ("H","I","J"): ws.column_dimensions[col].hidden=True   # أعمدة مساعدة للترجيح
+ws.merge_cells("B2:E2"); C(ws,2,2,"اللوحة الموجزة — إنجاز موزون (وزن المؤشر × وزن الإدارة) · سقف 100%",f=F_(13,True,WHITE),fillc=NAVY,al="center",border=False); ws.row_dimensions[2].height=26
+C(ws,4,2,"الإنجاز العام (موزون)",f=F_(11,True,WHITE),fillc=BLUE,al="center")
+hr=7
+drng=f"H{hr+2}:H{hr+1+len(DEPT_RANGES)}"; wrng=f"I{hr+2}:I{hr+1+len(DEPT_RANGES)}"; hasrng=f"J{hr+2}:J{hr+1+len(DEPT_RANGES)}"
+C(ws,5,2,f'=IFERROR(SUMPRODUCT({wrng},{drng})/SUMPRODUCT({wrng},{hasrng}),0)',f=F_(22,True,ORANGE),fmt="0%",al="center")
 for i,(lbl,key) in enumerate([("✅ محقق","✅ محقق"),("🟡 قريب","🟡 قريب"),("🔴 تحت الهدف","🔴 تحت الهدف")]):
-    c=3+i; C(ws,4,c,lbl,f=F_(10,True,WHITE),fillc=STEEL,al="center"); C(ws,5,c,f'=COUNTIF({STC},"{key}")',f=F_(18,True,NAVY),al="center")
-hr=7; C(ws,hr,2,"الأداء حسب الإدارة",f=F_(12,True,WHITE),fillc=ORANGE,al="center"); ws.merge_cells(start_row=hr,start_column=2,end_row=hr,end_column=3)
+    c=3+i; C(ws,4,c,lbl,f=F_(10,True,WHITE),fillc=STEEL,al="center")
+    C(ws,5,c,f'=COUNTIFS({STC},"{key}",{DEPC},"<>{EXEC_NAME}")',f=F_(18,True,NAVY),al="center")  # دون التنفيذية (تفادي الازدواج)
+C(ws,hr,2,"الأداء حسب الإدارة (موزون)",f=F_(12,True,WHITE),fillc=ORANGE,al="center"); ws.merge_cells(start_row=hr,start_column=2,end_row=hr,end_column=3)
 for c,h in zip([2,3],["الإدارة","الأداء"]): C(ws,hr+1,c,h,f=F_(10,True,WHITE),fillc=STEEL,al="center")
 rr=hr+2
 for dname,sh,s,e in DEPT_RANGES:
-    C(ws,rr,2,dname,f=F_(9),al="right"); C(ws,rr,3,f'=IFERROR(AVERAGEIFS({ACH},{DEPC},"{dname}"),"—")',f=F_(9,True,NAVY),fmt="0%",al="center"); rr+=1
+    C(ws,rr,2,dname,f=F_(9),al="right")
+    C(ws,rr,3,f'=IFERROR(SUMIF({DEPC},"{dname}",{WXN})/SUMIF({DEPC},"{dname}",{WAV}),"—")',f=F_(9,True,NAVY),fmt="0%",al="center")
+    # أعمدة مساعدة مخفيّة: الأداء الرقمي · وزن الإدارة · هل لديها بيانات
+    C(ws,rr,8,f'=IFERROR(SUMIF({DEPC},"{dname}",{WXN})/SUMIF({DEPC},"{dname}",{WAV}),0)',f=F_(8),al="center")
+    C(ws,rr,9,round(DW_BY_NAME.get(dname,0),5),f=F_(8),al="center")
+    C(ws,rr,10,f'=IF(SUMIF({DEPC},"{dname}",{WAV})=0,0,1)',f=F_(8),al="center")
+    rr+=1
 # ركيزة + منظور (يمين)
 pc=4; C(ws,hr,pc,"حسب الركيزة",f=F_(12,True,WHITE),fillc=ORANGE,al="center"); ws.merge_cells(start_row=hr,start_column=pc,end_row=hr,end_column=pc+1)
 for c,h in zip([pc,pc+1],["الركيزة","الأداء"]): C(ws,hr+1,c,h,f=F_(10,True,WHITE),fillc=STEEL,al="center")
@@ -207,9 +232,9 @@ def ach_calc(pol,tgt,act):
     if tgt is None or act is None: return None
     if tgt==0: return 1.0 if act<=0 else 0.0
     if act==0: return 0.0
-    return (tgt/act) if pol=="↓" else (act/tgt)
+    return min(1.0,(tgt/act) if pol=="↓" else (act/tgt))   # سقف 100%
 def status_txt(a):
-    if a is None: return "—"
+    if a is None: return "⏳ بانتظار هدف"
     if a>=1: return "✅ محقق"
     if a>=0.85: return "🟡 قريب"
     return "🔴 تحت الهدف"
@@ -223,7 +248,7 @@ for dname,key,records in K.DEPARTMENTS:
         C(flat,fr,3,nm,f=F_(9),al="right")
         C(flat,fr,4,unit,al="center")
         C(flat,fr,5,pol,al="center")
-        C(flat,fr,6,K.priority_label(K.priority(nm)),f=F_(8),al="center")
+        C(flat,fr,6,prio_label(nm),f=F_(8),al="center")
         C(flat,fr,7,weights[i],fmt="0%",al="center")
         C(flat,fr,8,tgt if tgt is not None else None,al="center")
         C(flat,fr,9,act if act is not None else None,al="center")
