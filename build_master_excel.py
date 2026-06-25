@@ -558,8 +558,44 @@ for (risk,cat,p,im,kpi,owner,mit,stt) in sorted(RISKS,key=lambda x:x[2]*x[3],rev
     C(bd,rr,6,("🔴 عالي" if p*im>=15 else "🟠 متوسط" if p*im>=8 else "🟢 منخفض"),f=F_(8),al="center"); rr+=1
 rr+=1; bd.merge_cells(start_row=rr,start_column=2,end_row=rr,end_column=6); C(bd,rr,2,"يُحدَّث آلياً من اللوحة الموجزة وتحليل الانحراف وسجل المخاطر · سرّي — لأعضاء المجلس",f=F_(8,False,"888888"),al="center",border=False)
 
+# ============ الخريطة الاستراتيجية (Strategy Map — علاقات السبب والأثر) ============
+sm=wb.create_sheet("الخريطة الاستراتيجية"); rtl(sm)
+for i in range(2,12): sm.column_dimensions[get_column_letter(i)].width=12
+C_FIN,C_CUS,C_INT,C_LRN="F47A21","5B9BD5","808285","3FB27F"
+sm.merge_cells("B2:K2"); C(sm,2,2,"الخريطة الاستراتيجية — علاقات السبب والأثر (Balanced Scorecard) · الأداء حي",f=F_(14,True,WHITE),fillc=NAVY,al="center",border=False); sm.row_dimensions[2].height=26
+def sm_header(r,color,label):
+    sm.merge_cells(start_row=r,start_column=2,end_row=r,end_column=11)
+    C(sm,r,2,label,f=F_(11,True,WHITE),fillc=color,al="center")
+def sm_box(r,c1,c2,name,formula,color):
+    sm.merge_cells(start_row=r,start_column=c1,end_row=r,end_column=c2); C(sm,r,c1,name,f=F_(8,True,WHITE),fillc=color,al="center",wrap=True)
+    sm.merge_cells(start_row=r+1,start_column=c1,end_row=r+1,end_column=c2); sm.cell(r+1,c1).value=formula; C(sm,r+1,c1,f=F_(12,True,WHITE),fillc=color,fmt="0%",al="center")
+def sm_row(r,color,boxes):
+    n=len(boxes); w=10//n; cc=2
+    for i,(nm,fm) in enumerate(boxes):
+        c2=11 if i==n-1 else cc+w-1; sm_box(r,cc,c2,nm,fm,color); cc=c2+1
+def sm_arrows(r):
+    for c in (3,5,7,9,11): C(sm,r,c,"⬆",f=F_(11,True,"AAAAAA"),al="center",border=False)
+def pf(proj): return f'=IFERROR(AVERAGEIFS({ACH},{PROJC},"{proj}"),"—")'
+def perf(persp): return f'=IFERROR(AVERAGEIFS({ACH},{PERC},"{persp}"),"—")'
+# المالي (الأعلى) — النتيجة النهائية
+sm_header(4,NAVY,"⬆ المنظور المالي — القيمة للمساهمين")
+sm_box(5,2,11,"النمو · الربحية · التدفّق النقدي والتحصيل",perf("مالي"),C_FIN)
+sm_arrows(7)
+# العملاء
+sm_header(8,NAVY,"المنظور — العملاء")
+sm_row(9,C_CUS,[("زيادة وصول العملاء",pf(K.P_REACH)),("تعزيز تجربة العملاء",pf(K.P_CX)),("تطبيق تانكي والولاء",pf(K.P_TANKI))])
+sm_arrows(11)
+# العمليات الداخلية
+sm_header(12,NAVY,"المنظور — العمليات الداخلية")
+sm_row(13,C_INT,[("التوسع في المواقع",pf(K.P_GROW1)),("الامتياز التجاري",pf(K.P_FRAN)),("منظومة التأجير",pf(K.P_LEASE)),("ساحات درب",pf(K.P_SAHAT)),("جودة التشغيل",pf(K.P_QUAL))])
+sm_arrows(15)
+# التعلّم والنمو (الأساس)
+sm_header(16,NAVY,"المنظور — التعلّم والنمو (الأساس الممكِّن)")
+sm_row(17,C_LRN,[("الاستثمار في الموظفين",pf(K.P_PEOPLE)),("التحول التقني",pf(K.P_TECH)),("إطلاق مشاريع جديدة",pf(K.P_NEW)),("التصاميم والهوية",pf(K.P_DESIGN))])
+sm.merge_cells("B19:K19"); C(sm,19,2,"القراءة من الأسفل للأعلى: تطوير الكوادر والتقنية ⟵ يُمكّن العمليات ⟵ يخلق قيمة للعملاء ⟵ يُنتج النتائج المالية",f=F_(8,False,"666666"),al="center",border=False)
+
 # ترتيب الأوراق
-order=["تقرير المجلس","الاستراتيجية والمستهدفات","اللوحة الموجزة","تحليل الانحراف","سجل المخاطر","ESG والاستدامة","مراجعة وحوكمة المؤشرات","بطاقة تعريف المؤشرات","بيانات الباوربي"]+[sh for _,sh,_,_ in DEPT_RANGES]+["سجل المشاريع","قاعدة المؤشرات"]
+order=["تقرير المجلس","الاستراتيجية والمستهدفات","الخريطة الاستراتيجية","اللوحة الموجزة","تحليل الانحراف","سجل المخاطر","ESG والاستدامة","مراجعة وحوكمة المؤشرات","بطاقة تعريف المؤشرات","بيانات الباوربي"]+[sh for _,sh,_,_ in DEPT_RANGES]+["سجل المشاريع","قاعدة المؤشرات"]
 wb._sheets.sort(key=lambda s: order.index(s.title) if s.title in order else 99)
 for s in wb.worksheets: rtl(s)
 cons.sheet_state="hidden"
