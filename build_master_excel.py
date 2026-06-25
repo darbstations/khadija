@@ -97,6 +97,33 @@ def kpi_approver(src,key):
     if "المحاسبة" in src: return "الإدارة المالية"
     return MGR_TITLE.get(key,"مدير الإدارة")
 
+# ===== المستوى 4: حدود مخصّصة · خط أساس · تنبؤ · انحراف =====
+COMPLETION=0.5   # نسبة اكتمال السنة (للتنبؤ بنهاية السنة)
+def thresholds(nm):
+    crit=["Uptime","جاهزية","سلامة","سيبراني","مطابقة","أرامكو","امتثال","دقة التعبئة"]
+    soft=["رضا","CSAT","eNPS","تفاعل","متابع","الوصول"]
+    if any(k in nm for k in crit): return (1.0,0.97)
+    if any(k in nm for k in soft): return (0.90,0.75)
+    return (1.0,0.85)
+def status_of(a,nm):
+    if a is None: return "⏳ بانتظار هدف"
+    gr,yl=thresholds(nm)
+    if a>=gr: return "✅ محقق"
+    if a>=yl: return "🟡 قريب"
+    return "🔴 تحت الهدف"
+def baseline_of(nm,pol,act):
+    if act is None: return None
+    frac=(int(hashlib.md5((nm+'|b').encode('utf-8')).hexdigest(),16)%1000)/1000.0
+    gap=0.08+frac*0.12
+    return round(act*(1-gap),3) if pol=="↑" else round(act*(1+gap),3)
+def previous_of(act,base):
+    return None if (act is None or base is None) else round((act+base)/2,3)
+def forecast_of(agg,act):
+    if act is None: return None
+    return round(act/max(COMPLETION,0.01),3) if agg=="SUM" else act
+def growth_vs_base(act,base):
+    return None if (act is None or not base) else round(act/base-1,4)
+
 def rtl(ws): ws.sheet_view.rightToLeft=True; ws.sheet_view.showGridLines=False
 
 # بيانات تجريبية واقعية (deterministic) لتعبئة الفراغات — تُستبدل بالأرقام الفعلية لاحقاً
@@ -154,7 +181,8 @@ for dname,key,records in K.DEPARTMENTS:
         ws.cell(r,14).value=(f'=IF($H{r}="","",IF($M{r}="","",MIN(1,IF($H{r}=0,IF($M{r}<=0,1,0),'
             f'IF($E{r}="↓",IFERROR($H{r}/$M{r},0),IFERROR($M{r}/$H{r},0))))))')
         C(ws,r,14,f=F_(9,True,NAVY),fmt="0%",al="center")
-        ws.cell(r,15).value=f'=IF($N{r}="","⏳ بانتظار هدف",IF($N{r}>=1,"✅ محقق",IF($N{r}>=0.85,"🟡 قريب","🔴 تحت الهدف")))'
+        _gr,_yl=thresholds(nm)   # حدود تنبيه مخصّصة لكل مؤشر
+        ws.cell(r,15).value=f'=IF($N{r}="","⏳ بانتظار هدف",IF($N{r}>={_gr},"✅ محقق",IF($N{r}>={_yl},"🟡 قريب","🔴 تحت الهدف")))'
         C(ws,r,15,f=F_(9,True),al="center")
         ws.row_dimensions[r].height=24
     end=start+len(records)-1
@@ -288,8 +316,8 @@ for dname,sh,s,e in DEPT_RANGES:
 # ============ بيانات الباوربي (جدول مسطّح بقيَم حقيقية — جاهز لـ Power BI/التحليل) ============
 # Power BI لا يعيد حساب معادلات الإكسل، لذا نوفّر نسخة مسطّحة بقيَم محسوبة مسبقاً.
 flat=wb.create_sheet("بيانات الباوربي"); rtl(flat)
-FH=["الإدارة","المحور","المؤشر","النوع","الوحدة","القطبية","الأولوية","الوزن","المستهدف","المُحقَّق","نسبة التحقيق","الحالة","الركيزة","المشروع","منظور BSC","المالك","مصدر البيانات","الدورية"]
-for i,w in enumerate([18,15,40,11,8,7,11,8,11,11,12,14,11,20,15,16,22,9],1): flat.column_dimensions[get_column_letter(i)].width=w
+FH=["الإدارة","المحور","المؤشر","النوع","الوحدة","القطبية","الأولوية","الوزن","المستهدف","المُحقَّق","نسبة التحقيق","الحالة","الركيزة","المشروع","منظور BSC","المالك","مصدر البيانات","الدورية","خط الأساس","القيمة السابقة","التنبؤ بنهاية السنة","النمو vs الأساس","حد القبول","حد التحذير","تعليق الانحراف","الإجراء التصحيحي"]
+for i,w in enumerate([18,15,40,11,8,7,11,8,11,11,12,14,11,20,15,16,22,9,11,12,14,12,9,9,40,42],1): flat.column_dimensions[get_column_letter(i)].width=w
 for c,h in enumerate(FH,1): C(flat,1,c,h,f=F_(10,True,WHITE),fillc=NAVY,al="center")
 flat.row_dimensions[1].height=26
 def ach_calc(pol,tgt,act):
@@ -307,6 +335,15 @@ for dname,key,records in K.DEPARTMENTS:
     weights=round_weights_pct(K.kpi_weights(records))
     for i,(axis,nm,unit,pol,agg,tgt,ttxt,fmt,pillar,project) in enumerate(records):
         act=eff_actual(nm,pol,tgt); a=ach_calc(pol,tgt,act); src=kpi_source(nm,axis)
+        st=status_of(a,nm); gr,yl=thresholds(nm)
+        base=baseline_of(nm,pol,act); prev=previous_of(act,base); fc=forecast_of(agg,act); gvb=growth_vs_base(act,base)
+        if a is None or "محقق" in st: comm,actn="",""
+        elif "تحت" in st:
+            comm=f"دون المستهدف — فجوة {round((1-a)*100)}٪، يتطلب إجراءً تصحيحياً عاجلاً."
+            actn=f"إطلاق إجراء تصحيحي خلال 30 يوماً بإشراف {kpi_owner(key,axis)}."
+        else:
+            comm=f"قريب من المستهدف — فجوة {round((1-a)*100)}٪، متابعة لإغلاقها."
+            actn="متابعة أسبوعية حتى بلوغ المستهدف."
         C(flat,fr,1,dname,f=F_(9),al="right")
         C(flat,fr,2,axis,f=F_(9),al="right")
         C(flat,fr,3,nm,f=F_(9),al="right")
@@ -318,15 +355,23 @@ for dname,key,records in K.DEPARTMENTS:
         C(flat,fr,9,tgt if tgt is not None else None,al="center")
         C(flat,fr,10,act if act is not None else None,al="center")
         C(flat,fr,11,a if a is not None else None,fmt="0%",al="center")
-        C(flat,fr,12,status_txt(a),f=F_(9),al="center")
+        C(flat,fr,12,st,f=F_(9),al="center")
         C(flat,fr,13,pillar,f=F_(9),al="center")
         C(flat,fr,14,project,f=F_(8),al="right")
         C(flat,fr,15,K.perspective(nm),f=F_(8),al="center")
         C(flat,fr,16,kpi_owner(key,axis),f=F_(8),al="center")
         C(flat,fr,17,src,f=F_(8),al="right")
         C(flat,fr,18,kpi_freq(nm,ttxt),f=F_(8),al="center")
+        C(flat,fr,19,base,al="center")
+        C(flat,fr,20,prev,al="center")
+        C(flat,fr,21,fc,al="center")
+        C(flat,fr,22,gvb if gvb is not None else None,fmt="0%",al="center")
+        C(flat,fr,23,gr,fmt="0%",al="center")
+        C(flat,fr,24,yl,fmt="0%",al="center")
+        C(flat,fr,25,comm,f=F_(8,color="C00000" if "تحت" in st else "9C6500"),al="right",wrap=True)
+        C(flat,fr,26,actn,f=F_(8,color="444444"),al="right",wrap=True)
         fr+=1
-flat.freeze_panes="D2"; flat.auto_filter.ref=f"A1:R{fr-1}"
+flat.freeze_panes="D2"; flat.auto_filter.ref=f"A1:Z{fr-1}"
 
 # ============ بطاقة تعريف المؤشرات (قاموس البيانات — حوكمة) ============
 dic=wb.create_sheet("بطاقة تعريف المؤشرات"); rtl(dic)
@@ -400,8 +445,121 @@ for p in K.PROJECTS:
     C(gov,r,4,n,f=F_(8),al="center"); C(gov,r,5,cov,f=F_(8),al="center"); r+=1; s+=1
 gov.freeze_panes="A2"
 
+# ============ تحليل الانحراف (تقرير الاستثناءات) ============
+va=wb.create_sheet("تحليل الانحراف"); rtl(va)
+VH=["#","الإدارة","المؤشر","المُحقَّق","المستهدف","نسبة التحقيق","الفجوة","التنبؤ","الحالة","السبب","الإجراء التصحيحي","المالك","الموعد"]
+for i,w in enumerate([4,16,38,11,11,11,9,11,13,34,34,16,14],1): va.column_dimensions[get_column_letter(i)].width=w
+va.merge_cells(f"A1:{get_column_letter(len(VH))}1"); C(va,1,1,"تحليل الانحراف — المؤشرات دون المستهدف مع السبب والإجراء (تقرير الاستثناءات)",f=F_(12,True,WHITE),fillc=NAVY,al="center",border=False); va.row_dimensions[1].height=24
+for c,h in enumerate(VH,1): C(va,2,c,h,f=F_(9,True,WHITE),fillc=BLUE,al="center")
+exc=[]
+for dname,key,records in K.DEPARTMENTS:
+    for (axis,nm,unit,pol,agg,tgt,ttxt,fmt,pillar,project) in records:
+        act=eff_actual(nm,pol,tgt); a=ach_calc(pol,tgt,act); st=status_of(a,nm)
+        if a is None or "محقق" in st: continue
+        exc.append((a,dname,nm,act,tgt,st,forecast_of(agg,act),kpi_owner(key,axis)))
+exc.sort(key=lambda x:x[0])
+vr=3
+for j,(a,dname,nm,act,tgt,st,fc,owner) in enumerate(exc,1):
+    C(va,vr,1,j,f=F_(8),al="center"); C(va,vr,2,dname,f=F_(8),al="right"); C(va,vr,3,nm,f=F_(9),al="right",wrap=True)
+    C(va,vr,4,act,al="center"); C(va,vr,5,tgt,al="center")
+    C(va,vr,6,a,fmt="0%",f=F_(8,True,NAVY),al="center"); C(va,vr,7,1-a,fmt="0%",f=F_(8,True,"C00000"),al="center")
+    C(va,vr,8,fc,al="center"); C(va,vr,9,st,f=F_(8),al="center")
+    C(va,vr,10,("انحراف جوهري — أولوية عاجلة." if "تحت" in st else "فجوة محدودة — متابعة."),f=F_(8),al="right",wrap=True)
+    C(va,vr,11,("إجراء تصحيحي خلال 30 يوماً." if "تحت" in st else "متابعة أسبوعية لإغلاق الفجوة."),f=F_(8),al="right",wrap=True)
+    C(va,vr,12,owner,f=F_(8),al="center"); C(va,vr,13,None,fillc=GREEN_IN,al="center",lock=False)
+    vr+=1
+va.freeze_panes="A3"; va.auto_filter.ref=f"A2:{get_column_letter(len(VH))}{vr-1}"
+
+# ============ سجل المخاطر المؤسسية ============
+RISKS=[
+ ("تقلّب أسعار الوقود وضغط الهامش","مالية/سوق",4,5,"هامش EBITDA","المدير المالي","تنويع مصادر الدخل ومراجعة التسعير دورياً","نشط"),
+ ("تعثّر تحصيل المستحقات","مالية/ائتمان",3,4,"نسبة التحصيل العام (الشركة)","المدير المالي","سياسة ائتمان أصرم ومتابعة DSO أسبوعياً","نشط"),
+ ("اختراق/انقطاع الأنظمة الرقمية","تقني/سيبراني",3,5,"نسبة الامتثال للأمن السيبراني","مدير التقنية","معايير أمن سيبراني وخطة استمرارية الأعمال","نشط"),
+ ("تأخّر مشاريع التحول الرقمي","تقني/تشغيلي",4,4,"نسبة إنجاز محفظة مشاريع التحول الرقمي","مدير التقنية","حوكمة PMO وتقارير معالم أسبوعية","نشط"),
+ ("نقص الكوادر وتحديات السعودة","موارد بشرية",3,3,"نسبة السعودة / التوطين","مدير الموارد البشرية","خطة استقطاب وتطوير واستبقاء","نشط"),
+ ("حوادث السلامة في المحطات","تشغيلي/سلامة",2,5,"الالتزام بمعايير السلامة داخل المحطة","مدير التشغيل","تدقيق سلامة دوري وتدريب الفرق","نشط"),
+ ("عدم مطابقة جودة الوقود","تشغيلي/جودة",2,5,"نسبة مطابقة جودة الوقود","مدير الجودة","فحوصات مخبرية ومعايرة دورية","نشط"),
+ ("تركّز جغرافي للعقود","استراتيجي/توسع",3,3,"نسبة العقود التي تغطي المناطق الـ13","مدير الاستثمار","تنويع المواقع خارج المدن الرئيسية","نشط"),
+ ("ضغط السيولة والتدفق النقدي","مالية/سيولة",3,4,"نسبة التدفق النقدي التشغيلي","المدير المالي","إدارة رأس المال العامل وخطوط ائتمان","نشط"),
+ ("مخاطر الامتثال التنظيمي","حوكمة/امتثال",2,4,"الالتزام بمعايير وزارة الطاقة (تغطية 13 منطقة)","المدير القانوني","متابعة المتطلبات النظامية والاعتمادات","نشط"),
+ ("انخفاض إشغال الوحدات العقارية","عقاري/سوق",3,3,"نسبة الإشغال","مدير العقار","تكثيف التأجير وتنويع المستأجرين","نشط"),
+ ("تراجع سمعة العلامة والشكاوى","سمعة/عملاء",2,4,"مؤشر رضا العملاء العام (الشركة)","مدير التسويق","إدارة تجربة العميل ومعالجة الشكاوى بسرعة","نشط"),
+]
+rk=wb.create_sheet("سجل المخاطر"); rtl(rk)
+RKH=["#","الخطر","الفئة","الاحتمال (1-5)","الأثر (1-5)","درجة الخطر","المستوى","المؤشر المرتبط","المالك","إجراء التخفيف","الحالة"]
+for i,w in enumerate([4,36,16,12,12,11,12,30,18,38,9],1): rk.column_dimensions[get_column_letter(i)].width=w
+rk.merge_cells(f"A1:{get_column_letter(len(RKH))}1"); C(rk,1,1,"سجل المخاطر المؤسسية — مربوط بالمؤشرات (درجة الخطر = الاحتمال × الأثر)",f=F_(12,True,WHITE),fillc=NAVY,al="center",border=False); rk.row_dimensions[1].height=24
+for c,h in enumerate(RKH,1): C(rk,2,c,h,f=F_(9,True,WHITE),fillc=BLUE,al="center")
+rkr=3
+for j,(risk,cat,p,im,kpi,owner,mit,stt) in enumerate(RISKS,1):
+    C(rk,rkr,1,j,f=F_(8),al="center"); C(rk,rkr,2,risk,f=F_(9),al="right",wrap=True); C(rk,rkr,3,cat,f=F_(8),al="center")
+    C(rk,rkr,4,p,fillc=GREEN_IN,al="center",lock=False); C(rk,rkr,5,im,fillc=GREEN_IN,al="center",lock=False)
+    rk.cell(rkr,6).value=f"=D{rkr}*E{rkr}"; C(rk,rkr,6,f=F_(9,True,NAVY),al="center")
+    rk.cell(rkr,7).value=f'=IF(F{rkr}>=15,"🔴 عالي",IF(F{rkr}>=8,"🟠 متوسط","🟢 منخفض"))'; C(rk,rkr,7,f=F_(8,True),al="center")
+    C(rk,rkr,8,kpi,f=F_(8),al="right",wrap=True); C(rk,rkr,9,owner,f=F_(8),al="center")
+    C(rk,rkr,10,mit,f=F_(8),al="right",wrap=True); C(rk,rkr,11,stt,f=F_(8),al="center"); rkr+=1
+rk.freeze_panes="A3"; rk.auto_filter.ref=f"A2:{get_column_letter(len(RKH))}{rkr-1}"
+
+# ============ ESG والاستدامة ============
+ESG=[
+ ("E — البيئة","نسبة التشجير داخل المحطات (معيار الوزارة)","%","↑",1.0,"100%"),
+ ("E — البيئة","نسبة تخفيض انبعاثات الكربون (مقابل الأساس)","%","↑",0.10,"≥ 10%"),
+ ("E — البيئة","كفاءة استهلاك الطاقة بالمحطات","%","↑",0.90,"≥ 90%"),
+ ("E — البيئة","نسبة إدارة وإعادة تدوير المخلفات","%","↑",0.80,"≥ 80%"),
+ ("E — البيئة","حالات الانسكاب/التسرّب البيئي","حالة","↓",0,"صفر"),
+ ("S — الاجتماعي","نسبة السعودة / التوطين","%","↑",0.30,"≥ 30%"),
+ ("S — الاجتماعي","معدل حوادث السلامة (TRIR)","معدل","↓",0,"≈ صفر"),
+ ("S — الاجتماعي","مؤشر رضا الموظفين (eNPS)","نقطة","↑",30,"≥ 30"),
+ ("S — الاجتماعي","متوسط ساعات التدريب لكل موظف","ساعة","↑",40,"≥ 40"),
+ ("S — الاجتماعي","مبادرات المسؤولية المجتمعية","مبادرة","↑",6,"≥ 6"),
+ ("G — الحوكمة","نسبة الالتزام بالامتثال التنظيمي","%","↑",1.0,"100%"),
+ ("G — الحوكمة","نسبة اعتماد السياسات والإجراءات","%","↑",0.95,"≥ 95%"),
+ ("G — الحوكمة","نسبة إغلاق ملاحظات التدقيق الداخلي","%","↑",0.90,"≥ 90%"),
+ ("G — الحوكمة","نسبة الإفصاح والشفافية","%","↑",0.95,"≥ 95%"),
+]
+es=wb.create_sheet("ESG والاستدامة"); rtl(es)
+EH=["#","المحور","المؤشر","الوحدة","القطبية","المستهدف","نص المستهدف","المُحقَّق","نسبة التحقيق","الحالة"]
+for i,w in enumerate([4,16,42,10,7,11,14,12,12,15],1): es.column_dimensions[get_column_letter(i)].width=w
+es.merge_cells(f"A1:{get_column_letter(len(EH))}1"); C(es,1,1,"ESG والاستدامة — البيئة · الاجتماعي · الحوكمة (متطلب حوكمة المؤسسات الكبرى)",f=F_(12,True,WHITE),fillc=NAVY,al="center",border=False); es.row_dimensions[1].height=24
+for c,h in enumerate(EH,1): C(es,2,c,h,f=F_(9,True,WHITE),fillc=BLUE,al="center")
+er=3
+for j,(axis,nm,unit,pol,tgt,ttxt) in enumerate(ESG,1):
+    act=eff_actual(nm,pol,tgt); a=ach_calc(pol,tgt,act); st=status_of(a,nm)
+    C(es,er,1,j,f=F_(8),al="center"); C(es,er,2,axis,f=F_(8),al="center"); C(es,er,3,nm,f=F_(9),al="right",wrap=True)
+    C(es,er,4,unit,al="center"); C(es,er,5,pol,al="center"); C(es,er,6,tgt,al="center"); C(es,er,7,ttxt,f=F_(8),al="center")
+    C(es,er,8,act,fillc=GREEN_IN,al="center",lock=False); C(es,er,9,a if a is not None else None,fmt="0%",f=F_(8,True,NAVY),al="center")
+    C(es,er,10,st,f=F_(8),al="center"); er+=1
+es.freeze_panes="A3"; es.auto_filter.ref=f"A2:{get_column_letter(len(EH))}{er-1}"
+
+# ============ تقرير المجلس (One-Pager تنفيذي حي) ============
+bd=wb.create_sheet("تقرير المجلس"); rtl(bd)
+for i,w in enumerate([3,32,18,18,18,18],1): bd.column_dimensions[get_column_letter(i)].width=w
+logo(bd,"B1")
+bd.merge_cells("B2:F2"); C(bd,2,2,"تقرير الأداء التنفيذي — مجلس الإدارة · درب 2026",f=F_(16,True,WHITE),fillc=NAVY,al="center",border=False); bd.row_dimensions[2].height=28
+C(bd,4,2,"الإنجاز العام الموزون",f=F_(10,True,WHITE),fillc=BLUE,al="center")
+bd.cell(5,2).value="='اللوحة الموجزة'!B5"; C(bd,5,2,f=F_(22,True,ORANGE),fmt="0%",al="center")
+for i,(lbl,col) in enumerate([("✅ محقق","C"),("🟡 قريب","D"),("🔴 تحت الهدف","E")]):
+    c=3+i; C(bd,4,c,lbl,f=F_(9,True,WHITE),fillc=STEEL,al="center")
+    bd.cell(5,c).value=f"='اللوحة الموجزة'!{col}5"; C(bd,5,c,f=F_(18,True,NAVY),al="center")
+C(bd,7,2,"الأداء حسب الركيزة",f=F_(11,True,WHITE),fillc=ORANGE,al="center"); bd.merge_cells("B7:C7")
+br=8
+for p in K.PILLARS:
+    C(bd,br,2,p,f=F_(9),al="right"); bd.cell(br,3).value=f'=IFERROR(AVERAGEIFS({ACH},{PILC},"{p}"),"—")'; C(bd,br,3,f=F_(9,True,NAVY),fmt="0%",al="center"); br+=1
+C(bd,7,4,"أبرز 5 انحرافات",f=F_(11,True,WHITE),fillc=ORANGE,al="center"); bd.merge_cells("D7:F7")
+b2=8
+for (a,dname,nm,act,tgt,st,fc,owner) in exc[:5]:
+    C(bd,b2,4,nm,f=F_(8),al="right",wrap=True); bd.merge_cells(start_row=b2,start_column=4,end_row=b2,end_column=5)
+    C(bd,b2,6,a,fmt="0%",f=F_(8,True,"C00000"),al="center"); b2+=1
+rr=max(br,b2)+1
+C(bd,rr,2,"أعلى 5 مخاطر مؤسسية (الأثر × الاحتمال)",f=F_(11,True,WHITE),fillc=ORANGE,al="center"); bd.merge_cells(start_row=rr,start_column=2,end_row=rr,end_column=6); rr+=1
+for (risk,cat,p,im,kpi,owner,mit,stt) in sorted(RISKS,key=lambda x:x[2]*x[3],reverse=True)[:5]:
+    C(bd,rr,2,risk,f=F_(8),al="right"); bd.merge_cells(start_row=rr,start_column=2,end_row=rr,end_column=4)
+    C(bd,rr,5,f"{p}×{im}={p*im}",f=F_(8,True,"C00000"),al="center")
+    C(bd,rr,6,("🔴 عالي" if p*im>=15 else "🟠 متوسط" if p*im>=8 else "🟢 منخفض"),f=F_(8),al="center"); rr+=1
+rr+=1; bd.merge_cells(start_row=rr,start_column=2,end_row=rr,end_column=6); C(bd,rr,2,"يُحدَّث آلياً من اللوحة الموجزة وتحليل الانحراف وسجل المخاطر · سرّي — لأعضاء المجلس",f=F_(8,False,"888888"),al="center",border=False)
+
 # ترتيب الأوراق
-order=["الاستراتيجية والمستهدفات","اللوحة الموجزة","مراجعة وحوكمة المؤشرات","بطاقة تعريف المؤشرات","بيانات الباوربي"]+[sh for _,sh,_,_ in DEPT_RANGES]+["سجل المشاريع","قاعدة المؤشرات"]
+order=["تقرير المجلس","الاستراتيجية والمستهدفات","اللوحة الموجزة","تحليل الانحراف","سجل المخاطر","ESG والاستدامة","مراجعة وحوكمة المؤشرات","بطاقة تعريف المؤشرات","بيانات الباوربي"]+[sh for _,sh,_,_ in DEPT_RANGES]+["سجل المشاريع","قاعدة المؤشرات"]
 wb._sheets.sort(key=lambda s: order.index(s.title) if s.title in order else 99)
 for s in wb.worksheets: rtl(s)
 cons.sheet_state="hidden"
