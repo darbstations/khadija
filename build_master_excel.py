@@ -33,6 +33,66 @@ _MILESTONE_KW=["اكتمال المستندات","اكتمال أرشفة","أر
 def is_milestone(nm): return any(k in nm for k in _MILESTONE_KW)
 def prio_label(nm): return "🏁 معلم" if is_milestone(nm) else K.priority_label(K.priority(nm))
 
+# ===== حوكمة المؤشرات: توليد بطاقة التعريف لكل مؤشر =====
+MGR_TITLE={"exec":"الرئيس التنفيذي","franchise":"مدير الامتياز","operations":"مدير التشغيل",
+ "investment":"مدير الاستثمار","realestate":"مدير العقار","digital":"مدير التقنية",
+ "hr":"مدير الموارد البشرية","marketing":"مدير التسويق","quality":"مدير الجودة",
+ "legal":"المدير القانوني","finance":"المدير المالي"}
+def round_weights_pct(weights):
+    """تقريب الأوزان إلى نِسب مئوية صحيحة مجموعها 100٪ (largest remainder) بحد أدنى 1٪."""
+    raw=[w*100 for w in weights]; floor=[int(x) for x in raw]; rem=[x-int(x) for x in raw]
+    for i in range(len(floor)):
+        if floor[i]==0: floor[i]=1; rem[i]=0
+    diff=100-sum(floor)
+    order=sorted(range(len(raw)),key=lambda i:rem[i],reverse=(diff>0))
+    i=0
+    while diff!=0 and order:
+        idx=order[i%len(order)]
+        if diff>0: floor[idx]+=1; diff-=1
+        elif floor[idx]>1: floor[idx]-=1; diff+=1
+        i+=1
+    return [f/100 for f in floor]
+def kpi_source(nm,axis):
+    t=nm+" "+axis
+    for kws,src in [
+     (["إيراد","ربح","هامش","تحصيل","DSO","سداد","موازنة","تدفق","نقدي","العائد","ROE","مستحق","مورد","تدقيق","ميزاني","دين","ذمم","إقفال"],"نظام المحاسبة / ERP (D365)"),
+     (["قوقل","Google","خرائط"],"تقييمات خرائط قوقل"),
+     (["رضا","CSAT","eNPS","استبيان"],"استبيان دوري"),
+     (["تانكي","الولاء","متابع","وصول","تفاعل","حمل","MAU"],"أنظمة التسويق الرقمي / تانكي"),
+     (["تدريب","سعودة","استبقاء","توظيف","موظف","شواغر","دوران","هيكل","أوصاف"],"نظام الموارد البشرية (HRMS)"),
+     (["مشروع","تحول رقمي","أتمتة","سيبراني","أنظمة","تكامل","Uptime"],"مكتب إدارة المشاريع (PMO)"),
+     (["جودة","ملاحظات","مخاطر","مطابقة","تفتيش","QMS","امتثال"],"نظام إدارة الجودة (QMS)"),
+     (["قضايا","مذكرة","مذكرات","استشار","صياغة"],"نظام إدارة العقود/القضايا"),
+     (["عقد","عقود","امتياز","استثمار","تأجير","إيجار","إشغال","استحواذ"],"نظام إدارة العقود (CRM)"),
+     (["محطة","محطات","مبيعات","لتر","مضخ","صيانة","سلامة","تشجير","وقود","تعبئة"],"نظام تشغيل المحطات"),
+    ]:
+        if any(k in t for k in kws): return src
+    return "سجلات الإدارة"
+def kpi_freq(nm,ttxt):
+    if any(k in nm for k in ["eNPS","رضا","CSAT","استبيان","تدقيق","مراجعة الوثائق"]): return "ربعي"
+    if "سنوي" in (ttxt or "") or any(k in nm for k in ["ROE","العائد على حقوق","نمو الإيرادات السنوي","الموازنة"]): return "ربعي"
+    return "شهري"
+def kpi_formula(fmt,unit,nm):
+    if "نسبة" in nm or fmt=="pct": return "(المتحقّق ÷ الإجمالي) × 100٪"
+    if fmt=="rial": return "إجمالي القيمة (ر.س) خلال الفترة"
+    if any(u in unit for u in ["يوم","أسبوع","ساعة","دقيقة","سنة"]): return f"متوسط {unit} خلال الفترة"
+    if "نجمة" in unit: return "متوسط التقييم (من 5)"
+    if "نقطة" in unit: return "٪ المروّجين − ٪ المنتقدين"
+    return "إجمالي العدد خلال الفترة"
+_OUTCOME=["إيراد","ربح","هامش","العائد","ROE","رضا","CSAT","eNPS","نمو","حصة","إشغال","تحصيل","مبيعات","استبقاء","قيمة","تقييم","شكاو","الوصول","EBITDA","ربحية"]
+_ACTIVITY=["عدد","زيارات","حمل","دورات","تنفيذ","إنجاز التقارير","اكتمال","أرشفة","تدريب","إعداد","مذكرة"]
+def kpi_type(nm):
+    if any(k in nm for k in _OUTCOME): return "🎯 نتيجة"
+    if any(k in nm for k in _ACTIVITY): return "⚙️ نشاط"
+    return "🔧 تشغيلي"
+def kpi_def(nm,axis,pillar):
+    return f"يقيس {nm} ضمن محور «{axis}»، ويعكس مساهمة الإدارة في ركيزة {pillar}."
+def kpi_owner(key,axis): return MGR_TITLE.get(key,"مدير الإدارة")
+def kpi_approver(src,key):
+    if key=="exec": return "اللجنة التنفيذية"
+    if "المحاسبة" in src: return "الإدارة المالية"
+    return MGR_TITLE.get(key,"مدير الإدارة")
+
 def rtl(ws): ws.sheet_view.rightToLeft=True; ws.sheet_view.showGridLines=False
 
 # بيانات تجريبية واقعية (deterministic) لتعبئة الفراغات — تُستبدل بالأرقام الفعلية لاحقاً
@@ -68,7 +128,7 @@ for dname,key,records in K.DEPARTMENTS:
     for c,h in enumerate(HEAD,1): C(ws,3,c,h,f=F_(9,True,WHITE),fillc=BLUE,al="center")
     ws.row_dimensions[3].height=28
     dv=DataValidation(type="decimal",operator="greaterThanOrEqual",formula1="0",allow_blank=True); ws.add_data_validation(dv)
-    weights=K.kpi_weights(records); start=4
+    weights=round_weights_pct(K.kpi_weights(records)); start=4
     for i,(axis,nm,unit,pol,agg,tgt,ttxt,fmt,pillar,project) in enumerate(records):
         r=start+i
         C(ws,r,1,i+1,f=F_(9,True),al="center")
@@ -224,8 +284,8 @@ for dname,sh,s,e in DEPT_RANGES:
 # ============ بيانات الباوربي (جدول مسطّح بقيَم حقيقية — جاهز لـ Power BI/التحليل) ============
 # Power BI لا يعيد حساب معادلات الإكسل، لذا نوفّر نسخة مسطّحة بقيَم محسوبة مسبقاً.
 flat=wb.create_sheet("بيانات الباوربي"); rtl(flat)
-FH=["الإدارة","المحور","المؤشر","الوحدة","القطبية","الأولوية","الوزن","المستهدف","المُحقَّق","نسبة التحقيق","الحالة","الركيزة","المشروع","منظور BSC"]
-for i,w in enumerate([18,16,42,9,7,11,8,12,12,13,15,12,22,16],1): flat.column_dimensions[get_column_letter(i)].width=w
+FH=["الإدارة","المحور","المؤشر","النوع","الوحدة","القطبية","الأولوية","الوزن","المستهدف","المُحقَّق","نسبة التحقيق","الحالة","الركيزة","المشروع","منظور BSC","المالك","مصدر البيانات","الدورية"]
+for i,w in enumerate([18,15,40,11,8,7,11,8,11,11,12,14,11,20,15,16,22,9],1): flat.column_dimensions[get_column_letter(i)].width=w
 for c,h in enumerate(FH,1): C(flat,1,c,h,f=F_(10,True,WHITE),fillc=NAVY,al="center")
 flat.row_dimensions[1].height=26
 def ach_calc(pol,tgt,act):
@@ -240,28 +300,104 @@ def status_txt(a):
     return "🔴 تحت الهدف"
 fr=2
 for dname,key,records in K.DEPARTMENTS:
-    weights=K.kpi_weights(records)
+    weights=round_weights_pct(K.kpi_weights(records))
     for i,(axis,nm,unit,pol,agg,tgt,ttxt,fmt,pillar,project) in enumerate(records):
-        act=eff_actual(nm,pol,tgt); a=ach_calc(pol,tgt,act)
+        act=eff_actual(nm,pol,tgt); a=ach_calc(pol,tgt,act); src=kpi_source(nm,axis)
         C(flat,fr,1,dname,f=F_(9),al="right")
         C(flat,fr,2,axis,f=F_(9),al="right")
         C(flat,fr,3,nm,f=F_(9),al="right")
-        C(flat,fr,4,unit,al="center")
-        C(flat,fr,5,pol,al="center")
-        C(flat,fr,6,prio_label(nm),f=F_(8),al="center")
-        C(flat,fr,7,weights[i],fmt="0%",al="center")
-        C(flat,fr,8,tgt if tgt is not None else None,al="center")
-        C(flat,fr,9,act if act is not None else None,al="center")
-        C(flat,fr,10,a if a is not None else None,fmt="0%",al="center")
-        C(flat,fr,11,status_txt(a),f=F_(9),al="center")
-        C(flat,fr,12,pillar,f=F_(9),al="center")
-        C(flat,fr,13,project,f=F_(8),al="right")
-        C(flat,fr,14,K.perspective(nm),f=F_(8),al="center")
+        C(flat,fr,4,kpi_type(nm),f=F_(8),al="center")
+        C(flat,fr,5,unit,al="center")
+        C(flat,fr,6,pol,al="center")
+        C(flat,fr,7,prio_label(nm),f=F_(8),al="center")
+        C(flat,fr,8,weights[i],fmt="0%",al="center")
+        C(flat,fr,9,tgt if tgt is not None else None,al="center")
+        C(flat,fr,10,act if act is not None else None,al="center")
+        C(flat,fr,11,a if a is not None else None,fmt="0%",al="center")
+        C(flat,fr,12,status_txt(a),f=F_(9),al="center")
+        C(flat,fr,13,pillar,f=F_(9),al="center")
+        C(flat,fr,14,project,f=F_(8),al="right")
+        C(flat,fr,15,K.perspective(nm),f=F_(8),al="center")
+        C(flat,fr,16,kpi_owner(key,axis),f=F_(8),al="center")
+        C(flat,fr,17,src,f=F_(8),al="right")
+        C(flat,fr,18,kpi_freq(nm,ttxt),f=F_(8),al="center")
         fr+=1
-flat.freeze_panes="A2"; flat.auto_filter.ref=f"A1:N{fr-1}"
+flat.freeze_panes="D2"; flat.auto_filter.ref=f"A1:R{fr-1}"
+
+# ============ بطاقة تعريف المؤشرات (قاموس البيانات — حوكمة) ============
+dic=wb.create_sheet("بطاقة تعريف المؤشرات"); rtl(dic)
+DH=["#","الإدارة","المؤشر","التعريف","طريقة الاحتساب","النوع","الهدف الاستراتيجي (ركيزة · مشروع)","منظور BSC","الوزن","المالك","مصدر البيانات","الدورية","جهة اعتماد البيانات","آخر تحديث للبيانات"]
+for i,w in enumerate([4,16,38,46,30,11,30,16,8,16,24,9,18,16],1): dic.column_dimensions[get_column_letter(i)].width=w
+dic.merge_cells(f"A1:{get_column_letter(len(DH))}1"); C(dic,1,1,"بطاقة تعريف المؤشرات — قاموس البيانات والحوكمة (مالك · مصدر · دورية · تعريف · احتساب · اعتماد)",f=F_(12,True,WHITE),fillc=NAVY,al="center",border=False); dic.row_dimensions[1].height=24
+for c,h in enumerate(DH,1): C(dic,2,c,h,f=F_(9,True,WHITE),fillc=BLUE,al="center")
+dic.row_dimensions[2].height=26
+dr=3; seq=1
+for dname,key,records in K.DEPARTMENTS:
+    weights=round_weights_pct(K.kpi_weights(records))
+    for i,(axis,nm,unit,pol,agg,tgt,ttxt,fmt,pillar,project) in enumerate(records):
+        src=kpi_source(nm,axis)
+        C(dic,dr,1,seq,f=F_(8),al="center")
+        C(dic,dr,2,dname,f=F_(8),al="right")
+        C(dic,dr,3,nm,f=F_(9),al="right",wrap=True)
+        C(dic,dr,4,kpi_def(nm,axis,pillar),f=F_(8,color="444444"),al="right",wrap=True)
+        C(dic,dr,5,kpi_formula(fmt,unit,nm),f=F_(8),al="right",wrap=True)
+        C(dic,dr,6,kpi_type(nm),f=F_(8),al="center")
+        C(dic,dr,7,f"{pillar} · {project}",f=F_(8),al="right",wrap=True)
+        C(dic,dr,8,K.perspective(nm),f=F_(8),al="center")
+        C(dic,dr,9,weights[i],fmt="0%",al="center")
+        C(dic,dr,10,kpi_owner(key,axis),f=F_(8),al="center")
+        C(dic,dr,11,src,f=F_(8),al="right",wrap=True)
+        C(dic,dr,12,kpi_freq(nm,ttxt),f=F_(8),al="center")
+        C(dic,dr,13,kpi_approver(src,key),f=F_(8),al="center")
+        C(dic,dr,14,None,fillc=GREEN_IN,al="center",lock=False)  # يُدخله مالك المؤشر
+        dic.row_dimensions[dr].height=30; dr+=1; seq+=1
+dic.freeze_panes="C3"; dic.auto_filter.ref=f"A2:{get_column_letter(len(DH))}{dr-1}"
+
+# ============ مراجعة وحوكمة المؤشرات (تحليل) ============
+gov=wb.create_sheet("مراجعة وحوكمة المؤشرات"); rtl(gov)
+for i,w in enumerate([4,24,14,14,14,14,16],1): gov.column_dimensions[get_column_letter(i)].width=w
+gov.merge_cells("A1:G1"); C(gov,1,1,"مراجعة وحوكمة المؤشرات — التوازن · النوع · الأوزان · تغطية الأهداف",f=F_(13,True,WHITE),fillc=NAVY,al="center",border=False); gov.row_dimensions[1].height=24
+# تجميع إحصائي
+from collections import Counter,defaultdict
+dep_cnt=Counter(); dep_out=Counter(); dep_act=Counter(); dep_ops=Counter(); dep_wsum=defaultdict(float)
+persp_cnt=Counter(); proj_cnt=Counter()
+for dname,key,records in K.DEPARTMENTS:
+    weights=round_weights_pct(K.kpi_weights(records))
+    for i,(axis,nm,unit,pol,agg,tgt,ttxt,fmt,pillar,project) in enumerate(records):
+        dep_cnt[dname]+=1; dep_wsum[dname]+=weights[i]
+        t=kpi_type(nm)
+        if "نتيجة" in t: dep_out[dname]+=1
+        elif "نشاط" in t: dep_act[dname]+=1
+        else: dep_ops[dname]+=1
+        persp_cnt[K.perspective(nm)]+=1; proj_cnt[project]+=1
+r=3
+C(gov,r,1,"أ) لكل إدارة: العدد · مجموع الأوزان · النوع",f=F_(11,True,WHITE),fillc=ORANGE,al="center"); gov.merge_cells(start_row=r,start_column=1,end_row=r,end_column=7); r+=1
+for c,h in enumerate(["#","الإدارة","عدد المؤشرات","مجموع الأوزان","🎯 نتيجة","⚙️ نشاط","🔧 تشغيلي"],1): C(gov,r,c,h,f=F_(9,True,WHITE),fillc=BLUE,al="center")
+r+=1; s=1
+for dname,key,_ in K.DEPARTMENTS:
+    C(gov,r,1,s,f=F_(8),al="center"); C(gov,r,2,dname,f=F_(8),al="right")
+    C(gov,r,3,dep_cnt[dname],f=F_(8),al="center")
+    C(gov,r,4,round(dep_wsum[dname],2),fmt="0%",f=F_(8,True,"3FB27F" if abs(dep_wsum[dname]-1)<0.005 else "C00000"),al="center")
+    C(gov,r,5,dep_out[dname],f=F_(8),al="center"); C(gov,r,6,dep_act[dname],f=F_(8),al="center"); C(gov,r,7,dep_ops[dname],f=F_(8),al="center")
+    r+=1; s+=1
+r+=1; C(gov,r,1,"ب) توزيع منظورات Balanced Scorecard",f=F_(11,True,WHITE),fillc=ORANGE,al="center"); gov.merge_cells(start_row=r,start_column=1,end_row=r,end_column=7); r+=1
+for c,h in enumerate(["#","المنظور","عدد المؤشرات","النسبة"],1): C(gov,r,c,h,f=F_(9,True,WHITE),fillc=BLUE,al="center")
+r+=1; s=1; tot=sum(persp_cnt.values())
+for p in PERSPS:
+    C(gov,r,1,s,f=F_(8),al="center"); C(gov,r,2,p,f=F_(8),al="right"); C(gov,r,3,persp_cnt[p],f=F_(8),al="center")
+    C(gov,r,4,round(persp_cnt[p]/tot,3),fmt="0%",f=F_(8),al="center"); r+=1; s+=1
+r+=1; C(gov,r,1,"ج) تغطية الأهداف الاستراتيجية (عدد المؤشرات لكل مشروع)",f=F_(11,True,WHITE),fillc=ORANGE,al="center"); gov.merge_cells(start_row=r,start_column=1,end_row=r,end_column=7); r+=1
+for c,h in enumerate(["#","المشروع/الهدف","الركيزة","عدد المؤشرات","التغطية"],1): C(gov,r,c,h,f=F_(9,True,WHITE),fillc=BLUE,al="center")
+r+=1; s=1
+for p in K.PROJECTS:
+    n=proj_cnt.get(p,0)
+    cov="🔴 فجوة" if n==0 else ("🟡 ضعيفة" if n<3 else "🟢 كافية")
+    C(gov,r,1,s,f=F_(8),al="center"); C(gov,r,2,p,f=F_(8),al="right"); C(gov,r,3,K.PROJECT_PILLAR.get(p,""),f=F_(8),al="center")
+    C(gov,r,4,n,f=F_(8),al="center"); C(gov,r,5,cov,f=F_(8),al="center"); r+=1; s+=1
+gov.freeze_panes="A2"
 
 # ترتيب الأوراق
-order=["الاستراتيجية والمستهدفات","اللوحة الموجزة","بيانات الباوربي"]+[sh for _,sh,_,_ in DEPT_RANGES]+["سجل المشاريع","قاعدة المؤشرات"]
+order=["الاستراتيجية والمستهدفات","اللوحة الموجزة","مراجعة وحوكمة المؤشرات","بطاقة تعريف المؤشرات","بيانات الباوربي"]+[sh for _,sh,_,_ in DEPT_RANGES]+["سجل المشاريع","قاعدة المؤشرات"]
 wb._sheets.sort(key=lambda s: order.index(s.title) if s.title in order else 99)
 for s in wb.worksheets: rtl(s)
 cons.sheet_state="hidden"
