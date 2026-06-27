@@ -316,8 +316,8 @@ for dname,sh,s,e in DEPT_RANGES:
 # ============ بيانات الباوربي (جدول مسطّح بقيَم حقيقية — جاهز لـ Power BI/التحليل) ============
 # Power BI لا يعيد حساب معادلات الإكسل، لذا نوفّر نسخة مسطّحة بقيَم محسوبة مسبقاً.
 flat=wb.create_sheet("بيانات الباوربي"); rtl(flat)
-FH=["الإدارة","المحور","المؤشر","النوع","الوحدة","القطبية","الأولوية","الوزن","المستهدف","المُحقَّق","نسبة التحقيق","الحالة","الركيزة","المشروع","منظور BSC","المالك","مصدر البيانات","الدورية","خط الأساس","القيمة السابقة","التنبؤ بنهاية السنة","النمو vs الأساس","حد القبول","حد التحذير","تعليق الانحراف","الإجراء التصحيحي"]
-for i,w in enumerate([18,15,40,11,8,7,11,8,11,11,12,14,11,20,15,16,22,9,11,12,14,12,9,9,40,42],1): flat.column_dimensions[get_column_letter(i)].width=w
+FH=["الإدارة","المحور","المؤشر","النوع","الوحدة","القطبية","الأولوية","الوزن","المستهدف","المُحقَّق","نسبة التحقيق","الحالة","الركيزة","المشروع","منظور BSC","المالك","مصدر البيانات","الدورية","خط الأساس","القيمة السابقة","التنبؤ بنهاية السنة","النمو vs الأساس","حد القبول","حد التحذير","تعليق الانحراف","الإجراء التصحيحي","الحالة (نص)","ترتيب الحالة","لون الحالة"]
+for i,w in enumerate([18,15,40,11,8,7,11,8,11,11,12,14,11,20,15,16,22,9,11,12,14,12,9,9,40,42,13,11,12],1): flat.column_dimensions[get_column_letter(i)].width=w
 for c,h in enumerate(FH,1): C(flat,1,c,h,f=F_(10,True,WHITE),fillc=NAVY,al="center")
 flat.row_dimensions[1].height=26
 def ach_calc(pol,tgt,act):
@@ -330,6 +330,10 @@ def status_txt(a):
     if a>=1: return "✅ محقق"
     if a>=0.85: return "🟡 قريب"
     return "🔴 تحت الهدف"
+# أعمدة نظيفة لـ Power BI: نص بلا إيموجي + ترتيب للفرز + لون Hex للتنسيق الشرطي
+_STMAP={"✅ محقق":("محقق",1,"2EAD6B"),"🟡 قريب":("قريب",2,"F2C94C"),
+        "🔴 تحت الهدف":("تحت الهدف",3,"EB5757"),"⏳ بانتظار هدف":("بانتظار هدف",4,"BDBDBD")}
+def clean_status(st): return _STMAP.get(st,("غير محدد",5,"BDBDBD"))
 fr=2
 for dname,key,records in K.DEPARTMENTS:
     weights=round_weights_pct(K.kpi_weights(records))
@@ -370,8 +374,12 @@ for dname,key,records in K.DEPARTMENTS:
         C(flat,fr,24,yl,fmt="0%",al="center")
         C(flat,fr,25,comm,f=F_(8,color="C00000" if "تحت" in st else "9C6500"),al="right",wrap=True)
         C(flat,fr,26,actn,f=F_(8,color="444444"),al="right",wrap=True)
+        st_txt,st_ord,st_hex=clean_status(st)
+        C(flat,fr,27,st_txt,f=F_(9),al="center")
+        C(flat,fr,28,st_ord,f=F_(9),al="center")
+        C(flat,fr,29,"#"+st_hex,f=F_(8,color=st_hex),al="center")
         fr+=1
-flat.freeze_panes="D2"; flat.auto_filter.ref=f"A1:Z{fr-1}"
+flat.freeze_panes="D2"; flat.auto_filter.ref=f"A1:{get_column_letter(len(FH))}{fr-1}"
 
 # ============ بطاقة تعريف المؤشرات (قاموس البيانات — حوكمة) ============
 dic=wb.create_sheet("بطاقة تعريف المؤشرات"); rtl(dic)
