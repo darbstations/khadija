@@ -602,8 +602,55 @@ sm_header(16,NAVY,"المنظور — التعلّم والنمو (الأساس 
 sm_row(17,C_LRN,[("الاستثمار في الموظفين",pf(K.P_PEOPLE)),("التحول التقني",pf(K.P_TECH)),("إطلاق مشاريع جديدة",pf(K.P_NEW)),("التصاميم والهوية",pf(K.P_DESIGN))])
 sm.merge_cells("B19:K19"); C(sm,19,2,"القراءة من الأسفل للأعلى: تطوير الكوادر والتقنية ⟵ يُمكّن العمليات ⟵ يخلق قيمة للعملاء ⟵ يُنتج النتائج المالية",f=F_(8,False,"666666"),al="center",border=False)
 
+# ============ التتبّع الشهري (إدخال شهري · المُحقَّق يُحسب تلقائياً حسب نوع المؤشر · وتيرة) ============
+mt=wb.create_sheet("التتبّع الشهري"); rtl(mt)
+MONTHS=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"]
+AGG_AR={"SUM":"تراكمي","AVG":"معدل","LAST":"لقطة"}
+MH=["#","الإدارة","المؤشر","الدورية","التجميع","القطبية","المستهدف"]+MONTHS+["المُحقَّق (تراكمي)","نسبة التحقيق","الحالة","المتوقّع حتى الآن","الوتيرة"]
+MW=[4,15,38,9,9,7,11]+[8]*12+[13,12,13,13,14]
+for i,w in enumerate(MW,1): mt.column_dimensions[get_column_letter(i)].width=w
+last=get_column_letter(len(MH))
+mt.merge_cells(f"A1:{last}1"); C(mt,1,1,"التتبّع الشهري — أدخل رقم كل شهر · «المُحقَّق» ونسبة التحقيق والحالة والوتيرة تُحسب تلقائياً",f=F_(12,True,WHITE),fillc=NAVY,al="center",border=False); mt.row_dimensions[1].height=24
+mt.merge_cells(f"A2:{last}2"); C(mt,2,1,"🟩 خلايا الأشهر للإدخال · تراكمي=مجموع الأشهر · معدل=متوسط المُدخل · لقطة=آخر شهر · الوتيرة: 🟢 على المسار / 🟠 متأخّر مقابل المتوقّع",f=F_(8,False,NAVY),fillc=GOLD,al="center",border=False); mt.row_dimensions[2].height=18
+for c,h in enumerate(MH,1): C(mt,3,c,h,f=F_(8,True,WHITE),fillc=BLUE,al="center")
+mt.row_dimensions[3].height=30
+M1=get_column_letter(8); M12=get_column_letter(19)   # نطاق الأشهر H..S
+mr=4
+for dname,key,records in K.DEPARTMENTS:
+    for (axis,nm,unit,pol,agg,tgt,ttxt,fmt,pillar,project) in records:
+        rng=f"${M1}{mr}:${M12}{mr}"; gr,yl=thresholds(nm)
+        C(mt,mr,1,mr-3,f=F_(8,True),al="center")
+        C(mt,mr,2,dname,f=F_(8),al="right")
+        C(mt,mr,3,nm,f=F_(8),al="right",wrap=True)
+        C(mt,mr,4,kpi_freq(nm,ttxt),f=F_(8),al="center")
+        C(mt,mr,5,AGG_AR.get(agg,agg),f=F_(8),al="center")
+        C(mt,mr,6,pol,al="center")
+        C(mt,mr,7,tgt if tgt is not None else None,fmt=FMT[fmt] if tgt is not None else None,al="center")
+        for mc in range(8,20): C(mt,mr,mc,None,fillc=GREEN_IN,fmt=FMT[fmt],al="center",lock=False)  # إدخال
+        # المُحقَّق (تراكمي) — حسب نوع التجميع
+        if agg=="SUM":   ytd=f'=IF(COUNT({rng})=0,"",SUM({rng}))'
+        elif agg=="AVG": ytd=f'=IF(COUNT({rng})=0,"",SUM({rng})/COUNT({rng}))'
+        else:            ytd=f'=IFERROR(LOOKUP(2,1/({rng}<>""),{rng}),"")'   # LAST
+        mt.cell(mr,20).value=ytd; C(mt,mr,20,f=F_(8,True,NAVY),fmt=FMT[fmt],al="center")
+        # نسبة التحقيق (سقف 100% + قطبية) — G=المستهدف · T=المُحقَّق · F=القطبية
+        mt.cell(mr,21).value=(f'=IF($G{mr}="","",IF($T{mr}="","",MIN(1,IF($G{mr}=0,IF($T{mr}<=0,1,0),'
+            f'IF($F{mr}="↓",IFERROR($G{mr}/$T{mr},0),IFERROR($T{mr}/$G{mr},0))))))')
+        C(mt,mr,21,f=F_(8,True,NAVY),fmt="0%",al="center")
+        mt.cell(mr,22).value=f'=IF($U{mr}="","⏳ بانتظار هدف",IF($U{mr}>={gr},"✅ محقق",IF($U{mr}>={yl},"🟡 قريب","🔴 تحت الهدف")))'
+        C(mt,mr,22,f=F_(8,True),al="center")
+        # المتوقّع حتى الآن: تراكمي يتناسب مع الأشهر المُدخلة · غيره = المستهدف
+        if agg=="SUM": mt.cell(mr,23).value=f'=IF($G{mr}="","",$G{mr}*COUNT({rng})/12)'
+        else:          mt.cell(mr,23).value=f'=IF($G{mr}="","",$G{mr})'
+        C(mt,mr,23,fmt=FMT[fmt],al="center",f=F_(8,color="666666"))
+        # الوتيرة: تراكمي يقارن النسبة بنسبة الأشهر المنقضية · غيره بعتبة القرب
+        if agg=="SUM": mt.cell(mr,24).value=f'=IF($U{mr}="","—",IF($U{mr}>=COUNT({rng})/12,"🟢 على المسار","🟠 متأخّر"))'
+        else:          mt.cell(mr,24).value=f'=IF($U{mr}="","—",IF($U{mr}>={yl},"🟢 على المسار","🟠 متأخّر"))'
+        C(mt,mr,24,f=F_(8,True),al="center")
+        mt.row_dimensions[mr].height=22; mr+=1
+mt.freeze_panes="H4"; mt.auto_filter.ref=f"A3:{last}{mr-1}"
+
 # ترتيب الأوراق
-order=["تقرير المجلس","الاستراتيجية والمستهدفات","الخريطة الاستراتيجية","اللوحة الموجزة","تحليل الانحراف","سجل المخاطر","ESG والاستدامة","مراجعة وحوكمة المؤشرات","بطاقة تعريف المؤشرات","بيانات الباوربي"]+[sh for _,sh,_,_ in DEPT_RANGES]+["سجل المشاريع","قاعدة المؤشرات"]
+order=["تقرير المجلس","الاستراتيجية والمستهدفات","الخريطة الاستراتيجية","اللوحة الموجزة","تحليل الانحراف","التتبّع الشهري","سجل المخاطر","ESG والاستدامة","مراجعة وحوكمة المؤشرات","بطاقة تعريف المؤشرات","بيانات الباوربي"]+[sh for _,sh,_,_ in DEPT_RANGES]+["سجل المشاريع","قاعدة المؤشرات"]
 wb._sheets.sort(key=lambda s: order.index(s.title) if s.title in order else 99)
 for s in wb.worksheets: rtl(s)
 cons.sheet_state="hidden"
