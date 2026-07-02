@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تحليل الأنشطة التجارية في المستشفيات (مع الأسماء) — ساحة درب</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#1E2227;--muted:#61696F;--bg:#F5F4F1;--card:#fff;--line:#E2E0D9;--gold:#C8862F;--navy:#20313c;
+    --core:#4F8F6D;--common:#3E7191;--emerg:#C8862F;--prem:#9C5A8C;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Tajawal','Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;padding:34px 18px 70px}
+  .wrap{max-width:1200px;margin:0 auto}
+  header.top{border-bottom:3px solid var(--gold);padding-bottom:15px;margin-bottom:22px}
+  .ey{color:var(--gold);font-weight:800;font-size:13px;letter-spacing:.5px}
+  h1{font-size:clamp(20px,2.9vw,31px);font-weight:900;color:#171b20;margin:4px 0}
+  .sub{color:var(--muted);font-size:14px;font-weight:500}
+  .model{background:#EAF1F4;border-right:5px solid var(--common);border-radius:10px;padding:12px 16px;font-size:13.5px;font-weight:600;color:#26424f;margin:16px 0}
+  .model b{color:#15303b}
+  h2{font-size:clamp(16px,2.2vw,21px);font-weight:900;margin:30px 0 12px;color:#171b20;display:flex;align-items:center;gap:10px}
+  h2::before{content:"";width:6px;height:21px;background:var(--gold);border-radius:3px}
+  .meth{font-size:12.5px;color:var(--muted);background:#EDEBE4;border-radius:9px;padding:10px 14px;font-weight:500}
+  .meth b{color:#3a4148}
+
+  .legend{display:flex;flex-wrap:wrap;gap:7px 15px;margin:8px 0}
+  .lg{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#3a4148}
+  .bd{font-size:10px;font-weight:900;color:#fff;border-radius:20px;padding:2px 9px;white-space:nowrap}
+  .b-core{background:var(--core)} .b-common{background:var(--common)} .b-emerg{background:var(--emerg)} .b-prem{background:var(--prem)}
+
+  table{width:100%;border-collapse:collapse;background:var(--card);border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(30,40,50,.06);font-size:13px}
+  th{background:var(--navy);color:#fff;font-weight:800;padding:10px 11px;text-align:right;font-size:12.5px;position:sticky;top:0}
+  td{padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.5}
+  tr:nth-child(even) td{background:#FAFAF8}
+  td .act{font-weight:900;color:#171b20;font-size:13.5px}
+  td .kamc{display:inline-block;background:#FBF3E0;color:#8a6620;font-weight:800;font-size:10.5px;border-radius:5px;padding:1px 6px;margin-top:4px}
+  .names{color:#33393f;font-weight:600}
+  .names .g{color:var(--muted);font-weight:500}
+  .serve{font-size:11.5px;color:var(--muted);font-weight:600}
+  .fmt{font-size:11.5px;color:#3a4148;font-weight:600}
+
+  .tiers{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:6px}
+  .tier{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:12px 14px;border-top:4px solid var(--gold)}
+  .tier h3{font-size:14px;font-weight:900;margin-bottom:5px}
+  .tier ul{list-style:none;font-size:12px;color:#3a4148;font-weight:600;display:flex;flex-direction:column;gap:3px}
+  .tier li::before{content:"• ";color:var(--gold);font-weight:900}
+  .tier.t1{border-top-color:var(--core)} .tier.t2{border-top-color:var(--common)} .tier.t3{border-top-color:var(--emerg)} .tier.t4{border-top-color:var(--prem)}
+
+  .kbox{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 22px;margin-top:4px}
+  .kbox li{margin:11px 0;font-size:13.5px;font-weight:500;color:#3a4148}
+  .kbox li b{color:#171b20}
+  footer{margin-top:28px;font-size:11.5px;color:#98a0a6;border-top:1px solid var(--line);padding-top:12px}
+  @media(max-width:820px){.tiers{grid-template-columns:1fr 1fr} table{font-size:12px} .serve{display:none}}
+  @media print{@page{size:A4 landscape;margin:10mm}body{background:#fff;padding:0}th{position:static}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="ey">ساحة درب · Darb Plaza — تحليل تمهيدي</div>
+    <h1>تحليل الأنشطة التجارية الموجودة في المستشفيات <span style="color:var(--gold)">— مع الأسماء</span></h1>
+    <div class="sub">مرجع لاختيار الأنشطة التي تُصمَّم لها المساحات وتُسوَّق للمستأجرين — مدينة الملك عبدالله الطبية، مكة المكرمة</div>
+  </header>
+
+  <div class="model">
+    <b>نموذج العمل:</b> أنت <b>مطوّر/مؤجّر الموقع</b> — تستلم المساحات من المدينة الطبية، <b>تصمّمها</b>، ثم تسوّقها وتؤجّرها لهذه الأنشطة (المستأجر يشغّل نشاطه). هذا التحليل يجيب سؤالين: <b>ما الأنشطة التي تعيش فعلاً داخل المستشفيات؟</b> و<b>مَن أمثلتها المسمّاة؟</b> — قبل أي اقتراح.
+  </div>
+
+  <div class="meth">
+    <b>المصادر (حضور مؤكَّد):</b> الأنشطة القائمة في مدينة الملك عبدالله الطبية نفسها (من خطتكم الخمسية) · Dr. CAFE بالطابق الأرضي في مستشفى الملك فيصل التخصصي · Starbucks و Au Bon Pain وصيدلية ومتجر هدايا في Cleveland Clinic (مبنى Crile) · صيدليات النهدي/الدواء/دلة · تعميم وزارة الصحة بمنع إدخال الأطعمة الخارجية (يُسمح بالماء/الشاي/القهوة فقط).
+  </div>
+
+  <h2>مصفوفة الأنشطة</h2>
+  <div class="legend">
+    <span class="lg"><span class="bd b-core">أساسي</span> يوجد في كل مستشفى تقريباً</span>
+    <span class="lg"><span class="bd b-common">شائع</span> منتشر</span>
+    <span class="lg"><span class="bd b-emerg">ناشئ</span> فرصة نمو</span>
+    <span class="lg"><span class="bd b-prem">راقٍ</span> في المدن الطبية الكبرى</span>
+  </div>
+
+  <table>
+    <thead><tr><th style="width:17%">النشاط</th><th style="width:8%">الانتشار</th><th style="width:40%">أمثلة مسمّاة (سعودي · عالمي)</th><th style="width:12%">يخدم</th><th style="width:23%">صيغة المساحة</th></tr></thead>
+    <tbody>
+      <tr><td><span class="act">مقاهي القهوة</span><br><span class="kamc">لديكم: قهوة الأمراء · بون</span></td><td><span class="bd b-core">أساسي</span></td><td class="names">Dr. CAFE (م. الملك فيصل التخصصي) · Dunkin · Costa · بارنز · Java Time <span class="g">| عالمياً: Starbucks · Au Bon Pain (Cleveland)</span></td><td class="serve">كادر · زوّار</td><td class="fmt">كشك 15–60م² · مقهى بجلوس</td></tr>
+
+      <tr><td><span class="act">الكافتيريا / التموين الرئيسي</span><br><span class="kamc">لديكم: كافتيريا</span></td><td><span class="bd b-core">أساسي</span></td><td class="names">شركات تموين صحي متخصصة <span class="g">| عالمياً: Sodexo · Aramark · Morrison</span></td><td class="serve">مرضى · كادر</td><td class="fmt">مطبخ + صالة كبيرة</td></tr>
+
+      <tr><td><span class="act">المطاعم السريعة / فود كورت</span></td><td><span class="bd b-common">شائع</span></td><td class="names">كودو · هرفي · ماكدونالدز · صب واي · شاورمر · طازج <span class="g">| عالمياً: Crile Food Emporium (Cleveland)</span></td><td class="serve">زوّار · كادر</td><td class="fmt">وحدات 20–50م² + جلوس مشترك</td></tr>
+
+      <tr><td><span class="act">المخابز والحلويات</span></td><td><span class="bd b-common">شائع</span></td><td class="names">Cinnabon · Krispy Kreme · أنوش <span class="g">| عالمياً: Au Bon Pain</span></td><td class="serve">زوّار · أطفال</td><td class="fmt">كشك 10–25م²</td></tr>
+
+      <tr><td><span class="act">العصائر والوجبات الصحية</span></td><td><span class="bd b-emerg">ناشئ</span></td><td class="names">Fresh House · بار عصائر طازجة <span class="g">| فرصة تمايز تتماشى مع استراتيجية الغذاء الصحي</span></td><td class="serve">كادر · حِميات</td><td class="fmt">كشك 12–30م²</td></tr>
+
+      <tr><td><span class="act">الصيدلية</span></td><td><span class="bd b-core">أساسي</span></td><td class="names">النهدي · الدواء · صيدلية دلة/المستشفى <span class="g">| عالمياً: Cleveland Clinic Pharmacy</span></td><td class="serve">مرضى · زوّار</td><td class="fmt">محل 30–80م²</td></tr>
+
+      <tr><td><span class="act">التسوق السريع / بقالة راحة</span><br><span class="kamc">لديكم: متجر ماركت</span></td><td><span class="bd b-common">شائع</span></td><td class="names">بقالة راحة (مياه/مناديل/شواحن/مستلزمات مبيت) <span class="g">| عالمياً: أكشاك convenience داخل اللوبيات</span></td><td class="serve">زوّار · مرافقون</td><td class="fmt">محل 25–60م² · 24/7</td></tr>
+
+      <tr><td><span class="act">الورد والهدايا</span></td><td><span class="bd b-common">شائع</span></td><td class="names">محلات ورد · Floward (توصيل) <span class="g">| عالمياً: Gift Shop (دباديب/حلوى/بطاقات/ورد) — Cleveland</span></td><td class="serve">زوّار</td><td class="fmt">كشك/محل 15–40م² قرب المخارج</td></tr>
+
+      <tr><td><span class="act">الشوكولاتة والتمور (إهداء)</span></td><td><span class="bd b-prem">راقٍ</span></td><td class="names">Patchi · Bateel (تمور) · ركن تمور محلي <span class="g">| مناسب لسياق مكة والإهداء للمريض</span></td><td class="serve">زوّار</td><td class="fmt">كشك 10–25م²</td></tr>
+
+      <tr><td><span class="act">مراكز الاتصالات</span><br><span class="kamc">لديكم: زين</span></td><td><span class="bd b-common">شائع</span></td><td class="names">STC · Mobily · Zain <span class="g">| شرائح واشتراكات — مهم للمعتمرين الأجانب</span></td><td class="serve">زوّار · كادر</td><td class="fmt">كشك 8–20م²</td></tr>
+
+      <tr><td><span class="act">البنوك والصرافات الآلية</span><br><span class="kamc">لديكم: صراف آلي</span></td><td><span class="bd b-core">أساسي</span></td><td class="names">الراجحي · الأهلي · صرافات متعددة البنوك <span class="g">| عالمياً: ATM/فرع مصغّر</span></td><td class="serve">الجميع</td><td class="fmt">جدار صرافات / كشك</td></tr>
+
+      <tr><td><span class="act">البصريات / النظارات</span></td><td><span class="bd b-common">شائع</span></td><td class="names">محلات نظارات (مرتبطة بعيادات العيون) <span class="g">| مثل: النظارات، مغربي بصريات</span></td><td class="serve">مرضى</td><td class="fmt">محل 20–50م²</td></tr>
+
+      <tr><td><span class="act">المستلزمات والأجهزة الطبية</span></td><td><span class="bd b-emerg">متخصص</span></td><td class="names">مستلزمات منزلية طبية · دعامات · كراسي متحركة <span class="g">| مرتبط بأقسام التأهيل</span></td><td class="serve">مرضى · مرافقون</td><td class="fmt">محل 30–70م²</td></tr>
+
+      <tr><td><span class="act">مكائن البيع الذاتي</span><br><span class="kamc">لديكم: مكائن بيع ذاتي</span></td><td><span class="bd b-core">أساسي</span></td><td class="names">غذاء/مشروبات · عناية شخصية · مستلزمات صيدلانية · ورود <span class="g">| تغطية الليل والطوارئ 24/7</span></td><td class="serve">الجميع</td><td class="fmt">موزّعة في الأروقة</td></tr>
+
+      <tr><td><span class="act">خدمات مساندة</span></td><td><span class="bd b-emerg">متفاوت</span></td><td class="names">مغسلة/تنظيف جاف · حلاق · قرطاسية/مكتبة · خياطة <span class="g">| تكثر في المدن الطبية الكبيرة</span></td><td class="serve">كادر · مرافقون</td><td class="fmt">محل صغير 15–35م²</td></tr>
+
+      <tr><td><span class="act">إقامة وراحة راقية</span></td><td><span class="bd b-prem">راقٍ</span></td><td class="names">أجنحة مرافقين/فندق · صالات انتظار مدفوعة · حضانة أطفال <span class="g">| في المدن الطبية الرائدة</span></td><td class="serve">مرافقون</td><td class="fmt">مساحات كبيرة</td></tr>
+    </tbody>
+  </table>
+
+  <h2>تصنيف الأنشطة حسب أولوية التأجير</h2>
+  <div class="tiers">
+    <div class="tier t1"><h3>أساسي — يؤجَّر أولاً</h3><ul><li>مقاهي القهوة</li><li>فود كورت</li><li>صيدلية</li><li>صرافات آلية</li><li>مكائن بيع ذاتي</li></ul></div>
+    <div class="tier t2"><h3>شائع — طلب مؤكّد</h3><ul><li>بقالة راحة 24/7</li><li>ورد وهدايا</li><li>اتصالات</li><li>مخابز/حلويات</li><li>بصريات</li></ul></div>
+    <div class="tier t3"><h3>ناشئ — تمايز</h3><ul><li>وجبات صحية/عصائر</li><li>مستلزمات طبية</li><li>خدمات مساندة</li></ul></div>
+    <div class="tier t4"><h3>راقٍ — قيمة عالية</h3><ul><li>شوكولاتة وتمور</li><li>أجنحة/صالات مرافقين</li><li>حضانة أطفال</li></ul></div>
+  </div>
+
+  <h2>ماذا يعني هذا لموقعك (مدينة الملك عبدالله الطبية)</h2>
+  <ul class="kbox">
+    <li><b>عندكم أصلاً منظومة أنشطة قائمة:</b> قهوة الأمراء · بون · كافتيريا · متجر ماركت · زين · صراف آلي · مكائن بيع ذاتي — فالمطلوب <b>ترقيتها وتوسيع مزيجها</b>، لا البدء من صفر.</li>
+    <li><b>الجمهور أسير</b> (منع الطعام الخارجي) → يبرّر تنوّعاً كافياً من فئة «أساسي» + «شائع» في البوليفارد.</li>
+    <li><b>سياق مكة</b> (ضيوف الرحمن · مرافقون كُثُر · 24/7) يرفع قيمة: بقالة راحة 24/7 · ورد وهدايا · تمور/شوكولاتة · اتصالات للأجانب.</li>
+    <li><b>الخطوة التالية (بعد اعتماد هذا التحليل):</b> نختار الأنشطة المستهدفة لكل مساحة، ثم <b>نصمّم المساحات</b> ونُخرج <b>كتيّب تأجير (Leasing Brochure)</b> يُرسَل للأنشطة لاستقطابها كمستأجرين.</li>
+  </ul>
+
+  <footer>ساحة درب · Darb Plaza — تحليل تمهيدي للأنشطة في المستشفيات. الانتشار وصيغ المساحات تقديرية إرشادية تُضبط بمخطط المباني الفعلي. المصادر مذكورة أعلى الصفحة.</footer>
+</div>
+</body>
+</html>
