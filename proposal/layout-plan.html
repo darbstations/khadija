@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مخطط توزيع المنافذ — البوليفارد ومساحات مدينة الملك عبدالله الطبية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1E2227; --muted:#61696F; --bg:#F5F4F1; --card:#fff; --line:#E2E0D9;
+    --gold:#C8862F;
+    --coffee:#8A6D3B; --food:#C0553F; --healthy:#4F8F6D; --hosp:#C8862F;
+    --gift:#9C5A8C; --serv:#3E7191; --plaza:#9AA1A8; --bldg:#2B2F36;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Tajawal','Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;padding:34px 20px 70px}
+  .wrap{max-width:1180px;margin:0 auto}
+  header.top{border-bottom:3px solid var(--gold);padding-bottom:16px;margin-bottom:26px}
+  .ey{color:var(--gold);font-weight:800;font-size:13px;letter-spacing:.5px}
+  h1{font-size:clamp(21px,3vw,32px);font-weight:900;color:#171b20;margin:4px 0}
+  .sub{color:var(--muted);font-size:14px;font-weight:500}
+  h2{font-size:clamp(16px,2.2vw,22px);font-weight:900;margin:34px 0 14px;color:#171b20;display:flex;align-items:center;gap:10px}
+  h2::before{content:"";width:6px;height:22px;background:var(--gold);border-radius:3px}
+  .note-ministry{background:#FBF3E0;border-right:5px solid var(--gold);border-radius:10px;padding:13px 16px;font-size:14px;font-weight:600;color:#5b4a22;margin-bottom:8px}
+
+  /* legend */
+  .legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin:6px 0 4px}
+  .lg{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#3a4148}
+  .dot{width:13px;height:13px;border-radius:4px;flex:none}
+
+  /* boulevard schematic */
+  .promenade{background:#EDEBE4;border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:6px;overflow-x:auto}
+  .rowlabel{display:flex;justify-content:space-between;font-size:11.5px;font-weight:800;color:var(--muted);margin-bottom:8px;padding:0 2px}
+  .flow{display:flex;gap:9px;align-items:stretch;min-width:920px}
+  .zone{flex:1;background:var(--card);border-radius:11px;border-top:5px solid var(--plaza);padding:11px 11px 12px;box-shadow:0 3px 8px rgba(30,40,50,.06);display:flex;flex-direction:column;min-width:112px}
+  .zone .zt{font-weight:900;font-size:13px;margin-bottom:3px;line-height:1.3}
+  .zone .zf{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:8px;line-height:1.4}
+  .zone ul{list-style:none;margin-top:auto;display:flex;flex-direction:column;gap:4px}
+  .zone li{font-size:11.5px;font-weight:700;background:#F4F2EC;border-radius:6px;padding:3px 7px;color:#33393f}
+  .endcap{flex:0 0 88px;background:var(--bldg);color:#fff;border-radius:11px;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:800;font-size:12px;padding:10px;min-width:88px;line-height:1.4}
+  .c-coffee{border-top-color:var(--coffee)} .c-food{border-top-color:var(--food)}
+  .c-healthy{border-top-color:var(--healthy)} .c-hosp{border-top-color:var(--hosp)}
+  .c-gift{border-top-color:var(--gift)} .c-serv{border-top-color:var(--serv)} .c-plaza{border-top-color:var(--plaza)}
+
+  .strips{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;min-width:920px}
+  .strip{border-radius:9px;padding:9px 13px;font-size:12.5px;font-weight:700}
+  .strip.fast{background:#E7EEF3;color:#2b5670;border-right:4px solid var(--serv)}
+  .strip.dist{background:#EDECF2;color:#4a3f5e;border-right:4px solid var(--gift)}
+
+  /* mini plans */
+  .mini{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .mcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px 17px}
+  .mcard h3{font-size:15px;font-weight:900;margin-bottom:6px}
+  .mcard p{font-size:13px;color:#4a5157;font-weight:500}
+  .tag{display:inline-block;background:#F0EEE7;border-radius:20px;padding:2px 10px;font-size:11.5px;font-weight:800;color:#5b4a22;margin:5px 5px 0 0}
+
+  /* principles */
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .p{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:13px 14px;border-top:4px solid var(--gold)}
+  .p b{display:block;font-size:14px;margin-bottom:4px;color:#171b20}
+  .p span{font-size:12px;color:var(--muted);font-weight:500}
+
+  /* adjacency */
+  .adj{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 20px}
+  .adj li{margin:11px 0;font-size:13.5px;font-weight:500;color:#3a4148}
+  .adj li b{color:#171b20}
+
+  footer{margin-top:30px;font-size:11.5px;color:#98a0a6;border-top:1px solid var(--line);padding-top:12px}
+  @media(max-width:720px){.mini,.grid4,.strips{grid-template-columns:1fr}}
+  @media print{@page{size:A4 landscape;margin:12mm} body{background:#fff;padding:0} .promenade{overflow:visible}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="ey">ساحة درب · Darb Plaza — مخطط تشغيلي</div>
+    <h1>مخطط توزيع المنافذ على مساحات مدينة الملك عبدالله الطبية</h1>
+    <div class="sub">توزيع مبني على العلامات ذات الحضور الفعلي في المستشفيات + منطق تدفق ومبادئ تصميم للبيئة الطبية — مكة المكرمة</div>
+  </header>
+
+  <div class="note-ministry">⚕️ محكوم بقاعدة وزارة الصحة: يُمنع إدخال طعام خارجي (يُسمح بالماء والشاي والقهوة فقط) → جمهور أسير يتطلّب <b>تنوّعاً كافياً</b> و<b>تشغيلاً 24/7</b> جزئياً.</div>
+
+  <h2>البوليفارد — المرساة (بين المستشفى التخصصي والعيادات الخارجية)</h2>
+  <div class="legend">
+    <span class="lg"><span class="dot" style="background:var(--coffee)"></span>قهوة ومخبوزات</span>
+    <span class="lg"><span class="dot" style="background:var(--food)"></span>مطاعم سريعة</span>
+    <span class="lg"><span class="dot" style="background:var(--healthy)"></span>صحي</span>
+    <span class="lg"><span class="dot" style="background:var(--hosp)"></span>ضيافة عربية</span>
+    <span class="lg"><span class="dot" style="background:var(--gift)"></span>هدايا الزوّار</span>
+    <span class="lg"><span class="dot" style="background:var(--serv)"></span>خدمات</span>
+    <span class="lg"><span class="dot" style="background:var(--plaza)"></span>ساحة/جلوس</span>
+  </div>
+
+  <div class="promenade">
+    <div class="rowlabel"><span>← جهة المستشفى التخصصي</span><span>اتجاه المشي على طول الممشى</span><span>جهة العيادات الخارجية →</span></div>
+    <div class="flow">
+      <div class="endcap">مدخل المستشفى التخصصي</div>
+
+      <div class="zone c-coffee">
+        <div class="zt">مرساة القهوة والترحيب</div>
+        <div class="zf">رائحة ترحيبية خفيفة عند المدخل + دخل متكرر</div>
+        <ul><li>Dr. CAFE</li><li>Cinnabon</li></ul>
+      </div>
+
+      <div class="zone c-plaza">
+        <div class="zt">الساحة العائلية + ركن الأطفال</div>
+        <div class="zf">قلب الجلوس — مقاعد مريحة ومسارات واسعة</div>
+        <ul><li>جلوس عائلي</li><li>Kids Area</li></ul>
+      </div>
+
+      <div class="zone c-food">
+        <div class="zt">صف المطاعم السريعة</div>
+        <div class="zf">فود كورت — أسعار اقتصادية للكادر والعوائل</div>
+        <ul><li>كودو / هرفي</li><li>شاورمر</li><li>Subway</li></ul>
+      </div>
+
+      <div class="zone c-healthy">
+        <div class="zt">الركن الصحي</div>
+        <div class="zf">جلوس أهدأ + تصميم أخضر (biophilic)</div>
+        <ul><li>Fresh House</li><li>بار عصائر</li></ul>
+      </div>
+
+      <div class="zone c-hosp">
+        <div class="zt">ركن الضيافة العربية</div>
+        <div class="zf">هوية «درب» — قهوة وتمر (تشغيل ذاتي)</div>
+        <ul><li>قهوة عربية</li><li>تمور</li></ul>
+      </div>
+
+      <div class="zone c-gift">
+        <div class="zt">عنقود الهدايا والخدمات</div>
+        <div class="zf">عند مخرج العيادات — دوران سريع وهامش عالٍ</div>
+        <ul><li>ورد + بالونات</li><li>باتشي / Bateel</li><li>صيدلية النهدي</li></ul>
+      </div>
+
+      <div class="endcap">مدخل العيادات الخارجية</div>
+    </div>
+
+    <div class="strips">
+      <div class="strip fast">▶ مسار سريع محاذٍ: أكشاك جراب-آند-قو + خزائن استلام الطلب المسبق (Pickup)</div>
+      <div class="strip dist">◆ موزّع على طول الممشى: مكائن بيع ذاتي 24/7 · دورات مياه · اتجاه المصلى · مقاعد ذوي الإعاقة</div>
+    </div>
+  </div>
+
+  <h2>المساحات الأخرى</h2>
+  <div class="mini">
+    <div class="mcard">
+      <h3>مقهى مبنى العيادات الخارجية</h3>
+      <p>قهوة هادئة ووجبات خفيفة لتحسين تجربة الانتظار، مع شاشة دور تُشعِر المراجع بحركة الطابور.</p>
+      <span class="tag">Dr. CAFE</span><span class="tag">Costa</span><span class="tag">بارنز</span><span class="tag">شاشة دور</span>
+    </div>
+    <div class="mcard">
+      <h3>المداخل / المواقف + البيع الذاتي</h3>
+      <p>التقاط الحركة عند نقاط الوصول والخروج، وتغطية الليل والطوارئ حيث لا يصل المنفذ البشري.</p>
+      <span class="tag">كشك قهوة سريع</span><span class="tag">بقالة راحة 24/7</span><span class="tag">ورد سريع</span><span class="tag">مكائن ذاتية</span>
+    </div>
+  </div>
+
+  <h2>مبادئ التصميم للبيئة الطبية</h2>
+  <div class="grid4">
+    <div class="p"><b>فصل التدفق</b><span>مسار سريع (كادر) منفصل عن مسار الجلوس (زوّار/عوائل).</span></div>
+    <div class="p"><b>إدارة الروائح</b><span>مطابخ خفيفة قرب المداخل الطبية؛ المقالي بتهوية مخصّصة وبعيدة عن المرضى.</span></div>
+    <div class="p"><b>مكافحة العدوى</b><span>أسطح سهلة التنظيف · فصل مسار النفايات · معقّمات في كل ركن.</span></div>
+    <div class="p"><b>وصول شامل</b><span>مسارات واسعة للكراسي المتحركة والأسرّة · مقاعد بارتفاعات متنوّعة.</span></div>
+    <div class="p"><b>إرشاد ثنائي اللغة</b><span>عربي/إنجليزي واضح للمعتمرين والزوّار من كل الجنسيات.</span></div>
+    <div class="p"><b>قرب المرافق</b><span>محاذاة المصلى ودورات المياه ومناطق الانتظار في التوزيع.</span></div>
+    <div class="p"><b>تشغيل 24/7</b><span>جزء دائم مفتوح: قهوة + بقالة راحة + بيع ذاتي (للمرافقين والكادر ليلاً).</span></div>
+    <div class="p"><b>تصميم شافٍ</b><span>خضرة وإضاءة دافئة وهدوء في الركن الصحي لتخفيف التوتر.</span></div>
+  </div>
+
+  <h2>منطق التجاور (لماذا هذا الترتيب)</h2>
+  <ul class="adj">
+    <li><b>القهوة عند المدخل:</b> رائحة ترحيبية وجذب فوري ودخل متكرر للكادر الداخل/الخارج.</li>
+    <li><b>الساحة العائلية في المنتصف:</b> تفصل بين الأركان وتُطيل زمن البقاء (dwell) دون ازدحام على المنافذ.</li>
+    <li><b>الركن الصحي بعيد عن روائح المقالي:</b> بيئة أهدأ تناسب الكادر والمرضى بالحمية.</li>
+    <li><b>عنقود الهدايا عند مخرج العيادات:</b> الزائر يشتري الورد/الشوكولاتة/التمر وهو خارج لزيارة المريض — أعلى نية شراء.</li>
+    <li><b>الصيدلية ملاصقة للهدايا:</b> تجمّع «ما قبل زيارة المريض» في نقطة واحدة مريحة.</li>
+    <li><b>المسار السريع محاذٍ:</b> يخدم الكادر المستعجل دون أن يعطّل جلوس العوائل.</li>
+  </ul>
+
+  <footer>ساحة درب · Darb Plaza — مخطط تشغيلي مبدئي لمدينة الملك عبدالله الطبية (مكة). العلامات مقترحة حسب ملاءمة الفئة والحضور المؤسسي؛ تُثبَّت المساحات والمقاسات بعد استلام مخطط المباني الفعلي.</footer>
+</div>
+</body>
+</html>
