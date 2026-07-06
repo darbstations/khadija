@@ -53,7 +53,10 @@ def round_weights_pct(weights):
         elif floor[idx]>1: floor[idx]-=1; diff+=1
         i+=1
     return [f/100 for f in floor]
-def kpi_source(nm,axis):
+def kpi_source(nm,axis,key=None):
+    # مصدر القياس حسب الإدارة أولاً (للإدارتين الجديدتين ذات النظام المتخصّص)
+    if key=="supplychain": return "نظام سلاسل الإمداد والمخزون (WMS/ERP)"
+    if key=="projects":    return "نظام إدارة المشاريع (PMO/Primavera)"
     t=nm+" "+axis
     for kws,src in [
      (["إيراد","ربح","هامش","تحصيل","DSO","سداد","موازنة","تدفق","نقدي","العائد","ROE","مستحق","مورد","تدقيق","ميزاني","دين","ذمم","إقفال"],"نظام المحاسبة / ERP (D365)"),
@@ -147,8 +150,8 @@ def logo(ws,anchor="B1",w=150):
 
 # ============ جداول الإدارات (كل إدارة ورقة مستقلة) ============
 # أعمدة: A# B محور C مؤشر D وحدة E قطبية F أولوية G وزن% H مستهدف I نص المستهدف J ركيزة K مشروع L منظور M المُحقَّق N نسبة التحقيق O الحالة
-HEAD=["#","المحور","المؤشر","الوحدة","القطبية","الأولوية","الوزن %","المستهدف","نص المستهدف","الركيزة","المشروع","منظور BSC","المُحقَّق","نسبة التحقيق","الحالة"]
-WID=[4,16,40,9,7,12,8,12,16,12,22,15,12,12,14]
+HEAD=["#","المحور","المؤشر","الوحدة","القطبية","الأولوية","الوزن %","المستهدف","نص المستهدف","الركيزة","المشروع","منظور BSC","المُحقَّق","نسبة التحقيق","الحالة","مصدر القياس"]
+WID=[4,16,40,9,7,12,8,12,16,12,22,15,12,12,14,28]
 DEPT_RANGES=[]
 def safe_title(name): return name[:31]
 for dname,key,records in K.DEPARTMENTS:
@@ -185,6 +188,7 @@ for dname,key,records in K.DEPARTMENTS:
         _gr,_yl=thresholds(nm)   # حدود تنبيه مخصّصة لكل مؤشر
         ws.cell(r,15).value=f'=IF($N{r}="","⏳ بانتظار هدف",IF($N{r}>={_gr},"✅ محقق",IF($N{r}>={_yl},"🟡 قريب","🔴 تحت الهدف")))'
         C(ws,r,15,f=F_(9,True),al="center")
+        C(ws,r,16,kpi_source(nm,axis,key),f=F_(8,color="555555"),al="right",wrap=True)  # مصدر القياس
         ws.row_dimensions[r].height=24
     end=start+len(records)-1
     ws.auto_filter.ref=f"A3:{last}{end}"
@@ -339,7 +343,7 @@ fr=2
 for dname,key,records in K.DEPARTMENTS:
     weights=round_weights_pct(K.kpi_weights(records))
     for i,(axis,nm,unit,pol,agg,tgt,ttxt,fmt,pillar,project) in enumerate(records):
-        act=eff_actual(nm,pol,tgt); a=ach_calc(pol,tgt,act); src=kpi_source(nm,axis)
+        act=eff_actual(nm,pol,tgt); a=ach_calc(pol,tgt,act); src=kpi_source(nm,axis,key)
         st=status_of(a,nm); gr,yl=thresholds(nm)
         base=baseline_of(nm,pol,act); prev=previous_of(act,base); fc=forecast_of(agg,act); gvb=growth_vs_base(act,base)
         if a is None or "محقق" in st: comm,actn="",""
@@ -393,7 +397,7 @@ dr=3; seq=1
 for dname,key,records in K.DEPARTMENTS:
     weights=round_weights_pct(K.kpi_weights(records))
     for i,(axis,nm,unit,pol,agg,tgt,ttxt,fmt,pillar,project) in enumerate(records):
-        src=kpi_source(nm,axis)
+        src=kpi_source(nm,axis,key)
         C(dic,dr,1,seq,f=F_(8),al="center")
         C(dic,dr,2,dname,f=F_(8),al="right")
         C(dic,dr,3,nm,f=F_(9),al="right",wrap=True)
