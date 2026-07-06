@@ -37,7 +37,8 @@ def prio_label(nm): return "🏁 معلم" if is_milestone(nm) else K.priority_l
 MGR_TITLE={"exec":"الرئيس التنفيذي","franchise":"مدير الامتياز","operations":"مدير التشغيل",
  "investment":"مدير الاستثمار","realestate":"مدير العقار","digital":"مدير التقنية",
  "hr":"مدير الموارد البشرية","marketing":"مدير التسويق","quality":"مدير الجودة",
- "legal":"المدير القانوني","finance":"المدير المالي"}
+ "legal":"المدير القانوني","finance":"المدير المالي",
+ "projects":"مدير إدارة المشاريع","supplychain":"مدير سلاسل الإمداد"}
 def round_weights_pct(weights):
     """تقريب الأوزان إلى نِسب مئوية صحيحة مجموعها 100٪ (largest remainder) بحد أدنى 1٪."""
     raw=[w*100 for w in weights]; floor=[int(x) for x in raw]; rem=[x-int(x) for x in raw]
