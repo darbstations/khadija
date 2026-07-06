@@ -188,7 +188,7 @@ for dname,key,records in K.DEPARTMENTS:
         _gr,_yl=thresholds(nm)   # حدود تنبيه مخصّصة لكل مؤشر
         ws.cell(r,15).value=f'=IF($N{r}="","⏳ بانتظار هدف",IF($N{r}>={_gr},"✅ محقق",IF($N{r}>={_yl},"🟡 قريب","🔴 تحت الهدف")))'
         C(ws,r,15,f=F_(9,True),al="center")
-        C(ws,r,16,kpi_source(nm,axis,key),f=F_(8,color="555555"),al="right",wrap=True)  # مصدر القياس
+        C(ws,r,16,None,fillc=GREEN_IN,al="right",wrap=True,lock=False)  # مصدر القياس — فاضٍ للإدخال اليدوي
         ws.row_dimensions[r].height=24
     end=start+len(records)-1
     ws.auto_filter.ref=f"A3:{last}{end}"
