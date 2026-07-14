@@ -96,7 +96,7 @@ export default function CustomerJourney() {
           <Badge tone="accent">{sim.tier.emoji} {sim.tier.label}</Badge>
         </div>
         <div className="grid sm:grid-cols-3 gap-3">
-          {TIER_PERKS.map((t) => (
+          {TIER_PERKS.filter((t) => t.key !== "business").map((t) => (
             <div key={t.key} className={`stat ${t.label === sim.tier.label ? "border-darb-orange/50" : ""}`}>
               <div className="font-bold mb-1">{t.emoji} {t.label}</div>
               <ul className="text-xs space-y-1 text-darb-ink/90 list-disc pr-4">
@@ -106,6 +106,17 @@ export default function CustomerJourney() {
           ))}
         </div>
         <p className="text-[11px] text-darb-mut mt-2">مستواه الحالي: <b>{tierPerks.label}</b> — يرتقي بزيادة إنفاق البنزين السنوي.</p>
+
+        {/* مسار منفصل: الأعمال/الأساطيل (B2B) */}
+        {TIER_PERKS.filter((t) => t.key === "business").map((t) => (
+          <div key={t.key} className="mt-3 rounded-xl border border-darb-accent/40 bg-darb-accent/5 p-3">
+            <div className="font-bold mb-1">{t.emoji} {t.label} · مسار منفصل للشركات</div>
+            <ul className="text-xs grid sm:grid-cols-2 gap-x-4 gap-y-1 text-darb-ink/90 list-disc pr-4">
+              {t.perks.map((p, i) => <li key={i}>{p}</li>)}
+            </ul>
+            <p className="text-[10px] text-darb-mut mt-1">هنا فقط يوجد مدير حساب فعلي — لأنه عدد محدود من الشركات يبرّر التكلفة.</p>
+          </div>
+        ))}
       </Card>
     </div>
   );
