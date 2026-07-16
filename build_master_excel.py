@@ -97,6 +97,39 @@ def kpi_formula(fmt,unit,nm):
     if "نجمة" in unit: return "متوسط التقييم (من 5)"
     if "نقطة" in unit: return "٪ المروّجين − ٪ المنتقدين"
     return "إجمالي العدد خلال الفترة"
+import re as _re
+def _core(nm): return _re.sub(r'\s*\([^)]*\)','',nm).strip()   # إزالة اللواحق بين قوسين
+def measure_method(nm,unit,pol,fmt,agg):
+    """طريقة قياس تفصيلية خاصة بكل مؤشر (بسط ÷ مقام) — تُشتق من صيغة الاسم والوحدة."""
+    n=nm.strip(); c=_core(n); lead=lambda p:c[len(p):].strip()
+    if n.startswith("نسبة"):
+        s=lead("نسبة"); return f"قيمة/عدد المتحقّق من «{s}» ÷ الإجمالي المستهدف لنفس البند × 100٪"
+    if n.startswith("معدل"):
+        s=lead("معدل"); return f"عدد حالات «{s}» خلال الفترة ÷ إجمالي الحالات القابلة للقياس × 100٪"
+    if n.startswith("متوسط"):
+        s=lead("متوسط")
+        if "دقيقة" in unit: return f"مجموع دقائق «{s}» لكل الحالات ÷ عدد الحالات"
+        if "ساعة"  in unit: return f"مجموع ساعات «{s}» ÷ عدد الحالات المغلقة"
+        if "يوم"   in unit: return f"مجموع أيام «{s}» ÷ عدد الحالات"
+        if "هللة"  in unit: return f"مجموع «{s}» (هللة/لتر) ÷ عدد الوحدات"
+        return f"مجموع قيم «{s}» ÷ عدد المفردات المقيسة"
+    if n.startswith("إجمالي"):
+        s=lead("إجمالي")
+        if fmt=="rial": return f"مجموع قيمة «{s}» بالريال خلال الفترة"
+        if "لتر" in unit: return f"مجموع لترات «{s}» خلال الفترة"
+        return f"مجموع «{s}» خلال الفترة"
+    if n.startswith("عدد"):
+        cum="تراكمياً حتى نهاية الفترة" if (agg=="LAST" or "تراكمي" in n) else "المُسجّلة خلال الفترة"
+        return f"إجمالي عدد «{lead('عدد')}» {cum}"
+    if fmt=="rial" or unit=="ر.س": return f"إجمالي قيمة «{c}» بالريال خلال الفترة"
+    if "لتر" in unit: return f"مجموع لترات «{c}» خلال الفترة"
+    if "eNPS" in n or "نقطة" in unit: return "٪ الموظفين المروّجين − ٪ المنتقدين (مقياس eNPS)"
+    if "نجمة" in unit or "درجة" in unit: return f"متوسط تقييم «{c}» على مقياسه المعتمد"
+    if "يوم" in unit: return f"متوسط عدد أيام «{c}» خلال الفترة"
+    if "ساعة" in unit: return f"متوسط عدد ساعات «{c}» خلال الفترة"
+    if fmt=="pct": return f"القيمة المتحقّقة من «{c}» ÷ المستهدف × 100٪"
+    if fmt=="int": return f"إجمالي عدد «{c}» المُسجّل خلال الفترة"
+    return f"قياس «{c}» مقابل مستهدفه المعتمد خلال الفترة"
 _OUTCOME=["إيراد","ربح","هامش","العائد","ROE","رضا","CSAT","eNPS","نمو","حصة","إشغال","تحصيل","مبيعات",
  "استبقاء","قيمة","تقييم","شكاو","الوصول","EBITDA","ربحية","جاهزية","Uptime","سلامة","امتثال","التزام",
  "حل الشكاو","دقة","مطابقة","إغلاق","فعالية","استدامة","تجديد","انخفاض","خفض","سعودة","توطين","مخاطر",
@@ -202,7 +235,7 @@ for dname,key,records in K.DEPARTMENTS:
         _gr,_yl=thresholds(nm)   # حدود تنبيه مخصّصة لكل مؤشر
         ws.cell(r,15).value=f'=IF($N{r}="","⏳ بانتظار هدف",IF($N{r}>={_gr},"✅ محقق",IF($N{r}>={_yl},"🟡 قريب","🔴 تحت الهدف")))'
         C(ws,r,15,f=F_(9,True),al="center")
-        desc=MAINT_METHODS.get(nm) or kpi_formula(fmt,unit,nm)   # وصف/طريقة القياس (الصيانة: من ملف الإدارة)
+        desc=MAINT_METHODS.get(nm) or measure_method(nm,unit,pol,fmt,agg)   # وصف/طريقة قياس تفصيلية لكل مؤشر
         C(ws,r,16,desc,f=F_(8,color="555555"),al="right",wrap=True)
         C(ws,r,17,kpi_source(nm,axis,key),f=F_(8,color="555555"),al="right",wrap=True)  # مصدر البيانات
         C(ws,r,18,kpi_freq(nm,ttxt),f=F_(8),al="center")  # دورية القياس
