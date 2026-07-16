@@ -16,6 +16,7 @@ import Redemption from "./components/Redemption";
 import WalletRedemption from "./components/WalletRedemption";
 import OffersMarketplace from "./components/OffersMarketplace";
 import OffersAdmin from "./components/OffersAdmin";
+import NetworkModel from "./components/NetworkModel";
 import FranchiseCollection from "./components/FranchiseCollection";
 import Projections from "./components/Projections";
 import ScenarioCompare from "./components/ScenarioCompare";
@@ -35,6 +36,7 @@ const TABS = [
   { id: "bundles", label: "باقات درب", icon: "🪪", el: <Bundles /> },
   { id: "offers", label: "سوق العروض (العميل)", icon: "🎁", el: <OffersMarketplace /> },
   { id: "offersadmin", label: "إدارة العروض (درب)", icon: "🛠️", el: <OffersAdmin /> },
+  { id: "network", label: "شبكة التجار (درب/Dsquares)", icon: "🕸️", el: <NetworkModel /> },
   { id: "redemption", label: "قنوات الاستبدال", icon: "🔁", el: <Redemption /> },
   { id: "wallet", label: "المحفظة وسوق الاستبدال", icon: "👛", el: <WalletRedemption /> },
   { id: "tiers", label: "المستويات وقيمة النقطة", icon: "🎯", el: <TiersAndValue /> },
