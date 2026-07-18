@@ -62,6 +62,11 @@ export default function CustomerFlow() {
     push({ icon, title: `استبدال: ${title}`, walletD: 0, pointsD: -cost, spend: 0, source: "redeem", note: "خصم من رصيد النقاط", earn: false });
   };
 
+  const buyBundle = (name: string, price: number) => {
+    if (price > wallet) return err(`شراء ${name} — رصيد المحفظة لا يكفي`, `تحتاج ${fmtSar(price)}`);
+    push({ icon: "🪪", title: `شراء ${name} (من المحفظة)`, walletD: -price, pointsD: 0, spend: 0, source: "none", note: "منتج مدفوع مسبقاً بخصم — 0 نقطة", earn: false });
+  };
+
   const reset = () => { setWallet(0); setPoints(0); setLog([]); };
 
   // تجميعات الرحلة
@@ -83,7 +88,7 @@ export default function CustomerFlow() {
       </div>
 
       <div className="grid sm:grid-cols-3 gap-3">
-        <Stat label="👛 محفظة الشحن (ريال)" value={fmtSar(wallet)} tone="accent" />
+        <Stat label="👛 محفظة درب · بنزين+باقات (ريال)" value={fmtSar(wallet)} tone="accent" hint="مغلقة · بلا سحب نقدي" />
         <Stat label="💎 رصيد النقاط" value={fmtInt(points)} hint={`= ${fmtSar(points / pv)}`} tone="good" />
         <Stat label="📋 عدد الخطوات" value={fmtInt(log.length)} />
       </div>
@@ -131,13 +136,14 @@ export default function CustomerFlow() {
           <button onClick={reset} className="ms-auto text-xs font-bold px-3 py-2 rounded-lg border border-darb-line hover:border-darb-orange text-darb-mut hover:text-darb-orange">↺ إعادة</button>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
           <FlowBtn onClick={topup} label="🔋 شحن المحفظة" />
           <FlowBtn onClick={() => spend("fuel")} label="⛽ تعبئة بنزين" />
           <FlowBtn onClick={() => spend("merchant")} label="🛍️ شراء متجر" />
+          <FlowBtn onClick={() => buyBundle("باقة ذيبان", 500)} label="🪪 اشترِ باقة (محفظة)" />
           <FlowBtn onClick={() => redeem("🎁", "قهوة مجانية", 1600)} label="🎁 استبدل قهوة" />
           <FlowBtn onClick={() => redeem("⛽", "خصم بنزين 10﷼", 10 * pv)} label="⛽ استبدل بنزين" />
-          <FlowBtn onClick={() => redeem("🪪", "باقة ذيبان", 500 * pv)} label="🪪 استبدل باقة" />
+          <FlowBtn onClick={() => redeem("🪪", "باقة ذيبان", 500 * pv)} label="🪪 استبدل باقة (نقاط)" />
         </div>
       </Card>
 
@@ -171,9 +177,9 @@ export default function CustomerFlow() {
 
       <Card>
         <p className="text-sm text-darb-ink/90 leading-relaxed">
-          🔑 <b>القاعدة:</b> كل ريال يكسب مرة واحدة. <b>شحن محفظة البنزين يكسب</b> ({fmtInt(fuelRate)} نقطة/ريال)،
-          و<b>بنزين المحفظة لا يكرّر الكسب</b>. البنزين خارج المحفظة يكسب عند QR، والمتجر {MERCHANT_CUST_PCT}% (يموّله التاجر).
-          المحفظة <b>بنزين فقط</b>. العميل يجمع من الاثنين في رصيد واحد.
+          🔑 <b>القاعدة:</b> كل ريال يكسب مرة واحدة. <b>شحن المحفظة يكسب</b> ({fmtInt(fuelRate)} نقطة/ريال)،
+          وما يُشترى منها (<b>بنزين أو باقات</b>) لا يكرّر الكسب. البنزين خارج المحفظة يكسب عند QR، والمتجر {MERCHANT_CUST_PCT}% (يموّله التاجر).
+          المحفظة <b>مغلقة (منتجات درب فقط) وبلا سحب نقدي</b>. العميل يجمع في رصيد واحد.
         </p>
       </Card>
     </div>
