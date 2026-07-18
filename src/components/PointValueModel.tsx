@@ -77,6 +77,25 @@ export default function PointValueModel() {
         </p>
       </Card>
 
+      {/* شحن المحفظة */}
+      <Card title="④ شحن المحفظة — علاقتها بالنقاط">
+        <div className="grid sm:grid-cols-3 gap-3">
+          <Stat label="🔋 عند الشحن" value="0 نقطة" tone="warn" hint="إيداع ريال حقيقي — ليس كسباً" />
+          <Stat label="🛒 عند الصرف (من المحفظة)" value={`${fmtInt(inputs.earnWhite)}–2 نقطة/﷼`} tone="good" hint="تكسب عند QR · أي طريقة دفع" />
+          <Stat label="🎯 قيمة الشحن لدرب" value="سيولة + رسوم أقل" tone="accent" hint="لا تُصرف كنقاط" />
+        </div>
+        <div className="mt-3 stat">
+          <div className="text-sm font-bold text-darb-ink mb-1">اختياري · بونص شحن (حملة منفصلة)</div>
+          <p className="text-xs text-darb-ink/90 leading-relaxed">
+            مثال: «اشحن 500 ﷼ واحصل على 100 نقطة هدية» (= {fmtSar(100 / pv)}) — <b>لمرة واحدة، لا يتراكم مع نقاط الصرف</b>،
+            فلا ازدواج. هدفه تشجيع الشحن المسبق فقط.
+          </p>
+        </div>
+        <p className="text-xs text-darb-mut mt-2">
+          💡 الخلاصة: <b>الشحن للدفع لا للكسب</b>. النقاط تُكتسب عند الشراء دائماً (القاعدة نفسها في «قواعد كسب النقاط»).
+        </p>
+      </Card>
+
       {/* كم نقطة أحتاج */}
       <Card title="③ كم نقطة أحتاج لـ…">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
