@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useScenario } from "../context/ScenarioContext";
 import { fmtInt, fmtSar } from "../model/engine";
-import { OFFER_LOCATIONS, OFFER_CATEGORIES } from "../model/defaults";
+import { OFFER_LOCATIONS, OFFER_CATEGORIES, RAFFLE_PRIZES } from "../model/defaults";
 import { useOffers, visibleOffers, type Offer } from "../model/offers";
 import { Card, Badge } from "./ui";
 
@@ -25,6 +25,29 @@ export default function OffersMarketplace() {
     setRedeemed((r) => [...r, o.id]);
     setLast(`✅ استبدلت «${o.title}» من ${o.merchant} مقابل ${fmtInt(o.points)} نقطة`);
   };
+
+  const [entries, setEntries] = useState<Record<number, number>>({});
+  const pv = inputs.pointValue;
+
+  const spend = (label: string, cost: number) => {
+    if (cost > balance) return;
+    setBalance((b) => b - cost);
+    setLast(`✅ ${label} مقابل ${fmtInt(cost)} نقطة`);
+  };
+  const enterRaffle = (id: number, name: string, cost: number) => {
+    if (cost > balance) return;
+    setBalance((b) => b - cost);
+    setEntries((e) => ({ ...e, [id]: (e[id] || 0) + 1 }));
+    setLast(`🎟️ دخلت سحب «${name}» (${fmtInt(cost)} نقطة)`);
+  };
+
+  const quick = [
+    { icon: "⛽", label: "خصم بنزين 10﷼", cost: 10 * pv },
+    { icon: "📱", label: "كرت شحن 10﷼", cost: 10 * pv },
+    { icon: "🎁", label: "قسيمة جرير 25﷼", cost: 25 * pv },
+    { icon: "🎬", label: "اشتراك شاهد شهر", cost: 3000 },
+    { icon: "❤️", label: "تبرّع 5﷼", cost: 5 * pv },
+  ];
 
   const catColor = (k: string) =>
     ({ restaurant: "bg-darb-orange/15 text-darb-orange", cafe: "bg-amber-400/15 text-amber-300", wash: "bg-sky-400/15 text-sky-300", service: "bg-darb-mut/20 text-darb-ink", grocery: "bg-darb-good/15 text-darb-good" }[k] || "bg-darb-line text-darb-mut");
@@ -132,6 +155,60 @@ export default function OffersMarketplace() {
       <Card>
         <p className="text-sm text-darb-ink/90 leading-relaxed">
           💡 العروض يصدرها كل متجر بنفسه ويسعّرها بالنقاط · تظهر للعميل <b>حسب موقعه</b> (محطته الأقرب) ·
+        </p>
+      </Card>
+
+      {/* السحوبات الكبرى */}
+      <Card title="🎟️ السحوبات الكبرى" subtitle="استبدل نقاطك كـدخول للسحب على جوائز كبرى">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {RAFFLE_PRIZES.map((p) => {
+            const can = p.pointsPerEntry <= balance;
+            return (
+              <div key={p.name} className="card text-center">
+                <div className="text-4xl">{p.icon}</div>
+                <div className="font-extrabold mt-1">{p.name}</div>
+                <div className="text-[11px] text-darb-mut">قيمتها {fmtSar(p.value)}</div>
+                {entries[RAFFLE_PRIZES.indexOf(p)] ? (
+                  <Badge tone="good">دخولاتك: {entries[RAFFLE_PRIZES.indexOf(p)]}</Badge>
+                ) : null}
+                <button
+                  onClick={() => enterRaffle(RAFFLE_PRIZES.indexOf(p), p.name, p.pointsPerEntry)}
+                  disabled={!can}
+                  className={`mt-2 w-full text-xs font-bold px-3 py-2 rounded-lg border transition ${can ? "border-darb-orange text-darb-orange hover:bg-darb-orange/15" : "border-darb-line text-darb-mut/40 cursor-not-allowed"}`}
+                >
+                  {fmtInt(p.pointsPerEntry)} نقطة / دخول
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+
+      {/* استبدال سريع */}
+      <Card title="⚡ استبدال سريع — قنوات أخرى">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+          {quick.map((q) => {
+            const can = q.cost <= balance;
+            return (
+              <button
+                key={q.label}
+                onClick={() => spend(q.label, q.cost)}
+                disabled={!can}
+                className={`text-xs font-bold px-2 py-3 rounded-lg border transition text-center ${can ? "border-darb-line hover:border-darb-orange hover:bg-darb-orange/10 text-darb-ink" : "border-darb-line text-darb-mut/40 cursor-not-allowed"}`}
+              >
+                <div className="text-2xl">{q.icon}</div>
+                <div className="mt-1">{q.label}</div>
+                <div className="text-[10px] text-darb-mut">{fmtInt(q.cost)} نقطة</div>
+              </button>
+            );
+          })}
+        </div>
+        <p className="text-[11px] text-darb-mut mt-2">وأيضاً: خدمات المحطة · تحويل أميال/قطاف · إهداء النقاط للعائلة · تحويل لرصيد المحفظة.</p>
+      </Card>
+
+      <Card>
+        <p className="text-sm text-darb-ink/90 leading-relaxed">
+          💡 كل قنوات الاستبدال في مكان واحد: عروض التجار · السحوبات · قنوات سريعة — والرصيد <b>موحّد</b>.
           والاستبدال يُخصم من رصيد نقاطه ويُموّل عبر <b>نموذج المحفظة</b> (التاجر يستلم من المحفظة + يجذب عميلاً).
         </p>
       </Card>
