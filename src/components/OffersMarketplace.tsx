@@ -42,7 +42,9 @@ export default function OffersMarketplace() {
 
   const quick = [
     { icon: "⛽", label: "خصم بنزين 10﷼", cost: 10 * pv },
-    { icon: "📱", label: "كرت شحن 10﷼", cost: 10 * pv },
+    { icon: "📱", label: "شحن STC 10﷼", cost: 10 * pv },
+    { icon: "📱", label: "شحن Mobily 10﷼", cost: 10 * pv },
+    { icon: "📱", label: "شحن Zain 10﷼", cost: 10 * pv },
     { icon: "🎁", label: "قسيمة جرير 25﷼", cost: 25 * pv },
     { icon: "🎬", label: "اشتراك شاهد شهر", cost: 3000 },
     { icon: "❤️", label: "تبرّع 5﷼", cost: 5 * pv },
