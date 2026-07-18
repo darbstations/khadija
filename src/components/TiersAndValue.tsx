@@ -4,11 +4,18 @@ import { Card, Stat } from "./ui";
 
 const BENEFITS = [
   ["نقاط مضاعفة في الأعياد", "❌", "🎯 1.5×", "🎯 2×"],
-  ["دعوة لفعاليات درب", "❌", "✅", "✅✅ VIP"],
+  ["العروض الخارجية", "أساسية", "أوسع", "حصرية (بريميوم)"],
   ["خصومات الشركاء", "5%", "10%", "15%"],
-  ["أولوية الدعم الفني", "عادي", "سريع", "فوري"],
+  ["الدعم الفني", "✅ للجميع", "✅ للجميع", "✅ للجميع"],
   ["إهداء النقاط للعائلة", "❌", "✅ محدود", "✅ بلا حدود"],
+  ["خصم على باقات درب", "❌", "❌", "✅"],
   ["تجميد الحساب", "❌", "❌", "✅ مرة/سنة"],
+];
+
+const EXTERNAL_OFFERS = [
+  { emoji: "🤍", label: "الأبيض", offers: "عروض خارجية أساسية · خصومات عامة على علامات مختارة" },
+  { emoji: "🩶", label: "الفضي", offers: "علامات أوسع · مطاعم وتسوّق وترفيه بخصومات أكبر" },
+  { emoji: "🟠", label: "البرتقالي", offers: "عروض حصرية · سفر وفخامة وإصدارات محدودة ووصول مبكر" },
 ];
 
 export default function TiersAndValue() {
@@ -83,6 +90,18 @@ export default function TiersAndValue() {
             </tbody>
           </table>
         </div>
+      </Card>
+
+      <Card title="🌍 العروض الخارجية تنفتح حسب المستوى" subtitle="كلما ارتقيت، تنفتح لك عروض علامات خارجية أفضل">
+        <div className="grid sm:grid-cols-3 gap-3">
+          {EXTERNAL_OFFERS.map((t) => (
+            <div key={t.label} className="stat">
+              <div className="font-bold mb-1">{t.emoji} {t.label}</div>
+              <p className="text-xs text-darb-ink/90 leading-relaxed">{t.offers}</p>
+            </div>
+          ))}
+        </div>
+        <p className="text-[11px] text-darb-mut mt-2">مثال العلامات الخارجية: مطاعم · تسوّق · سفر · ترفيه — تتوسّع وتصير أكثر حصرية مع المستوى.</p>
       </Card>
 
       <Card title="⚙️ قواعد الترقية والتنزيل">
