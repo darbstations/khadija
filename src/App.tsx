@@ -24,6 +24,7 @@ import Benchmark from "./components/Benchmark";
 import ExtendedEconomics from "./components/ExtendedEconomics";
 import ROICalculator from "./components/ROICalculator";
 import TenantTool from "./components/TenantTool";
+import MerchantPitch from "./components/MerchantPitch";
 import HowItWorks from "./components/HowItWorks";
 
 const TABS = [
@@ -45,6 +46,7 @@ const TABS = [
   { id: "stationcalc", label: "حاسبة النقطة لكل محطة", icon: "🧮", el: <StationCalculator /> },
   { id: "mystations", label: "محطاتي", icon: "⛽", el: <StationsDB /> },
   { id: "tenants", label: "أداة المستأجرين", icon: "🤝", el: <TenantTool /> },
+  { id: "pitch", label: "حاسبة إقناع التاجر", icon: "🧮", el: <MerchantPitch /> },
   { id: "franchise", label: "التحصيل من الامتياز", icon: "🧾", el: <FranchiseCollection /> },
   { id: "projections", label: "التوقعات السنوية", icon: "📈", el: <Projections /> },
   { id: "roi", label: "حاسبة ROI", icon: "💎", el: <ROICalculator /> },
