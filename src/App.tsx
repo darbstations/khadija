@@ -4,6 +4,7 @@ import { DarbLogo } from "./components/DarbLogo";
 import ExecutivePresentation from "./components/ExecutivePresentation";
 import ScenarioPanel from "./components/ScenarioPanel";
 import ExecutiveSummary from "./components/ExecutiveSummary";
+import ModelSummary from "./components/ModelSummary";
 import CustomerSimulator from "./components/CustomerSimulator";
 import CustomerJourney from "./components/CustomerJourney";
 import CustomerFlow from "./components/CustomerFlow";
@@ -42,6 +43,7 @@ const TABS = [
   // نظرة عامة
   { id: "presentation", group: "overview", label: "العرض التنفيذي", icon: "📑", el: <ExecutivePresentation /> },
   { id: "summary", group: "overview", label: "الملخص التنفيذي", icon: "📊", el: <ExecutiveSummary /> },
+  { id: "modelsummary", group: "overview", label: "ملخص النموذج النهائي", icon: "📋", el: <ModelSummary /> },
   { id: "scenarios", group: "overview", label: "السيناريوهات", icon: "⚙️", el: <ScenarioPanel /> },
   { id: "how", group: "overview", label: "كيف يعمل + التوسع", icon: "📚", el: <HowItWorks /> },
   // العميل
