@@ -25,6 +25,7 @@ import ExtendedEconomics from "./components/ExtendedEconomics";
 import ROICalculator from "./components/ROICalculator";
 import TenantTool from "./components/TenantTool";
 import MerchantPitch from "./components/MerchantPitch";
+import BillToPoints from "./components/BillToPoints";
 import HowItWorks from "./components/HowItWorks";
 
 const TABS = [
@@ -47,6 +48,7 @@ const TABS = [
   { id: "mystations", label: "محطاتي", icon: "⛽", el: <StationsDB /> },
   { id: "tenants", label: "أداة المستأجرين", icon: "🤝", el: <TenantTool /> },
   { id: "pitch", label: "حاسبة إقناع التاجر", icon: "🧮", el: <MerchantPitch /> },
+  { id: "billpoints", label: "الفاتورة → النقاط والتحصيل", icon: "🧾", el: <BillToPoints /> },
   { id: "franchise", label: "التحصيل من الامتياز", icon: "🧾", el: <FranchiseCollection /> },
   { id: "projections", label: "التوقعات السنوية", icon: "📈", el: <Projections /> },
   { id: "roi", label: "حاسبة ROI", icon: "💎", el: <ROICalculator /> },
