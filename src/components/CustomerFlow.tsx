@@ -83,20 +83,26 @@ export default function CustomerFlow() {
         <Stat label="📋 عدد الخطوات" value={fmtInt(log.length)} />
       </div>
 
-      {/* بطاقة تجميعية: من البنزين والتجار */}
-      <Card title="📊 من أين جمع نقاطه؟">
+      {/* ما يراه العميل: رصيد واحد موحّد */}
+      <div className="rounded-2xl bg-gradient-to-bl from-darb-orange/20 to-darb-card border border-darb-orange/40 p-4 text-center">
+        <div className="text-xs text-darb-mut">👀 ما يراه العميل — رصيد واحد موحّد</div>
+        <div className="text-3xl font-extrabold text-darb-orange mt-1">{fmtInt(points)} نقطة</div>
+        <div className="text-xs text-darb-mut">= {fmtSar(points / pv)} · من البنزين والتجار معاً في محفظة واحدة</div>
+      </div>
+
+      {/* تحليل داخلي لدرب فقط — لا يراه العميل */}
+      <Card title="🔒 تحليل داخلي لدرب · مصدر تمويل النقاط (لا يظهر للعميل)">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          <Stat label="⛽ من البنزين" value={fmtInt(fuelPts)} hint={`إنفاق ${fmtSar(fuelSpend)} · تموّله درب`} tone="warn" />
-          <Stat label="🛍️ من التجار" value={fmtInt(merchPts)} hint={`إنفاق ${fmtSar(merchSpend)} · يموّله التاجر`} tone="good" />
+          <Stat label="⛽ مموّلة من درب (بنزين)" value={fmtInt(fuelPts)} hint={`إنفاق ${fmtSar(fuelSpend)}`} tone="warn" />
+          <Stat label="🛍️ مموّلة من التجار" value={fmtInt(merchPts)} hint={`إنفاق ${fmtSar(merchSpend)}`} tone="good" />
           <Stat label="💎 إجمالي المكتسب" value={fmtInt(earned)} hint={`= ${fmtSar(earned / pv)}`} tone="accent" />
           <Stat label="🎁 المستبدل / الرصيد" value={`${fmtInt(redeemed)} / ${fmtInt(points)}`} />
         </div>
-        {totalSpend > 0 && (
-          <div className="mt-3 flex items-center gap-2 text-sm">
-            <span className="text-darb-mut">الكاش باك الفعلي للرحلة (بنزين + تجار):</span>
-            <Badge tone="accent">{fmtPct(effCashback)}</Badge>
-          </div>
-        )}
+        <p className="text-[11px] text-darb-mut mt-2">
+          هذا التقسيم <b>داخلي لدرب</b> لمعرفة من يموّل كل نقطة (البنزين تموّله درب · التجار يموّلونه). العميل
+          يرى <b>رصيداً واحداً فقط</b> — النقطة نفسها لا مصدر لها عنده.
+          {totalSpend > 0 && <> · كاش باك الرحلة الفعلي <b className="text-darb-accent">{fmtPct(effCashback)}</b>.</>}
+        </p>
       </Card>
 
       <Card>
