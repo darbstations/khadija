@@ -1,38 +1,56 @@
 import { useState } from "react";
-import { fmtSar } from "../model/engine";
+import { useScenario } from "../context/ScenarioContext";
+import { fmtSar, fmtInt } from "../model/engine";
 import { BUNDLES } from "../model/defaults";
 import { Card, Badge } from "./ui";
 
 export default function Bundles() {
-  const [wallet, setWallet] = useState(1500); // رصيد محفظة درب (ريال)
+  const { inputs } = useScenario();
+  const pv = inputs.pointValue; // نقطة = ريال
+  const [wallet, setWallet] = useState(1500); // محفظة الشحن (ريال)
+  const [points, setPoints] = useState(150000); // رصيد النقاط
   const [bought, setBought] = useState<string[]>([]);
   const [last, setLast] = useState<string | null>(null);
 
-  const buy = (b: (typeof BUNDLES)[number]) => {
+  const buyCash = (b: (typeof BUNDLES)[number]) => {
     if (b.price > wallet || bought.includes(b.id)) return;
     setWallet((w) => w - b.price);
     setBought((p) => [...p, b.id]);
-    setLast(`✅ اشتريت «${b.name}» مقابل ${fmtSar(b.price)} من محفظة درب`);
+    setLast(`✅ اشتريت «${b.name}» بـ ${fmtSar(b.price)} من محفظة الشحن`);
+  };
+  const redeemPoints = (b: (typeof BUNDLES)[number]) => {
+    const cost = b.price * pv;
+    if (cost > points || bought.includes(b.id)) return;
+    setPoints((p) => p - cost);
+    setBought((p) => [...p, b.id]);
+    setLast(`✅ استبدلت «${b.name}» بـ ${fmtInt(cost)} نقطة`);
   };
 
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-lg font-extrabold">🪪 باقات درب · بطاقات مدفوعة مسبقاً</h2>
+        <h2 className="text-lg font-extrabold">🪪 باقات درب · شراء أو استبدال بالنقاط</h2>
         <p className="text-xs text-darb-mut">
-          منتجات مستقلة عن النقاط · تُشترى من <b>محفظة درب</b> (رصيد بالريال)
+          العميل يستبدل نقاطه بـ 3 قنوات: 🛍️ عروض التجار · ⛽ بنزين · 🪪 باقات درب
         </p>
       </div>
 
-      {/* محفظة درب */}
-      <div className="rounded-2xl bg-gradient-to-bl from-darb-orange/25 to-darb-card border border-darb-line p-5 flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <div className="text-xs text-darb-mut">رصيد محفظة درب</div>
-          <div className="text-3xl font-extrabold text-darb-orange">{fmtSar(wallet)}</div>
+      {/* الرصيدان */}
+      <div className="grid sm:grid-cols-2 gap-3">
+        <div className="rounded-2xl bg-gradient-to-bl from-darb-orange/25 to-darb-card border border-darb-line p-4 flex items-center justify-between">
+          <div>
+            <div className="text-xs text-darb-mut">👛 محفظة الشحن (ريال)</div>
+            <div className="text-2xl font-extrabold text-darb-orange">{fmtSar(wallet)}</div>
+          </div>
+          <button onClick={() => setWallet((w) => w + 500)} className="text-xs font-bold px-3 py-2 rounded-lg border border-darb-line hover:border-darb-good text-darb-mut hover:text-darb-good">+ شحن 500</button>
         </div>
-        <div className="flex items-center gap-2">
-          <button onClick={() => setWallet((w) => w + 500)} className="text-xs font-bold px-3 py-2 rounded-lg border border-darb-line hover:border-darb-good text-darb-mut hover:text-darb-good transition">+ شحن 500 ﷼</button>
-          <button onClick={() => { setWallet(1500); setBought([]); setLast(null); }} className="text-xs font-bold px-3 py-2 rounded-lg border border-darb-line hover:border-darb-orange text-darb-mut hover:text-darb-orange transition">↺ إعادة</button>
+        <div className="rounded-2xl bg-darb-card border border-darb-line p-4 flex items-center justify-between">
+          <div>
+            <div className="text-xs text-darb-mut">💎 رصيد النقاط</div>
+            <div className="text-2xl font-extrabold text-darb-accent">{fmtInt(points)} نقطة</div>
+            <div className="text-[10px] text-darb-mut">= {fmtSar(points / pv)}</div>
+          </div>
+          <button onClick={() => { setWallet(1500); setPoints(150000); setBought([]); setLast(null); }} className="text-xs font-bold px-3 py-2 rounded-lg border border-darb-line hover:border-darb-orange text-darb-mut hover:text-darb-orange">↺ إعادة</button>
         </div>
       </div>
 
@@ -42,8 +60,10 @@ export default function Bundles() {
         {BUNDLES.map((b) => {
           const worth = b.items.reduce((a, x) => a + x.worth, 0);
           const savings = worth - b.price;
+          const pointsPrice = b.price * pv;
           const done = bought.includes(b.id);
-          const afford = b.price <= wallet;
+          const canCash = b.price <= wallet;
+          const canPoints = pointsPrice <= points;
           return (
             <div key={b.id} className={`card flex flex-col ${done ? "opacity-60" : ""}`}>
               <div className="flex items-center justify-between">
@@ -51,7 +71,10 @@ export default function Bundles() {
                 <Badge tone="accent">{b.tag}</Badge>
               </div>
               <div className="mt-2 text-lg font-extrabold">{b.name}</div>
-              <div className="text-2xl font-extrabold text-darb-orange">{fmtSar(b.price)}</div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-extrabold text-darb-orange">{fmtSar(b.price)}</span>
+                <span className="text-xs text-darb-accent">أو {fmtInt(pointsPrice)} نقطة</span>
+              </div>
 
               <ul className="mt-3 space-y-1.5 text-sm grow">
                 {b.items.map((it, idx) => (
@@ -68,17 +91,18 @@ export default function Bundles() {
               </div>
 
               {done ? (
-                <div className="mt-3"><Badge tone="good">✅ تم الشراء</Badge></div>
+                <div className="mt-3"><Badge tone="good">✅ تم</Badge></div>
               ) : (
-                <button
-                  onClick={() => buy(b)}
-                  disabled={!afford}
-                  className={`mt-3 w-full text-sm font-bold px-3 py-2 rounded-lg border transition ${
-                    afford ? "border-darb-orange text-darb-orange hover:bg-darb-orange/15" : "border-darb-line text-darb-mut/40 cursor-not-allowed"
-                  }`}
-                >
-                  {afford ? "اشترِ من محفظة درب" : "رصيد المحفظة غير كافٍ"}
-                </button>
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <button onClick={() => buyCash(b)} disabled={!canCash}
+                    className={`text-xs font-bold px-2 py-2 rounded-lg border transition ${canCash ? "border-darb-orange text-darb-orange hover:bg-darb-orange/15" : "border-darb-line text-darb-mut/40 cursor-not-allowed"}`}>
+                    👛 شراء
+                  </button>
+                  <button onClick={() => redeemPoints(b)} disabled={!canPoints}
+                    className={`text-xs font-bold px-2 py-2 rounded-lg border transition ${canPoints ? "border-darb-accent text-darb-accent hover:bg-darb-accent/15" : "border-darb-line text-darb-mut/40 cursor-not-allowed"}`}>
+                    💎 استبدال
+                  </button>
+                </div>
               )}
             </div>
           );
@@ -87,9 +111,9 @@ export default function Bundles() {
 
       <Card>
         <p className="text-sm text-darb-ink/90 leading-relaxed">
-          💡 الباقات <b>منتجات مستقلة</b> لا تُكتسب بالنقاط — تُشترى نقداً من محفظة درب وتعطي العميل
-          رصيد بنزين + خدمات شركاء بسعر مجمّع. فائدتها لدرب: <b>سيولة مقدّماً</b> + التزام إنفاق +
-          بيع متقاطع لخدمات الشركاء.
+          💡 الباقة لها طريقتان: <b>شراء بالفلوس</b> (محفظة الشحن) — تعطي درب سيولة، أو <b>استبدال بالنقاط</b>
+          (مغطّاة بالإسكرو، فدرب تموّل الباقة من نفس الرصيد). والباقات الكبيرة تصير <b>هدفاً تحفيزياً</b> يجمّع
+          له العميل نقاطه (أثر تدرّج الهدف).
         </p>
       </Card>
     </div>
