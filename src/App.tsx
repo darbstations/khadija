@@ -10,6 +10,7 @@ import CustomerFlow from "./components/CustomerFlow";
 import Bundles from "./components/Bundles";
 import EarnRules from "./components/EarnRules";
 import TiersAndValue from "./components/TiersAndValue";
+import PointValueModel from "./components/PointValueModel";
 import StationCost from "./components/StationCost";
 import StationCalculator from "./components/StationCalculator";
 import StationsDB from "./components/StationsDB";
@@ -48,6 +49,7 @@ const TABS = [
   { id: "journey", group: "customer", label: "رحلة العميل", icon: "🧭", el: <CustomerJourney /> },
   { id: "flow", group: "customer", label: "محاكي الرحلة المتكامل", icon: "🎬", el: <CustomerFlow /> },
   { id: "tiers", group: "customer", label: "المستويات وقيمة النقطة", icon: "🎯", el: <TiersAndValue /> },
+  { id: "pointvalue", group: "customer", label: "نموذج قيمة النقطة والاستبدال", icon: "💠", el: <PointValueModel /> },
   { id: "earnrules", group: "customer", label: "قواعد كسب النقاط", icon: "📐", el: <EarnRules /> },
   { id: "offers", group: "customer", label: "سوق العروض", icon: "🎁", el: <OffersMarketplace /> },
   { id: "bundles", group: "customer", label: "باقات درب", icon: "🪪", el: <Bundles /> },
