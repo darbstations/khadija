@@ -37,17 +37,22 @@ export default function CustomerFlow() {
     setLog((l) => [{ icon: "⛔", title, walletD: 0, pointsD: 0, spend: 0, source: "none", note, earn: false }, ...l]);
 
   const topup = () =>
-    push({ icon: "🔋", title: `شحن المحفظة ${fmtSar(amount)}`, walletD: amount, pointsD: 0, spend: 0, source: "topup", note: "لا كسب — إيداع رصيد", earn: false });
+    push({ icon: "🔋", title: `شحن محفظة البنزين ${fmtSar(amount)}`, walletD: amount, pointsD: amount * fuelRate, spend: amount, source: "fuel", note: "كسب عند الشحن · محفظة بنزين فقط", earn: true });
 
   const spend = (kind: "fuel" | "merchant") => {
+    if (kind === "merchant" && pay === "wallet") return err("المحفظة بنزين فقط", "ادفعي المتجر بالبطاقة/كاش");
     if (pay === "wallet" && amount > wallet) return err("رصيد المحفظة لا يكفي", "اشحني أو ادفعي بالبطاقة");
-    const walletD = pay === "wallet" ? -amount : 0;
+    // بنزين من المحفظة: كُسب عند الشحن — لا تكرار
+    if (kind === "fuel" && pay === "wallet") {
+      push({ icon: "⛽", title: `تعبئة بنزين ${fmtSar(amount)} (من المحفظة)`, walletD: -amount, pointsD: 0, spend: 0, source: "none", note: "كُسب عند الشحن — لا تكرار", earn: false });
+      return;
+    }
     const pts = kind === "fuel" ? amount * fuelRate : amount * (MERCHANT_CUST_PCT / 100) * pv;
     push({
       icon: kind === "fuel" ? "⛽" : "🛍️",
-      title: `${kind === "fuel" ? "تعبئة بنزين" : "شراء من متجر"} ${fmtSar(amount)} (${pay === "wallet" ? "من المحفظة" : "بطاقة"})`,
-      walletD, pointsD: pts, spend: amount, source: kind,
-      note: `كسب عند الشراء (QR) · ${kind === "merchant" ? "التاجر يدفع 3%" : "تموّله درب"}`,
+      title: `${kind === "fuel" ? "تعبئة بنزين" : "شراء من متجر"} ${fmtSar(amount)} (بطاقة)`,
+      walletD: 0, pointsD: pts, spend: amount, source: kind,
+      note: `كسب عند الشراء (QR) · ${kind === "merchant" ? "يموّله التاجر" : "تموّله درب"}`,
       earn: true,
     });
   };
@@ -166,8 +171,9 @@ export default function CustomerFlow() {
 
       <Card>
         <p className="text-sm text-darb-ink/90 leading-relaxed">
-          🔑 <b>القاعدة:</b> الشحن = 0 نقطة. الشراء (بنزين/متجر) = نقاط عند QR مهما كانت طريقة الدفع.
-          البنزين {fmtInt(fuelRate)} نقطة/ريال (تموّله درب)، والمتجر {MERCHANT_CUST_PCT}% (يموّله التاجر) — والعميل يجمع من الاثنين في رصيد واحد.
+          🔑 <b>القاعدة:</b> كل ريال يكسب مرة واحدة. <b>شحن محفظة البنزين يكسب</b> ({fmtInt(fuelRate)} نقطة/ريال)،
+          و<b>بنزين المحفظة لا يكرّر الكسب</b>. البنزين خارج المحفظة يكسب عند QR، والمتجر {MERCHANT_CUST_PCT}% (يموّله التاجر).
+          المحفظة <b>بنزين فقط</b>. العميل يجمع من الاثنين في رصيد واحد.
         </p>
       </Card>
     </div>
