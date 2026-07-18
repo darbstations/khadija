@@ -35,9 +35,9 @@ export default function MerchantPitch() {
 
       <Card>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <NumberInput label="مبيعات البرنامج / شهر (﷼)" value={sales} onChange={setSales} step={10000} />
+          <NumberInput label="إجمالي فواتير عملاء البرنامج/شهر (﷼)" value={sales} onChange={setSales} step={10000} hint="النسبة تُحسب على كل فاتورة" />
           <NumberInput label="هامش التاجر (%)" value={marginPct} onChange={setMarginPct} step={5} suffix="%" />
-          <NumberInput label="نسبة الزيادة المتوقعة (%)" value={upliftPct} onChange={setUpliftPct} step={1} suffix="%" hint="الولاء يعطي 15–30%" />
+          <NumberInput label="نمو إجمالي المبيعات المتوقع (%)" value={upliftPct} onChange={setUpliftPct} step={1} suffix="%" hint="الولاء يعطي 15–30%" />
           <NumberInput label="النسبة الكلية من الفاتورة (%)" value={totalPct} onChange={setTotalPct} step={0.5} suffix="%" />
           <NumberInput label="حصة العميل · نقاط (%)" value={customerPct} onChange={setCustomerPct} step={0.5} suffix="%" hint={`حصة درب (المنصة) = ${fmtNum(platformPct, 1)}%`} />
         </div>
@@ -104,13 +104,22 @@ export default function MerchantPitch() {
         <p className="text-xs text-darb-mut mt-2">القاعدة: كل ما قلّ هامش التاجر، خفّضي نسبته ليبقى التعادل سهلاً (~5%).</p>
       </Card>
 
+      <Card title="⚠️ صدق مهم · النسبة على كل فاتورة">
+        <p className="text-sm text-darb-ink/90 leading-relaxed">
+          بما إن الـ{fmtNum(totalPct, 1)}% تُحسب على <b>كل فاتورة</b> من عميل البرنامج (وليس على المبيعات الجديدة فقط)،
+          فالتاجر يدفع أيضاً على زبائنه المعتادين الذين انضموا. لذلك <b>نقطة التعادل ({fmtNum(breakEvenUplift, 1)}%)
+          يجب أن تتحقق كنمو صافٍ حقيقي</b> — وإلا يدفع على مبيعات كان سيحققها.
+          <br />👈 لذلك ركّزي في الإقناع على <b>عملاء درب الجدد + زيادة التكرار</b>، وأثبتيها بـ<b>Pilot 3 شهور</b>.
+        </p>
+      </Card>
+
       <Card title="🗣️ سكربت الإقناع (بالترتيب)">
         <ol className="text-sm space-y-1.5 text-darb-ink/90 list-decimal pr-5">
           <li><b>ابدئي بالقيمة:</b> «عندنا 50 ألف عميل درب — هؤلاء عملاؤك المحتملون.»</li>
-          <li><b>اقلبي النسبة لهامش:</b> «الـ{fmtNum(totalPct, 1)}% = {fmtNum((totalPct / marginPct) * 100, 0)}% من ربحك فقط، وعلى مبيعات جديدة.»</li>
-          <li><b>نقطة التعادل:</b> «تكفي زيادة +{fmtNum(breakEvenUplift, 1)}% لتغطية التكلفة، والولاء يعطي 15–30%.»</li>
-          <li><b>de-risk:</b> «جرّب Pilot 3 شهور، لو ما شفت زيادة انسحب بدون رسوم.»</li>
-          <li><b>أغلقي:</b> «أنت تدفع فقط على النجاح — على عميل جاك من التطبيق.»</li>
+          <li><b>اقلبي النسبة لهامش:</b> «الـ{fmtNum(totalPct, 1)}% = {fmtNum((totalPct / marginPct) * 100, 0)}% من ربحك فقط.»</li>
+          <li><b>نقطة التعادل:</b> «يكفي نمو مبيعاتك +{fmtNum(breakEvenUplift, 1)}% لتغطية التكلفة، والولاء يعطي 15–30%.»</li>
+          <li><b>de-risk:</b> «جرّب Pilot 3 شهور، لو ما تحقق النمو انسحب بدون رسوم.»</li>
+          <li><b>أغلقي:</b> «تختبر بلا مخاطرة، والنمو الصافي يغطّي التكلفة بأضعاف.»</li>
         </ol>
       </Card>
     </div>
