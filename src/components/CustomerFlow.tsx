@@ -1,18 +1,21 @@
 import { useState } from "react";
 import { useScenario } from "../context/ScenarioContext";
-import { fmtSar, fmtInt } from "../model/engine";
+import { fmtSar, fmtInt, fmtPct } from "../model/engine";
 import { Card, Stat, Badge } from "./ui";
 
+type Source = "topup" | "fuel" | "merchant" | "redeem" | "none";
 interface Step {
   icon: string;
   title: string;
-  walletD: number; // تغيّر محفظة الشحن (ريال)
-  pointsD: number; // تغيّر النقاط
+  walletD: number;
+  pointsD: number;
+  spend: number;
+  source: Source;
   note: string;
   earn: boolean;
 }
 
-const MERCHANT_CUST_PCT = 1; // حصة العميل عند المتجر % (من نموذج 3%)
+const MERCHANT_CUST_PCT = 1; // حصة العميل عند المتجر %
 
 export default function CustomerFlow() {
   const { inputs } = useScenario();
@@ -30,52 +33,72 @@ export default function CustomerFlow() {
     setPoints((p) => Math.max(0, p + s.pointsD));
     setLog((l) => [s, ...l]);
   };
+  const err = (title: string, note: string) =>
+    setLog((l) => [{ icon: "⛔", title, walletD: 0, pointsD: 0, spend: 0, source: "none", note, earn: false }, ...l]);
 
   const topup = () =>
-    push({ icon: "🔋", title: `شحن المحفظة ${fmtSar(amount)}`, walletD: amount, pointsD: 0, note: "لا كسب — إيداع رصيد", earn: false });
+    push({ icon: "🔋", title: `شحن المحفظة ${fmtSar(amount)}`, walletD: amount, pointsD: 0, spend: 0, source: "topup", note: "لا كسب — إيداع رصيد", earn: false });
 
   const spend = (kind: "fuel" | "merchant") => {
-    if (pay === "wallet" && amount > wallet) {
-      setLog((l) => [{ icon: "⛔", title: "رصيد المحفظة لا يكفي", walletD: 0, pointsD: 0, note: "اشحني أو ادفعي بالبطاقة", earn: false }, ...l]);
-      return;
-    }
+    if (pay === "wallet" && amount > wallet) return err("رصيد المحفظة لا يكفي", "اشحني أو ادفعي بالبطاقة");
     const walletD = pay === "wallet" ? -amount : 0;
     const pts = kind === "fuel" ? amount * fuelRate : amount * (MERCHANT_CUST_PCT / 100) * pv;
     push({
       icon: kind === "fuel" ? "⛽" : "🛍️",
       title: `${kind === "fuel" ? "تعبئة بنزين" : "شراء من متجر"} ${fmtSar(amount)} (${pay === "wallet" ? "من المحفظة" : "بطاقة"})`,
-      walletD,
-      pointsD: pts,
+      walletD, pointsD: pts, spend: amount, source: kind,
       note: `كسب عند الشراء (QR) · ${kind === "merchant" ? "التاجر يدفع 3%" : "تموّله درب"}`,
       earn: true,
     });
   };
 
   const redeem = (icon: string, title: string, cost: number) => {
-    if (cost > points) {
-      setLog((l) => [{ icon: "⛔", title: `${title} — نقاط غير كافية`, walletD: 0, pointsD: 0, note: `تحتاج ${fmtInt(cost)} نقطة`, earn: false }, ...l]);
-      return;
-    }
-    push({ icon, title: `استبدال: ${title}`, walletD: 0, pointsD: -cost, note: "خصم من رصيد النقاط", earn: false });
+    if (cost > points) return err(`${title} — نقاط غير كافية`, `تحتاج ${fmtInt(cost)} نقطة`);
+    push({ icon, title: `استبدال: ${title}`, walletD: 0, pointsD: -cost, spend: 0, source: "redeem", note: "خصم من رصيد النقاط", earn: false });
   };
 
   const reset = () => { setWallet(0); setPoints(0); setLog([]); };
+
+  // تجميعات الرحلة
+  const sum = (f: (s: Step) => number) => log.reduce((a, s) => a + f(s), 0);
+  const fuelSpend = sum((s) => (s.source === "fuel" ? s.spend : 0));
+  const merchSpend = sum((s) => (s.source === "merchant" ? s.spend : 0));
+  const fuelPts = sum((s) => (s.source === "fuel" ? s.pointsD : 0));
+  const merchPts = sum((s) => (s.source === "merchant" ? s.pointsD : 0));
+  const earned = fuelPts + merchPts;
+  const redeemed = -sum((s) => (s.source === "redeem" ? s.pointsD : 0));
+  const totalSpend = fuelSpend + merchSpend;
+  const effCashback = totalSpend ? earned / pv / totalSpend : 0;
 
   return (
     <div className="space-y-4">
       <div>
         <h2 className="text-lg font-extrabold">🎬 محاكي رحلة العميل المتكامل</h2>
-        <p className="text-xs text-darb-mut">ابدئي من شحن المحفظة أو تعبئة البنزين · شوفي المحفظتين تتحدثان بقاعدة الكسب</p>
+        <p className="text-xs text-darb-mut">يجمع نقاطاً من البنزين والتجار · ابدئي من الشحن أو التعبئة</p>
       </div>
 
-      {/* المحفظتان */}
       <div className="grid sm:grid-cols-3 gap-3">
         <Stat label="👛 محفظة الشحن (ريال)" value={fmtSar(wallet)} tone="accent" />
         <Stat label="💎 رصيد النقاط" value={fmtInt(points)} hint={`= ${fmtSar(points / pv)}`} tone="good" />
         <Stat label="📋 عدد الخطوات" value={fmtInt(log.length)} />
       </div>
 
-      {/* لوحة التحكم */}
+      {/* بطاقة تجميعية: من البنزين والتجار */}
+      <Card title="📊 من أين جمع نقاطه؟">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <Stat label="⛽ من البنزين" value={fmtInt(fuelPts)} hint={`إنفاق ${fmtSar(fuelSpend)} · تموّله درب`} tone="warn" />
+          <Stat label="🛍️ من التجار" value={fmtInt(merchPts)} hint={`إنفاق ${fmtSar(merchSpend)} · يموّله التاجر`} tone="good" />
+          <Stat label="💎 إجمالي المكتسب" value={fmtInt(earned)} hint={`= ${fmtSar(earned / pv)}`} tone="accent" />
+          <Stat label="🎁 المستبدل / الرصيد" value={`${fmtInt(redeemed)} / ${fmtInt(points)}`} />
+        </div>
+        {totalSpend > 0 && (
+          <div className="mt-3 flex items-center gap-2 text-sm">
+            <span className="text-darb-mut">الكاش باك الفعلي للرحلة (بنزين + تجار):</span>
+            <Badge tone="accent">{fmtPct(effCashback)}</Badge>
+          </div>
+        )}
+      </Card>
+
       <Card>
         <div className="flex flex-wrap items-end gap-3 mb-3">
           <label className="block">
@@ -107,7 +130,6 @@ export default function CustomerFlow() {
         </div>
       </Card>
 
-      {/* الخط الزمني */}
       <Card title="🧾 سجل الرحلة">
         {log.length === 0 ? (
           <p className="text-sm text-darb-mut text-center py-6">ابدئي بالضغط على «🔋 شحن المحفظة» أو «⛽ تعبئة بنزين».</p>
@@ -127,7 +149,7 @@ export default function CustomerFlow() {
                   {s.pointsD !== 0 ? (
                     <div className={`text-xs font-bold ${s.pointsD > 0 ? "text-darb-accent" : "text-darb-bad"}`}>{s.pointsD > 0 ? "+" : ""}{fmtInt(s.pointsD)} نقطة</div>
                   ) : (
-                    !s.earn && s.walletD >= 0 && <Badge tone="warn">0 نقطة</Badge>
+                    s.source === "topup" && <Badge tone="warn">0 نقطة</Badge>
                   )}
                 </div>
               </div>
@@ -138,9 +160,8 @@ export default function CustomerFlow() {
 
       <Card>
         <p className="text-sm text-darb-ink/90 leading-relaxed">
-          🔑 <b>القاعدة المطبّقة:</b> الشحن = <b>0 نقطة</b> (إيداع). الشراء (بنزين/متجر) = <b>نقاط عند مسح QR</b>
-          مهما كانت طريقة الدفع. البنزين يكسب {fmtInt(fuelRate)} نقطة/ريال (تموّله درب)، والمتجر {MERCHANT_CUST_PCT}% (يموّله التاجر).
-          فلا ازدواج ولا خسارة.
+          🔑 <b>القاعدة:</b> الشحن = 0 نقطة. الشراء (بنزين/متجر) = نقاط عند QR مهما كانت طريقة الدفع.
+          البنزين {fmtInt(fuelRate)} نقطة/ريال (تموّله درب)، والمتجر {MERCHANT_CUST_PCT}% (يموّله التاجر) — والعميل يجمع من الاثنين في رصيد واحد.
         </p>
       </Card>
     </div>
