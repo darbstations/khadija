@@ -8,6 +8,7 @@ export default function MerchantPitch() {
   const [totalPct, setTotalPct] = useState(3); // النسبة الكلية من الفاتورة %
   const [customerPct, setCustomerPct] = useState(1); // حصة العميل (نقاط) %
   const [upliftPct, setUpliftPct] = useState(15); // الزيادة المتوقعة في المبيعات %
+  const [baseline, setBaseline] = useState(85000); // متوسط مبيعاته قبل البرنامج
 
   const margin = marginPct / 100;
   const platformPct = Math.max(0, totalPct - customerPct); // حصة درب (المنصة)
@@ -20,6 +21,12 @@ export default function MerchantPitch() {
   const netGain = extraMargin - cost;
   const merchantROI = cost ? netGain / cost : 0;
   const convincing = upliftPct >= breakEvenUplift;
+
+  // بديل مستدام: التسعير على النمو فوق الأساس
+  const growth = Math.max(0, sales - baseline);
+  const costGrowth = (growth * totalPct) / 100;
+  const netGrowth = growth * margin - costGrowth;
+  const darbRevGrowth = (growth * platformPct) / 100;
 
   // جدول مرجعي: النسبة المقترحة لإبقاء التعادل ~5%
   const refMargins = [70, 60, 45, 30, 20];
@@ -102,6 +109,22 @@ export default function MerchantPitch() {
           </table>
         </div>
         <p className="text-xs text-darb-mut mt-2">القاعدة: كل ما قلّ هامش التاجر، خفّضي نسبته ليبقى التعادل سهلاً (~5%).</p>
+      </Card>
+
+      <Card title="🌱 بديل مستدام · التسعير على النمو فوق الأساس">
+        <div className="max-w-sm mb-3">
+          <NumberInput label="متوسط مبيعاته قبل البرنامج · خط الأساس (﷼/شهر)" value={baseline} onChange={setBaseline} step={5000} />
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <Stat label="📈 النمو (فوق الأساس)" value={fmtSar(growth)} tone="accent" />
+          <Stat label="💸 يدفع التاجر (على النمو فقط)" value={fmtSar(costGrowth)} tone="warn" />
+          <Stat label="✅ صافي ربح التاجر" value={fmtSar(netGrowth)} tone="good" />
+          <Stat label="💰 إيراد درب" value={fmtSar(darbRevGrowth)} />
+        </div>
+        <p className="text-xs text-darb-mut mt-3 leading-relaxed">
+          هنا التاجر <b>مستحيل يخسر</b> — يدفع فقط على نموّه الحقيقي. درب تكسب أقل، لكن التاجر يبقى دائماً.
+          <b> حل وسط:</b> نسبة كاملة على كل فاتورة أول سنة (لإثبات القيمة)، ثم التحوّل للتسعير على النمو للاستدامة.
+        </p>
       </Card>
 
       <Card title="ℹ️ الأساس · النسبة على كل فاتورة من عميل البرنامج">
