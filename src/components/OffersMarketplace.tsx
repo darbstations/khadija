@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useScenario } from "../context/ScenarioContext";
 import { fmtInt, fmtSar } from "../model/engine";
-import { OFFER_LOCATIONS, OFFER_CATEGORIES, RAFFLE_PRIZES } from "../model/defaults";
+import { OFFER_LOCATIONS, OFFER_CATEGORIES, DRAW_PRIZES } from "../model/defaults";
 import { useOffers, visibleOffers, type Offer } from "../model/offers";
 import { Card, Badge } from "./ui";
 
@@ -34,11 +34,10 @@ export default function OffersMarketplace() {
     setBalance((b) => b - cost);
     setLast(`✅ ${label} مقابل ${fmtInt(cost)} نقطة`);
   };
-  const enterRaffle = (id: number, name: string, cost: number) => {
-    if (cost > balance) return;
-    setBalance((b) => b - cost);
+  const enterDraw = (id: number, name: string) => {
+    // دخول مجاني — بلا نقاط (حلال)
     setEntries((e) => ({ ...e, [id]: (e[id] || 0) + 1 }));
-    setLast(`🎟️ دخلت سحب «${name}» (${fmtInt(cost)} نقطة)`);
+    setLast(`🎁 دخلت السحب المجاني على «${name}»`);
   };
 
   const quick = [
@@ -158,30 +157,25 @@ export default function OffersMarketplace() {
         </p>
       </Card>
 
-      {/* السحوبات الكبرى */}
-      <Card title="🎟️ السحوبات الكبرى" subtitle="استبدل نقاطك كـدخول للسحب على جوائز كبرى">
+      {/* السحب المجاني (حلال) */}
+      <Card title="🎁 السحب المجاني على جوائز كبرى" subtitle="دخول مجاني بلا نقاط — عن كل تعبئة/شهر">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {RAFFLE_PRIZES.map((p) => {
-            const can = p.pointsPerEntry <= balance;
-            return (
-              <div key={p.name} className="card text-center">
-                <div className="text-4xl">{p.icon}</div>
-                <div className="font-extrabold mt-1">{p.name}</div>
-                <div className="text-[11px] text-darb-mut">قيمتها {fmtSar(p.value)}</div>
-                {entries[RAFFLE_PRIZES.indexOf(p)] ? (
-                  <Badge tone="good">دخولاتك: {entries[RAFFLE_PRIZES.indexOf(p)]}</Badge>
-                ) : null}
-                <button
-                  onClick={() => enterRaffle(RAFFLE_PRIZES.indexOf(p), p.name, p.pointsPerEntry)}
-                  disabled={!can}
-                  className={`mt-2 w-full text-xs font-bold px-3 py-2 rounded-lg border transition ${can ? "border-darb-orange text-darb-orange hover:bg-darb-orange/15" : "border-darb-line text-darb-mut/40 cursor-not-allowed"}`}
-                >
-                  {fmtInt(p.pointsPerEntry)} نقطة / دخول
-                </button>
-              </div>
-            );
-          })}
+          {DRAW_PRIZES.map((p, idx) => (
+            <div key={p.name} className="card text-center">
+              <div className="text-4xl">{p.icon}</div>
+              <div className="font-extrabold mt-1">{p.name}</div>
+              <div className="text-[11px] text-darb-mut">قيمتها {fmtSar(p.value)}</div>
+              {entries[idx] ? <div className="my-1"><Badge tone="good">دخولاتك: {entries[idx]}</Badge></div> : null}
+              <button
+                onClick={() => enterDraw(idx, p.name)}
+                className="mt-2 w-full text-xs font-bold px-3 py-2 rounded-lg border border-darb-good text-darb-good hover:bg-darb-good/15 transition"
+              >
+                ادخل السحب (مجاناً)
+              </button>
+            </div>
+          ))}
         </div>
+        <p className="text-[11px] text-darb-mut mt-2">✅ الدخول مجاني بلا نقاط ولا رسوم — لا مقابل مدفوع (ليس ميساراً). تموّله درب كحملة.</p>
       </Card>
 
       {/* استبدال سريع */}

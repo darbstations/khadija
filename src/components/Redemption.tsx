@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { redemptionBlend, fmtPct, fmtSar, fmtInt } from "../model/engine";
-import { REDEMPTION_CHANNELS, REDEMPTION_CATALOG, RAFFLE_PRIZES } from "../model/defaults";
+import { redemptionBlend, fmtPct, fmtSar } from "../model/engine";
+import { REDEMPTION_CHANNELS, REDEMPTION_CATALOG, DRAW_PRIZES } from "../model/defaults";
 import { Card, Stat, NumberInput, Badge } from "./ui";
 
 interface ChannelState {
@@ -173,21 +173,21 @@ export default function Redemption() {
         </div>
       </Card>
 
-      {/* السحوبات الكبرى */}
-      <Card title="🎟️ سحوبات الجوائز الكبرى" subtitle="يستبدل العميل نقاطه كـ«دخول» للسحب — تحفيز عالٍ بتكلفة محسوبة">
+      {/* السحب المجاني (حلال) */}
+      <Card title="🎁 السحب المجاني على جوائز كبرى" subtitle="دخول مجاني بلا نقاط — تموّله درب تسويقياً">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {RAFFLE_PRIZES.map((p) => (
+          {DRAW_PRIZES.map((p) => (
             <div key={p.name} className="card text-center">
               <div className="text-4xl">{p.icon}</div>
               <div className="font-extrabold mt-1">{p.name}</div>
               <div className="text-xs text-darb-mut">قيمتها {fmtSar(p.value)}</div>
-              <div className="mt-2 text-darb-orange font-bold">{fmtInt(p.pointsPerEntry)} نقطة / دخول</div>
+              <div className="mt-2"><Badge tone="good">دخول مجاني</Badge></div>
             </div>
           ))}
         </div>
         <p className="text-xs text-darb-mut mt-3 leading-relaxed">
-          💡 السحوبات تستهلك <b>النقاط الخاملة</b> وتثير التفاعل — جائزة واحدة تجذب آلاف الدخولات، فتكلفتها الفعلية
-          على درب منخفضة مقابل حماس كبير. اجعليها موسمية (رمضان/اليوم الوطني) لأثر أقوى.
+          ✅ <b>حلال:</b> الدخول <b>مجاني بلا نقاط ولا رسوم</b> (لا مقابل مدفوع → ليس ميساراً). يُمنح كدخول مجاني
+          عن كل تعبئة/شهر دون رفع الأسعار. تموّله درب كحملة تسويقية موسمية (رمضان/اليوم الوطني) لجذب وتفاعل عالٍ.
         </p>
       </Card>
     </div>
