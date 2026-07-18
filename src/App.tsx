@@ -6,6 +6,7 @@ import ScenarioPanel from "./components/ScenarioPanel";
 import ExecutiveSummary from "./components/ExecutiveSummary";
 import CustomerSimulator from "./components/CustomerSimulator";
 import CustomerJourney from "./components/CustomerJourney";
+import CustomerFlow from "./components/CustomerFlow";
 import Bundles from "./components/Bundles";
 import EarnRules from "./components/EarnRules";
 import TiersAndValue from "./components/TiersAndValue";
@@ -45,6 +46,7 @@ const TABS = [
   // العميل
   { id: "simulator", group: "customer", label: "محاكي العميل", icon: "🎮", el: <CustomerSimulator /> },
   { id: "journey", group: "customer", label: "رحلة العميل", icon: "🧭", el: <CustomerJourney /> },
+  { id: "flow", group: "customer", label: "محاكي الرحلة المتكامل", icon: "🎬", el: <CustomerFlow /> },
   { id: "tiers", group: "customer", label: "المستويات وقيمة النقطة", icon: "🎯", el: <TiersAndValue /> },
   { id: "earnrules", group: "customer", label: "قواعد كسب النقاط", icon: "📐", el: <EarnRules /> },
   { id: "offers", group: "customer", label: "سوق العروض", icon: "🎁", el: <OffersMarketplace /> },
