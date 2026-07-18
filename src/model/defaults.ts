@@ -280,6 +280,23 @@ export const BENCHMARKS = [
   { name: "🔵 ساسكو", region: "السعودية", method: "نقاط/ريال", earn: "0.43 نقطة/ريال", redeem: "100 نقطة = ريال", eff: "~0.43%" },
 ];
 
+/** كتالوج قنوات الاستبدال الشامل (مجموعات حسب التمويل) */
+export const REDEMPTION_CATALOG = [
+  { group: "🟢 من الشركاء (مموّلة — الأرخص)", cost: "≈ 0%", items: ["عروض وخصومات التجار", "عروض خارجية حسب المستوى"] },
+  { group: "🔵 منتجات درب", cost: "تكلفتك الفعلية", items: ["خصم بنزين", "غسيل/تغيير زيت/خدمة", "متجر المحطة", "باقات درب", "تحويل لرصيد المحفظة"] },
+  { group: "🟠 قسائم خارجية (بخصم جملة)", cost: "95–97%", items: ["جرير · أمازون · نون", "كرت شحن", "اشتراكات رقمية (شاهد/أنغامي)"] },
+  { group: "🟣 تحويل / تحالف", cost: "حسب الاتفاق", items: ["أميال طيران / قطاف", "إهداء النقاط للعائلة"] },
+  { group: "🔴 تحفيزي / سحوبات", cost: "منخفضة", items: ["سحوبات جوائز كبرى (سيارات/آيفونات)", "تبرّع خيري"] },
+];
+
+/** سحوبات الجوائز الكبرى (استبدال بالنقاط كدخول) */
+export const RAFFLE_PRIZES = [
+  { icon: "🚗", name: "سيارة (تويوتا)", value: 90000, pointsPerEntry: 1000 },
+  { icon: "📱", name: "آيفون", value: 5000, pointsPerEntry: 500 },
+  { icon: "🏍️", name: "سكوتر", value: 8000, pointsPerEntry: 500 },
+  { icon: "⌚", name: "ساعة ذكية", value: 1500, pointsPerEntry: 300 },
+];
+
 export const BENCHMARK_SOURCES = [
   { label: "ADNOC Rewards", url: "https://www.adnocdistribution.ae/en/rewards" },
   { label: "Emarat EmCan", url: "https://www.emcan.com/en/faq" },
