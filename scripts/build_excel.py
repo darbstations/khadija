@@ -295,6 +295,48 @@ def main() -> None:
     for col, w in {"A": 30, "B": 16, "C": 16, "D": 14}.items():
         W.column_dimensions[col].width = w
 
+    # 6.7) ورقة «نموذج التاجر» — اقتصاد الـ3% (1% عميل + 2% درب) بمعادلات حقيقية
+    if "نموذج التاجر" in wb.sheetnames:
+        del wb["نموذج التاجر"]
+    T = wb.create_sheet("نموذج التاجر")
+    T.sheet_view.rightToLeft = True
+
+    def tput(coord, value, bold=False, fill=None, fmt=None):
+        c = T[coord]; c.value = value; c.alignment = RTL
+        c.font = Font(bold=bold, color="FFE8EEFC")
+        if fill: c.fill = fill
+        if fmt: c.number_format = fmt
+        return c
+
+    tput("A1", "درب · نموذج التاجر — اقتصاد الـ3% (1% عميل + 2% درب) · معادلات حيّة", bold=True)
+    tput("A2", "المدخلات (خلايا صفراء)", bold=True, fill=HEADER)
+    # C3=مبيعات · C4=هامش · C5=النسبة الكلية · C6=حصة العميل
+    for r, (label, val, fmt) in enumerate([
+        ("مبيعات التاجر الشهرية (فواتير عملاء البرنامج)", 100000, "#,##0"),
+        ("هامش التاجر (%)", 60, "0"),
+        ("النسبة الكلية من الفاتورة (%)", 3, "0.0"),
+        ("حصة العميل · نقاط (%)", 1, "0.0"),
+    ], start=3):
+        tput(f"A{r}", label); tput(f"C{r}", val, fill=YELLOW, fmt=fmt)
+
+    tput("A8", "النتائج (معادلات)", bold=True, fill=HEADER)
+    outs = [
+        (9, "حصة درب (%)", "=C5-C6", "0.0"),
+        (10, "تكلفة التاجر/شهر (﷼)", "=C3*C5/100", "#,##0.00"),
+        (11, "نقاط العميل/شهر", "=C3*C6/100*السيناريوهات!C6", "#,##0"),
+        (12, "إيراد درب/شهر (﷼)", "=C3*(C5-C6)/100", "#,##0.00"),
+        (13, "إيراد درب/سنة (﷼)", "=C3*(C5-C6)/100*12", "#,##0"),
+        (14, "نقطة التعادل للتاجر (% نمو)", "=C5*100/C4", "0.0"),
+        (15, "ربح إضافي عند نمو 15% (﷼)", "=C3*0.15*C4/100", "#,##0.00"),
+        (16, "صافي ربح التاجر/شهر (﷼)", "=C3*0.15*C4/100-C3*C5/100", "#,##0.00"),
+        (17, "ROI للتاجر", "=(C3*0.15*C4/100-C3*C5/100)/(C3*C5/100)", "0%"),
+    ]
+    for r, label, formula, fmt in outs:
+        tput(f"A{r}", label); tput(f"C{r}", formula, bold=True, fmt=fmt)
+    tput("A19", "💡 التعادل = النسبة ÷ الهامش (~5%). الولاء يعطي 15-30% → التاجر رابح. الاستدامة: التسعير على النمو فوق الأساس.")
+    T.column_dimensions["A"].width = 44
+    T.column_dimensions["C"].width = 16
+
     # 7) إعادة حساب كاملة عند الفتح
     try:
         wb.calculation.fullCalcOnLoad = True
