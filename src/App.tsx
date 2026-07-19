@@ -28,6 +28,7 @@ import ExtendedEconomics from "./components/ExtendedEconomics";
 import ROICalculator from "./components/ROICalculator";
 import TenantTool from "./components/TenantTool";
 import MerchantPitch from "./components/MerchantPitch";
+import MerchantRates from "./components/MerchantRates";
 import BillToPoints from "./components/BillToPoints";
 import HowItWorks from "./components/HowItWorks";
 
@@ -60,6 +61,7 @@ const TABS = [
   // التجار
   { id: "tenants", group: "merchants", label: "أداة المستأجرين", icon: "🤝", el: <TenantTool /> },
   { id: "pitch", group: "merchants", label: "حاسبة إقناع التاجر", icon: "🧮", el: <MerchantPitch /> },
+  { id: "rates", group: "merchants", label: "معدلات Earn & Burn", icon: "🎚️", el: <MerchantRates /> },
   { id: "billpoints", group: "merchants", label: "الفاتورة → النقاط والتحصيل", icon: "🧾", el: <BillToPoints /> },
   { id: "offersadmin", group: "merchants", label: "إدارة العروض", icon: "🛠️", el: <OffersAdmin /> },
   { id: "network", group: "merchants", label: "شبكة التجار (درب/Dsquares)", icon: "🕸️", el: <NetworkModel /> },
