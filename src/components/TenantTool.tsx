@@ -19,9 +19,12 @@ interface TenantRow {
   model: string;
   status: string;
   note: string;
+  earnPct: number; // Earn · النسبة عند الشراء
+  burnPct: number; // Burn · رسوم التسويق عند الاستبدال
+  offers: string; // العروض/الأوبشنز المطلوبة من التاجر
 }
 
-const STORAGE = "tanki.tenants.v1";
+const STORAGE = "tanki.tenants.v2";
 const stars = (n: number) => "⭐".repeat(n);
 const modelByKey = (k: string) =>
   NEGOTIATION_MODELS.find((m) => m.key === k) ?? NEGOTIATION_MODELS[2];
@@ -34,7 +37,10 @@ export default function TenantTool() {
     } catch {
       /* تجاهل */
     }
-    return TENANT_SAMPLES.map((t, idx) => ({ id: idx + 1, ...t }));
+    return TENANT_SAMPLES.map((t, idx) => ({
+      id: idx + 1, ...t,
+      earnPct: 3, burnPct: 5, offers: "قهوة/وجبة مجانية · خصم % · عرض حصري",
+    }));
   });
 
   useEffect(() => {
@@ -77,6 +83,9 @@ export default function TenantTool() {
         model: "split5050",
         status: "لم نتواصل",
         note: "",
+        earnPct: 3,
+        burnPct: 5,
+        offers: "قهوة/وجبة مجانية · خصم %",
       },
     ]);
   const removeTenant = (id: number) =>
@@ -174,6 +183,9 @@ export default function TenantTool() {
                 <th className="th">إيراد/شهر</th>
                 <th className="th">الهامش</th>
                 <th className="th">النموذج</th>
+                <th className="th">العروض/الأوبشنز المطلوبة</th>
+                <th className="th">🟢 Earn %</th>
+                <th className="th">🔴 Burn %</th>
                 <th className="th">ROI</th>
                 <th className="th">الحالة</th>
                 <th className="th"></th>
@@ -196,6 +208,24 @@ export default function TenantTool() {
                     <td className="td">{fmtInt(t.monthly)}</td>
                     <td className="td">{fmtPct(t.margin, 0)}</td>
                     <td className="td text-xs">{modelByKey(t.model).label}</td>
+                    <td className="td">
+                      <input
+                        value={t.offers ?? ""}
+                        onChange={(e) => updateTenant(t.id, { offers: e.target.value })}
+                        placeholder="عروض التاجر…"
+                        className="bg-transparent border-b border-darb-line/50 focus:border-darb-accent outline-none w-44 text-xs text-darb-ink"
+                      />
+                    </td>
+                    <td className="td">
+                      <input type="number" step={0.5} value={t.earnPct ?? 3}
+                        onChange={(e) => updateTenant(t.id, { earnPct: parseFloat(e.target.value) || 0 })}
+                        className="bg-darb-yellow/10 border border-darb-yellow/30 rounded px-2 py-1 w-14 text-left" dir="ltr" />
+                    </td>
+                    <td className="td">
+                      <input type="number" step={0.5} value={t.burnPct ?? 5}
+                        onChange={(e) => updateTenant(t.id, { burnPct: parseFloat(e.target.value) || 0 })}
+                        className="bg-darb-yellow/10 border border-darb-yellow/30 rounded px-2 py-1 w-14 text-left" dir="ltr" />
+                    </td>
                     <td className="td">
                       <Badge tone={ti.roi > 1 ? "good" : "warn"}>{fmtPct(ti.roi, 0)}</Badge>
                     </td>
