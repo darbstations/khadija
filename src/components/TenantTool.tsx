@@ -1,30 +1,27 @@
 import { useState, useEffect } from "react";
-import { tenantImpact, fmtInt, fmtSar, fmtPct, fmtNum } from "../model/engine";
+import { tenantImpact, fmtSar, fmtPct, fmtNum } from "../model/engine";
 import {
   NEGOTIATION_MODELS,
-  TENANT_SAMPLES,
   TENANT_STATUSES,
   NEGOTIATION_SCRIPT,
   OBJECTIONS,
 } from "../model/defaults";
-import { Card, Stat, Badge, NumberInput } from "./ui";
+import { Card, Stat, NumberInput } from "./ui";
 
 interface TenantRow {
   id: number;
   name: string;
   type: string;
-  stations: number;
-  monthly: number;
   margin: number;
   model: string;
-  status: string;
-  note: string;
   earnPct: number; // Earn · النسبة عند الشراء
   burnPct: number; // Burn · رسوم التسويق عند الاستبدال
-  offers: string; // العروض/الأوبشنز المطلوبة من التاجر
+  appOffers: string; // عروض خاصة لعملاء التطبيق
+  redemptionPricing: string; // قيمة المنتجات بالنقاط عند الاستبدال
+  status: string;
 }
 
-const STORAGE = "tanki.tenants.v2";
+const STORAGE = "tanki.tenants.v3";
 const stars = (n: number) => "⭐".repeat(n);
 const modelByKey = (k: string) =>
   NEGOTIATION_MODELS.find((m) => m.key === k) ?? NEGOTIATION_MODELS[2];
@@ -37,10 +34,7 @@ export default function TenantTool() {
     } catch {
       /* تجاهل */
     }
-    return TENANT_SAMPLES.map((t, idx) => ({
-      id: idx + 1, ...t,
-      earnPct: 3, burnPct: 5, offers: "قهوة/وجبة مجانية · خصم % · عرض حصري",
-    }));
+    return []; // تبدأ فاضية · إدخال يدوي
   });
 
   useEffect(() => {
@@ -63,7 +57,6 @@ export default function TenantTool() {
 
   const loadTenant = (t: TenantRow) => {
     setName(t.name);
-    setMonthly(t.monthly);
     setMargin(t.margin);
     setModelKey(t.model);
   };
@@ -75,17 +68,15 @@ export default function TenantTool() {
       ...prev,
       {
         id: Math.max(0, ...prev.map((t) => t.id)) + 1,
-        name: "مستأجر جديد",
-        type: "كافيه",
-        stations: 0,
-        monthly: 100000,
+        name: "",
+        type: "",
         margin: 0.5,
         model: "split5050",
-        status: "لم نتواصل",
-        note: "",
         earnPct: 3,
         burnPct: 5,
-        offers: "قهوة/وجبة مجانية · خصم %",
+        appOffers: "",
+        redemptionPricing: "",
+        status: "لم نتواصل",
       },
     ]);
   const removeTenant = (id: number) =>
@@ -180,80 +171,69 @@ export default function TenantTool() {
               <tr>
                 <th className="th">المستأجر</th>
                 <th className="th">النوع</th>
-                <th className="th">إيراد/شهر</th>
                 <th className="th">الهامش</th>
                 <th className="th">النموذج</th>
-                <th className="th">العروض/الأوبشنز المطلوبة</th>
                 <th className="th">🟢 Earn %</th>
                 <th className="th">🔴 Burn %</th>
-                <th className="th">ROI</th>
+                <th className="th">عروض خاصة لعملاء التطبيق</th>
+                <th className="th">الاستبدال · قيمة المنتجات بالنقاط</th>
                 <th className="th">الحالة</th>
                 <th className="th"></th>
               </tr>
             </thead>
             <tbody>
-              {tenants.map((t) => {
-                const ti = tenantImpact(t.monthly, t.margin, modelByKey(t.model).tenantHalala);
-                return (
-                  <tr key={t.id} className="hover:bg-darb-panel/50">
-                    <td className="td">
-                      <button
-                        onClick={() => loadTenant(t)}
-                        className="font-bold text-darb-accent hover:underline text-right"
-                      >
-                        {t.name}
-                      </button>
-                    </td>
-                    <td className="td">{t.type}</td>
-                    <td className="td">{fmtInt(t.monthly)}</td>
-                    <td className="td">{fmtPct(t.margin, 0)}</td>
-                    <td className="td text-xs">{modelByKey(t.model).label}</td>
-                    <td className="td">
-                      <input
-                        value={t.offers ?? ""}
-                        onChange={(e) => updateTenant(t.id, { offers: e.target.value })}
-                        placeholder="عروض التاجر…"
-                        className="bg-transparent border-b border-darb-line/50 focus:border-darb-accent outline-none w-44 text-xs text-darb-ink"
-                      />
-                    </td>
-                    <td className="td">
-                      <input type="number" step={0.5} value={t.earnPct ?? 3}
-                        onChange={(e) => updateTenant(t.id, { earnPct: parseFloat(e.target.value) || 0 })}
-                        className="bg-darb-yellow/10 border border-darb-yellow/30 rounded px-2 py-1 w-14 text-left" dir="ltr" />
-                    </td>
-                    <td className="td">
-                      <input type="number" step={0.5} value={t.burnPct ?? 5}
-                        onChange={(e) => updateTenant(t.id, { burnPct: parseFloat(e.target.value) || 0 })}
-                        className="bg-darb-yellow/10 border border-darb-yellow/30 rounded px-2 py-1 w-14 text-left" dir="ltr" />
-                    </td>
-                    <td className="td">
-                      <Badge tone={ti.roi > 1 ? "good" : "warn"}>{fmtPct(ti.roi, 0)}</Badge>
-                    </td>
-                    <td className="td">
-                      <select
-                        value={t.status}
-                        onChange={(e) => updateTenant(t.id, { status: e.target.value })}
-                        className="bg-darb-panel border border-darb-line rounded px-1.5 py-1 text-xs"
-                      >
-                        {TENANT_STATUSES.map((s) => (
-                          <option key={s} value={s}>
-                            {s}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    <td className="td">
-                      <button
-                        onClick={() => removeTenant(t.id)}
-                        className="text-darb-bad hover:opacity-70 text-sm"
-                        title="حذف"
-                      >
-                        ✕
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
+              {tenants.map((t) => (
+                <tr key={t.id} className="hover:bg-darb-panel/40 align-top">
+                  <td className="td">
+                    <div className="flex items-center gap-1">
+                      <input value={t.name} onChange={(e) => updateTenant(t.id, { name: e.target.value })} placeholder="اسم التاجر"
+                        className="bg-transparent border-b border-darb-line/50 focus:border-darb-accent outline-none w-28 text-darb-ink font-bold" />
+                      <button onClick={() => loadTenant(t)} title="حمّل في الحاسبة أعلاه" className="text-darb-accent hover:opacity-70 text-xs shrink-0">🧮</button>
+                    </div>
+                  </td>
+                  <td className="td">
+                    <input value={t.type} onChange={(e) => updateTenant(t.id, { type: e.target.value })} placeholder="كافيه…"
+                      className="bg-transparent border-b border-darb-line/50 focus:border-darb-accent outline-none w-20 text-xs text-darb-ink" />
+                  </td>
+                  <td className="td whitespace-nowrap">
+                    <input type="number" value={Math.round(t.margin * 100)} onChange={(e) => updateTenant(t.id, { margin: (parseFloat(e.target.value) || 0) / 100 })}
+                      className="bg-darb-panel border border-darb-line rounded px-2 py-1 w-14 text-left" dir="ltr" />%
+                  </td>
+                  <td className="td">
+                    <select value={t.model} onChange={(e) => updateTenant(t.id, { model: e.target.value })}
+                      className="bg-darb-panel border border-darb-line rounded px-1.5 py-1 text-xs">
+                      {NEGOTIATION_MODELS.map((m) => (<option key={m.key} value={m.key}>{m.label}</option>))}
+                    </select>
+                  </td>
+                  <td className="td">
+                    <input type="number" step={0.5} value={t.earnPct} onChange={(e) => updateTenant(t.id, { earnPct: parseFloat(e.target.value) || 0 })}
+                      className="bg-darb-yellow/10 border border-darb-yellow/30 rounded px-2 py-1 w-14 text-left" dir="ltr" />
+                  </td>
+                  <td className="td">
+                    <input type="number" step={0.5} value={t.burnPct} onChange={(e) => updateTenant(t.id, { burnPct: parseFloat(e.target.value) || 0 })}
+                      className="bg-darb-yellow/10 border border-darb-yellow/30 rounded px-2 py-1 w-14 text-left" dir="ltr" />
+                  </td>
+                  <td className="td">
+                    <textarea value={t.appOffers} onChange={(e) => updateTenant(t.id, { appOffers: e.target.value })} rows={2}
+                      placeholder="مثال: قهوة ثانية مجاناً · خصم 20% على الوجبات لعملاء التطبيق"
+                      className="bg-transparent border border-darb-line/60 rounded px-2 py-1 w-56 text-xs text-darb-ink resize-y align-top" />
+                  </td>
+                  <td className="td">
+                    <textarea value={t.redemptionPricing} onChange={(e) => updateTenant(t.id, { redemptionPricing: e.target.value })} rows={2}
+                      placeholder="مثال: قهوة = 1,600 نقطة · وجبة = 3,000 نقطة"
+                      className="bg-transparent border border-darb-line/60 rounded px-2 py-1 w-56 text-xs text-darb-ink resize-y align-top" />
+                  </td>
+                  <td className="td">
+                    <select value={t.status} onChange={(e) => updateTenant(t.id, { status: e.target.value })}
+                      className="bg-darb-panel border border-darb-line rounded px-1.5 py-1 text-xs">
+                      {TENANT_STATUSES.map((s) => (<option key={s} value={s}>{s}</option>))}
+                    </select>
+                  </td>
+                  <td className="td">
+                    <button onClick={() => removeTenant(t.id)} className="text-darb-bad hover:opacity-70 text-sm" title="حذف">✕</button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
