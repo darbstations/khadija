@@ -480,6 +480,7 @@ for dname,key,records in K.DEPARTMENTS:
         C(flat,fr,29,"#"+st_hex,f=F_(8,color=st_hex),al="center")
         fr+=1
 flat.freeze_panes="D2"; flat.auto_filter.ref=f"A1:{get_column_letter(len(FH))}{fr-1}"
+wb.remove(flat)  # حُذفت ورقة «بيانات الباوربي» بناءً على الطلب
 
 # ============ بطاقة تعريف المؤشرات (قاموس البيانات — حوكمة) ============
 dic=wb.create_sheet("بطاقة تعريف المؤشرات"); rtl(dic)
@@ -750,7 +751,7 @@ for dname,key,records in K.DEPARTMENTS:
 mt.freeze_panes="H4"; mt.auto_filter.ref=f"A3:{last}{mr-1}"
 
 # ترتيب الأوراق
-order=["تقرير المجلس","الاستراتيجية والمستهدفات","الخريطة الاستراتيجية","اللوحة الموجزة","تحليل الانحراف","التتبّع الشهري","سجل المخاطر","ESG والاستدامة","مراجعة وحوكمة المؤشرات","بطاقة تعريف المؤشرات","بيانات الباوربي"]+[sh for _,sh,_,_ in DEPT_RANGES]+["سجل المشاريع","قاعدة المؤشرات"]
+order=["تقرير المجلس","الاستراتيجية والمستهدفات","الخريطة الاستراتيجية","اللوحة الموجزة","تحليل الانحراف","التتبّع الشهري","سجل المخاطر","ESG والاستدامة","مراجعة وحوكمة المؤشرات","بطاقة تعريف المؤشرات"]+[sh for _,sh,_,_ in DEPT_RANGES]+["سجل المشاريع","قاعدة المؤشرات"]
 wb._sheets.sort(key=lambda s: order.index(s.title) if s.title in order else 99)
 for s in wb.worksheets: rtl(s)
 cons.sheet_state="hidden"
