@@ -1,0 +1,187 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تانكي — مقارنة تنفيذية: درب مقابل ديسكوير</title>
+<style>
+  :root{
+    --orange:#F18A2B; --orange-d:#E07C16; --grey:#6D6E70;
+    --bg:#F7F7F5; --card:#FFFFFF; --ink:#26262A; --mut:#6D6E70;
+    --line:#E7E5E1; --good:#1E9E5A; --warn:#C8871B; --bad:#C6413B;
+    --good-bg:#E8F6EE; --warn-bg:#FBF1DD; --bad-bg:#FBE9E8;
+    --darb-bg:#FEF3E6; --ds-bg:#F0F0F2;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#141416; --card:#1E1E22; --ink:#F2F1EE; --mut:#A5A4A0;
+      --line:#33333A; --good-bg:#123322; --warn-bg:#33280F; --bad-bg:#331715;
+      --darb-bg:#2A1E10; --ds-bg:#26262B; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Tahoma,"Noto Sans Arabic",sans-serif;
+    direction:rtl;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
+  header{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+  .logo{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--orange),var(--orange-d));
+    display:grid;place-items:center;color:#fff;font-weight:900;font-size:22px;flex:none;box-shadow:0 4px 14px rgba(241,138,43,.35)}
+  h1{font-size:23px;margin:0;font-weight:900;letter-spacing:-.3px}
+  .sub{color:var(--mut);font-size:13px;margin:2px 0 0}
+  .kick{display:inline-block;background:var(--orange);color:#fff;font-size:11px;font-weight:800;
+    padding:3px 10px;border-radius:999px;margin-bottom:18px}
+  h2{font-size:16px;margin:30px 0 12px;font-weight:800;display:flex;align-items:center;gap:8px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{padding:12px 14px;text-align:right;vertical-align:top;border-bottom:1px solid var(--line)}
+  thead th{font-size:12px;font-weight:800;background:var(--card);position:sticky;top:0}
+  .col-dim{width:130px;font-weight:800;color:var(--ink);background:var(--bg)}
+  .h-darb{color:var(--orange-d)}
+  .h-ds{color:var(--grey)}
+  td.darb{background:var(--darb-bg)}
+  td.ds{background:var(--ds-bg)}
+  tbody tr:last-child td{border-bottom:none}
+  .tag{display:inline-block;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:6px;margin-bottom:6px}
+  .t-good{background:var(--good-bg);color:var(--good)}
+  .t-warn{background:var(--warn-bg);color:var(--warn)}
+  .t-bad{background:var(--bad-bg);color:var(--bad)}
+  ul{margin:0;padding-inline-start:18px}
+  li{margin:3px 0}
+  .score{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 4px}
+  .sc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .sc .lbl{font-size:12px;color:var(--mut);font-weight:700}
+  .sc .win{font-size:15px;font-weight:900;margin-top:6px;display:flex;align-items:center;gap:6px}
+  .verdict{background:linear-gradient(135deg,var(--orange),var(--orange-d));color:#fff;border-radius:18px;
+    padding:22px 22px;margin-top:26px;box-shadow:0 8px 26px rgba(241,138,43,.32)}
+  .verdict h3{margin:0 0 8px;font-size:17px;font-weight:900}
+  .verdict p{margin:6px 0;font-size:14px;opacity:.97}
+  .verdict .path{background:rgba(255,255,255,.16);border-radius:12px;padding:12px 14px;margin-top:12px;font-size:13.5px}
+  .foot{color:var(--mut);font-size:11.5px;margin-top:22px;text-align:center}
+  @media(max-width:620px){.score{grid-template-columns:repeat(2,1fr)}.col-dim{width:84px}th,td{padding:10px 9px;font-size:12.5px}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="logo">د</div>
+    <div>
+      <h1>تانكي — مقارنة تنفيذية</h1>
+      <p class="sub">سيناريو «درب تملك المنصة» مقابل سيناريو «ديسكوير مشغّل كامل»</p>
+    </div>
+  </header>
+  <span class="kick">مذكرة قرار · للإدارة التنفيذية</span>
+
+  <!-- Scorecard -->
+  <div class="score">
+    <div class="sc"><div class="lbl">⚙️ التشغيل</div><div class="win">🟡 متقارب</div></div>
+    <div class="sc"><div class="lbl">💰 المالي</div><div class="win" style="color:var(--orange-d)">🟢 لصالح درب</div></div>
+    <div class="sc"><div class="lbl">📣 التسويق</div><div class="win" style="color:var(--orange-d)">🟢 لصالح درب</div></div>
+    <div class="sc"><div class="lbl">🏛️ الأصول</div><div class="win" style="color:var(--orange-d)">🟢 لصالح درب</div></div>
+  </div>
+
+  <!-- Comparison table -->
+  <h2>📊 المقارنة عبر الأبعاد الأربعة</h2>
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-dim">البُعد</th>
+          <th class="h-darb">🟠 درب تملك المنصة</th>
+          <th class="h-ds">⚪ ديسكوير مشغّل كامل</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- التشغيل -->
+        <tr>
+          <td class="col-dim">⚙️ التشغيل</td>
+          <td class="darb">
+            <span class="tag t-warn">إطلاق أبطأ · تحكّم أعلى</span>
+            <ul>
+              <li>تحكّم كامل بالمحرك والقواعد — تعدّلين الكسب والاستبدال لحظياً.</li>
+              <li>يحتاج فريق تقني + بناء المحفظة وتكامل المضخات (مسؤوليتك).</li>
+              <li>زمن إطلاق أطول، لكن مستقل عن أولويات طرف ثاني.</li>
+            </ul>
+          </td>
+          <td class="ds">
+            <span class="tag t-good">إطلاق أسرع · مرونة أقل</span>
+            <ul>
+              <li>منصة جاهزة — خارطة ٤ أشهر، إطلاق أسرع.</li>
+              <li>أي تعديل يمر عليهم ويخضع لأولوياتهم وطابور عملهم.</li>
+              <li>تكامل المضخات والمحفظة يبقى مسؤوليتك <b>في الحالتين</b> (على المسار الحرج).</li>
+            </ul>
+          </td>
+        </tr>
+        <!-- المالي -->
+        <tr>
+          <td class="col-dim">💰 المالي</td>
+          <td class="darb">
+            <span class="tag t-good">تكلفة أولية أعلى · ربحية أعلى للأبد</span>
+            <ul>
+              <li>هامش النقطة كامل لدرب — لا رسوم منصة على كل معاملة.</li>
+              <li><b>رصيد المحافظ (float) يبقى داخل درب</b> — هدفك الأساسي.</li>
+              <li>Capex أعلى بداية، لكن لا التزام رسوم متكررة يقضم الربحية.</li>
+            </ul>
+          </td>
+          <td class="ds">
+            <span class="tag t-bad">تكلفة بداية أقل · تسرّب دائم</span>
+            <ul>
+              <li>رسوم Setup + رسوم شهرية + رسوم على كل نقطة/معاملة.</li>
+              <li>Open-loop قد يُخرج الـ float من شبكتك.</li>
+              <li>طلب دفعات مقدمة (float للقسائم) + احتمال co-funding للتجار.</li>
+            </ul>
+          </td>
+        </tr>
+        <!-- التسويق -->
+        <tr>
+          <td class="col-dim">📣 التسويق</td>
+          <td class="darb">
+            <span class="tag t-good">استهداف دقيق · ملاءمة عالية</span>
+            <ul>
+              <li>ملكية بيانات العميل بالكامل → حملات واستهداف دقيق.</li>
+              <li>قائمة تجار <b>مصمّمة لعميل المحطات</b> (صرف يومي متكرر).</li>
+              <li>علامة «تانكي» تبني قيمتها ووعيها لصالح درب.</li>
+            </ul>
+          </td>
+          <td class="ds">
+            <span class="tag t-bad">قائمة غير ملائمة · تسويق محدود</span>
+            <ul>
+              <li>القائمة عامة (أزياء/تجزئة/عطور) لا تخدم سائق المحطة.</li>
+              <li>الداتا عندهم → قدرة درب على التسويق الدقيق محدودة.</li>
+              <li>ملاءمة استبدال أضعف → تفاعل أقل ونقاط غير مستبدلة أعلى.</li>
+            </ul>
+          </td>
+        </tr>
+        <!-- الأصول -->
+        <tr>
+          <td class="col-dim">🏛️ الأصول</td>
+          <td class="darb">
+            <span class="tag t-good">أصل استراتيجي متراكم</span>
+            <ul>
+              <li>الداتا + المحفظة + العلامة + علاقة العميل = <b>ملك درب</b>.</li>
+              <li>أصل يتراكم قيمته سنة بعد سنة — لا lock-in.</li>
+              <li>حرية تبديل أي مورّد دون فقدان جوهر البرنامج.</li>
+            </ul>
+          </td>
+          <td class="ds">
+            <span class="tag t-bad">ارتهان · خروج مكلف</span>
+            <ul>
+              <li>الداتا والحسابات على منصتهم — درب تصبح واجهة.</li>
+              <li>Lock-in تعاقدي: العملاء والنقاط والتاريخ عندهم.</li>
+              <li>الخروج لاحقاً مكلف ومعقّد.</li>
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Verdict -->
+  <div class="verdict">
+    <h3>🎯 التوصية — المسار الوسط</h3>
+    <p>درب لا تبني كل شيء، ولا تسلّم كل شيء. تملك <b>النواة</b> وتستأجر <b>الأطراف</b> فقط.</p>
+    <div class="path">
+      <b>١) درب تملك:</b> محرك النقاط + بيانات العميل + المحفظة + العلامة.<br>
+      <b>٢) شراكة محفظة مرخّصة</b> (بدل ترخيص SAMA من الصفر) لاختصار أصعب بند تنظيمي.<br>
+      <b>٣) ديسكوير = مورّد قناة استبدال ثانوية فقط</b> — شبكتهم كخيار إضافي، والداتا تبقى لدى درب.
+    </div>
+    <p style="margin-top:12px">أصعب بند (المحفظة + تكامل المضخات) مسؤولية درب في كل السيناريوهات — فالتنازل عن الملكية لا يحلّه، بل يكلّف درب أثمن أصولها مقابل لا شيء.</p>
+  </div>
+
+  <p class="foot">درب · برنامج تانكي للولاء — وثيقة داخلية للمناقشة التنفيذية · الأرقام والبنود التجارية تُثبَّت عند التفاوض النهائي</p>
+</div>
