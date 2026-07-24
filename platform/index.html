@@ -218,8 +218,8 @@ function calc(){
  $('breakeven').textContent=rem<=0?'مغطّاة ✓':(isFinite(be)?money(be)+' لتر':'—');
  $('be_h').textContent=rem<=0?'غير الوقود يغطّي المصاريف':(isFinite(be)?`نبيع ${(L/be).toFixed(1)}× التعادل`:'—');
  const win=net>=0,v=$('verdict');v.className='bigv '+(win?'win':'lose');
- $('vtext').textContent=win?'🟢 كسبانة':'🔴 خسرانة';$('vnet').innerHTML=(win?'+':'')+fmt(net)+' ر.س<small>صافي الربح/الخسارة</small>';
- const tp=$('toppill');tp.className='pill '+(win?'win':'lose');$('toppill_t').textContent=(win?'كسبانة ':'خسرانة ')+(win?'+':'')+money(net)+' ر.س/شهر';
+ $('vtext').textContent=win?'🟢 رابحة':'🔴 خاسرة';$('vnet').innerHTML=(win?'+':'')+fmt(net)+' ر.س<small>صافي الربح/الخسارة</small>';
+ const tp=$('toppill');tp.className='pill '+(win?'win':'lose');$('toppill_t').textContent=(win?'رابحة ':'خاسرة ')+(win?'+':'')+money(net)+' ر.س/شهر';
 }
 function save(){try{localStorage.setItem(KEY,JSON.stringify(D));$('saved').textContent='✓ محفوظ';setTimeout(()=>{$('saved').textContent='';},1000);}catch(e){}}
 document.addEventListener('input',e=>{const el=e.target;if(!el.dataset||!el.dataset.p)return;let v=el.value;if(el.type==='number'||el.type==='range'||el.classList.contains('edn'))v=parseFloat(v)||0;sp(D,el.dataset.p,v);refresh();});
