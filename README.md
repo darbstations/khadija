@@ -47,6 +47,7 @@ khadija/
 │   ├── framework.md             ← الإطار: نموذج العمل + المحاور + المؤشرات
 │   ├── site-study.md            ← منهجية دراسة وتحليل الموقع (نقطة البداية)
 │   ├── execution.md             ← آلية التنفيذ والحوكمة
+│   ├── tracking-system.md       ← نظام تتبّع المبيعات (المواصفات)
 │   └── glossary.md              ← المصطلحات والمفاهيم
 ├── divisions/                   ← إدارات القسم الأربع + خطة كل إدارة
 │   ├── fuel-sales/README.md         🛢️ إدارة مبيعات الوقود
@@ -76,6 +77,7 @@ khadija/
 - 📐 [الإطار الاستراتيجي للقسم](docs/framework.md)
 - 🔎 [منهجية دراسة وتحليل الموقع](docs/site-study.md)
 - ⚙️ [آلية التنفيذ والحوكمة](docs/execution.md)
+- 📊 [نظام تتبّع المبيعات](docs/tracking-system.md)
 - 🛢️ [إدارة مبيعات الوقود](divisions/fuel-sales/README.md)
 - 🏪 [إدارة التأجير](divisions/leasing/README.md)
 - 🤝 [إدارة الشراكات](divisions/partnerships/README.md)
