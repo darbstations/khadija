@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>المنصّة التجارية · درب — MK007 (تفاعلية)</title>
+<title>منصّة مبيعات القسم التجاري · درب (تفاعلية)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -11,18 +11,19 @@
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#1b1c1e;--panel:#242528;--elev:#2b2c2f;--ink:#f4f5f6;--ink2:#d5d7da;--muted:#9a9da2;--line:#3b3d41;
 --accent:#f18a2b;--accent2:#f7a94e;--good:#3fb27f;--gold:#ffd54a;--sky:#38bdf8;--crit:#e06666;
---good-bg:rgba(63,178,127,.14);--crit-bg:rgba(224,102,102,.14);--gold-bg:rgba(255,213,74,.12);
+--good-bg:rgba(63,178,127,.14);--crit-bg:rgba(224,102,102,.14);--gold-bg:rgba(255,213,74,.12);--sky-bg:rgba(56,189,248,.12);
 --f91:#38bdf8;--f95:#f18a2b;--fd:#6b7280;--sh:0 10px 28px rgba(0,0,0,.35);--sh2:0 20px 50px rgba(0,0,0,.45)}
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--ink);font-family:Tajawal,Cairo,"Segoe UI",Tahoma,Arial,sans-serif;direction:rtl;line-height:1.6;-webkit-font-smoothing:antialiased}
 .tnum{font-variant-numeric:tabular-nums}
-.wrap{max-width:1140px;margin:0 auto;padding:0 clamp(14px,3vw,26px)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(14px,3vw,26px)}
 .top{position:sticky;top:0;z-index:30;background:rgba(27,28,30,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.top .row{display:flex;align-items:center;gap:11px;padding:10px 0;flex-wrap:wrap}
+.top .row{display:flex;align-items:center;gap:10px;padding:10px 0;flex-wrap:wrap}
 .mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#e0922e);color:#1b1c1e;display:grid;place-items:center;font-weight:800;font-size:16px;flex:none}
 .top .nm{font-weight:800;font-size:14.5px}
 .pill{display:inline-flex;align-items:center;gap:7px;font-weight:800;font-size:12.5px;padding:6px 12px;border-radius:999px;white-space:nowrap}
 .pill.win{background:var(--good-bg);color:var(--good)}.pill.lose{background:var(--crit-bg);color:var(--crit)}
+.pill.pipe{background:var(--gold-bg);color:var(--gold)}
 .pill .dot{width:8px;height:8px;border-radius:50%;background:currentColor}
 .tools{display:flex;gap:7px;margin-inline-start:auto;align-items:center;flex-wrap:wrap}
 .btn{font-family:inherit;font-size:12.5px;font-weight:700;padding:7px 12px;border-radius:9px;border:1px solid var(--line);background:var(--elev);color:var(--ink);cursor:pointer}
@@ -36,23 +37,49 @@ textarea.ed{resize:vertical;min-height:40px;line-height:1.5}
 .edn{width:76px;background:var(--elev);border:1px solid var(--line);border-radius:7px;color:inherit;font:inherit;font-variant-numeric:tabular-nums;padding:5px 8px;text-align:left;direction:ltr}
 .edn:focus{outline:none;border-color:var(--accent)}
 select.ed{border:1px solid var(--line);border-radius:7px;background:var(--elev);padding:4px 7px;width:auto}
-.hero{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:22px;margin-top:14px;padding:clamp(20px,4vw,36px);background:radial-gradient(130% 150% at 88% -20%,rgba(241,138,43,.28) 0%,rgba(241,138,43,.05) 34%,var(--elev) 62%);box-shadow:var(--sh2)}
+.hero{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:22px;margin-top:14px;padding:clamp(20px,4vw,32px);background:radial-gradient(130% 150% at 88% -20%,rgba(241,138,43,.28) 0%,rgba(241,138,43,.05) 34%,var(--elev) 62%);box-shadow:var(--sh2)}
 .hero .ed{color:var(--ink)}
 .hero .eyeb{color:var(--accent2);font-weight:700;letter-spacing:.14em;font-size:12px;border-bottom-color:transparent}
-.hero .nameed{font-size:clamp(23px,4.4vw,40px);font-weight:800;letter-spacing:-.02em;margin:8px 0 6px}
-.hero .taged{color:var(--ink2);font-size:14.5px}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:22px}
-.hk{border-top:2px solid var(--accent);padding-top:8px}
-.hk .vr{display:flex;gap:5px;align-items:baseline}
-.hk .vr .ed{font-size:22px;font-weight:800;width:auto;min-width:40px}.hk .vr .un{font-size:12px;color:var(--ink2);width:auto}
-.hk .lb{font-size:12px;color:var(--muted);margin-top:2px}
-.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:18px}
-.chip{font-size:11.5px;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line)}
-.chip .ed{width:auto;min-width:60px;font-size:11.5px;border-bottom-color:transparent;color:var(--ink2)}
-section{margin-top:34px;scroll-margin-top:60px}
+.hero .nameed{font-size:clamp(21px,4vw,34px);font-weight:800;letter-spacing:-.02em;margin:8px 0 6px}
+.hero .taged{color:var(--ink2);font-size:14px}
+.pfk{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:20px}
+.pfc{border-top:2px solid var(--accent);padding-top:8px}
+.pfc .v{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}.pfc .l{font-size:12px;color:var(--muted);margin-top:2px}
+section{margin-top:32px;scroll-margin-top:60px}
 .shead{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
 .shead .no{font-size:12px;font-weight:800;color:var(--accent);letter-spacing:.12em}
-.shead h2{font-size:clamp(18px,2.4vw,22px);font-weight:800}.shead .rule{flex:1;height:1px;background:var(--line)}
+.shead h2{font-size:clamp(17px,2.4vw,22px);font-weight:800}.shead .rule{flex:1;height:1px;background:var(--line)}
+/* overview cards */
+.ovg{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:13px}
+.ovc{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:15px 16px;cursor:pointer;transition:border-color .15s,transform .1s}
+.ovc:hover{border-color:var(--accent2);transform:translateY(-2px)}
+.ovc.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),var(--sh)}
+.ovc .code{font-size:11px;font-weight:800;color:var(--accent2);letter-spacing:.08em}
+.ovc .nm{font-size:16px;font-weight:800;margin:2px 0 2px}
+.ovc .mt{font-size:11.5px;color:var(--muted)}
+.ovc .st{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px;border-top:1px solid var(--line);padding-top:11px}
+.ovc .st .k{font-size:10.5px;color:var(--muted)}.ovc .st .b{font-size:14px;font-weight:800;font-variant-numeric:tabular-nums}
+.ovc .foot{display:flex;justify-content:space-between;align-items:center;margin-top:11px}
+.ovc .badge{font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px}
+.ovc .badge.win{background:var(--good-bg);color:var(--good)}.ovc .badge.lose{background:var(--crit-bg);color:var(--crit)}
+.ovc .open{font-size:11px;color:var(--accent2);font-weight:700}
+.ovc.sel .open{color:var(--accent)}
+.stationtag{display:inline-flex;gap:7px;align-items:center;font-size:12px;font-weight:800;color:var(--accent2);background:var(--elev);border:1px solid var(--line);border-radius:999px;padding:4px 12px;margin-bottom:10px}
+.sheader{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:20px;padding:clamp(18px,3vw,26px);background:linear-gradient(180deg,rgba(241,138,43,.06),var(--panel));box-shadow:var(--sh)}
+.sheader .eyeb{color:var(--accent2);font-weight:700;letter-spacing:.12em;font-size:12px;border-bottom-color:transparent}
+.sheader .nameed{font-size:clamp(20px,3.6vw,30px);font-weight:800;margin:6px 0 5px}
+.sheader .taged{color:var(--ink2);font-size:13.5px}
+.smeta{display:flex;gap:7px;flex-wrap:wrap;margin-top:13px}
+.smeta .mi{display:inline-flex;gap:5px;align-items:center;background:var(--elev);border:1px solid var(--line);border-radius:9px;padding:4px 9px;font-size:11.5px}
+.smeta .mi .k{color:var(--muted);font-weight:700}.smeta .mi .ed{width:auto;min-width:44px;border-bottom-color:transparent;font-size:11.5px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:13px;margin-top:16px}
+.hk{border-top:2px solid var(--accent);padding-top:7px}
+.hk .vr{display:flex;gap:5px;align-items:baseline}
+.hk .vr .ed{font-size:20px;font-weight:800;width:auto;min-width:36px}.hk .vr .un{font-size:12px;color:var(--ink2);width:auto}
+.hk .lb{font-size:11.5px;color:var(--muted);margin-top:2px}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:15px}
+.chip{font-size:11.5px;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line)}
+.chip .ed{width:auto;min-width:60px;font-size:11.5px;border-bottom-color:transparent;color:var(--ink2)}
 .grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
 @media(max-width:820px){.g3{grid-template-columns:1fr 1fr}}@media(max-width:560px){.g2,.g3{grid-template-columns:1fr}}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:15px 16px}
@@ -73,6 +100,33 @@ section{margin-top:34px;scroll-margin-top:60px}
 .sug{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
 .sug .it{display:flex;gap:6px;align-items:center;background:var(--elev);border:1px solid var(--line);border-radius:9px;padding:5px 9px;font-size:12.5px}
 .sug .it .ed{width:auto;min-width:80px;border-bottom-color:transparent}
+.scen{margin-top:12px;background:var(--elev);border:1px solid var(--line);border-radius:14px;padding:13px 15px}
+.scen .sh{font-size:13px;font-weight:800;margin-bottom:9px;color:var(--accent2)}
+.scen-g{display:grid;grid-template-columns:1fr 1fr;gap:9px}@media(max-width:560px){.scen-g{grid-template-columns:1fr}}
+.scen-i{display:flex;gap:8px;align-items:flex-start;font-size:12.5px}
+.scen-i .k{flex:none;width:52px;font-weight:800;color:var(--muted)}
+.pnote{font-size:12.5px;color:var(--muted);margin-bottom:12px}
+.psum{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:11px;margin-bottom:14px}
+.pm{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:12px 14px}
+.pm .v{font-size:21px;font-weight:800;font-variant-numeric:tabular-nums}
+.pm .l{font-size:11.5px;color:var(--muted);margin-top:3px}
+.pm.tot{border-top:2px solid var(--gold)}.pm.con{border-top:2px solid var(--good)}.pm.opn{border-top:2px solid var(--accent)}
+.pbars{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin-bottom:14px}
+.pbars .bh{font-size:12px;font-weight:800;color:var(--muted);margin-bottom:9px}
+.plist{display:grid;grid-template-columns:1fr 1fr;gap:11px}@media(max-width:720px){.plist{grid-template-columns:1fr}}
+.opp{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 13px;box-shadow:var(--sh);border-inline-start:3px solid var(--accent)}
+.opp-t{display:flex;gap:8px;align-items:center;margin-bottom:7px}
+.opp-t .oppname{font-weight:800;font-size:14px}
+.opp .opptype{font-size:12px;color:var(--ink2);margin-bottom:9px}
+.opp-b{display:flex;gap:7px;align-items:center;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:9px}
+.opp-b .oppval{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)}
+.opp-b .edn{width:82px}
+.xbtn{flex:none;width:24px;height:24px;border-radius:7px;border:1px solid var(--line);background:var(--elev);color:var(--crit);cursor:pointer;font-size:12px;line-height:1}
+.xbtn:hover{border-color:var(--crit);background:var(--crit-bg)}
+.stg{font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;flex:none;background:rgba(255,255,255,.06)}
+.addrow{margin-top:13px}
+.metric{margin:8px 0}.metric .t{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;gap:8px}.metric .t b{font-variant-numeric:tabular-nums}
+.track{height:9px;border-radius:5px;background:var(--elev);overflow:hidden}.track i{display:block;height:100%;border-radius:5px;width:0}
 .donut{width:130px;height:130px;border-radius:50%;flex:none;position:relative}
 .donut::after{content:"";position:absolute;inset:19px;border-radius:50%;background:var(--panel)}
 .donut .mid{position:absolute;inset:0;display:grid;place-content:center;text-align:center;z-index:1}
@@ -80,11 +134,11 @@ section{margin-top:34px;scroll-margin-top:60px}
 .leg{display:flex;flex-direction:column;gap:6px;font-size:12.5px;justify-content:center;flex:1}
 .legrow{display:flex;align-items:center;gap:7px}.sw{width:11px;height:11px;border-radius:3px;flex:none}
 .legrow .ed{flex:1}.legrow .edn{width:56px}
-.metric{margin:8px 0}.metric .t{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;gap:8px}.metric .t b{font-variant-numeric:tabular-nums}
-.track{height:9px;border-radius:5px;background:var(--elev);overflow:hidden}.track i{display:block;height:100%;border-radius:5px;width:0}
-.alert{display:inline-flex;gap:6px;font-size:11.5px;font-weight:700;color:var(--crit);background:var(--crit-bg);padding:3px 9px;border-radius:999px;margin-top:8px;align-items:center;flex-wrap:wrap}
+.alert{display:flex;gap:6px;font-size:11.5px;font-weight:700;color:var(--crit);background:var(--crit-bg);padding:5px 9px;border-radius:10px;margin-top:8px;align-items:center;flex-wrap:wrap}
+.alert .ed{color:var(--crit);flex:1;min-width:120px;border-bottom-color:rgba(224,102,102,.3)}
 .alert .edn{width:64px}
 .monthly{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}.monthly .edn{width:54px}
+.note-ed{font-size:12.5px;color:var(--ink2)}
 .fin{display:grid;grid-template-columns:340px 1fr;gap:18px}@media(max-width:820px){.fin{grid-template-columns:1fr}}
 .slbl{font-size:10.5px;color:var(--muted);letter-spacing:.05em;margin:13px 0 8px;font-weight:800}
 .fld{margin-bottom:10px}.fld label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:4px}
@@ -108,67 +162,102 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 </head>
 <body>
 <div class="top"><div class="wrap row">
- <div class="mark">د</div><div class="nm">تانكي · درب — المنصّة</div>
+ <div class="mark">د</div><div class="nm">تانكي · درب — منصّة المبيعات</div>
+ <span id="pipepill" class="pill pipe"><span class="dot"></span><span id="pipepill_t">—</span></span>
  <span id="toppill" class="pill win"><span class="dot"></span><span id="toppill_t">—</span></span>
  <div class="tools"><span class="saved" id="saved"></span>
   <button class="btn" id="reset">↺ استرجاع الأصل</button>
   <button class="btn pri" id="export">⬇️ تصدير data.json</button></div>
 </div></div>
 <div class="wrap">
- <div class="hint">✏️ <b>كل الحقول قابلة للتعديل</b> — عدّل أي قيمة (اسم، رقم، براند، نسبة...) والرسوم والربحية تتحدّث لحظياً. يُحفظ تلقائياً في متصفحك، وللنشر اضغط <b>تصدير data.json</b>.</div>
+ <div class="hint">✏️ <b>كل معلومة حقل قابل للتعديل</b> — اختر محطة من النظرة العامة، وعدّل أي قيمة (اسم، رقم، فرصة بيع، نسبة...) وكل الرسوم وخط أنابيب المبيعات والربحية تتحدّث لحظياً. يُحفظ تلقائياً، وللنشر اضغط <b>تصدير data.json</b>.</div>
+
  <div class="hero">
-  <input class="ed eyeb" data-p="station.eyebrow">
-  <input class="ed nameed" data-p="station.name">
-  <textarea class="ed taged" data-p="station.tagline"></textarea>
-  <div class="kpis" id="kpis"></div>
-  <div class="chips" id="chips"></div>
+  <input class="ed eyeb" data-p="platform.name" style="font-size:20px;font-weight:800;color:var(--ink);border-bottom-color:transparent">
+  <textarea class="ed taged" data-p="platform.tagline"></textarea>
+  <div class="pfk" id="pfk"></div>
  </div>
- <section id="serve"><div class="shead"><span class="no">01</span><h2>مَن تخدمه المحطة</h2><span class="rule"></span></div>
-  <div class="grid g3" id="segments"></div><div class="demo" id="demo"></div></section>
- <section id="comp"><div class="shead"><span class="no">02</span><h2>المحيط التنافسي</h2><span class="rule"></span></div>
-  <div class="vs"><div class="box us"><div class="h">🟠 محطتنا (MK007)</div><div id="us"></div></div>
-  <div class="box"><div class="h">🏁 المنافسون</div><div id="them"></div></div></div>
-  <div class="adv">✅ <b>ميزتنا:</b> <input class="ed" data-p="advantage"></div>
-  <div class="gap">⚠️ <b>الفجوة:</b> <input class="ed" data-p="gap"><div class="sug" id="suggested"></div></div></section>
- <section id="axes"><div class="shead"><span class="no">03</span><h2>أداء المحاور الخمسة</h2><span class="rule"></span></div>
-  <div class="grid g2">
-   <div class="card"><h3>⛽ الوقود — المزيج (عدّل النِسب)</h3>
-    <div style="display:flex;gap:16px;align-items:center"><div class="donut" id="donut"><div class="mid"><b id="dmid">—</b><span>لتر/شهر</span></div></div><div class="leg" id="leg"></div></div>
-    <div class="metric" style="margin-top:12px"><div class="t"><span>الاتجاه الشهري (مليون لتر)</span><span id="trend"></span></div><svg id="spark" viewBox="0 0 300 42" width="100%" height="42" preserveAspectRatio="none"></svg><div class="monthly" id="monthly"></div></div></div>
-   <div class="card"><h3>💳 طرق الدفع (عدّل النِسب)</h3><div id="pay"></div><div class="alert">⚑ التطبيق منخفض — فرصة رقمية</div></div>
-   <div class="card"><h3>🏪 التأجير</h3><input class="ed" data-p="leasing.note" style="font-size:13px">
-    <div class="metric" style="margin-top:10px"><div class="t"><span>إشغال الامتياز</span><span><input class="edn" type="number" data-p="leasing.franchiseOcc">٪</span></div><div class="track"><i id="occbar" style="background:var(--crit)"></i></div></div>
-    <div class="alert">🚨 وحدات شاغرة بالشبكة: <input class="edn" type="number" data-p="leasing.vacant"> — أكبر فرصة</div></div>
-   <div class="card"><h3>🎁 تانكي · 🤝 الشراكات</h3><div style="font-size:13px;color:var(--ink2)"><b>تانكي:</b> ولاء عالٍ لدى السكان.<br><b>الشراكات:</b> «المذاق المغربي» مستأجر + شريك حملة (+9.5٪) — نموذج نكرّره + أساطيل.</div></div>
-  </div></section>
- <section id="fin"><div class="shead"><span class="no">04</span><h2>نموذج الربحية التفاعلي</h2><span class="rule"></span></div>
-  <div class="fin"><div class="card">
-    <div class="slbl">⛽ الوقود</div>
-    <div class="fld"><label>اللترات / شهر</label><div class="inp"><input id="liters" type="number" data-p="finance.liters"><span class="u">لتر</span></div></div>
-    <div class="fld"><label>هامش الوقود / لتر <span class="val" id="marginv"></span></label><input id="margin" type="range" min="0" max="0.5" step="0.01" data-p="finance.margin"></div>
-    <div class="slbl">🏪 التأجير</div>
-    <div class="fld"><label>عدد الوحدات</label><div class="inp"><input id="units" type="number" data-p="finance.units"><span class="u">وحدة</span></div></div>
-    <div class="fld"><label>نسبة الإشغال <span class="val" id="occv"></span></label><input id="occ" type="range" min="0" max="100" step="1" data-p="finance.occ"></div>
-    <div class="fld"><label>متوسط الإيجار / وحدة</label><div class="inp"><input id="rent" type="number" data-p="finance.rent"><span class="u">ر.س</span></div></div>
-    <div class="fld"><label>دخل المتجر/الخدمات</label><div class="inp"><input id="store" type="number" data-p="finance.store"><span class="u">ر.س</span></div></div>
-    <div class="slbl">💸 المصاريف الشهرية</div>
-    <div class="fld"><label>رواتب</label><div class="inp"><input id="salaries" type="number" data-p="finance.salaries"><span class="u">ر.س</span></div></div>
-    <div class="fld"><label>إيجار/تشغيل</label><div class="inp"><input id="oprent" type="number" data-p="finance.oprent"><span class="u">ر.س</span></div></div>
-    <div class="fld"><label>كهرباء وماء</label><div class="inp"><input id="utils" type="number" data-p="finance.utils"><span class="u">ر.س</span></div></div>
-    <div class="fld"><label>صيانة · أخرى</label><div class="inp"><input id="maint" type="number" data-p="finance.maint"><span class="u">ر.س</span></div></div>
-   </div>
-   <div><div class="res">
-    <div class="bigv win" id="verdict"><div><div style="font-size:12px;color:var(--muted)">حالة المحطة (شهرياً)</div><div class="st" id="vtext">—</div></div><div class="n" id="vnet">—<small>صافي</small></div></div>
-    <div class="r inc"><div class="v tnum" id="fuelinc">—</div><div class="l">دخل الوقود</div><div class="h" id="fuelinc_h"></div></div>
-    <div class="r inc"><div class="v tnum" id="rentinc">—</div><div class="l">دخل التأجير</div><div class="h" id="rentinc_h"></div></div>
-    <div class="r inc"><div class="v tnum" id="totinc">—</div><div class="l">إجمالي الدخل</div></div>
-    <div class="r exp"><div class="v tnum" id="totexp">—</div><div class="l">إجمالي المصاريف</div></div>
-    <div class="r"><div class="v tnum" id="cpl">—</div><div class="l">تكلفة التشغيل/لتر</div></div>
-    <div class="r"><div class="v tnum" id="coverage">—</div><div class="l">تغطية غير الوقود</div></div>
-    <div class="r"><div class="v tnum" id="breakeven">—</div><div class="l">نقطة التعادل</div><div class="h" id="be_h"></div></div>
-   </div></div>
-  </div></section>
- <div class="foot">تانكي · درب — منصّة تفاعلية · كل الحقول قابلة للتعديل · صدّر <b>data.json</b> والصقه في المستودع لينشر تلقائياً.</div>
+
+ <section id="overview"><div class="shead"><span class="no">٠٠</span><h2>نظرة عامة — محطات القسم التجاري</h2><span class="rule"></span></div>
+  <div class="ovg" id="ov"></div>
+  <button class="btn pri addrow" id="addst">➕ أضف محطة</button></section>
+
+ <div id="detail">
+  <div class="stationtag">📍 <span id="curtag">—</span> — تحليل المبيعات</div>
+  <div class="sheader">
+   <input class="ed eyeb" data-sp="station.eyebrow">
+   <input class="ed nameed" data-sp="station.name">
+   <textarea class="ed taged" data-sp="station.tagline"></textarea>
+   <div class="smeta" id="smeta"></div>
+   <div class="kpis" id="skpis"></div>
+   <div class="chips" id="schips"></div>
+  </div>
+
+  <section id="serve"><div class="shead"><span class="no">01</span><h2>مَن نبيع له</h2><span class="rule"></span></div>
+   <div class="grid g3" id="segments"></div><div class="demo" id="demo"></div></section>
+
+  <section id="comp"><div class="shead"><span class="no">02</span><h2>المحيط التنافسي وبطاقة السيناريو</h2><span class="rule"></span></div>
+   <div class="vs"><div class="box us"><div class="h">🟠 محطتنا</div><div id="us"></div></div>
+   <div class="box"><div class="h">🏁 المنافسون</div><div id="them"></div></div></div>
+   <div class="adv">✅ <b>ميزتنا:</b> <input class="ed" data-sp="advantage"></div>
+   <div class="gap">⚠️ <b>الفجوة:</b> <input class="ed" data-sp="gap"><div class="sug" id="suggested"></div></div>
+   <div class="scen"><div class="sh">🛣️ بطاقة السيناريو — موقعنا على الطريق</div><div class="scen-g">
+    <div class="scen-i"><span class="k">الطريق</span><input class="ed" data-sp="scenario.road"></div>
+    <div class="scen-i"><span class="k">قبلنا</span><input class="ed" data-sp="scenario.before"></div>
+    <div class="scen-i"><span class="k">بعدنا</span><input class="ed" data-sp="scenario.after"></div>
+    <div class="scen-i"><span class="k">الكثافة</span><input class="ed" data-sp="scenario.density"></div>
+   </div></div></section>
+
+  <section id="pipe"><div class="shead"><span class="no">03</span><h2>🎯 خريطة فرص المبيعات — الجوار التجاري (B2B)</h2><span class="rule"></span></div>
+   <input class="ed pnote" data-sp="pipeline.note">
+   <div class="psum" id="psum"></div>
+   <div class="pbars"><div class="bh">قيمة خط الأنابيب حسب قناة البيع (ر.س/شهر)</div><div id="pbars"></div></div>
+   <div class="plist" id="plist"></div>
+   <button class="btn pri addrow" id="addopp">➕ أضف فرصة مبيعات</button></section>
+
+  <section id="axes"><div class="shead"><span class="no">04</span><h2>أداء خطط المبيعات (وقود · تأجير · تطبيق)</h2><span class="rule"></span></div>
+   <div class="grid g2">
+    <div class="card"><h3>⛽ الوقود — المزيج (عدّل النِسب)</h3>
+     <div style="display:flex;gap:16px;align-items:center"><div class="donut" id="donut"><div class="mid"><b id="dmid">—</b><span>لتر/شهر</span></div></div><div class="leg" id="leg"></div></div>
+     <div class="metric" style="margin-top:12px"><div class="t"><span>الاتجاه الشهري (مليون لتر)</span><span id="trend"></span></div><svg id="spark" viewBox="0 0 300 42" width="100%" height="42" preserveAspectRatio="none"></svg><div class="monthly" id="monthly"></div></div></div>
+    <div class="card"><h3>💳 طرق الدفع (عدّل النِسب)</h3><div id="pay"></div><div class="alert">⚑ <input class="ed" data-sp="notes.payAlert"></div></div>
+    <div class="card"><h3>🏪 التأجير</h3><input class="ed note-ed" data-sp="leasing.note">
+     <div class="metric" style="margin-top:10px"><div class="t"><span>إشغال الوحدات</span><span><input class="edn" type="number" data-sp="leasing.franchiseOcc">٪</span></div><div class="track"><i id="occbar" style="background:var(--crit)"></i></div></div>
+     <div class="alert">🚨 <input class="ed" data-sp="notes.vacantAlert"> — <input class="edn" type="number" data-sp="leasing.vacant"></div></div>
+    <div class="card"><h3>🎁 تانكي · 🤝 الشراكات</h3>
+     <div style="font-size:12px;color:var(--muted);margin-bottom:2px">🎁 تانكي</div><textarea class="ed note-ed" data-sp="notes.tanki"></textarea>
+     <div style="font-size:12px;color:var(--muted);margin:8px 0 2px">🤝 الشراكات</div><textarea class="ed note-ed" data-sp="notes.partners"></textarea></div>
+   </div></section>
+
+  <section id="fin"><div class="shead"><span class="no">05</span><h2>نموذج الربحية التفاعلي</h2><span class="rule"></span></div>
+   <div class="fin"><div class="card">
+     <div class="slbl">⛽ الوقود</div>
+     <div class="fld"><label>اللترات / شهر</label><div class="inp"><input type="number" data-sp="finance.liters"><span class="u">لتر</span></div></div>
+     <div class="fld"><label>هامش الوقود / لتر <span class="val" id="marginv"></span></label><input type="range" min="0" max="0.5" step="0.01" data-sp="finance.margin"></div>
+     <div class="slbl">🏪 التأجير</div>
+     <div class="fld"><label>عدد الوحدات</label><div class="inp"><input type="number" data-sp="finance.units"><span class="u">وحدة</span></div></div>
+     <div class="fld"><label>نسبة الإشغال <span class="val" id="occv"></span></label><input type="range" min="0" max="100" step="1" data-sp="finance.occ"></div>
+     <div class="fld"><label>متوسط الإيجار / وحدة</label><div class="inp"><input type="number" data-sp="finance.rent"><span class="u">ر.س</span></div></div>
+     <div class="fld"><label>دخل المتجر/الخدمات</label><div class="inp"><input type="number" data-sp="finance.store"><span class="u">ر.س</span></div></div>
+     <div class="slbl">💸 المصاريف الشهرية</div>
+     <div class="fld"><label>رواتب</label><div class="inp"><input type="number" data-sp="finance.salaries"><span class="u">ر.س</span></div></div>
+     <div class="fld"><label>إيجار/تشغيل</label><div class="inp"><input type="number" data-sp="finance.oprent"><span class="u">ر.س</span></div></div>
+     <div class="fld"><label>كهرباء وماء</label><div class="inp"><input type="number" data-sp="finance.utils"><span class="u">ر.س</span></div></div>
+     <div class="fld"><label>صيانة · أخرى</label><div class="inp"><input type="number" data-sp="finance.maint"><span class="u">ر.س</span></div></div>
+    </div>
+    <div><div class="res">
+     <div class="bigv win" id="verdict"><div><div style="font-size:12px;color:var(--muted)">حالة المحطة (شهرياً)</div><div class="st" id="vtext">—</div></div><div class="n" id="vnet">—<small>صافي</small></div></div>
+     <div class="r inc"><div class="v tnum" id="fuelinc">—</div><div class="l">دخل الوقود</div><div class="h" id="fuelinc_h"></div></div>
+     <div class="r inc"><div class="v tnum" id="rentinc">—</div><div class="l">دخل التأجير</div><div class="h" id="rentinc_h"></div></div>
+     <div class="r inc"><div class="v tnum" id="totinc">—</div><div class="l">إجمالي الدخل</div></div>
+     <div class="r exp"><div class="v tnum" id="totexp">—</div><div class="l">إجمالي المصاريف</div></div>
+     <div class="r"><div class="v tnum" id="cpl">—</div><div class="l">تكلفة التشغيل/لتر</div></div>
+     <div class="r"><div class="v tnum" id="coverage">—</div><div class="l">تغطية غير الوقود</div></div>
+     <div class="r"><div class="v tnum" id="breakeven">—</div><div class="l">نقطة التعادل</div><div class="h" id="be_h"></div></div>
+    </div></div>
+   </div></section>
+ </div>
+ <div class="foot">تانكي · درب — منصّة مبيعات تفاعلية · نظرة عامة + تحليل لكل محطة · كل معلومة قابلة للتعديل · صدّر <b>data.json</b> للنشر.</div>
 </div>
 <script>
 const $=id=>document.getElementById(id);
@@ -177,39 +266,65 @@ const money=n=>Math.abs(n)>=1e6?(n/1e6).toFixed(2)+'M':fmt(n);
 const gp=(o,p)=>p.split('.').reduce((a,k)=>a==null?a:a[k],o);
 const sp=(o,p,v)=>{const ks=p.split('.'),last=ks.pop();let t=o;ks.forEach(k=>t=t[k]);t[last]=v;};
 const FC=['var(--f91)','var(--f95)','var(--fd)'],PC=['var(--fd)','var(--sky)','var(--accent)'];
-let D={};const KEY='darb_commercial_v1';
-function setAll(){document.querySelectorAll('[data-p]').forEach(e=>{e.value=gp(D,e.dataset.p);});}
+const CH=['⛽ وقود أسطول','🏪 تأجير','🤝 شراكة','🔄 بيع متقاطع'];
+const ST=['فرصة','تواصل','عرض مقدّم','متعاقد'];
+const STC={'فرصة':'var(--muted)','تواصل':'var(--sky)','عرض مقدّم':'var(--gold)','متعاقد':'var(--good)'};
+const PRI=['عالية','متوسطة','منخفضة'];
+const opt=(arr,sel)=>arr.map(o=>`<option${o===sel?' selected':''}>${o}</option>`).join('');
+let D={},sel=0;const KEY='darb_sales_v2';
+const S=()=>D.stations[sel],P=()=>'stations.'+sel+'.';
+function net(st){const f=st.finance,L=+f.liters||0,m=+f.margin||0,occ=(+f.occ||0)/100;const exp=(+f.salaries||0)+(+f.oprent||0)+(+f.utils||0)+(+f.maint||0);return m*L+(+f.units||0)*occ*(+f.rent||0)+(+f.store||0)-exp;}
+const pipeTot=st=>st.pipeline.items.reduce((a,o)=>a+(+o.value||0),0);
+function setAll(){document.querySelectorAll('[data-p]').forEach(e=>{const v=gp(D,e.dataset.p);if(v!=null)e.value=v;});}
 function build(){
- $('kpis').innerHTML=D.kpis.map((k,i)=>`<div class="hk"><div class="vr"><input class="ed" data-p="kpis.${i}.v"><input class="ed un" data-p="kpis.${i}.u"></div><input class="ed lb" data-p="kpis.${i}.l"></div>`).join('');
- $('chips').innerHTML=D.chips.map((c,i)=>`<span class="chip"><input class="ed" data-p="chips.${i}"></span>`).join('');
- $('segments').innerHTML=D.segments.map((s,i)=>`<div class="card seg"><div class="tl"><span class="ic">${s.ic}</span><input class="ed" data-p="segments.${i}.t"></div><input class="ed" data-p="segments.${i}.d" style="font-size:13px;color:var(--ink2);margin-top:4px"><textarea class="ed ev" data-p="segments.${i}.ev"></textarea></div>`).join('');
- $('demo').innerHTML=D.demo.map((d,i)=>`<span>📊 <input class="ed" data-p="demo.${i}"></span>`).join('');
- $('us').innerHTML=D.us.map((r,i)=>`<div class="brow"><input class="ed k" data-p="us.${i}.0"><input class="ed" data-p="us.${i}.1"></div>`).join('');
- $('them').innerHTML=D.them.map((r,i)=>`<div class="brow"><input class="ed k" data-p="them.${i}.0"><input class="ed" data-p="them.${i}.1"></div>`).join('');
- $('suggested').innerHTML=D.suggested.map((s,i)=>`<span class="it"><input class="ed" data-p="suggested.${i}.0"><select class="ed" data-p="suggested.${i}.1"><option>عالية</option><option>متوسطة</option><option>منخفضة</option></select></span>`).join('');
- $('monthly').innerHTML=D.fuel.monthly.map((m,i)=>`<input class="edn" type="number" step="0.01" data-p="fuel.monthly.${i}">`).join('');
- $('leg').innerHTML=D.fuel.mix.map((m,i)=>`<div class="legrow"><i class="sw" style="background:${FC[i]}"></i><input class="ed" data-p="fuel.mix.${i}.0"><input class="edn" type="number" data-p="fuel.mix.${i}.1">٪</div>`).join('')+`<div class="legrow" style="color:var(--muted);font-size:11.5px">متوسط <input class="edn" data-p="fuel.avg" style="width:52px"> ر.س/لتر</div>`;
- $('pay').innerHTML=D.payment.map((pm,i)=>`<div class="metric"><div class="t"><span style="flex:1"><input class="ed" data-p="payment.${i}.0" style="max-width:150px"></span><span><input class="edn" type="number" data-p="payment.${i}.1">٪</span></div><div class="track"><i data-bar="${i}" style="background:${PC[i%3]}"></i></div></div>`).join('');
+ const s=S(),pf=P();
+ $('curtag').textContent=(s.meta&&s.meta.code||'')+' · '+s.station.name;
+ $('smeta').innerHTML=[['code','الرمز'],['city','المدينة'],['type','النوع'],['size','الحجم'],['area','المساحة']].map(([k,lb])=>`<span class="mi"><span class="k">${lb}</span><input class="ed" data-p="${pf}meta.${k}"></span>`).join('');
+ $('skpis').innerHTML=s.kpis.map((k,i)=>`<div class="hk"><div class="vr"><input class="ed" data-p="${pf}kpis.${i}.v"><input class="ed un" data-p="${pf}kpis.${i}.u"></div><input class="ed lb" data-p="${pf}kpis.${i}.l"></div>`).join('');
+ $('schips').innerHTML=s.chips.map((c,i)=>`<span class="chip"><input class="ed" data-p="${pf}chips.${i}"></span>`).join('');
+ $('segments').innerHTML=s.segments.map((sg,i)=>`<div class="card seg"><div class="tl"><span class="ic">${sg.ic}</span><input class="ed" data-p="${pf}segments.${i}.t"></div><input class="ed" data-p="${pf}segments.${i}.d" style="font-size:13px;color:var(--ink2);margin-top:4px"><textarea class="ed ev" data-p="${pf}segments.${i}.ev"></textarea></div>`).join('');
+ $('demo').innerHTML=s.demo.map((d,i)=>`<span>📊 <input class="ed" data-p="${pf}demo.${i}"></span>`).join('');
+ $('us').innerHTML=s.us.map((r,i)=>`<div class="brow"><input class="ed k" data-p="${pf}us.${i}.0"><input class="ed" data-p="${pf}us.${i}.1"></div>`).join('');
+ $('them').innerHTML=s.them.map((r,i)=>`<div class="brow"><input class="ed k" data-p="${pf}them.${i}.0"><input class="ed" data-p="${pf}them.${i}.1"></div>`).join('');
+ $('suggested').innerHTML=s.suggested.map((sg,i)=>`<span class="it"><input class="ed" data-p="${pf}suggested.${i}.0"><select class="ed" data-p="${pf}suggested.${i}.1">${opt(PRI,sg[1])}</select></span>`).join('');
+ $('plist').innerHTML=s.pipeline.items.map((o,i)=>`<div class="opp"><div class="opp-t"><input class="ed oppname" data-p="${pf}pipeline.items.${i}.name"><span class="stg" data-stg="${i}">—</span><button class="xbtn" data-del="${i}">✕</button></div><input class="ed opptype" data-p="${pf}pipeline.items.${i}.type"><div class="opp-b"><select class="ed" data-p="${pf}pipeline.items.${i}.channel">${opt(CH,o.channel)}</select><span class="oppval"><input class="edn" type="number" data-p="${pf}pipeline.items.${i}.value">ر.س/شهر</span><select class="ed" data-p="${pf}pipeline.items.${i}.status">${opt(ST,o.status)}</select><select class="ed" data-p="${pf}pipeline.items.${i}.pri">${opt(PRI,o.pri)}</select></div></div>`).join('');
+ $('monthly').innerHTML=s.fuel.monthly.map((m,i)=>`<input class="edn" type="number" step="0.01" data-p="${pf}fuel.monthly.${i}">`).join('');
+ $('leg').innerHTML=s.fuel.mix.map((m,i)=>`<div class="legrow"><i class="sw" style="background:${FC[i]}"></i><input class="ed" data-p="${pf}fuel.mix.${i}.0"><input class="edn" type="number" data-p="${pf}fuel.mix.${i}.1">٪</div>`).join('')+`<div class="legrow" style="color:var(--muted);font-size:11.5px">متوسط <input class="edn" data-p="${pf}fuel.avg" style="width:52px"> ر.س/لتر</div>`;
+ $('pay').innerHTML=s.payment.map((pm,i)=>`<div class="metric"><div class="t"><span style="flex:1"><input class="ed" data-p="${pf}payment.${i}.0" style="max-width:150px"></span><span><input class="edn" type="number" data-p="${pf}payment.${i}.1">٪</span></div><div class="track"><i data-bar="${i}" style="background:${PC[i%3]}"></i></div></div>`).join('');
+ document.querySelectorAll('[data-sp]').forEach(e=>e.setAttribute('data-p',pf+e.dataset.sp));
  setAll();
 }
 function refresh(){
- let acc=0,st=[];D.fuel.mix.forEach((m,i)=>{const p=+m[1]||0;st.push(`${FC[i]} ${acc}% ${acc+p}%`);acc+=p;});
- $('donut').style.background=`conic-gradient(${st.join(',')})`;
- $('dmid').textContent=((+gp(D,'finance.liters')||0)/1e6).toFixed(1)+'M';
- const d=D.fuel.monthly.map(Number),W=300,H=42,p=4,mx=Math.max(...d),mn=Math.min(...d);
- const X=i=>i/(d.length-1||1)*(W-2*p)+p,Y=v=>mx===mn?H/2:H-p-(v-mn)/(mx-mn)*(H-2*p);
+ // portfolio
+ let pAll=0,netAll=0,prof=0;D.stations.forEach(st=>{pAll+=pipeTot(st);const n=net(st);netAll+=n;if(n>=0)prof++;});
+ $('pfk').innerHTML=`<div class="pfc"><div class="v tnum">${D.stations.length}</div><div class="l">عدد المحطات</div></div><div class="pfc" style="border-color:var(--gold)"><div class="v tnum" style="color:var(--gold)">${money(pAll)}</div><div class="l">إجمالي خط الأنابيب (ر.س/شهر)</div></div><div class="pfc" style="border-color:${netAll>=0?'var(--good)':'var(--crit)'}"><div class="v tnum" style="color:${netAll>=0?'var(--good)':'var(--crit)'}">${(netAll>=0?'+':'')+money(netAll)}</div><div class="l">صافي المحفظة (شهرياً)</div></div><div class="pfc"><div class="v tnum">${prof}/${D.stations.length}</div><div class="l">محطات رابحة</div></div>`;
+ // overview cards
+ $('ov').innerHTML=D.stations.map((st,i)=>{const n=net(st),w=n>=0;const rev=st.kpis[0]||{},fu=st.kpis[1]||{};return `<div class="ovc${i===sel?' sel':''}" data-sel="${i}"><div class="code">${(st.meta&&st.meta.code)||''}</div><div class="nm">${st.station.name}</div><div class="mt">${(st.meta&&st.meta.type)||''} · ${(st.meta&&st.meta.city)||''}</div><div class="st"><div><div class="k">الإيراد (٦ش)</div><div class="b">${(rev.v||'—')} <span style="font-size:10px;color:var(--muted)">${rev.u||''}</span></div></div><div><div class="k">خط الأنابيب</div><div class="b" style="color:var(--gold)">${money(pipeTot(st))}</div></div></div><div class="foot"><span class="badge ${w?'win':'lose'}">${w?'🟢 رابحة':'🔴 خاسرة'} ${(w?'+':'')+money(n)}</span><span class="open">${i===sel?'✓ معروضة':'عرض ←'}</span>${D.stations.length>1?`<button class="xbtn" data-delst="${i}" style="position:absolute;top:10px;left:10px">✕</button>`:''}</div></div>`;}).join('');
+ // selected station visuals
+ const s=S(),items=s.pipeline.items;let tot=0,con=0;const bc={};
+ items.forEach(o=>{const v=+o.value||0;tot+=v;if(o.status==='متعاقد')con+=v;bc[o.channel]=(bc[o.channel]||0)+v;});
+ $('psum').innerHTML=`<div class="pm tot"><div class="v tnum">${money(tot)}</div><div class="l">إجمالي خط الأنابيب (ر.س/شهر)</div></div><div class="pm con"><div class="v tnum" style="color:var(--good)">${money(con)}</div><div class="l">متعاقد ✓</div></div><div class="pm opn"><div class="v tnum" style="color:var(--gold)">${money(tot-con)}</div><div class="l">فرص مفتوحة</div></div><div class="pm"><div class="v tnum">${items.length}</div><div class="l">عدد الجهات</div></div>`;
+ const mx=Math.max(1,...CH.map(c=>bc[c]||0));
+ $('pbars').innerHTML=CH.map(c=>`<div class="metric"><div class="t"><span>${c}</span><b class="tnum">${money(bc[c]||0)}</b></div><div class="track"><i style="width:${(bc[c]||0)/mx*100}%;background:var(--accent)"></i></div></div>`).join('');
+ items.forEach((o,i)=>{const b=document.querySelector(`[data-stg="${i}"]`);if(b){b.textContent=o.status;b.style.color=STC[o.status]||'var(--muted)';}});
+ $('pipepill_t').textContent='خط الأنابيب '+money(tot)+' ر.س/شهر';
+ let acc=0,stops=[];s.fuel.mix.forEach((m,i)=>{const p=+m[1]||0;stops.push(`${FC[i]} ${acc}% ${acc+p}%`);acc+=p;});
+ $('donut').style.background=`conic-gradient(${stops.join(',')})`;
+ $('dmid').textContent=((+s.finance.liters||0)/1e6).toFixed(1)+'M';
+ const d=s.fuel.monthly.map(Number),W=300,H=42,p=4,mxv=Math.max(...d),mn=Math.min(...d);
+ const X=i=>i/(d.length-1||1)*(W-2*p)+p,Y=v=>mxv===mn?H/2:H-p-(v-mn)/(mxv-mn)*(H-2*p);
  let Lp='',A=`M ${X(0)} ${H}`;d.forEach((v,i)=>{Lp+=(i?' L':'M')+` ${X(i).toFixed(1)} ${Y(v).toFixed(1)}`;A+=` L ${X(i).toFixed(1)} ${Y(v).toFixed(1)}`;});A+=` L ${X(d.length-1)} ${H} Z`;
  $('spark').innerHTML=`<path d="${A}" fill="var(--accent)" opacity="0.12"/><path d="${Lp}" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linejoin="round"/><circle cx="${X(d.length-1)}" cy="${Y(d[d.length-1])}" r="3.2" fill="var(--crit)"/>`;
  $('trend').textContent=d[d.length-1]<d[0]?'تراجع':'نمو';$('trend').style.color=d[d.length-1]<d[0]?'var(--crit)':'var(--good)';
- document.querySelectorAll('#pay [data-bar]').forEach(bar=>{const i=+bar.dataset.bar;bar.style.width=Math.max(+D.payment[i][1]||0,1)+'%';});
- $('occbar').style.width=(+gp(D,'leasing.franchiseOcc')||0)+'%';
+ document.querySelectorAll('#pay [data-bar]').forEach(bar=>{const i=+bar.dataset.bar;bar.style.width=Math.max(+s.payment[i][1]||0,1)+'%';});
+ $('occbar').style.width=(+s.leasing.franchiseOcc||0)+'%';
  calc();save();
 }
 function calc(){
- const f=D.finance,L=+f.liters||0,m=+f.margin||0,units=+f.units||0,occ=(+f.occ||0)/100,rent=+f.rent||0,store=+f.store||0;
+ const f=S().finance,L=+f.liters||0,m=+f.margin||0,units=+f.units||0,occ=(+f.occ||0)/100,rent=+f.rent||0,store=+f.store||0;
  const exp=(+f.salaries||0)+(+f.oprent||0)+(+f.utils||0)+(+f.maint||0);
  $('marginv').textContent=m.toFixed(2);$('occv').textContent=Math.round(occ*100)+'٪';
- const fuelInc=m*L,occU=units*occ,rentInc=occU*rent,nonFuel=rentInc+store,totInc=fuelInc+nonFuel,net=totInc-exp;
+ const fuelInc=m*L,occU=units*occ,rentInc=occU*rent,nonFuel=rentInc+store,totInc=fuelInc+nonFuel,nt=totInc-exp;
  const cpl=L>0?exp/L:0,cov=exp>0?nonFuel/exp*100:0,rem=Math.max(0,exp-nonFuel),be=m>0?rem/m:Infinity;
  $('fuelinc').textContent=fmt(fuelInc);$('fuelinc_h').textContent=`${m.toFixed(2)} × ${money(L)} لتر`;
  $('rentinc').textContent=fmt(rentInc);$('rentinc_h').textContent=`${Math.round(occU)} وحدة × ${fmt(rent)}`;
@@ -217,17 +332,24 @@ function calc(){
  $('cpl').textContent=cpl.toFixed(3)+' ر.س';$('coverage').textContent=Math.round(cov)+'٪';
  $('breakeven').textContent=rem<=0?'مغطّاة ✓':(isFinite(be)?money(be)+' لتر':'—');
  $('be_h').textContent=rem<=0?'غير الوقود يغطّي المصاريف':(isFinite(be)?`نبيع ${(L/be).toFixed(1)}× التعادل`:'—');
- const win=net>=0,v=$('verdict');v.className='bigv '+(win?'win':'lose');
- $('vtext').textContent=win?'🟢 رابحة':'🔴 خاسرة';$('vnet').innerHTML=(win?'+':'')+fmt(net)+' ر.س<small>صافي الربح/الخسارة</small>';
- const tp=$('toppill');tp.className='pill '+(win?'win':'lose');$('toppill_t').textContent=(win?'رابحة ':'خاسرة ')+(win?'+':'')+money(net)+' ر.س/شهر';
+ const win=nt>=0,v=$('verdict');v.className='bigv '+(win?'win':'lose');
+ $('vtext').textContent=win?'🟢 رابحة':'🔴 خاسرة';$('vnet').innerHTML=(win?'+':'')+fmt(nt)+' ر.س<small>صافي الربح/الخسارة</small>';
+ const tp=$('toppill');tp.className='pill '+(win?'win':'lose');$('toppill_t').textContent=(win?'رابحة ':'خاسرة ')+(win?'+':'')+money(nt)+' ر.س/شهر';
 }
 function save(){try{localStorage.setItem(KEY,JSON.stringify(D));$('saved').textContent='✓ محفوظ';setTimeout(()=>{$('saved').textContent='';},1000);}catch(e){}}
+function blankStation(){return {id:'MK000',meta:{code:'MK000',city:'—',type:'—',size:'—',area:'—'},station:{eyebrow:'محطة جديدة',name:'محطة جديدة',tagline:'—'},kpis:[{v:'—',u:'',l:'الإيراد (٦ش)'},{v:'—',u:'',l:'الوقود'},{v:'—',u:'',l:'التقييم'},{v:'—',u:'',l:'الفاتورة'}],chips:['—'],segments:[{ic:'👤',t:'شريحة',d:'—',ev:'—'}],demo:['—'],us:[['—','—']],them:[['—','—']],advantage:'—',gap:'—',suggested:[['—','متوسطة']],scenario:{road:'—',before:'—',after:'—',density:'—'},pipeline:{note:'فرص الموقع — تُستكمل.',items:[]},fuel:{mix:[['بنزين 91',34],['بنزين 95',33],['ديزل',33]],avg:'0',monthly:[0,0,0,0,0,0]},notes:{payAlert:'—',vacantAlert:'—',tanki:'—',partners:'—'},payment:[['نقدي',50],['شبكة (مدى)',49],['التطبيق',1]],leasing:{note:'—',franchiseOcc:0,vacant:0},finance:{liters:0,margin:0.15,units:0,occ:0,rent:0,store:0,salaries:0,oprent:0,utils:0,maint:0}};}
 document.addEventListener('input',e=>{const el=e.target;if(!el.dataset||!el.dataset.p)return;let v=el.value;if(el.type==='number'||el.type==='range'||el.classList.contains('edn'))v=parseFloat(v)||0;sp(D,el.dataset.p,v);refresh();});
+document.addEventListener('click',e=>{const t=e.target;if(!t.dataset)return;
+ if(t.dataset.delst!=null){e.stopPropagation();if(D.stations.length>1&&confirm('حذف هذه المحطة؟')){D.stations.splice(+t.dataset.delst,1);if(sel>=D.stations.length)sel=D.stations.length-1;build();refresh();}return;}
+ if(t.dataset.del!=null){S().pipeline.items.splice(+t.dataset.del,1);build();refresh();return;}
+ const card=t.closest&&t.closest('[data-sel]');if(card){sel=+card.dataset.sel;build();refresh();$('detail').scrollIntoView({behavior:'smooth',block:'start'});}});
+$('addst').onclick=()=>{D.stations.push(blankStation());sel=D.stations.length-1;build();refresh();$('detail').scrollIntoView({behavior:'smooth'});};
+$('addopp').onclick=()=>{S().pipeline.items.push({name:'جهة جديدة',type:'النشاط / التقييم',channel:CH[0],value:0,status:'فرصة',pri:'متوسطة'});build();refresh();};
 $('export').onclick=()=>{const b=new Blob([JSON.stringify(D,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='data.json';a.click();};
 $('reset').onclick=()=>{localStorage.removeItem(KEY);location.reload();};
-function start(o){D=o;build();refresh();}
+function start(o){D=o;sel=0;build();refresh();}
 let ok=false;const c=localStorage.getItem(KEY);
-if(c){try{start(JSON.parse(c));ok=true;}catch(e){}}
+if(c){try{const j=JSON.parse(c);if(j&&Array.isArray(j.stations)&&j.stations.length){start(j);ok=true;}}catch(e){}}
 if(!ok)fetch('./data.json?_='+Date.now()).then(r=>r.json()).then(start).catch(()=>{document.querySelector('.wrap').insertAdjacentHTML('afterbegin','<p style="padding:24px;text-align:center;color:var(--muted)">تعذّر تحميل data.json</p>');});
 </script>
 </body>
