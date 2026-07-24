@@ -148,7 +148,7 @@ section{margin-top:30px;scroll-margin-top:60px}
 .donut .mid b{font-size:18px;font-weight:800}.donut .mid span{font-size:10px;color:var(--muted)}
 .leg{display:flex;flex-direction:column;gap:6px;font-size:12.5px;justify-content:center;flex:1}
 .legrow{display:flex;align-items:center;gap:7px}.sw{width:11px;height:11px;border-radius:3px;flex:none}
-.legrow .ed{flex:1}.legrow .edn{width:56px}
+.legrow .ed{flex:1}.legrow .edn{width:56px}.legrow select.fprodsel{flex:1;min-width:64px;font-size:12px}.legrow .xbtn{width:22px;height:22px}
 .alert{display:flex;gap:6px;font-size:11.5px;font-weight:700;color:var(--crit);background:var(--crit-bg);padding:5px 9px;border-radius:10px;margin-top:8px;align-items:center;flex-wrap:wrap}
 .alert .ed{color:var(--crit);flex:1;min-width:120px;border-bottom-color:rgba(224,102,102,.3)}.alert .edn{width:64px}
 .monthly{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}.monthly .edn{width:54px}
@@ -218,14 +218,16 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 
   <section id="fuelsec"><div class="shead divbar"><span class="no">02</span><h2>⛽ منتجات البنزين — قسم مبيعات الوقود</h2><span class="rule"></span></div>
    <div class="grid g2">
-    <div class="card"><h3>مزيج المنتجات (عدّل النِسب)</h3>
+    <div class="card"><h3>مزيج المنتجات (عدّل المنتجات والنِسب)</h3>
      <div style="display:flex;gap:16px;align-items:center"><div class="donut" id="donut"><div class="mid"><b id="dmid">—</b><span>لتر/شهر</span></div></div><div class="leg" id="leg"></div></div>
+     <button class="btn addrow" id="addprod" style="margin-top:10px">➕ أضف منتج بنزين</button>
      <div class="fprod" id="fprod"></div></div>
     <div class="card"><h3>التشغيل والاتجاه الشهري</h3>
      <div class="ops">
       <span>⛽ المضخات <input class="edn" type="number" data-sp="finance.pumps"></span>
       <span>🛢️ سعة الخزان <input class="edn" type="number" data-sp="finance.tankCapacity"> لتر</span>
       <span>👷 العمّال <input class="edn" type="number" data-sp="finance.workers"></span>
+      <span>🖐️ خدمة ذاتية <select class="ed" data-sp="meta.selfService"><option>لا</option><option>نعم</option><option>الاثنتان</option></select></span>
      </div>
      <div class="metric" style="margin-top:6px"><div class="t"><span>الاتجاه الشهري (مليون لتر)</span><span id="trend"></span></div><svg id="spark" viewBox="0 0 300 42" width="100%" height="42" preserveAspectRatio="none"></svg><div class="monthly" id="monthly"></div></div></div>
    </div></section>
@@ -299,7 +301,12 @@ const fmt=n=>Math.round(n).toLocaleString('en-US');
 const money=n=>Math.abs(n)>=1e6?(n/1e6).toFixed(2)+'M':fmt(n);
 const gp=(o,p)=>p.split('.').reduce((a,k)=>a==null?a:a[k],o);
 const sp=(o,p,v)=>{const ks=p.split('.'),last=ks.pop();let t=o;ks.forEach(k=>t=t[k]);t[last]=v;};
-const FC=['var(--f91)','var(--f95)','var(--fd)'],PC=['var(--fd)','var(--sky)','var(--accent)'];
+const PC=['var(--fd)','var(--sky)','var(--accent)'];
+const FUEL=['بنزين 91','بنزين 95','بنزين 98','ديزل'];
+const FUELC={'بنزين 91':'#38bdf8','بنزين 95':'#f18a2b','بنزين 98':'#a78bfa','ديزل':'#6b7280'};
+const FB=['#3fb27f','#e06666','#ffd54a','#38bdf8','#f18a2b','#a78bfa'];
+const fcol=(n,i)=>FUELC[n]||FB[i%FB.length];
+const optW=(arr,v)=>{const a=arr.indexOf(v)>=0?arr:[v,...arr];return a.map(o=>`<option${o===v?' selected':''}>${o}</option>`).join('');};
 const CH=['⛽ وقود أسطول','🏪 تأجير','🤝 شراكة','🔄 بيع متقاطع'];
 const ST=['فرصة','تواصل','عرض مقدّم','متعاقد'];
 const STC={'فرصة':'var(--muted)','تواصل':'var(--sky)','عرض مقدّم':'var(--gold)','متعاقد':'var(--good)'};
@@ -326,7 +333,7 @@ function build(){
  $('tlist').innerHTML=s.tenants.items.map((t,i)=>`<div class="unit${t.status==='شاغرة'?' vac':''}"><div class="unit-t"><input class="ed uname" data-p="${pf}tenants.items.${i}.name"><span class="tst" data-ust="${i}">—</span><button class="xbtn" data-delu="${i}">✕</button></div><div class="unit-b"><select class="ed" data-p="${pf}tenants.items.${i}.cat">${opt(TCAT,t.cat)}</select><input class="ed uservice" data-p="${pf}tenants.items.${i}.service"><select class="ed" data-p="${pf}tenants.items.${i}.status">${opt(TST,t.status)}</select></div></div>`).join('');
  $('plist').innerHTML=s.pipeline.items.map((o,i)=>`<div class="opp"><div class="opp-t"><input class="ed oppname" data-p="${pf}pipeline.items.${i}.name"><span class="stg" data-stg="${i}">—</span><button class="xbtn" data-del="${i}">✕</button></div><input class="ed opptype" data-p="${pf}pipeline.items.${i}.type"><div class="opp-b"><select class="ed" data-p="${pf}pipeline.items.${i}.channel">${opt(CH,o.channel)}</select><span class="oppval"><input class="edn" type="number" data-p="${pf}pipeline.items.${i}.value">ر.س/شهر</span><select class="ed" data-p="${pf}pipeline.items.${i}.status">${opt(ST,o.status)}</select><select class="ed" data-p="${pf}pipeline.items.${i}.pri">${opt(PRI,o.pri)}</select></div></div>`).join('');
  $('monthly').innerHTML=s.fuel.monthly.map((m,i)=>`<input class="edn" type="number" step="0.01" data-p="${pf}fuel.monthly.${i}">`).join('');
- $('leg').innerHTML=s.fuel.mix.map((m,i)=>`<div class="legrow"><i class="sw" style="background:${FC[i]}"></i><input class="ed" data-p="${pf}fuel.mix.${i}.0"><input class="edn" type="number" data-p="${pf}fuel.mix.${i}.1">٪</div>`).join('')+`<div class="legrow" style="color:var(--muted);font-size:11.5px">متوسط <input class="edn" data-p="${pf}fuel.avg" style="width:52px"> ر.س/لتر</div>`;
+ $('leg').innerHTML=s.fuel.mix.map((m,i)=>`<div class="legrow"><i class="sw" style="background:${fcol(m[0],i)}"></i><select class="ed fprodsel" data-p="${pf}fuel.mix.${i}.0">${optW(FUEL,m[0])}</select><input class="edn" type="number" data-p="${pf}fuel.mix.${i}.1">٪<button class="xbtn" data-delp="${i}">✕</button></div>`).join('')+`<div class="legrow" style="color:var(--muted);font-size:11.5px">متوسط <input class="edn" data-p="${pf}fuel.avg" style="width:52px"> ر.س/لتر</div>`;
  $('pay').innerHTML=s.payment.map((pm,i)=>`<div class="metric"><div class="t"><span style="flex:1"><input class="ed" data-p="${pf}payment.${i}.0" style="max-width:150px"></span><span><input class="edn" type="number" data-p="${pf}payment.${i}.1">٪</span></div><div class="track"><i data-bar="${i}" style="background:${PC[i%3]}"></i></div></div>`).join('');
  document.querySelectorAll('[data-sp]').forEach(e=>e.setAttribute('data-p',pf+e.dataset.sp));
  setAll();
@@ -341,7 +348,7 @@ function refresh(){
  $('tsum').innerHTML=`<div class="tc"><div class="v">${T.length}</div><div class="l">إجمالي الوحدات</div></div><div class="tc"><div class="v">${nR}</div><div class="l">🍔 مطاعم</div></div><div class="tc"><div class="v">${nC}</div><div class="l">☕ كافيهات</div></div><div class="tc occ"><div class="v">${nO}</div><div class="l">مؤجّرة</div></div><div class="tc vac"><div class="v">${T.length-nO}</div><div class="l">شاغرة</div></div>`;
  T.forEach((t,i)=>{const b=document.querySelector(`[data-ust="${i}"]`);if(b){const oc=t.status==='مؤجّرة';b.textContent=t.status;b.style.color=oc?'var(--good)':'var(--crit)';b.style.background=oc?'var(--good-bg)':'var(--crit-bg)';}});
  // products
- $('fprod').innerHTML=s.fuel.mix.map((m,i)=>`<span class="fp"><i style="background:${FC[i]}"></i>${m[0]} <b class="tnum">${m[1]}٪</b></span>`).join('');
+ $('fprod').innerHTML=s.fuel.mix.map((m,i)=>`<span class="fp"><i style="background:${fcol(m[0],i)}"></i>${m[0]} <b class="tnum">${m[1]}٪</b></span>`).join('');
  // pipeline
  const items=s.pipeline.items;let tot=0,con=0;const bc={};
  items.forEach(o=>{const v=+o.value||0;tot+=v;if(o.status==='متعاقد')con+=v;bc[o.channel]=(bc[o.channel]||0)+v;});
@@ -351,8 +358,9 @@ function refresh(){
  items.forEach((o,i)=>{const b=document.querySelector(`[data-stg="${i}"]`);if(b){b.textContent=o.status;b.style.color=STC[o.status]||'var(--muted)';}});
  $('pipepill_t').textContent='خط الأنابيب '+money(tot)+' ر.س/شهر';
  // fuel donut + spark
- let acc=0,stops=[];s.fuel.mix.forEach((m,i)=>{const p=+m[1]||0;stops.push(`${FC[i]} ${acc}% ${acc+p}%`);acc+=p;});
+ let acc=0,stops=[];s.fuel.mix.forEach((m,i)=>{const p=+m[1]||0;stops.push(`${fcol(m[0],i)} ${acc}% ${acc+p}%`);acc+=p;});
  $('donut').style.background=`conic-gradient(${stops.join(',')})`;
+ document.querySelectorAll('#leg .sw').forEach((sw,i)=>{const m=s.fuel.mix[i];if(m)sw.style.background=fcol(m[0],i);});
  $('dmid').textContent=((+s.finance.liters||0)/1e6).toFixed(1)+'M';
  const d=s.fuel.monthly.map(Number),W=300,H=42,p=4,mxv=Math.max(...d),mn=Math.min(...d);
  const X=i=>i/(d.length-1||1)*(W-2*p)+p,Y=v=>mxv===mn?H/2:H-p-(v-mn)/(mxv-mn)*(H-2*p);
@@ -385,16 +393,18 @@ function calc(){
  const tp=$('toppill');tp.className='pill '+(win?'win':'lose');$('toppill_t').textContent=(win?'رابحة ':'خاسرة ')+(win?'+':'')+money(nt)+' ر.س/شهر';
 }
 function save(){try{localStorage.setItem(KEY,JSON.stringify(D));$('saved').textContent='✓ محفوظ';setTimeout(()=>{$('saved').textContent='';},1000);}catch(e){}}
-function blankStation(){return {id:'MK000',meta:{code:'MK000',city:'—',type:'—',size:'—',area:'—'},station:{eyebrow:'محطة جديدة',name:'محطة جديدة',tagline:'—'},kpis:[{v:'—',u:'',l:'الإيراد (٦ش)'},{v:'—',u:'',l:'الوقود'},{v:'—',u:'',l:'التقييم'},{v:'—',u:'',l:'الفاتورة'}],chips:['—'],segments:[{ic:'👤',t:'شريحة',share:'—',profile:'—',need:'—',offer:'—',ev:'—'}],demo:['—'],tenants:{note:'يُستكمل بالجرد.',items:[]},us:[['—','—']],them:[['—','—']],advantage:'—',gap:'—',suggested:[['—','متوسطة']],scenario:{road:'—',before:'—',after:'—',density:'—'},pipeline:{note:'فرص الموقع — تُستكمل.',items:[]},fuel:{mix:[['بنزين 91',34],['بنزين 95',33],['ديزل',33]],avg:'0',monthly:[0,0,0,0,0,0]},notes:{payAlert:'—',vacantAlert:'—',tanki:'—',partners:'—'},payment:[['نقدي',50],['شبكة (مدى)',49],['التطبيق',1]],leasing:{note:'—',franchiseOcc:0,vacant:0},finance:{liters:0,margin:0.15,units:0,occ:0,rent:0,store:0,salaries:0,oprent:0,utils:0,maint:0,workers:0,tankCapacity:0,pumps:0}};}
+function blankStation(){return {id:'MK000',meta:{code:'MK000',city:'—',type:'—',size:'—',area:'—',selfService:'لا'},station:{eyebrow:'محطة جديدة',name:'محطة جديدة',tagline:'—'},kpis:[{v:'—',u:'',l:'الإيراد (٦ش)'},{v:'—',u:'',l:'الوقود'},{v:'—',u:'',l:'التقييم'},{v:'—',u:'',l:'الفاتورة'}],chips:['—'],segments:[{ic:'👤',t:'شريحة',share:'—',profile:'—',need:'—',offer:'—',ev:'—'}],demo:['—'],tenants:{note:'يُستكمل بالجرد.',items:[]},us:[['—','—']],them:[['—','—']],advantage:'—',gap:'—',suggested:[['—','متوسطة']],scenario:{road:'—',before:'—',after:'—',density:'—'},pipeline:{note:'فرص الموقع — تُستكمل.',items:[]},fuel:{mix:[['بنزين 91',34],['بنزين 95',33],['ديزل',33]],avg:'0',monthly:[0,0,0,0,0,0]},notes:{payAlert:'—',vacantAlert:'—',tanki:'—',partners:'—'},payment:[['نقدي',50],['شبكة (مدى)',49],['التطبيق',1]],leasing:{note:'—',franchiseOcc:0,vacant:0},finance:{liters:0,margin:0.15,units:0,occ:0,rent:0,store:0,salaries:0,oprent:0,utils:0,maint:0,workers:0,tankCapacity:0,pumps:0}};}
 document.addEventListener('input',e=>{const el=e.target;if(!el.dataset||!el.dataset.p)return;let v=el.value;if(el.type==='number'||el.type==='range'||el.classList.contains('edn'))v=parseFloat(v)||0;sp(D,el.dataset.p,v);refresh();});
 document.addEventListener('click',e=>{const t=e.target;if(!t.dataset)return;
  if(t.dataset.delst!=null){e.stopPropagation();if(D.stations.length>1&&confirm('حذف هذه المحطة؟')){D.stations.splice(+t.dataset.delst,1);if(sel>=D.stations.length)sel=D.stations.length-1;build();refresh();}return;}
  if(t.dataset.del!=null){S().pipeline.items.splice(+t.dataset.del,1);build();refresh();return;}
  if(t.dataset.delu!=null){S().tenants.items.splice(+t.dataset.delu,1);build();refresh();return;}
+ if(t.dataset.delp!=null){if(S().fuel.mix.length>1){S().fuel.mix.splice(+t.dataset.delp,1);build();refresh();}return;}
  const card=t.closest&&t.closest('[data-sel]');if(card){sel=+card.dataset.sel;build();refresh();$('detail').scrollIntoView({behavior:'smooth',block:'start'});}});
 $('addst').onclick=()=>{D.stations.push(blankStation());sel=D.stations.length-1;build();refresh();$('detail').scrollIntoView({behavior:'smooth'});};
 $('addopp').onclick=()=>{S().pipeline.items.push({name:'جهة جديدة',type:'النشاط / التقييم',channel:CH[0],value:0,status:'فرصة',pri:'متوسطة'});build();refresh();};
 $('addunit').onclick=()=>{S().tenants.items.push({name:'وحدة جديدة',cat:TCAT[0],service:'—',status:'شاغرة'});build();refresh();};
+$('addprod').onclick=()=>{const have=S().fuel.mix.map(m=>m[0]);const nx=FUEL.find(f=>!have.includes(f))||'بنزين 98';S().fuel.mix.push([nx,0]);build();refresh();};
 $('export').onclick=()=>{const b=new Blob([JSON.stringify(D,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='data.json';a.click();};
 $('reset').onclick=()=>{localStorage.removeItem(KEY);location.reload();};
 function start(o){D=o;sel=0;build();refresh();}
