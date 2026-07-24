@@ -97,9 +97,15 @@ section{margin-top:30px;scroll-margin-top:60px}
 .scen-i .k{flex:none;width:52px;font-weight:800;color:var(--muted)}
 .ops{display:flex;gap:14px;flex-wrap:wrap;background:var(--elev);border:1px solid var(--line);border-radius:12px;padding:11px 14px;font-size:12.5px;margin:4px 0 6px}
 .ops span{display:inline-flex;align-items:center;gap:6px}.ops .edn{width:92px}
-.fprod{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
-.fp{display:inline-flex;align-items:center;gap:5px;background:var(--elev);border:1px solid var(--line);border-radius:9px;padding:4px 9px;font-size:12px}
-.fp i{width:10px;height:10px;border-radius:3px}
+.fprod{margin-top:12px}
+.fptbl{width:100%;border:1px solid var(--line);border-radius:11px;overflow:hidden}
+.fphead,.fprow{display:grid;grid-template-columns:1.5fr .7fr 1fr 1fr;gap:6px;padding:7px 11px;align-items:center}
+.fphead{background:var(--elev);color:var(--muted);font-weight:800;font-size:10.5px}
+.fprow{border-top:1px solid var(--line);font-size:12px}
+.fprow .fpname{display:flex;align-items:center;gap:6px;font-weight:700}
+.fprow .fpname i{width:10px;height:10px;border-radius:3px;flex:none}
+.fprow .lit{color:var(--ink2)}.fprow .rev{color:var(--good);font-weight:800}
+.fptot{display:grid;grid-template-columns:1.5fr .7fr 1fr 1fr;gap:6px;padding:8px 11px;background:var(--elev);border-top:1px solid var(--line);font-size:12px;font-weight:800}
 .vs{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:560px){.vs{grid-template-columns:1fr}}
 .box{border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--panel)}
 .box.us{border-color:rgba(241,138,43,.5);background:linear-gradient(180deg,rgba(241,138,43,.08),var(--panel))}
@@ -348,7 +354,9 @@ function refresh(){
  $('tsum').innerHTML=`<div class="tc"><div class="v">${T.length}</div><div class="l">إجمالي الوحدات</div></div><div class="tc"><div class="v">${nR}</div><div class="l">🍔 مطاعم</div></div><div class="tc"><div class="v">${nC}</div><div class="l">☕ كافيهات</div></div><div class="tc occ"><div class="v">${nO}</div><div class="l">مؤجّرة</div></div><div class="tc vac"><div class="v">${T.length-nO}</div><div class="l">شاغرة</div></div>`;
  T.forEach((t,i)=>{const b=document.querySelector(`[data-ust="${i}"]`);if(b){const oc=t.status==='مؤجّرة';b.textContent=t.status;b.style.color=oc?'var(--good)':'var(--crit)';b.style.background=oc?'var(--good-bg)':'var(--crit-bg)';}});
  // products
- $('fprod').innerHTML=s.fuel.mix.map((m,i)=>`<span class="fp"><i style="background:${fcol(m[0],i)}"></i>${m[0]} <b class="tnum">${m[1]}٪</b></span>`).join('');
+ const TL=+s.finance.liters||0,MG=+s.finance.margin||0;let sumL=0,sumR=0,sumP=0;
+ const frows=s.fuel.mix.map((m,i)=>{const sh=+m[1]||0,li=sh/100*TL,rv=li*MG;sumL+=li;sumR+=rv;sumP+=sh;return `<div class="fprow"><span class="fpname"><i style="background:${fcol(m[0],i)}"></i>${m[0]}</span><span class="tnum">${sh}٪</span><span class="tnum lit">${money(li)}</span><span class="tnum rev">${money(rv)}</span></div>`;}).join('');
+ $('fprod').innerHTML=`<div class="fptbl"><div class="fphead"><span>المنتج</span><span>الحصة</span><span>لتر/شهر</span><span>ربح/شهر</span></div>${frows}<div class="fptot"><span>الإجمالي</span><span class="tnum">${Math.round(sumP)}٪</span><span class="tnum">${money(sumL)}</span><span class="tnum" style="color:var(--good)">${money(sumR)}</span></div></div>`;
  // pipeline
  const items=s.pipeline.items;let tot=0,con=0;const bc={};
  items.forEach(o=>{const v=+o.value||0;tot+=v;if(o.status==='متعاقد')con+=v;bc[o.channel]=(bc[o.channel]||0)+v;});
