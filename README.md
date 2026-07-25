@@ -77,6 +77,8 @@ khadija/
 - 🧭 [استراتيجية القسم](docs/strategy.md)
 - 📐 [الإطار الاستراتيجي للقسم](docs/framework.md)
 - 🔗 [استراتيجية التكامل بين الإدارات](docs/integration-strategy.md)
+- 📊 [ملف البيانات والخطط (إكسل)](data/)
+- 🖥️ [المنصّة: وحدة العرض + المحرّر](platform/)
 - 🔎 [منهجية دراسة وتحليل الموقع](docs/site-study.md)
 - ⚙️ [آلية التنفيذ والحوكمة](docs/execution.md)
 - 📊 [نظام تتبّع المبيعات](docs/tracking-system.md)
