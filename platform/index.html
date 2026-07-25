@@ -125,10 +125,14 @@ section{margin-top:30px;scroll-margin-top:60px}
 .tlist{display:grid;grid-template-columns:1fr 1fr;gap:11px}@media(max-width:720px){.tlist{grid-template-columns:1fr}}
 .unit{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:11px 12px;box-shadow:var(--sh);border-inline-start:3px solid var(--good)}
 .unit.vac{border-inline-start-color:var(--crit)}
-.unit-t{display:flex;gap:8px;align-items:center;margin-bottom:8px}.unit-t .uname{font-weight:800;font-size:13.5px}
-.unit-b{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.unit-b .uservice{font-size:12px;color:var(--ink2);flex:1;min-width:120px}
+.unit-t{display:flex;gap:8px;align-items:center;margin-bottom:9px}.unit-t .uname{font-weight:800;font-size:13.5px;flex:1}
+.ucount{display:inline-flex;align-items:center;gap:1px;font-size:12px;color:var(--muted);flex:none}.ucount .edn{width:44px}
+.unit-b{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:9px}
+.uf{display:inline-flex;flex-direction:column;gap:2px}.uf span{font-size:9.5px;color:var(--muted);font-weight:800}.uf select{font-size:11.5px;padding:3px 6px}
 .tst{font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;flex:none}
+.tbreak{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:13px;align-items:center}
+.tbh{font-size:11px;color:var(--muted);font-weight:800}
+.tb{font-size:11.5px;background:var(--elev);border:1px solid var(--line);border-radius:8px;padding:3px 9px}.tb b{color:var(--accent2)}
 .xbtn{flex:none;width:24px;height:24px;border-radius:7px;border:1px solid var(--line);background:var(--elev);color:var(--crit);cursor:pointer;font-size:12px;line-height:1}
 .xbtn:hover{border-color:var(--crit);background:var(--crit-bg)}
 .addrow{margin-top:13px}
@@ -241,6 +245,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   <section id="leasesec"><div class="shead divbar"><span class="no">03</span><h2>🏪 التأجير — قسم التأجير · مكوّنات المحطة</h2><span class="rule"></span></div>
    <input class="ed pnote" data-sp="tenants.note">
    <div class="tsum" id="tsum"></div>
+   <div class="tbreak" id="tbreak"></div>
    <div class="tlist" id="tlist"></div>
    <button class="btn pri addrow" id="addunit">➕ أضف وحدة/مستأجر</button>
    <div class="metric" style="margin-top:16px"><div class="t"><span>نسبة إشغال الوحدات</span><span><input class="edn" type="number" data-sp="leasing.franchiseOcc">٪</span></div><div class="track"><i id="occbar" style="background:var(--crit)"></i></div></div>
@@ -317,7 +322,10 @@ const CH=['⛽ وقود أسطول','🏪 تأجير','🤝 شراكة','🔄 ب
 const ST=['فرصة','تواصل','عرض مقدّم','متعاقد'];
 const STC={'فرصة':'var(--muted)','تواصل':'var(--sky)','عرض مقدّم':'var(--gold)','متعاقد':'var(--good)'};
 const PRI=['عالية','متوسطة','منخفضة'];
-const TCAT=['🍔 مطعم','☕ كافيه','🍦 حلويات','🛒 ماركت','🚗 خدمة سيارات','💊 صيدلية','🏧 صراف','🕌 مرفق','🧕 خدمات معتمرين','📦 أخرى'];
+const UTYPE=['كشك','محل تجاري','دريف ثرو','سوبر ماركت','عربة/كارت','أخرى'];
+const SCAT=['مطاعم','كافيهات','حلويات','زيوت','مغاسل','سوبر ماركت','بقالة','صيدلية','صراف','خدمات معتمرين','أخرى'];
+const SUB={'مطاعم':['فطور','غداء','فطاير','وجبات سريعة','جلسات','مشاوي','متنوع'],'كافيهات':['قهوة مختصة','تجاري'],'حلويات':['آيسكريم','حلويات','مخبوزات'],'زيوت':['تغيير زيت','خدمة شاملة'],'مغاسل':['آلية','يدوي'],'سوبر ماركت':['هايبر','ماركت صغير'],'بقالة':['ميني ماركت','بقالة'],'صيدلية':['صيدلية'],'صراف':['صراف آلي'],'خدمات معتمرين':['هدايا/عبايات','صرافة','عام'],'أخرى':['عام']};
+const subOf=c=>SUB[c]||['عام'];
 const TST=['مؤجّرة','شاغرة'];
 const opt=(arr,sel)=>arr.map(o=>`<option${o===sel?' selected':''}>${o}</option>`).join('');
 let D={},sel=0;const KEY='darb_sales_v3';
@@ -336,7 +344,7 @@ function build(){
  $('us').innerHTML=s.us.map((r,i)=>`<div class="brow"><input class="ed k" data-p="${pf}us.${i}.0"><input class="ed" data-p="${pf}us.${i}.1"></div>`).join('');
  $('them').innerHTML=s.them.map((r,i)=>`<div class="brow"><input class="ed k" data-p="${pf}them.${i}.0"><input class="ed" data-p="${pf}them.${i}.1"></div>`).join('');
  $('suggested').innerHTML=s.suggested.map((sg,i)=>`<span class="it"><input class="ed" data-p="${pf}suggested.${i}.0"><select class="ed" data-p="${pf}suggested.${i}.1">${opt(PRI,sg[1])}</select></span>`).join('');
- $('tlist').innerHTML=s.tenants.items.map((t,i)=>`<div class="unit${t.status==='شاغرة'?' vac':''}"><div class="unit-t"><input class="ed uname" data-p="${pf}tenants.items.${i}.name"><span class="tst" data-ust="${i}">—</span><button class="xbtn" data-delu="${i}">✕</button></div><div class="unit-b"><select class="ed" data-p="${pf}tenants.items.${i}.cat">${opt(TCAT,t.cat)}</select><input class="ed uservice" data-p="${pf}tenants.items.${i}.service"><select class="ed" data-p="${pf}tenants.items.${i}.status">${opt(TST,t.status)}</select></div></div>`).join('');
+ $('tlist').innerHTML=s.tenants.items.map((t,i)=>`<div class="unit${t.status==='شاغرة'?' vac':''}"><div class="unit-t"><input class="ed uname" data-p="${pf}tenants.items.${i}.name"><span class="ucount">×<input class="edn" type="number" data-p="${pf}tenants.items.${i}.count"></span><span class="tst" data-ust="${i}">—</span><button class="xbtn" data-delu="${i}">✕</button></div><div class="unit-b"><label class="uf"><span>نوع الوحدة</span><select class="ed" data-p="${pf}tenants.items.${i}.unitType">${opt(UTYPE,t.unitType)}</select></label><label class="uf"><span>الخدمة</span><select class="ed svccat" data-p="${pf}tenants.items.${i}.serviceCat">${opt(SCAT,t.serviceCat)}</select></label><label class="uf"><span>النوع الفرعي</span><select class="ed" data-p="${pf}tenants.items.${i}.subType">${optW(subOf(t.serviceCat),t.subType)}</select></label><label class="uf"><span>الحالة</span><select class="ed" data-p="${pf}tenants.items.${i}.status">${opt(TST,t.status)}</select></label></div></div>`).join('');
  $('plist').innerHTML=s.pipeline.items.map((o,i)=>`<div class="opp"><div class="opp-t"><input class="ed oppname" data-p="${pf}pipeline.items.${i}.name"><span class="stg" data-stg="${i}">—</span><button class="xbtn" data-del="${i}">✕</button></div><input class="ed opptype" data-p="${pf}pipeline.items.${i}.type"><div class="opp-b"><select class="ed" data-p="${pf}pipeline.items.${i}.channel">${opt(CH,o.channel)}</select><span class="oppval"><input class="edn" type="number" data-p="${pf}pipeline.items.${i}.value">ر.س/شهر</span><select class="ed" data-p="${pf}pipeline.items.${i}.status">${opt(ST,o.status)}</select><select class="ed" data-p="${pf}pipeline.items.${i}.pri">${opt(PRI,o.pri)}</select></div></div>`).join('');
  $('monthly').innerHTML=s.fuel.monthly.map((m,i)=>`<input class="edn" type="number" step="0.01" data-p="${pf}fuel.monthly.${i}">`).join('');
  $('leg').innerHTML=s.fuel.mix.map((m,i)=>`<div class="legrow"><i class="sw" style="background:${fcol(m[0],i)}"></i><select class="ed fprodsel" data-p="${pf}fuel.mix.${i}.0">${optW(FUEL,m[0])}</select><input class="edn" type="number" data-p="${pf}fuel.mix.${i}.1">٪<button class="xbtn" data-delp="${i}">✕</button></div>`).join('')+`<div class="legrow" style="color:var(--muted);font-size:11.5px">متوسط <input class="edn" data-p="${pf}fuel.avg" style="width:52px"> ر.س/لتر</div>`;
@@ -350,8 +358,11 @@ function refresh(){
  $('ov').innerHTML=D.stations.map((st,i)=>{const n=net(st),w=n>=0;const rev=st.kpis[0]||{};return `<div class="ovc${i===sel?' sel':''}" data-sel="${i}"><div class="code">${(st.meta&&st.meta.code)||''}</div><div class="nm">${st.station.name}</div><div class="mt">${(st.meta&&st.meta.type)||''} · ${(st.meta&&st.meta.city)||''}</div><div class="st"><div><div class="k">الإيراد (٦ش)</div><div class="b">${(rev.v||'—')} <span style="font-size:10px;color:var(--muted)">${rev.u||''}</span></div></div><div><div class="k">خط الأنابيب</div><div class="b" style="color:var(--gold)">${money(pipeTot(st))}</div></div></div><div class="foot"><span class="badge ${w?'win':'lose'}">${w?'🟢 رابحة':'🔴 خاسرة'} ${(w?'+':'')+money(n)}</span><span class="open">${i===sel?'✓ معروضة':'عرض ←'}</span>${D.stations.length>1?`<button class="xbtn" data-delst="${i}" style="position:absolute;top:10px;left:10px">✕</button>`:''}</div></div>`;}).join('');
  const s=S();
  // tenants summary + badges
- const T=s.tenants.items,nR=T.filter(x=>x.cat==='🍔 مطعم').length,nC=T.filter(x=>x.cat==='☕ كافيه').length,nO=T.filter(x=>x.status==='مؤجّرة').length;
- $('tsum').innerHTML=`<div class="tc"><div class="v">${T.length}</div><div class="l">إجمالي الوحدات</div></div><div class="tc"><div class="v">${nR}</div><div class="l">🍔 مطاعم</div></div><div class="tc"><div class="v">${nC}</div><div class="l">☕ كافيهات</div></div><div class="tc occ"><div class="v">${nO}</div><div class="l">مؤجّرة</div></div><div class="tc vac"><div class="v">${T.length-nO}</div><div class="l">شاغرة</div></div>`;
+ const T=s.tenants.items,cnt=f=>T.filter(f).reduce((a,x)=>a+(+x.count||1),0);
+ const ttot=cnt(()=>true),nR=cnt(x=>x.serviceCat==='مطاعم'),nC=cnt(x=>x.serviceCat==='كافيهات'),nO=cnt(x=>x.status==='مؤجّرة');
+ $('tsum').innerHTML=`<div class="tc"><div class="v">${ttot}</div><div class="l">إجمالي الوحدات</div></div><div class="tc"><div class="v">${nR}</div><div class="l">🍔 مطاعم</div></div><div class="tc"><div class="v">${nC}</div><div class="l">☕ كافيهات</div></div><div class="tc occ"><div class="v">${nO}</div><div class="l">مؤجّرة</div></div><div class="tc vac"><div class="v">${ttot-nO}</div><div class="l">شاغرة</div></div>`;
+ const byType={};T.forEach(x=>{byType[x.unitType]=(byType[x.unitType]||0)+(+x.count||1);});
+ $('tbreak').innerHTML='<span class="tbh">أنواع الوحدات:</span>'+Object.keys(byType).map(k=>`<span class="tb">${k} <b>${byType[k]}</b></span>`).join('');
  T.forEach((t,i)=>{const b=document.querySelector(`[data-ust="${i}"]`);if(b){const oc=t.status==='مؤجّرة';b.textContent=t.status;b.style.color=oc?'var(--good)':'var(--crit)';b.style.background=oc?'var(--good-bg)':'var(--crit-bg)';}});
  // products
  const TL=+s.finance.liters||0,MG=+s.finance.margin||0;let sumL=0,sumR=0,sumP=0;
@@ -402,7 +413,7 @@ function calc(){
 }
 function save(){try{localStorage.setItem(KEY,JSON.stringify(D));$('saved').textContent='✓ محفوظ';setTimeout(()=>{$('saved').textContent='';},1000);}catch(e){}}
 function blankStation(){return {id:'MK000',meta:{code:'MK000',city:'—',type:'—',size:'—',area:'—',selfService:'لا'},station:{eyebrow:'محطة جديدة',name:'محطة جديدة',tagline:'—'},kpis:[{v:'—',u:'',l:'الإيراد (٦ش)'},{v:'—',u:'',l:'الوقود'},{v:'—',u:'',l:'التقييم'},{v:'—',u:'',l:'الفاتورة'}],chips:['—'],segments:[{ic:'👤',t:'شريحة',share:'—',profile:'—',need:'—',offer:'—',ev:'—'}],demo:['—'],tenants:{note:'يُستكمل بالجرد.',items:[]},us:[['—','—']],them:[['—','—']],advantage:'—',gap:'—',suggested:[['—','متوسطة']],scenario:{road:'—',before:'—',after:'—',density:'—'},pipeline:{note:'فرص الموقع — تُستكمل.',items:[]},fuel:{mix:[['بنزين 91',34],['بنزين 95',33],['ديزل',33]],avg:'0',monthly:[0,0,0,0,0,0]},notes:{payAlert:'—',vacantAlert:'—',tanki:'—',partners:'—'},payment:[['نقدي',50],['شبكة (مدى)',49],['التطبيق',1]],leasing:{note:'—',franchiseOcc:0,vacant:0},finance:{liters:0,margin:0.15,units:0,occ:0,rent:0,store:0,salaries:0,oprent:0,utils:0,maint:0,workers:0,tankCapacity:0,pumps:0}};}
-document.addEventListener('input',e=>{const el=e.target;if(!el.dataset||!el.dataset.p)return;let v=el.value;if(el.type==='number'||el.type==='range'||el.classList.contains('edn'))v=parseFloat(v)||0;sp(D,el.dataset.p,v);refresh();});
+document.addEventListener('input',e=>{const el=e.target;if(!el.dataset||!el.dataset.p)return;let v=el.value;if(el.type==='number'||el.type==='range'||el.classList.contains('edn'))v=parseFloat(v)||0;sp(D,el.dataset.p,v);if(el.classList.contains('svccat')){sp(D,el.dataset.p.replace(/\.serviceCat$/,'.subType'),subOf(v)[0]);build();}refresh();});
 document.addEventListener('click',e=>{const t=e.target;if(!t.dataset)return;
  if(t.dataset.delst!=null){e.stopPropagation();if(D.stations.length>1&&confirm('حذف هذه المحطة؟')){D.stations.splice(+t.dataset.delst,1);if(sel>=D.stations.length)sel=D.stations.length-1;build();refresh();}return;}
  if(t.dataset.del!=null){S().pipeline.items.splice(+t.dataset.del,1);build();refresh();return;}
@@ -411,7 +422,7 @@ document.addEventListener('click',e=>{const t=e.target;if(!t.dataset)return;
  const card=t.closest&&t.closest('[data-sel]');if(card){sel=+card.dataset.sel;build();refresh();$('detail').scrollIntoView({behavior:'smooth',block:'start'});}});
 $('addst').onclick=()=>{D.stations.push(blankStation());sel=D.stations.length-1;build();refresh();$('detail').scrollIntoView({behavior:'smooth'});};
 $('addopp').onclick=()=>{S().pipeline.items.push({name:'جهة جديدة',type:'النشاط / التقييم',channel:CH[0],value:0,status:'فرصة',pri:'متوسطة'});build();refresh();};
-$('addunit').onclick=()=>{S().tenants.items.push({name:'وحدة جديدة',cat:TCAT[0],service:'—',status:'شاغرة'});build();refresh();};
+$('addunit').onclick=()=>{S().tenants.items.push({name:'وحدة جديدة',count:1,unitType:UTYPE[0],serviceCat:SCAT[0],subType:subOf(SCAT[0])[0],status:'شاغرة'});build();refresh();};
 $('addprod').onclick=()=>{const have=S().fuel.mix.map(m=>m[0]);const nx=FUEL.find(f=>!have.includes(f))||'بنزين 98';S().fuel.mix.push([nx,0]);build();refresh();};
 $('export').onclick=()=>{const b=new Blob([JSON.stringify(D,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='data.json';a.click();};
 $('reset').onclick=()=>{localStorage.removeItem(KEY);location.reload();};
