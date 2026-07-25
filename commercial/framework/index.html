@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>القسم التجاري · درب — الإطار الاستراتيجي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1b1c1e;--panel:#242528;--elev:#2b2c2f;--ink:#f4f5f6;--ink2:#d5d7da;--muted:#9a9da2;--line:#3b3d41;
+--accent:#f18a2b;--accent2:#f7a94e;--good:#3fb27f;--gold:#ffd54a;--sky:#38bdf8;--crit:#e06666;
+--good-bg:rgba(63,178,127,.14);--crit-bg:rgba(224,102,102,.14);--gold-bg:rgba(255,213,74,.12);--sky-bg:rgba(56,189,248,.12);
+--sh:0 10px 28px rgba(0,0,0,.35);--sh2:0 20px 50px rgba(0,0,0,.45)}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:Tajawal,Cairo,"Segoe UI",Tahoma,Arial,sans-serif;direction:rtl;line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1140px;margin:0 auto;padding:0 clamp(14px,3vw,26px)}
+/* nav */
+.top{position:sticky;top:0;z-index:30;background:rgba(27,28,30,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .row{display:flex;align-items:center;gap:11px;padding:10px 0;flex-wrap:wrap}
+.mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#e0922e);color:#1b1c1e;display:grid;place-items:center;font-weight:800;font-size:16px;flex:none}
+.top .nm{font-weight:800;font-size:14.5px}
+.nav{display:flex;gap:3px;margin-inline-start:auto;flex-wrap:wrap}
+.nav a{font-size:11.5px;color:var(--muted);text-decoration:none;padding:5px 9px;border-radius:7px;white-space:nowrap}
+.nav a:hover{color:var(--ink);background:var(--elev)}
+/* hero */
+.hero{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:22px;margin-top:16px;padding:clamp(26px,5vw,50px);background:radial-gradient(130% 150% at 88% -20%,rgba(241,138,43,.28) 0%,rgba(241,138,43,.05) 34%,var(--elev) 62%);box-shadow:var(--sh2)}
+.hero .eyeb{color:var(--accent2);font-weight:700;letter-spacing:.16em;font-size:12px}
+.hero h1{font-size:clamp(26px,5vw,46px);font-weight:800;letter-spacing:-.02em;margin:10px 0 12px;line-height:1.25}
+.hero p{color:var(--ink2);font-size:clamp(14px,1.7vw,17px);max-width:70ch}
+.hero .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}
+.tag{font-size:12px;padding:5px 12px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--ink2)}
+/* sections */
+section{margin-top:44px;scroll-margin-top:64px}
+.shead{display:flex;align-items:baseline;gap:13px;margin-bottom:8px}
+.shead .no{font-size:12px;font-weight:800;color:var(--accent);letter-spacing:.14em}
+.shead h2{font-size:clamp(19px,2.6vw,25px);font-weight:800}
+.shead .rule{flex:1;height:1px;background:var(--line)}
+.sub{color:var(--muted);font-size:13px;margin-bottom:18px;max-width:80ch}
+.grid{display:grid;gap:13px}
+.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:900px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.g2,.g3,.g4{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:16px 17px;box-shadow:var(--sh)}
+.card .ic{font-size:22px;display:block;margin-bottom:7px}
+.card h3{font-size:14.5px;font-weight:800;margin-bottom:6px}
+.card p{font-size:12.5px;color:var(--ink2)}
+.card.tp{border-top:2px solid var(--accent)}
+.card.acc{border-inline-start:3px solid var(--accent)}
+/* principle */
+.principle{background:linear-gradient(90deg,rgba(241,138,43,.18),rgba(241,138,43,.03));border:1px solid rgba(241,138,43,.35);border-radius:15px;padding:18px 22px;text-align:center;margin-bottom:12px}
+.principle b{font-size:clamp(14px,2vw,19px);font-weight:800;color:var(--accent2);line-height:1.6}
+.unit{background:var(--elev);border:1px solid var(--line);border-radius:13px;padding:13px 17px;font-size:13.5px;color:var(--ink2);margin-bottom:20px}
+.unit b{color:var(--gold)}
+/* cycle */
+.cycle{display:flex;gap:7px;align-items:stretch;flex-wrap:wrap;background:var(--elev);border:1px solid var(--line);border-radius:15px;padding:16px}
+.cyn{flex:1;min-width:124px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:12px 10px;text-align:center}
+.cyn .i{font-size:21px;display:block;line-height:1.4}
+.cyn b{display:block;font-size:12.5px;font-weight:800;margin:3px 0 2px}
+.cyn span{font-size:10.5px;color:var(--muted);display:block;line-height:1.45}
+.cya{align-self:center;color:var(--accent);font-weight:800;font-size:15px;flex:none}
+.cyloop{flex-basis:100%;text-align:center;font-size:12px;color:var(--accent2);font-weight:700;margin-top:12px;border-top:1px dashed var(--line);padding-top:12px}
+/* rules */
+.rul{display:grid;grid-template-columns:1fr 1.15fr;gap:12px;padding:12px 15px;border:1px solid var(--line);border-radius:12px;background:var(--panel);margin-bottom:8px;font-size:12.5px;align-items:center}
+@media(max-width:600px){.rul{grid-template-columns:1fr;gap:5px}}
+.rul .c{color:var(--crit)}.rul .r{color:var(--good)}
+.rul .r::before{content:"◄ ";opacity:.55}
+@media(max-width:600px){.rul .r::before{content:"↳ "}}
+/* phases */
+.phs{display:flex;gap:14px;padding:14px 16px;border:1px solid var(--line);border-radius:13px;background:var(--panel);margin-bottom:9px;border-inline-start:3px solid var(--accent)}
+.phs .p{flex:none;width:96px;font-size:12px;font-weight:800;color:var(--accent2)}
+.phs .b b{display:block;font-size:14px;font-weight:800;margin-bottom:3px}
+.phs .b p{font-size:12.5px;color:var(--ink2)}
+.phs .b small{font-size:11px;color:var(--muted);display:block;margin-top:4px}
+/* steps */
+.steps{counter-reset:s}
+.step{counter-increment:s;display:flex;gap:13px;padding:12px 0;border-bottom:1px solid var(--line)}
+.step:last-child{border-bottom:none}
+.step::before{content:counter(s);flex:none;width:26px;height:26px;border-radius:50%;background:var(--elev);border:1px solid var(--accent);color:var(--accent2);font-size:12px;font-weight:800;display:grid;place-items:center}
+.step .t{font-weight:800;font-size:13.5px}
+.step .d{font-size:12.5px;color:var(--ink2)}
+/* archetypes */
+.arch{background:var(--panel);border:1px solid var(--line);border-radius:15px;overflow:hidden;box-shadow:var(--sh)}
+.arch .h{padding:13px 16px;background:var(--elev);border-bottom:1px solid var(--line);display:flex;gap:9px;align-items:center}
+.arch .h .i{font-size:20px}.arch .h b{font-size:14.5px;font-weight:800}
+.arch .rows{padding:6px 16px 14px}
+.arow{display:flex;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:12.5px}
+.arow:last-child{border-bottom:none}
+.arow .k{flex:none;width:86px;color:var(--muted);font-weight:800;font-size:11px}
+.arow .v{color:var(--ink2)}
+/* taxonomy */
+.tax{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px 17px}
+.taxrow{display:flex;gap:11px;padding:10px 0;border-bottom:1px dashed var(--line);flex-wrap:wrap;align-items:baseline}
+.taxrow:last-child{border-bottom:none}
+.taxk{flex:none;width:112px;font-size:12.5px;font-weight:800;color:var(--accent2)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:11.5px;padding:3px 10px;border-radius:999px;background:var(--elev);border:1px solid var(--line);color:var(--ink2)}
+.chip.hi{border-color:rgba(241,138,43,.45);color:var(--accent2)}
+/* fleet */
+.fl{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px 16px;border-inline-start:3px solid var(--sky)}
+.fl b.t{display:block;font-size:14px;font-weight:800;margin-bottom:8px}
+.fl .lb{font-size:10.5px;color:var(--muted);font-weight:800;margin-top:9px}
+.fl p{font-size:12.5px;color:var(--ink2)}
+.guide{font-size:12.5px;color:var(--ink2);background:var(--sky-bg);border:1px solid rgba(56,189,248,.28);border-radius:12px;padding:12px 16px;margin-bottom:14px;line-height:1.8}
+.guide b{color:var(--sky)}
+/* kpi list */
+.kpil{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:800px){.kpil{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.kpil{grid-template-columns:1fr}}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;border-top:2px solid var(--gold)}
+.kpi b{display:block;font-size:13px;font-weight:800;margin-bottom:2px}
+.kpi span{font-size:11.5px;color:var(--muted)}
+.note{background:var(--gold-bg);border:1px solid rgba(255,213,74,.3);border-radius:12px;padding:13px 17px;font-size:12.5px;color:var(--ink2);margin-top:16px}
+.note b{color:var(--gold)}
+.pagefoot{margin:48px 0 26px;color:var(--muted);font-size:11.5px;text-align:center;border-top:1px solid var(--line);padding-top:16px}
+@media print{
+ body{background:#fff;color:#111}
+ .top{display:none}
+ .hero,.card,.arch,.tax,.fl,.kpi,.phs,.rul,.cycle,.cyn,.unit,.principle,.guide,.note{background:#fff!important;border-color:#ccc!important;box-shadow:none!important}
+ .hero h1,.card h3,.shead h2{color:#111}
+ .card p,.sub,.arow .v,.fl p,.phs .b p{color:#333}
+ section{break-inside:avoid;margin-top:26px}
+}
+</style>
+</head>
+<body>
+<div class="top"><div class="wrap row">
+ <div class="mark">د</div><div class="nm">درب · القسم التجاري</div>
+ <nav class="nav">
+  <a href="#framework">الإطار</a><a href="#integration">التكامل</a><a href="#method">المنهجية</a>
+  <a href="#archetypes">أنماط المواقع</a><a href="#leasing">التأجير</a><a href="#partners">الشراكات</a>
+  <a href="#marketing">المكس التسويقي</a><a href="#kpis">المؤشرات</a>
+ </nav>
+</div></div>
+
+<div class="wrap">
+ <div class="hero">
+  <div class="eyeb">الإطار الاستراتيجي</div>
+  <h1>القسم التجاري — مبيعات شاملة لكل منفذ</h1>
+  <p>إطار يوحّد إدارات الوقود والتأجير والشراكات والتسويق حول هدف واحد في كل محطة: رفع مبيعات الوقود، وتغطية الوحدات الشاغرة بما يناسب احتياجات الموقع ويضمن استدامة المستأجر، ودعم البيع كله بالتطبيق وبرنامج المكافآت.</p>
+  <div class="tags"><span class="tag">⛽ مبيعات الوقود</span><span class="tag">🏪 التأجير</span><span class="tag">🤝 الشراكات</span><span class="tag">📣 التسويق</span></div>
+ </div>
+
+ <section id="framework"><div class="shead"><span class="no">٠١</span><h2>الإطار — نموذج العمل</h2><span class="rule"></span></div>
+  <p class="sub">ثلاثة محرّكات للبيع تسندها طبقتا دعم، وكلها تلتقي عند المنفذ الواحد.</p>
+  <div class="grid g3">
+   <div class="card tp"><span class="ic">⛽</span><h3>خطة مبيعات الوقود</h3><p>رفع أحجام بيع البنزين والديزل والهوامش، بمنتجات تناسب شريحة كل موقع.</p></div>
+   <div class="card tp"><span class="ic">🏪</span><h3>خطة التأجير</h3><p>تغطية جميع الوحدات الشاغرة بمستأجرين يناسبون احتياجات الموقع بما يضمن استدامتهم — لا مجرد ملء الفراغ.</p></div>
+   <div class="card tp"><span class="ic">📱</span><h3>خطة التطبيق</h3><p>تنمية المبيعات الرقمية وتحويل الزيارة المجهولة إلى عميل معروف قابل للاستهداف.</p></div>
+  </div>
+  <div class="grid g2" style="margin-top:13px">
+   <div class="card acc"><span class="ic">📣</span><h3>التسويق — طبقة دعم</h3><p>التطبيق وبرنامج المكافآت والحملات والعروض: ترويج وولاء وبيع متقاطع يرفع الوقود والتأجير والمعاملات الرقمية.</p></div>
+   <div class="card acc"><span class="ic">🤝</span><h3>الشراكات — طبقة دعم</h3><p>علامات وامتيازات للتأجير، وأساطيل وحسابات مؤسسية للوقود، وشركاء عروض مشتركة للتطبيق والمكافآت.</p></div>
+  </div>
+ </section>
+
+ <section id="integration"><div class="shead"><span class="no">٠٢</span><h2>استراتيجية التكامل بين الإدارات</h2><span class="rule"></span></div>
+  <p class="sub">الإدارات الأربع تبيع لنفس العميل في نفس الموقع وفي نفس الزيارة — والتكامل لا يُصنع باجتماعات، بل بإعادة تعريف وحدة القياس والحوافز.</p>
+  <div class="principle"><b>الوقود يجلب الحركة · غير الوقود يصنع الربح · التطبيق يربطهما · المندوب ينفّذها</b></div>
+  <div class="unit"><b>وحدة القياس المشتركة:</b> الربح لكل زيارة في كل منفذ — لأن هامش الوقود مُقنَّن ومساحة النمو الحقيقية في غير الوقود، وهي بطبيعتها لا تُفتح إلا بتكامل الإدارات الأربع.</div>
+
+  <div class="grid g3">
+   <div class="card tp"><h3>مالك منفذ واحد</h3><p>شخص واحد مسؤول عن ربح المحطة الكامل، والإدارات الأربع خدمات مشتركة تخدمه.</p></div>
+   <div class="card tp"><h3>بطاقة أداء موحّدة</h3><p>مؤشر الإدارة للمساءلة الوظيفية، ومؤشر مشترك للتكامل — على البطاقة نفسها.</p></div>
+   <div class="card tp"><h3>حوافز مشتركة</h3><p>جزء من الحافز على هدف الإدارة، وجزء على ربح المنفذ المشترك — بدونه يبقى كل قسم يحمي رقمه.</p></div>
+  </div>
+
+  <p class="sub" style="margin-top:26px;margin-bottom:10px"><b style="color:var(--ink)">دورة النمو</b> — الآلية التشغيلية التي تُدار بها المحطة</p>
+  <div class="cycle">
+   <div class="cyn"><span class="i">🤝</span><b>عقود الأساطيل</b><span>حجم وقود مضمون وتدفّق متكرّر</span></div><span class="cya">←</span>
+   <div class="cyn"><span class="i">🏪</span><b>جاذبية الموقع</b><span>إشغال وإيجار أعلى</span></div><span class="cya">←</span>
+   <div class="cyn"><span class="i">⛽</span><b>سبب زيارة إضافي</b><span>وقود أكثر لكل زيارة</span></div><span class="cya">←</span>
+   <div class="cyn"><span class="i">📱</span><b>التطبيق يلتقط الهوية</b><span>إعادة استهداف مُقاسة</span></div><span class="cya">←</span>
+   <div class="cyn"><span class="i">📣</span><b>تكرار الزيارة</b><span>مبيعات مستأجر أعلى ← إيجار أعلى</span></div>
+   <div class="cyloop">↻ كل دورة ترفع الربح لكل زيارة</div>
+  </div>
+
+  <p class="sub" style="margin-top:26px;margin-bottom:10px"><b style="color:var(--ink)">قواعد فضّ التعارض</b></p>
+  <div class="rul"><span class="c">التسويق يريد خصماً · الوقود يحمي الهامش</span><span class="r">الخصم يُموَّل من هامش غير الوقود أو ميزانية الشريك — لا من هامش الوقود</span></div>
+  <div class="rul"><span class="c">التأجير يريد أعلى إيجار · الوقود يريد جاذب حركة</span><span class="r">المستأجر يُقيَّم على الإيجار ومساهمته في الحركة معاً — لا الإيجار وحده</span></div>
+  <div class="rul"><span class="c">الشراكات تَعِد بأسعار · التشغيل يتحمّلها</span><span class="r">أي التزام سعري يمرّ باعتماد مالك المنفذ</span></div>
+  <div class="rul"><span class="c">محطتان متجاورتان على نفس العميل</span><span class="r">تُدار المنطقة كمحفظة واحدة لتفادي التغذية الذاتية</span></div>
+
+  <p class="sub" style="margin-top:26px;margin-bottom:10px"><b style="color:var(--ink)">التسلسل التنفيذي</b></p>
+  <div class="phs"><span class="p">المرحلة الأولى</span><div class="b"><b>التأسيس</b><p>مالك منفذ · بطاقة أداء موحّدة · تفعيل التطبيق عند المضخة.</p><small>البنية التحتية للقياس — والتطبيق يفتح كل ما بعده</small></div></div>
+  <div class="phs"><span class="p">المرحلة الثانية</span><div class="b"><b>ملء الطاقة</b><p>تغطية الوحدات الشاغرة بما يناسب الموقع، وإبرام عقود الأساطيل.</p><small>أكبر مجمّعَي إيراد جاهزَين للتحصيل</small></div></div>
+  <div class="phs"><span class="p">المرحلة الثالثة</span><div class="b"><b>تسييل الدورة</b><p>المستأجر يشتري وصولاً عبر التطبيق · عروض مجمّعة · تسعير حسب الشريحة.</p><small>هنا يتحوّل التكامل إلى ربح</small></div></div>
+ </section>
+
+ <section id="method"><div class="shead"><span class="no">٠٣</span><h2>منهجية دراسة الموقع</h2><span class="rule"></span></div>
+  <p class="sub">كل استراتيجية منفذ تبدأ من دراسة موقعه — لا من قالب موحّد.</p>
+  <div class="card steps">
+   <div class="step"><div><div class="t">نوع العميل</div><div class="d">من يزور المحطة ولماذا: عابرون، معتمرون، أساطيل، سكان حي — ونمط الزيارة وتوقيتها.</div></div></div>
+   <div class="step"><div><div class="t">المدينة ونطاق الخدمة</div><div class="d">الحي والطريق الذي تخدمه المحطة، وطبيعة المنطقة والسكان المحيطين.</div></div></div>
+   <div class="step"><div><div class="t">النشاطات المناسبة للموقع ← 🏪 التأجير</div><div class="d">ما الذي يحتاجه هذا الموقع فعلاً من خدمات ووحدات — بما يضمن استدامة المستأجر.</div></div></div>
+   <div class="step"><div><div class="t">منتجات الوقود المناسبة ← ⛽ الوقود</div><div class="d">مزيج المنتجات الذي يناسب شريحة الموقع، وما يستلزمه من خدمة وتجهيز.</div></div></div>
+   <div class="step"><div><div class="t">عملاء الشركات المحتملون ← 🤝 الشراكات</div><div class="d">الجهات والأساطيل ضمن نطاق الموقع القابلة للتعاقد، وآلية التعاقد المناسبة لكل فئة.</div></div></div>
+   <div class="step"><div><div class="t">العروض المناسبة ← 📣 التسويق</div><div class="d">العروض وتوقيتها بما يناسب سلوك الزيارة، وربطها بالتطبيق وبرنامج المكافآت.</div></div></div>
+   <div class="step"><div><div class="t">بطاقة سيناريو الموقع</div><div class="d">المحيط: المحطة السابقة والتالية، كثافة المنافسين، التجار والمحلات المجاورة، وشركات الأعمال القريبة.</div></div></div>
+  </div>
+  <div class="note"><b>المخرج:</b> ملف استراتيجية لكل منفذ يربط نتائج الدراسة بقرارات الإدارات الأربع ومبادراتها.</div>
+ </section>
+
+ <section id="archetypes"><div class="shead"><span class="no">٠٤</span><h2>أنماط المواقع وشرائح العملاء</h2><span class="rule"></span></div>
+  <p class="sub">لا توجد استراتيجية واحدة لكل المحطات — النمط يحدّد العميل والمنتج والأولوية.</p>
+  <div class="grid g3">
+   <div class="arch"><div class="h"><span class="i">🕋</span><b>ممر المعتمرين</b></div><div class="rows">
+    <div class="arow"><span class="k">العميل</span><span class="v">معتمرون وعابرون · أساطيل حافلات · سكان محيطون</span></div>
+    <div class="arow"><span class="k">المنتج</span><span class="v">وجبات سريعة · قهوة عالمية · خدمات معتمرين · مسجد ومرافق كاملة</span></div>
+    <div class="arow"><span class="k">الوقود</span><span class="v">بنزين ٩١ و٩٥ مع حضور قوي للديزل (الأساطيل)</span></div>
+    <div class="arow"><span class="k">الأولوية</span><span class="v">عقود الأساطيل وسدّ فجوة مرساة القهوة العالمية</span></div>
+   </div></div>
+   <div class="arch"><div class="h"><span class="i">🚗</span><b>خط السفر</b></div><div class="rows">
+    <div class="arow"><span class="k">العميل</span><span class="v">مسافرون وعابرون أعلى إنفاقاً · سكان مجاورون</span></div>
+    <div class="arow"><span class="k">المنتج</span><span class="v">استراحة · قهوة ووجبة · خدمات سيارات سريعة</span></div>
+    <div class="arow"><span class="k">الوقود</span><span class="v">تركيز على البنزين الممتاز مع توفّر دائم</span></div>
+    <div class="arow"><span class="k">الأولوية</span><span class="v">تغطية الوحدات الشاغرة وخدمة العابرين السريعة</span></div>
+   </div></div>
+   <div class="arch"><div class="h"><span class="i">🏘️</span><b>الحي السكني</b></div><div class="rows">
+    <div class="arow"><span class="k">العميل</span><span class="v">سكان متكرّرون حسّاسون للسعر · أسر الحي</span></div>
+    <div class="arow"><span class="k">المنتج</span><span class="v">مخبز · بقالة · صيدلية · خدمات يومية ومسائية</span></div>
+    <div class="arow"><span class="k">الوقود</span><span class="v">غلبة البنزين الاقتصادي مع تنافسية دائمة</span></div>
+    <div class="arow"><span class="k">الأولوية</span><span class="v">تكرار الزيارة والولاء عبر برنامج المكافآت</span></div>
+   </div></div>
+  </div>
+ </section>
+
+ <section id="leasing"><div class="shead"><span class="no">٠٥</span><h2>التأجير — تصنيف مكوّنات المحطة</h2><span class="rule"></span></div>
+  <p class="sub">تصنيف موحّد لكل وحدة داخل المحطة: نوع الوحدة، ثم قسم الخدمة، ثم النوع الفرعي — أساس خطة الإشغال ومقارنة المنافذ.</p>
+  <div class="tax">
+   <div class="taxrow"><span class="taxk">نوع الوحدة</span><div class="chips"><span class="chip hi">كشك</span><span class="chip hi">محل تجاري</span><span class="chip hi">دريف ثرو</span><span class="chip hi">سوبر ماركت</span><span class="chip">عربة/كارت</span></div></div>
+   <div class="taxrow"><span class="taxk">قسم الخدمة</span><div class="chips"><span class="chip">مطاعم</span><span class="chip">كافيهات</span><span class="chip">آيس كريم</span><span class="chip">عصائر</span><span class="chip">كافتيريا</span><span class="chip">ماتشا</span><span class="chip">حلويات</span><span class="chip">زيوت</span><span class="chip">مغاسل</span><span class="chip">سوبر ماركت</span><span class="chip">بقالة</span><span class="chip">صيدلية</span><span class="chip">صراف</span><span class="chip">خدمات معتمرين</span></div></div>
+   <div class="taxrow"><span class="taxk">مطاعم</span><div class="chips"><span class="chip">فطور</span><span class="chip">غداء</span><span class="chip">فطاير</span><span class="chip">وجبات سريعة</span><span class="chip">جلسات</span><span class="chip">مشاوي</span></div></div>
+   <div class="taxrow"><span class="taxk">كافيهات</span><div class="chips"><span class="chip">قهوة مختصة</span><span class="chip">تجاري</span></div></div>
+   <div class="taxrow"><span class="taxk">مغاسل</span><div class="chips"><span class="chip">آلية</span><span class="chip">يدوي</span></div></div>
+   <div class="taxrow"><span class="taxk">سوبر ماركت</span><div class="chips"><span class="chip">هايبر</span><span class="chip">ماركت صغير</span></div></div>
+  </div>
+  <div class="grid g2" style="margin-top:14px">
+   <div class="card acc"><h3>معيار اختيار المستأجر</h3><p>يُقيَّم على قيمة الإيجار <b>ومساهمته في حركة المحطة</b> معاً، بما يناسب احتياج الموقع ويضمن استمراريته — لا على الإيجار وحده.</p></div>
+   <div class="card acc"><h3>متابعة أداء المستأجر</h3><p>تُرصد مبيعات كل مستأجر شهرياً وتُقارن بإيجاره ومساحته، لضبط التسعير مبكراً وحماية استدامته.</p></div>
+  </div>
+ </section>
+
+ <section id="partners"><div class="shead"><span class="no">٠٦</span><h2>الشراكات — عقود وقود الأساطيل</h2><span class="rule"></span></div>
+  <p class="sub">المركبات التجارية العابرة بجوار المحطة هي أكبر مصدر لحجم وقود متكرّر ومضمون.</p>
+  <div class="guide">🧭 <b>آليات التعاقد:</b> بطاقة وقود أسطول · خصم حجمي متدرّج · عقد موسمي · تزويد حصري · فوترة مركزية ودفع آجل · تقارير استهلاك لكل مركبة · برنامج ولاء للسائقين · مسار مخصّص وخدمة سريعة</div>
+  <div class="grid g4">
+   <div class="fl"><b class="t">🚌 باصات الحجاج والمعتمرين</b><p>أساطيل نقل موسمية عالية الاستهلاك على ممرات الحرمين.</p><div class="lb">الآلية الأنسب</div><p>عقد موسمي مربوط بمواسم الحج والعمرة، مع بطاقة أسطول ومسار حافلات سريع.</p></div>
+   <div class="fl"><b class="t">🚚 شاحنات اللوجستيات</b><p>أساطيل توزيع وشحن تعبر الطريق يومياً.</p><div class="lb">الآلية الأنسب</div><p>عقد سنوي بخصم حجمي متدرّج، وخدمة على مدار الساعة ومسار شاحنات مخصّص.</p></div>
+   <div class="fl"><b class="t">🚕 تكاسي المسافرين</b><p>سائقون على خطوط النقل بين المدن.</p><div class="lb">الآلية الأنسب</div><p>برنامج ولاء للسائقين وبطاقة لمكاتب النقل، مع نقطة استراحة وربط بالتطبيق.</p></div>
+   <div class="fl"><b class="t">🚗 منصّات إدارة الأساطيل</b><p>منصّات تدير محافظ مركبات لشركات متعدّدة (منها مكاتب تأجير السيارات).</p><div class="lb">الآلية الأنسب</div><p>اتفاقية واحدة مع المنصّة تفتح محفظتها كاملة: بطاقة موحّدة وفوترة مركزية وتقارير وربط رقمي.</p></div>
+  </div>
+ </section>
+
+ <section id="marketing"><div class="shead"><span class="no">٠٧</span><h2>المكس التسويقي</h2><span class="rule"></span></div>
+  <p class="sub">سعر الوقود مُقنَّن والمنافسة السعرية غير متاحة — لذلك يُبنى المكس على المنتج والمكان والناس، ويقود الترويجَ التطبيقُ ويموّله الشركاء.</p>
+  <div class="grid g4">
+   <div class="card tp"><span class="ic">📦</span><h3>المنتج</h3><p>المنتج ليس الوقود — بل الزيارة الكاملة: وقود وطعام وخدمة ومرافق، بسلة تختلف باختلاف نمط الموقع.</p></div>
+   <div class="card tp"><span class="ic">🏷️</span><h3>السعر</h3><p>الأدوات المتاحة: خصم حجمي للأساطيل، وتسعير غير الوقود، وإيجار يجمع ثابتاً ونسبةً من مبيعات المستأجر، والقيمة عبر برنامج المكافآت بدل الخصم.</p></div>
+   <div class="card tp"><span class="ic">📍</span><h3>المكان</h3><p>المحطة وجهة لا نقطة تعبئة: مسار مخصّص للأساطيل، وتوزيع الوحدات داخل المخطط حسب الحركة، والتطبيق كمنفذ رقمي إضافي.</p></div>
+   <div class="card tp"><span class="ic">📣</span><h3>الترويج</h3><p>يقوده التطبيق ويموّله الشريك: تفعيل عند المضخة، وعروض حول أوقات الذروة، وحملات مشتركة مع المستأجرين، وترويج مباشر لعملاء الأعمال.</p></div>
+   <div class="card tp"><span class="ic">👥</span><h3>الناس</h3><p>مندوب متكامل بنطاق جغرافي يحمل عروض الإدارات الأربع، وموظف المحطة كنقطة تفعيل للتطبيق — وجودة الخدمة أصل تسويقي قائم يُحافظ عليه.</p></div>
+   <div class="card tp"><span class="ic">⚙️</span><h3>العمليات</h3><p>سرعة الخدمة وقت الذروة، وتفعيل رقمي بخطوة واحدة، ومعيار واضح لاختيار المستأجر، وعقد أسطول ببطاقة وفوترة وتقارير.</p></div>
+   <div class="card tp"><span class="ic">🏛️</span><h3>الدليل المادي</h3><p>المسجد والمرافق ودورات المياه ميزة موثّقة في تقييمات العملاء، مع النظافة والإضاءة والتوجيه وهوية موحّدة عبر الشبكة.</p></div>
+   <div class="card tp" style="border-top-color:var(--gold)"><span class="ic">🎯</span><h3>أولوية الإنفاق</h3><p>الحصة الكبرى لتفعيل التطبيق لأنه القيد الذي يعطّل قياس كل شيء، تليها الحملات المشتركة الممولة من الشركاء، ثم الترويج المباشر لعملاء الأعمال.</p></div>
+  </div>
+  <div class="note"><b>قاعدة الحوكمة:</b> تُقاس ميزانية التسويق بالربح لكل زيارة — لا بالوصول والانطباعات.</div>
+ </section>
+
+ <section id="kpis"><div class="shead"><span class="no">٠٨</span><h2>مؤشرات المتابعة</h2><span class="rule"></span></div>
+  <p class="sub">بطاقة واحدة لكل منفذ تجمع مؤشرات المساءلة الوظيفية والمؤشرات المشتركة.</p>
+  <div class="kpil">
+   <div class="kpi"><b>الربح لكل زيارة</b><span>المؤشر المشترك · مالك المنفذ</span></div>
+   <div class="kpi"><b>عدد الزيارات</b><span>المؤشر المشترك · مالك المنفذ</span></div>
+   <div class="kpi"><b>حصة التطبيق من المعاملات</b><span>📣 التسويق</span></div>
+   <div class="kpi"><b>حجم مبيعات الوقود ومزيج المنتجات</b><span>⛽ الوقود</span></div>
+   <div class="kpi"><b>نسبة إشغال الوحدات</b><span>🏪 التأجير</span></div>
+   <div class="kpi"><b>نسبة الإيجار إلى مبيعات المستأجر</b><span>🏪 التأجير</span></div>
+   <div class="kpi"><b>حجم الأساطيل المتعاقد عليها</b><span>🤝 الشراكات</span></div>
+   <div class="kpi"><b>تغطية غير الوقود للمصاريف</b><span>المؤشر المشترك · مالك المنفذ</span></div>
+   <div class="kpi"><b>تقييم العملاء</b><span>📣 التسويق · التشغيل</span></div>
+  </div>
+  <div class="note"><b>ملاحظة:</b> القيم والمستهدفات الرقمية وخطط كل منفذ تُدار في ملف البيانات المرافق، ويقتصر هذا العرض على الإطار والمنهجية.</div>
+ </section>
+
+ <div class="pagefoot">درب · القسم التجاري — الإطار الاستراتيجي · وحدة عرض</div>
+</div>
+</body>
+</html>
