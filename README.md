@@ -86,6 +86,7 @@ khadija/
 - 🏪 [إدارة التأجير](divisions/leasing/README.md)
 - 🤝 [إدارة الشراكات](divisions/partnerships/README.md)
 - 📣 [إدارة التسويق](divisions/marketing/README.md)
+- ⭐ [**استراتيجية منفذ العمرة الجديدة (MK007)**](outlets/MK007-الاستراتيجية.md)
 - 🗂️ [فهرس المنافذ](outlets/README.md)
 - 📄 [قالب استراتيجية المنفذ](outlets/_TEMPLATE.md)
 - 📖 [المصطلحات](docs/glossary.md)
