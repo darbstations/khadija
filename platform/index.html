@@ -126,9 +126,27 @@ section{margin-top:30px;scroll-margin-top:60px}
 .tc .tcin:focus{outline:none;border-bottom:1.5px solid var(--accent);background:rgba(241,138,43,.05)}
 .tc.occ .tcin{color:var(--good)}.tc.vac .tcin{color:var(--crit)}
 .tcbar{display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap;margin-bottom:9px}
-.tlist{display:grid;grid-template-columns:1fr 1fr;gap:11px}@media(max-width:720px){.tlist{grid-template-columns:1fr}}
-.unit{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:11px 12px;box-shadow:var(--sh);border-inline-start:3px solid var(--good)}
+.tfilter{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.tsearchin{flex:1;min-width:150px;background:var(--elev);border:1px solid var(--line);border-radius:9px;color:var(--ink);font:inherit;font-size:12.5px;padding:8px 11px}
+.tsearchin:focus{outline:none;border-color:var(--accent)}
+.tcount{font-size:11px;color:var(--muted);white-space:nowrap}
+.tlist{display:block;max-height:560px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.tlist::-webkit-scrollbar{width:8px}.tlist::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+.unit{background:var(--panel);border:none;border-bottom:1px solid var(--line);border-radius:0;padding:0;box-shadow:none;border-inline-start:3px solid var(--good)}
+.unit:last-child{border-bottom:none}
 .unit.vac{border-inline-start-color:var(--crit)}
+.urow{display:flex;gap:8px;align-items:center;padding:8px 11px;cursor:pointer}
+.urow:hover{background:rgba(255,255,255,.03)}
+.uarrow{font-size:10px;color:var(--muted);flex:none;width:12px;text-align:center}
+.urow .uname{flex:1;min-width:60px;font-weight:700;font-size:13px;border-bottom-color:transparent}
+.urow .uname:hover{border-bottom-color:var(--accent2)}
+.ubadge{font-size:10px;background:var(--elev);border:1px solid var(--line);border-radius:7px;padding:2px 7px;flex:none;color:var(--ink2);white-space:nowrap}
+.ubadge.svc{color:var(--accent2)}
+@media(max-width:600px){.ubadge{display:none}}
+.ustt{font-size:9.5px;font-weight:800;padding:2px 8px;border-radius:999px;flex:none}
+.ustt.g{background:var(--good-bg);color:var(--good)}.ustt.rr{background:var(--crit-bg);color:var(--crit)}
+.udetail{padding:2px 12px 12px 24px}
+.udetail .unit-b{border-top:none;padding-top:2px}
 .unit-t{display:flex;gap:8px;align-items:center;margin-bottom:9px}.unit-t .uname{font-weight:800;font-size:13.5px;flex:1}
 .ucount{display:inline-flex;align-items:center;gap:1px;font-size:12px;color:var(--muted);flex:none}.ucount .edn{width:44px}
 .unit-b{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:9px}
@@ -273,6 +291,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
    <div class="tsum" id="tsum"></div>
    <div class="tbreak" id="tbreak"></div>
    <div class="tsum" id="lsum" style="margin-bottom:13px"></div>
+   <div class="tfilter"><input id="tsearch" class="tsearchin" placeholder="🔍 ابحث باسم/نوع/خدمة..."><select id="tfstatus" class="ed"><option value="all">كل الحالات</option><option value="مؤجّرة">مؤجّرة فقط</option><option value="شاغرة">شاغرة فقط</option></select><span class="tcount" id="tcount"></span></div>
    <div class="tlist" id="tlist"></div>
    <button class="btn pri addrow" id="addunit">➕ أضف وحدة/مستأجر</button>
    <div class="planwrap">
@@ -365,7 +384,7 @@ const SUB={'مطاعم':['فطور','غداء','فطاير','وجبات سريع
 const subOf=c=>SUB[c]||['عام'];
 const TST=['مؤجّرة','شاغرة'];
 const opt=(arr,sel)=>arr.map(o=>`<option${o===sel?' selected':''}>${o}</option>`).join('');
-let D={},sel=0,planSel=-1;const KEY='darb_sales_v3';
+let D={},sel=0,planSel=-1,openUnits=new Set(),unitFilter={q:'',status:'all'};const KEY='darb_sales_v3';
 const S=()=>D.stations[sel],P=()=>'stations.'+sel+'.';
 function net(st){const f=st.finance,L=+f.liters||0,m=+f.margin||0,occ=(+f.occ||0)/100;const exp=(+f.salaries||0)+(+f.oprent||0)+(+f.utils||0)+(+f.maint||0);return m*L+(+f.units||0)*occ*(+f.rent||0)+(+f.store||0)-exp;}
 const pipeTot=st=>st.pipeline.items.reduce((a,o)=>a+(+o.value||0),0);
@@ -382,7 +401,7 @@ function build(){
  $('them').innerHTML=s.them.map((r,i)=>`<div class="brow"><input class="ed k" data-p="${pf}them.${i}.0"><input class="ed" data-p="${pf}them.${i}.1"></div>`).join('');
  $('suggested').innerHTML=s.suggested.map((sg,i)=>`<span class="it"><input class="ed" data-p="${pf}suggested.${i}.0"><select class="ed" data-p="${pf}suggested.${i}.1">${opt(PRI,sg[1])}</select></span>`).join('');
  $('tsum').innerHTML=[['total','إجمالي الوحدات',''],['restaurants','🍔 مطاعم',''],['cafes','☕ كافيهات',''],['rented','مؤجّرة','occ'],['vacant','شاغرة','vac']].map(([k,lb,cl])=>`<div class="tc ${cl}"><input class="edn tcin" type="number" min="0" data-p="${pf}tenants.summary.${k}"><div class="l">${lb}</div></div>`).join('');
- $('tlist').innerHTML=s.tenants.items.map((t,i)=>`<div class="unit${t.status==='شاغرة'?' vac':''}"><div class="unit-t"><input class="ed uname" data-p="${pf}tenants.items.${i}.name"><span class="tst" data-ust="${i}">—</span><button class="xbtn" data-delu="${i}">✕</button></div><div class="unit-b"><label class="uf"><span>نوع الوحدة</span><select class="ed" data-p="${pf}tenants.items.${i}.unitType">${opt(UTYPE,t.unitType)}</select></label><label class="uf"><span>العدد</span><input class="edn unum" type="number" min="0" data-p="${pf}tenants.items.${i}.count"></label><label class="uf"><span>الخدمة</span><select class="ed svccat" data-p="${pf}tenants.items.${i}.serviceCat">${opt(SCAT,t.serviceCat)}</select></label><label class="uf"><span>النوع الفرعي</span><select class="ed" data-p="${pf}tenants.items.${i}.subType">${optW(subOf(t.serviceCat),t.subType)}</select></label><label class="uf"><span>الحالة</span><select class="ed" data-p="${pf}tenants.items.${i}.status">${opt(TST,t.status)}</select></label></div>${t.status==='مؤجّرة'?`<div class="unit-a"><label class="uf"><span>مبيعات المستأجر/شهر</span><input class="edn uwide" type="number" min="0" data-p="${pf}tenants.items.${i}.sales"></label><label class="uf"><span>الإيجار/شهر</span><input class="edn" type="number" min="0" data-p="${pf}tenants.items.${i}.rent"></label><label class="uf"><span>المساحة م²</span><input class="edn" type="number" min="0" data-p="${pf}tenants.items.${i}.area"></label><span class="uana" data-uana="${i}"></span></div>`:`<div class="unit-a vacnote">💡 وحدة شاغرة — فرصة تأجير</div>`}</div>`).join('');
+ buildUnits();const _du=false&&s.tenants.items.map((t,i)=>`<div class="unit${t.status==='شاغرة'?' vac':''}"><div class="unit-t"><input class="ed uname" data-p="${pf}tenants.items.${i}.name"><span class="tst" data-ust="${i}">—</span><button class="xbtn" data-delu="${i}">✕</button></div><div class="unit-b"><label class="uf"><span>نوع الوحدة</span><select class="ed" data-p="${pf}tenants.items.${i}.unitType">${opt(UTYPE,t.unitType)}</select></label><label class="uf"><span>العدد</span><input class="edn unum" type="number" min="0" data-p="${pf}tenants.items.${i}.count"></label><label class="uf"><span>الخدمة</span><select class="ed svccat" data-p="${pf}tenants.items.${i}.serviceCat">${opt(SCAT,t.serviceCat)}</select></label><label class="uf"><span>النوع الفرعي</span><select class="ed" data-p="${pf}tenants.items.${i}.subType">${optW(subOf(t.serviceCat),t.subType)}</select></label><label class="uf"><span>الحالة</span><select class="ed" data-p="${pf}tenants.items.${i}.status">${opt(TST,t.status)}</select></label></div>${t.status==='مؤجّرة'?`<div class="unit-a"><label class="uf"><span>مبيعات المستأجر/شهر</span><input class="edn uwide" type="number" min="0" data-p="${pf}tenants.items.${i}.sales"></label><label class="uf"><span>الإيجار/شهر</span><input class="edn" type="number" min="0" data-p="${pf}tenants.items.${i}.rent"></label><label class="uf"><span>المساحة م²</span><input class="edn" type="number" min="0" data-p="${pf}tenants.items.${i}.area"></label><span class="uana" data-uana="${i}"></span></div>`:`<div class="unit-a vacnote">💡 وحدة شاغرة — فرصة تأجير</div>`}</div>`).join('');
  $('plist').innerHTML=s.pipeline.items.map((o,i)=>`<div class="opp"><div class="opp-t"><input class="ed oppname" data-p="${pf}pipeline.items.${i}.name"><span class="stg" data-stg="${i}">—</span><button class="xbtn" data-del="${i}">✕</button></div><input class="ed opptype" data-p="${pf}pipeline.items.${i}.type"><div class="opp-b"><select class="ed" data-p="${pf}pipeline.items.${i}.channel">${opt(CH,o.channel)}</select><span class="oppval"><input class="edn" type="number" data-p="${pf}pipeline.items.${i}.value">ر.س/شهر</span><select class="ed" data-p="${pf}pipeline.items.${i}.status">${opt(ST,o.status)}</select><select class="ed" data-p="${pf}pipeline.items.${i}.pri">${opt(PRI,o.pri)}</select></div></div>`).join('');
  $('monthly').innerHTML=s.fuel.monthly.map((m,i)=>`<input class="edn" type="number" step="0.01" data-p="${pf}fuel.monthly.${i}">`).join('');
  $('leg').innerHTML=s.fuel.mix.map((m,i)=>`<div class="legrow"><i class="sw" style="background:${fcol(m[0],i)}"></i><select class="ed fprodsel" data-p="${pf}fuel.mix.${i}.0">${optW(FUEL,m[0])}</select><input class="edn" type="number" data-p="${pf}fuel.mix.${i}.1">٪<button class="xbtn" data-delp="${i}">✕</button></div>`).join('')+`<div class="legrow" style="color:var(--muted);font-size:11.5px">متوسط <input class="edn" data-p="${pf}fuel.avg" style="width:52px"> ر.س/لتر</div>`;
@@ -453,24 +472,39 @@ function calc(){
 function save(){try{localStorage.setItem(KEY,JSON.stringify(D));$('saved').textContent='✓ محفوظ';setTimeout(()=>{$('saved').textContent='';},1000);}catch(e){}}
 function tallyUnits(it){const c=f=>(it||[]).filter(f).reduce((a,x)=>a+(+x.count||1),0);return {total:c(()=>true),restaurants:c(x=>x.serviceCat==='مطاعم'),cafes:c(x=>x.serviceCat==='كافيهات'),rented:c(x=>x.status==='مؤجّرة'),vacant:c(x=>x.status!=='مؤجّرة')};}
 function normalize(o){(o.stations||[]).forEach(st=>{if(!st.tenants)st.tenants={note:'',items:[]};if(!st.tenants.plan)st.tenants.plan={image:'',note:''};(st.tenants.items||[]).forEach(t=>{if(t.count==null)t.count=1;if(t.sales==null)t.sales=0;if(t.rent==null)t.rent=0;if(t.area==null)t.area=0;});if(!st.tenants.summary)st.tenants.summary=tallyUnits(st.tenants.items);});}
-function posOf(t,i){if(typeof t.x==='number'&&typeof t.y==='number')return{x:t.x,y:t.y};const cols=4;return{x:5+(i%cols)*23.5,y:6+Math.floor(i/cols)*24};}
-function buildPlan(){const s=S(),pl=s.tenants.plan||{},el=$('plan');if(!el)return;el.style.backgroundImage=pl.image?`url("${pl.image}")`:'';el.classList.toggle('empty',!pl.image);el.innerHTML=s.tenants.items.map((t,i)=>{const p=posOf(t,i);return `<div class="pbox ${t.status==='مؤجّرة'?'rented':'vac'}${i===planSel?' sel':''}" data-pbox="${i}" style="left:${p.x}%;top:${p.y}%"><b>${t.name}</b><span>${t.unitType}${(+t.count>1)?' ×'+t.count:''}</span></div>`;}).join('');}
+function posOf(t,i,n){if(typeof t.x==='number'&&typeof t.y==='number')return{x:t.x,y:t.y};const cols=Math.max(3,Math.ceil(Math.sqrt((n||1)*1.7))),gx=90/cols,gy=Math.min(23,82/Math.max(1,Math.ceil((n||1)/cols)));return{x:4+(i%cols)*gx,y:5+Math.floor(i/cols)*gy};}
+function buildPlan(){const s=S(),pl=s.tenants.plan||{},el=$('plan');if(!el)return;const n=s.tenants.items.length;el.style.backgroundImage=pl.image?`url("${pl.image}")`:'';el.classList.toggle('empty',!pl.image);el.innerHTML=s.tenants.items.map((t,i)=>{const p=posOf(t,i,n);return `<div class="pbox ${t.status==='مؤجّرة'?'rented':'vac'}${i===planSel?' sel':''}" data-pbox="${i}" style="left:${p.x}%;top:${p.y}%"><b>${t.name}</b><span>${t.unitType}${(+t.count>1)?' ×'+t.count:''}</span></div>`;}).join('');}
 function showPlanInfo(i){const t=S().tenants.items[i],el=$('planinfo');if(!el)return;if(!t){el.textContent='اضغط أي وحدة في المخطط لعرض تحليل مبيعاتها.';return;}if(t.status==='مؤجّرة'){const sl=+t.sales||0,rn=+t.rent||0,ar=+t.area||0,ratio=sl>0?rn/sl*100:0,spm=ar>0?sl/ar:0;el.innerHTML=`<b>${t.name}</b> · ${t.unitType} · ${t.serviceCat}/${t.subType} · <span style="color:var(--good);font-weight:800">مؤجّرة</span><br>مبيعات <b>${money(sl)}</b> ر.س · إيجار <b>${money(rn)}</b> ر.س · نسبة الإيجار <b style="color:${sl>0&&ratio<=15?'var(--good)':'var(--crit)'}">${sl>0?ratio.toFixed(1)+'٪':'—'}</b>${ar?` · <b>${money(spm)}</b> ر.س/م²`:''}`;}else{el.innerHTML=`<b>${t.name}</b> · ${t.unitType} · <span style="color:var(--crit);font-weight:800">شاغرة</span> — 💡 فرصة تأجير`;}}
 let _dI=-1,_dMoved=false,_dS=null;
 function planDown(e){const box=e.target.closest&&e.target.closest('[data-pbox]');if(!box)return;e.preventDefault();_dI=+box.dataset.pbox;_dMoved=false;_dS={x:e.clientX,y:e.clientY};}
 function planMove(e){if(_dI<0)return;if(Math.abs(e.clientX-_dS.x)+Math.abs(e.clientY-_dS.y)>4)_dMoved=true;if(!_dMoved)return;const el=$('plan'),r=el.getBoundingClientRect();let x=(e.clientX-r.left)/r.width*100,y=(e.clientY-r.top)/r.height*100;x=Math.max(0,Math.min(90,x));y=Math.max(0,Math.min(86,y));const t=S().tenants.items[_dI];if(!t)return;t.x=Math.round(x*10)/10;t.y=Math.round(y*10)/10;const box=el.querySelector(`[data-pbox="${_dI}"]`);if(box){box.style.left=t.x+'%';box.style.top=t.y+'%';}}
 function planUp(){if(_dI<0)return;const i=_dI;_dI=-1;if(_dMoved){save();}else{planSel=i;buildPlan();showPlanInfo(i);}}
+function resetFilter(){unitFilter.q='';unitFilter.status='all';const a=$('tsearch');if(a)a.value='';const b=$('tfstatus');if(b)b.value='all';}
+function buildUnits(){const s=S(),pf=P(),q=(unitFilter.q||'').trim(),fs=unitFilter.status;
+ const rows=s.tenants.items.map((t,i)=>[t,i]).filter(([t])=>{if(fs==='مؤجّرة'&&t.status!=='مؤجّرة')return false;if(fs==='شاغرة'&&t.status==='مؤجّرة')return false;if(q&&!(''+(t.name||'')+(t.unitType||'')+(t.serviceCat||'')+(t.subType||'')).includes(q))return false;return true;});
+ const tc=$('tcount');if(tc)tc.textContent=`عرض ${rows.length} من ${s.tenants.items.length}`;
+ $('tlist').innerHTML=rows.map(([t,i])=>{const open=openUnits.has(i),r=t.status==='مؤجّرة';
+  const head=`<div class="urow ${r?'r':'v'}" data-toggle="${i}"><span class="uarrow">${open?'▾':'▸'}</span><input class="ed uname" data-p="${pf}tenants.items.${i}.name"><span class="ubadge">${t.unitType}${(+t.count>1)?' ×'+t.count:''}</span><span class="ubadge svc">${t.serviceCat}</span><span class="ustt ${r?'g':'rr'}">${t.status}</span><button class="xbtn" data-delu="${i}">✕</button></div>`;
+  const det=open?`<div class="udetail"><div class="unit-b"><label class="uf"><span>نوع الوحدة</span><select class="ed" data-p="${pf}tenants.items.${i}.unitType">${opt(UTYPE,t.unitType)}</select></label><label class="uf"><span>العدد</span><input class="edn unum" type="number" min="0" data-p="${pf}tenants.items.${i}.count"></label><label class="uf"><span>الخدمة</span><select class="ed svccat" data-p="${pf}tenants.items.${i}.serviceCat">${opt(SCAT,t.serviceCat)}</select></label><label class="uf"><span>النوع الفرعي</span><select class="ed" data-p="${pf}tenants.items.${i}.subType">${optW(subOf(t.serviceCat),t.subType)}</select></label><label class="uf"><span>الحالة</span><select class="ed" data-p="${pf}tenants.items.${i}.status">${opt(TST,t.status)}</select></label></div>${r?`<div class="unit-a"><label class="uf"><span>مبيعات المستأجر/شهر</span><input class="edn uwide" type="number" min="0" data-p="${pf}tenants.items.${i}.sales"></label><label class="uf"><span>الإيجار/شهر</span><input class="edn" type="number" min="0" data-p="${pf}tenants.items.${i}.rent"></label><label class="uf"><span>المساحة م²</span><input class="edn" type="number" min="0" data-p="${pf}tenants.items.${i}.area"></label><span class="uana" data-uana="${i}"></span></div>`:`<div class="unit-a vacnote">💡 وحدة شاغرة — فرصة تأجير</div>`}</div>`:'';
+  return `<div class="unit ${r?'':'vac'}">${head}${det}</div>`;}).join('');
+ setAll();}
 function blankStation(){return {id:'MK000',meta:{code:'MK000',city:'—',type:'—',size:'—',area:'—',selfService:'لا'},station:{eyebrow:'محطة جديدة',name:'محطة جديدة',tagline:'—'},kpis:[{v:'—',u:'',l:'الإيراد (٦ش)'},{v:'—',u:'',l:'الوقود'},{v:'—',u:'',l:'التقييم'},{v:'—',u:'',l:'الفاتورة'}],chips:['—'],segments:[{ic:'👤',t:'شريحة',share:'—',profile:'—',need:'—',offer:'—',ev:'—'}],demo:['—'],tenants:{note:'يُستكمل بالجرد.',items:[],plan:{image:'',note:''},summary:{total:0,restaurants:0,cafes:0,rented:0,vacant:0}},us:[['—','—']],them:[['—','—']],advantage:'—',gap:'—',suggested:[['—','متوسطة']],scenario:{road:'—',before:'—',after:'—',density:'—'},pipeline:{note:'فرص الموقع — تُستكمل.',items:[]},fuel:{mix:[['بنزين 91',34],['بنزين 95',33],['ديزل',33]],avg:'0',monthly:[0,0,0,0,0,0]},notes:{payAlert:'—',vacantAlert:'—',tanki:'—',partners:'—'},payment:[['نقدي',50],['شبكة (مدى)',49],['التطبيق',1]],leasing:{note:'—',franchiseOcc:0,vacant:0},finance:{liters:0,margin:0.15,units:0,occ:0,rent:0,store:0,salaries:0,oprent:0,utils:0,maint:0,workers:0,tankCapacity:0,pumps:0}};}
-document.addEventListener('input',e=>{const el=e.target;if(!el.dataset||!el.dataset.p)return;let v=el.value;if(el.type==='number'||el.type==='range'||el.classList.contains('edn'))v=parseFloat(v)||0;sp(D,el.dataset.p,v);if(el.classList.contains('svccat')){sp(D,el.dataset.p.replace(/\.serviceCat$/,'.subType'),subOf(v)[0]);build();}refresh();});
+document.addEventListener('input',e=>{const el=e.target;if(!el.dataset||!el.dataset.p)return;let v=el.value;if(el.type==='number'||el.type==='range'||el.classList.contains('edn'))v=parseFloat(v)||0;const p=el.dataset.p;sp(D,p,v);
+ if(el.classList.contains('svccat')){sp(D,p.replace(/\.serviceCat$/,'.subType'),subOf(v)[0]);buildUnits();refresh();return;}
+ if(/\.tenants\.items\.\d+\.(status|unitType)$/.test(p)){buildUnits();refresh();return;}
+ refresh();});
 document.addEventListener('click',e=>{const t=e.target;if(!t.dataset)return;
  if(t.dataset.delst!=null){e.stopPropagation();if(D.stations.length>1&&confirm('حذف هذه المحطة؟')){D.stations.splice(+t.dataset.delst,1);if(sel>=D.stations.length)sel=D.stations.length-1;planSel=-1;build();refresh();showPlanInfo(-1);}return;}
  if(t.dataset.del!=null){S().pipeline.items.splice(+t.dataset.del,1);build();refresh();return;}
- if(t.dataset.delu!=null){S().tenants.items.splice(+t.dataset.delu,1);planSel=-1;build();refresh();showPlanInfo(-1);return;}
+ if(t.dataset.delu!=null){S().tenants.items.splice(+t.dataset.delu,1);openUnits.clear();planSel=-1;build();refresh();showPlanInfo(-1);return;}
  if(t.dataset.delp!=null){if(S().fuel.mix.length>1){S().fuel.mix.splice(+t.dataset.delp,1);build();refresh();}return;}
- const card=t.closest&&t.closest('[data-sel]');if(card){sel=+card.dataset.sel;planSel=-1;build();refresh();showPlanInfo(-1);$('detail').scrollIntoView({behavior:'smooth',block:'start'});}});
-$('addst').onclick=()=>{D.stations.push(blankStation());sel=D.stations.length-1;build();refresh();$('detail').scrollIntoView({behavior:'smooth'});};
+ const urow=t.closest&&t.closest('.urow');if(urow&&!t.closest('input,select,textarea')){const i=+urow.dataset.toggle;if(openUnits.has(i))openUnits.delete(i);else openUnits.add(i);buildUnits();return;}
+ const card=t.closest&&t.closest('[data-sel]');if(card){sel=+card.dataset.sel;planSel=-1;openUnits.clear();resetFilter();build();refresh();showPlanInfo(-1);$('detail').scrollIntoView({behavior:'smooth',block:'start'});}});
+$('addst').onclick=()=>{D.stations.push(blankStation());sel=D.stations.length-1;planSel=-1;openUnits.clear();resetFilter();build();refresh();$('detail').scrollIntoView({behavior:'smooth'});};
 $('addopp').onclick=()=>{S().pipeline.items.push({name:'جهة جديدة',type:'النشاط / التقييم',channel:CH[0],value:0,status:'فرصة',pri:'متوسطة'});build();refresh();};
-$('addunit').onclick=()=>{S().tenants.items.push({name:'وحدة جديدة',count:1,unitType:UTYPE[0],serviceCat:SCAT[0],subType:subOf(SCAT[0])[0],status:'شاغرة'});build();refresh();};
+$('addunit').onclick=()=>{S().tenants.items.push({name:'وحدة جديدة',count:1,unitType:UTYPE[0],serviceCat:SCAT[0],subType:subOf(SCAT[0])[0],status:'شاغرة'});resetFilter();openUnits.add(S().tenants.items.length-1);build();refresh();};
+$('tsearch').addEventListener('input',e=>{unitFilter.q=e.target.value;buildUnits();});
+$('tfstatus').addEventListener('change',e=>{unitFilter.status=e.target.value;buildUnits();});
 $('addprod').onclick=()=>{const have=S().fuel.mix.map(m=>m[0]);const nx=FUEL.find(f=>!have.includes(f))||'بنزين 98';S().fuel.mix.push([nx,0]);build();refresh();};
 $('plan').addEventListener('pointerdown',planDown);document.addEventListener('pointermove',planMove);document.addEventListener('pointerup',planUp);
 $('planimg').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{const s=S();if(!s.tenants.plan)s.tenants.plan={};s.tenants.plan.image=rd.result;buildPlan();save();};rd.readAsDataURL(f);e.target.value='';});
@@ -478,7 +512,7 @@ $('planclear').onclick=()=>{const s=S();if(s.tenants.plan)s.tenants.plan.image='
 $('tcalc').onclick=()=>{S().tenants.summary=tallyUnits(S().tenants.items);build();refresh();};
 $('export').onclick=()=>{const b=new Blob([JSON.stringify(D,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='data.json';a.click();};
 $('reset').onclick=()=>{localStorage.removeItem(KEY);location.reload();};
-function start(o){D=o;normalize(D);sel=0;planSel=-1;build();refresh();}
+function start(o){D=o;normalize(D);sel=0;planSel=-1;openUnits.clear();resetFilter();build();refresh();}
 let ok=false;const c=localStorage.getItem(KEY);
 if(c){try{const j=JSON.parse(c);if(j&&Array.isArray(j.stations)&&j.stations.length&&j.stations[0].tenants){start(j);ok=true;}}catch(e){}}
 if(!ok)fetch('./data.json?_='+Date.now()).then(r=>r.json()).then(start).catch(()=>{document.querySelector('.wrap').insertAdjacentHTML('afterbegin','<p style="padding:24px;text-align:center;color:var(--muted)">تعذّر تحميل data.json</p>');});
