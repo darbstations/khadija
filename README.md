@@ -45,6 +45,7 @@ khadija/
 ├── docs/
 │   ├── strategy.md              ← استراتيجية القسم (رؤية/أهداف/توجهات)
 │   ├── framework.md             ← الإطار: نموذج العمل + المحاور + المؤشرات
+│   ├── integration-strategy.md  ← استراتيجية التكامل بين الإدارات (الربح/الزيارة)
 │   ├── site-study.md            ← منهجية دراسة وتحليل الموقع (نقطة البداية)
 │   ├── execution.md             ← آلية التنفيذ والحوكمة
 │   ├── tracking-system.md       ← نظام تتبّع المبيعات (المواصفات)
@@ -75,6 +76,7 @@ khadija/
 
 - 🧭 [استراتيجية القسم](docs/strategy.md)
 - 📐 [الإطار الاستراتيجي للقسم](docs/framework.md)
+- 🔗 [استراتيجية التكامل بين الإدارات](docs/integration-strategy.md)
 - 🔎 [منهجية دراسة وتحليل الموقع](docs/site-study.md)
 - ⚙️ [آلية التنفيذ والحوكمة](docs/execution.md)
 - 📊 [نظام تتبّع المبيعات](docs/tracking-system.md)
