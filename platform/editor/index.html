@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>منصّة مبيعات القسم التجاري · درب (تفاعلية)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1b1c1e;--panel:#242528;--elev:#2b2c2f;--ink:#f4f5f6;--ink2:#d5d7da;--muted:#9a9da2;--line:#3b3d41;
+--accent:#f18a2b;--accent2:#f7a94e;--good:#3fb27f;--gold:#ffd54a;--sky:#38bdf8;--crit:#e06666;
+--good-bg:rgba(63,178,127,.14);--crit-bg:rgba(224,102,102,.14);--gold-bg:rgba(255,213,74,.12);--sky-bg:rgba(56,189,248,.12);
+--f91:#38bdf8;--f95:#f18a2b;--fd:#6b7280;--sh:0 10px 28px rgba(0,0,0,.35);--sh2:0 20px 50px rgba(0,0,0,.45)}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:Tajawal,Cairo,"Segoe UI",Tahoma,Arial,sans-serif;direction:rtl;line-height:1.6;-webkit-font-smoothing:antialiased}
+.tnum{font-variant-numeric:tabular-nums}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(14px,3vw,26px)}
+.top{position:sticky;top:0;z-index:30;background:rgba(27,28,30,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .row{display:flex;align-items:center;gap:10px;padding:10px 0;flex-wrap:wrap}
+.mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#e0922e);color:#1b1c1e;display:grid;place-items:center;font-weight:800;font-size:16px;flex:none}
+.top .nm{font-weight:800;font-size:14.5px}
+.pill{display:inline-flex;align-items:center;gap:7px;font-weight:800;font-size:12.5px;padding:6px 12px;border-radius:999px;white-space:nowrap}
+.pill.win{background:var(--good-bg);color:var(--good)}.pill.lose{background:var(--crit-bg);color:var(--crit)}
+.pill.pipe{background:var(--gold-bg);color:var(--gold)}
+.pill .dot{width:8px;height:8px;border-radius:50%;background:currentColor}
+.tools{display:flex;gap:7px;margin-inline-start:auto;align-items:center;flex-wrap:wrap}
+.btn{font-family:inherit;font-size:12.5px;font-weight:700;padding:7px 12px;border-radius:9px;border:1px solid var(--line);background:var(--elev);color:var(--ink);cursor:pointer}
+.btn:hover{border-color:var(--accent)}.btn.pri{background:var(--accent);color:#1b1c1e;border-color:var(--accent)}
+.saved{font-size:11px;color:var(--good)}
+.hint{background:var(--gold-bg);border:1px solid rgba(255,213,74,.3);border-radius:12px;padding:10px 15px;margin-top:14px;font-size:12.5px;color:var(--ink2)}
+.hint b{color:var(--gold)}
+.ed{background:transparent;border:none;border-bottom:1px dashed var(--line);color:inherit;font:inherit;padding:2px 1px;width:100%;transition:border-color .15s}
+.ed:hover{border-bottom-color:var(--accent2)}.ed:focus{outline:none;border-bottom:1px solid var(--accent);background:rgba(241,138,43,.05)}
+textarea.ed{resize:vertical;min-height:38px;line-height:1.5}
+.edn{width:76px;background:var(--elev);border:1px solid var(--line);border-radius:7px;color:inherit;font:inherit;font-variant-numeric:tabular-nums;padding:5px 8px;text-align:left;direction:ltr}
+.edn:focus{outline:none;border-color:var(--accent)}
+select.ed{border:1px solid var(--line);border-radius:7px;background:var(--elev);padding:4px 7px;width:auto}
+.hero{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:22px;margin-top:14px;padding:clamp(20px,4vw,32px);background:radial-gradient(130% 150% at 88% -20%,rgba(241,138,43,.28) 0%,rgba(241,138,43,.05) 34%,var(--elev) 62%);box-shadow:var(--sh2)}
+.hero .ed{color:var(--ink)}
+.hero .taged{color:var(--ink2);font-size:14px}
+.pfk{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:20px}
+.pfc{border-top:2px solid var(--accent);padding-top:8px}
+.pfc .v{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}.pfc .l{font-size:12px;color:var(--muted);margin-top:2px}
+section{margin-top:30px;scroll-margin-top:60px}
+.shead{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
+.shead .no{font-size:12px;font-weight:800;color:var(--accent);letter-spacing:.12em;white-space:nowrap}
+.shead h2{font-size:clamp(16px,2.3vw,21px);font-weight:800}.shead .rule{flex:1;height:1px;background:var(--line)}
+.divbar{border-inline-start:4px solid var(--accent);padding-inline-start:12px}
+.ovg{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:13px}
+.ovc{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:15px 16px;cursor:pointer;transition:border-color .15s,transform .1s}
+.ovc:hover{border-color:var(--accent2);transform:translateY(-2px)}
+.ovc.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),var(--sh)}
+.ovc .code{font-size:11px;font-weight:800;color:var(--accent2);letter-spacing:.08em}
+.ovc .nm{font-size:16px;font-weight:800;margin:2px 0 2px}
+.ovc .mt{font-size:11.5px;color:var(--muted)}
+.ovc .st{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px;border-top:1px solid var(--line);padding-top:11px}
+.ovc .st .k{font-size:10.5px;color:var(--muted)}.ovc .st .b{font-size:14px;font-weight:800;font-variant-numeric:tabular-nums}
+.ovc .foot{display:flex;justify-content:space-between;align-items:center;margin-top:11px}
+.ovc .badge{font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px}
+.ovc .badge.win{background:var(--good-bg);color:var(--good)}.ovc .badge.lose{background:var(--crit-bg);color:var(--crit)}
+.ovc .open{font-size:11px;color:var(--accent2);font-weight:700}.ovc.sel .open{color:var(--accent)}
+.principle{background:linear-gradient(90deg,rgba(241,138,43,.16),rgba(241,138,43,.03));border:1px solid rgba(241,138,43,.32);border-radius:12px;padding:11px 15px;margin-bottom:9px}
+.principle .ed{font-size:14.5px;font-weight:800;color:var(--accent2);border-bottom-color:transparent;text-align:center}
+.unitline{font-size:12.5px;color:var(--muted);margin-bottom:14px}
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:16px}@media(max-width:720px){.pillars{grid-template-columns:1fr}}
+.pil{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px 13px;border-top:2px solid var(--accent)}
+.pil b{display:block;font-size:13px;margin-bottom:3px}.pil b .ed{font-weight:800}
+.pil .ed{font-size:11.5px;color:var(--ink2);border-bottom-color:transparent}
+.pil:hover .ed{border-bottom-color:var(--line)}
+.cyc-h{font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.06em;margin:16px 0 9px}
+.cycle{display:flex;gap:6px;align-items:stretch;flex-wrap:wrap;background:var(--elev);border:1px solid var(--line);border-radius:13px;padding:13px}
+.cyn{flex:1;min-width:112px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 10px;text-align:center}
+.cyi{font-size:19px;display:block;line-height:1.3}
+.cyn b .ed{font-size:11.5px;font-weight:800;text-align:center;border-bottom-color:transparent}
+.cyd{font-size:10px;color:var(--muted);text-align:center;border-bottom-color:transparent}
+.cyn:hover .ed{border-bottom-color:var(--line)}
+.cya{align-self:center;color:var(--accent);font-weight:800;flex:none}
+.cyloop{flex-basis:100%;text-align:center;font-size:11px;color:var(--accent2);font-weight:700;margin-top:9px;border-top:1px dashed var(--line);padding-top:9px}
+.scwrap{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel)}
+.schead,.scrow{display:grid;grid-template-columns:1.6fr .9fr .9fr .8fr 1fr 1fr;gap:8px;align-items:center;padding:8px 13px}
+.schead{background:var(--elev);font-size:10px;font-weight:800;color:var(--muted);border-bottom:1px solid var(--line)}
+.scrow{border-bottom:1px solid var(--line);font-size:12px;cursor:pointer}
+.scrow:hover{background:rgba(255,255,255,.03)}
+.scrow.cur{background:rgba(241,138,43,.07);border-inline-start:3px solid var(--accent)}
+.scrow.tot{background:var(--elev);font-weight:800;cursor:default;border-bottom:none}
+.scrow.tot:hover{background:var(--elev)}
+.scn{display:flex;flex-direction:column;line-height:1.25;font-weight:700}.scn small{font-size:9.5px;color:var(--muted);font-weight:500}
+.scnote{grid-column:1/-1;padding:9px 13px;font-size:11.5px;color:var(--ink2);background:var(--gold-bg);border-top:1px solid rgba(255,213,74,.25)}
+.ig2{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:820px){.ig2{grid-template-columns:1fr}}
+.rul{display:grid;grid-template-columns:1fr 1.2fr;gap:9px;padding:8px 11px;border:1px solid var(--line);border-radius:10px;background:var(--panel);margin-bottom:7px;font-size:11.5px}
+.rul .ed{min-height:auto;resize:none;line-height:1.45;font-size:11.5px;border-bottom-color:transparent;overflow:hidden}
+.rul .rc .ed{color:var(--crit)}
+.rul .rr .ed{color:var(--good)}
+.rul:hover .ed{border-bottom-color:var(--line)}
+.phs{display:flex;gap:10px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--panel);margin-bottom:7px}
+.pp{flex:none;width:74px}.pp .ed{font-size:10.5px;font-weight:800;color:var(--accent2);border-bottom-color:transparent}
+.pb{flex:1;min-width:0}.pb b .ed{font-size:12.5px;font-weight:800;border-bottom-color:transparent}
+.pb>.ed{font-size:11.5px;color:var(--ink2);border-bottom-color:transparent;min-height:auto;resize:none;line-height:1.45;overflow:hidden}
+.pb small .ed{font-size:10px;color:var(--muted);border-bottom-color:transparent}
+.phs:hover .ed{border-bottom-color:var(--line)}
+.stationtag{display:inline-flex;gap:7px;align-items:center;font-size:12px;font-weight:800;color:var(--accent2);background:var(--elev);border:1px solid var(--line);border-radius:999px;padding:4px 12px;margin-bottom:10px;margin-top:6px}
+.sheader{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:20px;padding:clamp(18px,3vw,26px);background:linear-gradient(180deg,rgba(241,138,43,.06),var(--panel));box-shadow:var(--sh)}
+.sheader .eyeb{color:var(--accent2);font-weight:700;letter-spacing:.12em;font-size:12px;border-bottom-color:transparent}
+.sheader .nameed{font-size:clamp(20px,3.6vw,30px);font-weight:800;margin:6px 0 5px}
+.sheader .taged{color:var(--ink2);font-size:13.5px}
+.smeta{display:flex;gap:7px;flex-wrap:wrap;margin-top:13px}
+.smeta .mi{display:inline-flex;gap:5px;align-items:center;background:var(--elev);border:1px solid var(--line);border-radius:9px;padding:4px 9px;font-size:11.5px}
+.smeta .mi .k{color:var(--muted);font-weight:700}.smeta .mi .ed{width:auto;min-width:44px;border-bottom-color:transparent;font-size:11.5px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:13px;margin-top:16px}
+.hk{border-top:2px solid var(--accent);padding-top:7px}
+.hk .vr{display:flex;gap:5px;align-items:baseline}
+.hk .vr .ed{font-size:20px;font-weight:800;width:auto;min-width:36px}.hk .vr .un{font-size:12px;color:var(--ink2);width:auto}
+.hk .lb{font-size:11.5px;color:var(--muted);margin-top:2px}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:15px}
+.chip{font-size:11.5px;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line)}
+.chip .ed{width:auto;min-width:60px;font-size:11.5px;border-bottom-color:transparent;color:var(--ink2)}
+.grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:820px){.g3{grid-template-columns:1fr 1fr}}@media(max-width:560px){.g2,.g3{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:15px 16px}
+.card h3{font-size:14px;font-weight:800;margin-bottom:8px;display:flex;gap:8px}
+.seg .tl{display:flex;gap:7px;align-items:center;font-weight:800;font-size:14px}.seg .tl .ic{font-size:20px}
+.seg .tl .nm{flex:1}
+.seg .share{flex:none;background:var(--accent);color:#1b1c1e;border-radius:999px;padding:1px 4px;font-size:10.5px;font-weight:800}
+.seg .share .ed{color:#1b1c1e;width:auto;min-width:48px;border-bottom-color:transparent;text-align:center;font-size:10.5px;font-weight:800}
+.seg .sfield{display:flex;gap:7px;font-size:12px;margin-top:7px;align-items:flex-start}
+.seg .sfield .k{flex:none;width:52px;color:var(--muted);font-weight:800}
+.seg .ev{font-size:11.5px;color:var(--muted);margin-top:8px;border-top:1px dashed var(--line);padding-top:7px}
+.demo{display:flex;gap:12px;flex-wrap:wrap;background:var(--elev);border:1px solid var(--line);border-radius:13px;padding:12px 14px;margin-top:14px;font-size:13px}
+.demo .ed{width:auto;min-width:120px}
+.scen{background:var(--elev);border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin-bottom:14px}
+.scen .sh{font-size:13px;font-weight:800;margin-bottom:9px;color:var(--accent2)}
+.scen-g{display:grid;grid-template-columns:1fr 1fr;gap:9px}@media(max-width:560px){.scen-g{grid-template-columns:1fr}}
+.scen-i{display:flex;gap:8px;align-items:flex-start;font-size:12.5px}
+.scen-i .k{flex:none;width:52px;font-weight:800;color:var(--muted)}
+.ops{display:flex;gap:14px;flex-wrap:wrap;background:var(--elev);border:1px solid var(--line);border-radius:12px;padding:11px 14px;font-size:12.5px;margin:4px 0 6px}
+.ops span{display:inline-flex;align-items:center;gap:6px}.ops .edn{width:92px}
+.fprod{margin-top:12px}
+.fptbl{width:100%;border:1px solid var(--line);border-radius:11px;overflow:hidden}
+.fphead,.fprow{display:grid;grid-template-columns:1.5fr .7fr 1fr 1fr;gap:6px;padding:7px 11px;align-items:center}
+.fphead{background:var(--elev);color:var(--muted);font-weight:800;font-size:10.5px}
+.fprow{border-top:1px solid var(--line);font-size:12px}
+.fprow .fpname{display:flex;align-items:center;gap:6px;font-weight:700}
+.fprow .fpname i{width:10px;height:10px;border-radius:3px;flex:none}
+.fprow .lit{color:var(--ink2)}.fprow .rev{color:var(--good);font-weight:800}
+.fptot{display:grid;grid-template-columns:1.5fr .7fr 1fr 1fr;gap:6px;padding:8px 11px;background:var(--elev);border-top:1px solid var(--line);font-size:12px;font-weight:800}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:560px){.vs{grid-template-columns:1fr}}
+.box{border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--panel)}
+.box.us{border-color:rgba(241,138,43,.5);background:linear-gradient(180deg,rgba(241,138,43,.08),var(--panel))}
+.box .h{font-size:13px;font-weight:800;margin-bottom:9px}
+.brow{display:flex;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid var(--line)}
+.brow .ed.k{white-space:nowrap;font-weight:700;color:var(--ink2);font-size:12.5px;flex:none;width:96px}
+.brow .ed{font-size:12.5px}
+.adv{background:var(--good-bg);border:1px solid rgba(63,178,127,.3);border-radius:13px;padding:12px 15px;margin-top:14px;font-size:13.5px}.adv b{color:var(--good)}
+.gap{background:var(--crit-bg);border:1px solid rgba(224,102,102,.3);border-radius:13px;padding:12px 15px;margin-top:10px;font-size:13.5px}.gap b{color:var(--crit)}
+.sug{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+.sug .it{display:flex;gap:6px;align-items:center;background:var(--elev);border:1px solid var(--line);border-radius:9px;padding:5px 9px;font-size:12.5px}
+.sug .it .ed{width:auto;min-width:80px;border-bottom-color:transparent}
+.tsum{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:13px}
+.tc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px;text-align:center}
+.tc .v{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums}.tc .l{font-size:11px;color:var(--muted);margin-top:2px}
+.tc.occ .v{color:var(--good)}.tc.vac .v{color:var(--crit)}
+.tc .tcin{width:100%;text-align:center;font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;background:transparent;border:none;border-bottom:1px dashed var(--line);border-radius:0;padding:2px 0;color:inherit;direction:ltr}
+.tc .tcin:focus{outline:none;border-bottom:1.5px solid var(--accent);background:rgba(241,138,43,.05)}
+.tc.occ .tcin{color:var(--good)}.tc.vac .tcin{color:var(--crit)}
+.tcbar{display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap;margin-bottom:9px}
+.tfilter{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.tsearchin{flex:1;min-width:150px;background:var(--elev);border:1px solid var(--line);border-radius:9px;color:var(--ink);font:inherit;font-size:12.5px;padding:8px 11px}
+.tsearchin:focus{outline:none;border-color:var(--accent)}
+.tcount{font-size:11px;color:var(--muted);white-space:nowrap}
+.tlist{display:block;max-height:560px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.tlist::-webkit-scrollbar{width:8px}.tlist::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+.unit{background:var(--panel);border:none;border-bottom:1px solid var(--line);border-radius:0;padding:0;box-shadow:none;border-inline-start:3px solid var(--good)}
+.unit:last-child{border-bottom:none}
+.unit.vac{border-inline-start-color:var(--crit)}
+.urow{display:flex;gap:8px;align-items:center;padding:8px 11px;cursor:pointer}
+.urow:hover{background:rgba(255,255,255,.03)}
+.uarrow{font-size:10px;color:var(--muted);flex:none;width:12px;text-align:center}
+.urow .uname{flex:1;min-width:60px;font-weight:700;font-size:13px;border-bottom-color:transparent}
+.urow .uname:hover{border-bottom-color:var(--accent2)}
+.ubadge{font-size:10px;background:var(--elev);border:1px solid var(--line);border-radius:7px;padding:2px 7px;flex:none;color:var(--ink2);white-space:nowrap}
+.ubadge.svc{color:var(--accent2)}
+@media(max-width:600px){.ubadge{display:none}}
+.ustt{font-size:9.5px;font-weight:800;padding:2px 8px;border-radius:999px;flex:none}
+.ustt.g{background:var(--good-bg);color:var(--good)}.ustt.rr{background:var(--crit-bg);color:var(--crit)}
+.udetail{padding:2px 12px 12px 24px}
+.udetail .unit-b{border-top:none;padding-top:2px}
+.unit-t{display:flex;gap:8px;align-items:center;margin-bottom:9px}.unit-t .uname{font-weight:800;font-size:13.5px;flex:1}
+.ucount{display:inline-flex;align-items:center;gap:1px;font-size:12px;color:var(--muted);flex:none}.ucount .edn{width:44px}
+.unit-b{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:9px}
+.uf{display:inline-flex;flex-direction:column;gap:2px}.uf span{font-size:9.5px;color:var(--muted);font-weight:800}.uf select{font-size:11.5px;padding:3px 6px}
+.uf .unum{width:58px;padding:4px 7px;text-align:center;direction:ltr}
+.tst{font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;flex:none}
+.unit-a{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;border-top:1px dashed var(--line);margin-top:9px;padding-top:9px}
+.unit-a .uwide{width:90px}
+.unit-a .uana{font-size:11.5px;color:var(--ink2);align-self:center}.unit-a .uana b{font-variant-numeric:tabular-nums}
+.vacnote{font-size:11.5px;color:var(--muted);font-style:italic}
+.monthbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--elev);border:1px solid var(--line);border-radius:11px;padding:9px 13px;margin-bottom:11px;font-size:12.5px}
+.monthbar b{color:var(--accent2)}
+.monthbar select{font-size:12.5px;font-weight:700}
+.tanalysis{margin-top:18px}
+.tanwrap{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel)}
+.taninsight{font-size:11.5px;color:var(--ink2);background:var(--gold-bg);border-bottom:1px solid rgba(255,213,74,.25);padding:9px 13px}
+.taninsight b{color:var(--gold)}
+.tanhead,.tanrow{display:grid;grid-template-columns:26px 1.5fr 1.7fr .8fr .8fr .8fr;gap:8px;align-items:center;padding:7px 12px}
+.tanhead{font-size:10px;font-weight:800;color:var(--muted);border-bottom:1px solid var(--line);background:var(--elev)}
+.tanrow{border-bottom:1px solid var(--line);font-size:12px}.tanrow:last-child{border-bottom:none}
+.tanrank{font-weight:800;color:var(--accent2);font-size:11px;text-align:center}
+.tanname{font-weight:700;display:flex;flex-direction:column;line-height:1.25;min-width:0}.tanname small{font-size:9.5px;color:var(--muted);font-weight:500}
+.tanbar{position:relative;background:var(--elev);border-radius:6px;height:22px;display:flex;align-items:center;overflow:hidden}
+.tanbar i{position:absolute;top:0;bottom:0;right:0;background:linear-gradient(270deg,rgba(241,138,43,.55),rgba(241,138,43,.15));border-radius:6px}
+.tanbar b{position:relative;padding:0 8px;font-size:11px;font-variant-numeric:tabular-nums}
+.tanm{font-variant-numeric:tabular-nums;font-size:11.5px}
+.tan-empty{font-size:12px;color:var(--muted);padding:16px;text-align:center}
+@media(max-width:600px){.tanhead,.tanrow{grid-template-columns:22px 1.3fr 1.6fr .9fr}.tanhead span:nth-child(4),.tanrow .tanm:nth-child(4),.tanhead span:nth-child(6),.tanrow .tanm:nth-child(6){display:none}}
+.planwrap{margin-top:20px}
+.shead2{font-size:14px;font-weight:800;margin-bottom:10px;color:var(--accent2)}
+.plan-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.plan-tools .btn{cursor:pointer}
+.hint2{font-size:11px;color:var(--muted)}
+.plan{position:relative;width:100%;aspect-ratio:16/9;max-height:480px;background:var(--elev);background-size:contain;background-position:center;background-repeat:no-repeat;border:1px solid var(--line);border-radius:14px;overflow:hidden;touch-action:none}
+.plan.empty{background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:34px 34px}
+.pbox{position:absolute;min-width:64px;max-width:132px;padding:5px 8px;border-radius:8px;cursor:grab;box-shadow:var(--sh);border:1.5px solid;user-select:none;touch-action:none}
+.pbox b{display:block;font-size:10.5px;font-weight:800;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:116px}
+.pbox span{font-size:9px;opacity:.85}
+.pbox.rented{background:rgba(63,178,127,.9);border-color:#2e8c63;color:#08150f}
+.pbox.vac{background:rgba(224,102,102,.9);border-color:#b34a4a;color:#210a0a}
+.pbox.sel{outline:3px solid var(--gold);z-index:6}
+.pbox:active{cursor:grabbing}
+.planinfo{margin-top:10px;font-size:12px;color:var(--ink2);background:var(--elev);border:1px solid var(--line);border-radius:10px;padding:10px 13px;line-height:1.75}
+.planinfo b{font-variant-numeric:tabular-nums}
+.tbreak{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:13px;align-items:center}
+.tbh{font-size:11px;color:var(--muted);font-weight:800}
+.tb{font-size:11.5px;background:var(--elev);border:1px solid var(--line);border-radius:8px;padding:3px 9px}.tb b{color:var(--accent2)}
+.xbtn{flex:none;width:24px;height:24px;border-radius:7px;border:1px solid var(--line);background:var(--elev);color:var(--crit);cursor:pointer;font-size:12px;line-height:1;opacity:0;transition:opacity .15s}
+.xbtn:hover{border-color:var(--crit);background:var(--crit-bg)}
+.ovc:hover .xbtn,.unit:hover .xbtn,.opp:hover .xbtn,.fleet:hover .xbtn,.legrow:hover .xbtn,.xbtn:focus{opacity:1}
+.addrow{margin-top:13px}
+.pnote{font-size:12.5px;color:var(--muted);margin-bottom:12px}
+.mixg{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
+@media(max-width:900px){.mixg{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.mixg{grid-template-columns:1fr}}
+.mixc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px 12px;border-top:2px solid var(--accent)}
+.mixt{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.mixi{font-size:16px}.mixt b{font-size:12.5px;font-weight:800}
+.mixc .ed{font-size:11.5px;color:var(--ink2);min-height:auto;resize:none;line-height:1.5;border-bottom-color:transparent;overflow:hidden}
+.mixc:hover .ed{border-bottom-color:var(--line)}
+.budnote{font-size:11.5px;color:var(--ink2);background:var(--elev);border:1px solid var(--line);border-radius:9px;padding:8px 11px;margin-top:9px}
+.budnote b{font-variant-numeric:tabular-nums}
+.camp{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;border-inline-start:3px solid var(--gold)}
+.camp-t{display:flex;gap:8px;align-items:center;margin-bottom:7px}
+.camp-t .cname{font-weight:800;font-size:12.5px;flex:1}
+.camp-b{display:flex;gap:9px;align-items:flex-end;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:8px}
+.camp-b .ctype{font-size:11.5px;color:var(--ink2);flex:1;min-width:110px}
+.fguide{font-size:11.5px;color:var(--ink2);background:var(--sky-bg);border:1px solid rgba(56,189,248,.25);border-radius:10px;padding:9px 13px;margin-bottom:12px;line-height:1.7}
+.fguide b{color:var(--sky)}
+.fleetlist{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:720px){.fleetlist{grid-template-columns:1fr}}
+.fleet{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 13px;box-shadow:var(--sh);border-inline-start:3px solid var(--sky)}
+.fleet-t{display:flex;gap:8px;align-items:center;margin-bottom:9px}
+.fleet-t .fseg{font-weight:800;font-size:13.5px;flex:1}
+.fleet-g{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:9px;margin-bottom:4px}
+.fleet-g .fprofit{font-size:11px;color:var(--muted);align-self:center}.fleet-g .fprofit b{color:var(--gold);font-variant-numeric:tabular-nums}
+.fleet .fl{display:block;font-size:10px;color:var(--muted);font-weight:800;margin-top:7px}
+.fleet .fl>span{display:block;margin-bottom:2px}
+.fleet .fl textarea{min-height:36px;font-size:12px;color:var(--ink)}
+.fleet .fl .ed{font-size:12px;color:var(--ink)}
+.psum{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:11px;margin-bottom:14px}
+.pm{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:12px 14px}
+.pm .v{font-size:21px;font-weight:800;font-variant-numeric:tabular-nums}.pm .l{font-size:11.5px;color:var(--muted);margin-top:3px}
+.pm.tot{border-top:2px solid var(--gold)}.pm.con{border-top:2px solid var(--good)}.pm.opn{border-top:2px solid var(--accent)}
+.pbars{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin-bottom:14px}
+.pbars .bh{font-size:12px;font-weight:800;color:var(--muted);margin-bottom:9px}
+.plist{display:grid;grid-template-columns:1fr 1fr;gap:11px}@media(max-width:720px){.plist{grid-template-columns:1fr}}
+.opp{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 13px;box-shadow:var(--sh);border-inline-start:3px solid var(--accent)}
+.opp-t{display:flex;gap:8px;align-items:center;margin-bottom:7px}.opp-t .oppname{font-weight:800;font-size:14px}
+.opp .opptype{font-size:12px;color:var(--ink2);margin-bottom:9px}
+.opp-b{display:flex;gap:7px;align-items:center;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:9px}
+.opp-b .oppval{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)}.opp-b .edn{width:82px}
+.stg{font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;flex:none;background:rgba(255,255,255,.06)}
+.metric{margin:8px 0}.metric .t{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;gap:8px}.metric .t b{font-variant-numeric:tabular-nums}
+.track{height:9px;border-radius:5px;background:var(--elev);overflow:hidden}.track i{display:block;height:100%;border-radius:5px;width:0}
+.donut{width:130px;height:130px;border-radius:50%;flex:none;position:relative}
+.donut::after{content:"";position:absolute;inset:19px;border-radius:50%;background:var(--panel)}
+.donut .mid{position:absolute;inset:0;display:grid;place-content:center;text-align:center;z-index:1}
+.donut .mid b{font-size:18px;font-weight:800}.donut .mid span{font-size:10px;color:var(--muted)}
+.leg{display:flex;flex-direction:column;gap:6px;font-size:12.5px;justify-content:center;flex:1}
+.legrow{display:flex;align-items:center;gap:7px}.sw{width:11px;height:11px;border-radius:3px;flex:none}
+.legrow .ed{flex:1}.legrow .edn{width:56px}.legrow select.fprodsel{flex:1;min-width:64px;font-size:12px}.legrow .xbtn{width:22px;height:22px}
+.alert{display:flex;gap:6px;font-size:11.5px;font-weight:700;color:var(--crit);background:var(--crit-bg);padding:5px 9px;border-radius:10px;margin-top:8px;align-items:center;flex-wrap:wrap}
+.alert .ed{color:var(--crit);flex:1;min-width:120px;border-bottom-color:rgba(224,102,102,.3)}.alert .edn{width:64px}
+.monthly{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}.monthly .edn{width:54px}
+.note-ed{font-size:12.5px;color:var(--ink2)}
+.fin{display:grid;grid-template-columns:340px 1fr;gap:18px}@media(max-width:820px){.fin{grid-template-columns:1fr}}
+.slbl{font-size:10.5px;color:var(--muted);letter-spacing:.05em;margin:13px 0 8px;font-weight:800}
+.fld{margin-bottom:10px}.fld label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:4px}
+.fld label .val{color:var(--accent2);font-weight:800;font-variant-numeric:tabular-nums}
+.inp{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:9px;background:var(--elev);padding:0 11px}
+.inp:focus-within{border-color:var(--accent)}
+.inp input[type=number]{border:0;background:transparent;color:var(--ink);font-family:inherit;font-size:14px;font-variant-numeric:tabular-nums;padding:9px 0;width:100%;text-align:left;direction:ltr}
+.inp input:focus{outline:none}.inp .u{font-size:11px;color:var(--muted)}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.res{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:11px}
+.r{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:12px 14px}
+.r .v{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums}.r .l{font-size:11.5px;color:var(--muted);margin-top:4px}.r .h{font-size:10.5px;color:var(--muted);margin-top:3px}
+.r.inc .v{color:var(--good)}.r.exp .v{color:var(--crit)}
+.bigv{grid-column:1/-1;border-radius:15px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;border:1px solid var(--line)}
+.bigv.win{background:var(--good-bg);border-color:rgba(63,178,127,.35)}.bigv.lose{background:var(--crit-bg);border-color:rgba(224,102,102,.35)}
+.bigv .st{font-size:24px;font-weight:800}.bigv.win .st{color:var(--good)}.bigv.lose .st{color:var(--crit)}
+.bigv .n{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;text-align:left}.bigv.win .n{color:var(--good)}.bigv.lose .n{color:var(--crit)}
+.bigv .n small{display:block;font-size:11.5px;color:var(--muted);font-weight:600}
+.pagefoot{margin:34px 0 20px;color:var(--muted);font-size:11.5px;text-align:center;border-top:1px solid var(--line);padding-top:14px}
+</style>
+</head>
+<body>
+<div class="top"><div class="wrap row">
+ <div class="mark">د</div><div class="nm">تانكي · درب — منصّة المبيعات</div>
+ <span id="pipepill" class="pill pipe"><span class="dot"></span><span id="pipepill_t">—</span></span>
+ <span id="toppill" class="pill win"><span class="dot"></span><span id="toppill_t">—</span></span>
+ <div class="tools"><span class="saved" id="saved"></span>
+  <button class="btn" id="reset">↺ استرجاع الأصل</button>
+  <button class="btn pri" id="export">⬇️ تصدير data.json</button></div>
+</div></div>
+<div class="wrap">
+
+ <div class="hero">
+  <input class="ed" data-p="platform.name" style="font-size:20px;font-weight:800;color:var(--ink);border-bottom-color:transparent">
+  <textarea class="ed taged" data-p="platform.tagline"></textarea>
+  <div class="pfk" id="pfk"></div>
+ </div>
+
+ <section id="overview"><div class="shead"><span class="no">٠٠</span><h2>نظرة عامة على المحطات</h2><span class="rule"></span></div>
+  <div class="ovg" id="ov"></div>
+  <button class="btn pri addrow" id="addst">➕ أضف محطة</button></section>
+
+ <section id="integ"><div class="shead divbar"><span class="no">◆</span><h2>🔗 التكامل بين الإدارات</h2><span class="rule"></span></div>
+  <div class="principle"><input class="ed" data-p="platform.integration.principle"></div>
+  <input class="ed unitline" data-p="platform.integration.unit">
+  <div class="pillars" id="pillars"></div>
+  <div class="cyc-h">دورة النمو</div><div class="cycle" id="cycle"></div>
+  <div class="cyc-h">بطاقة الأداء المشتركة — لكل منفذ</div>
+  <div class="scwrap"><div class="schead"><span>المنفذ</span><span>الزيارات/شهر</span><span>الربح/الزيارة</span><span>حصة التطبيق</span><span>تغطية غير الوقود</span><span>ربح المنفذ</span></div><div id="scbody"></div></div>
+  <div class="ig2">
+   <div><div class="cyc-h">قواعد فضّ التعارض</div><div id="igrules"></div></div>
+   <div><div class="cyc-h">التسلسل التنفيذي</div><div id="igphases"></div></div>
+  </div></section>
+
+ <div id="detail">
+  <div class="stationtag">📍 <span id="curtag">—</span> — تحليل المبيعات</div>
+  <div class="sheader">
+   <input class="ed eyeb" data-sp="station.eyebrow">
+   <input class="ed nameed" data-sp="station.name">
+   <textarea class="ed taged" data-sp="station.tagline"></textarea>
+   <div class="smeta" id="smeta"></div>
+   <div class="kpis" id="skpis"></div>
+   <div class="chips" id="schips"></div>
+  </div>
+
+  <section id="loc"><div class="shead divbar"><span class="no">01</span><h2>📍 الموقع وشرائح العملاء</h2><span class="rule"></span></div>
+   <div class="scen"><div class="sh">🛣️ بطاقة السيناريو — الموقع على الطريق</div><div class="scen-g">
+    <div class="scen-i"><span class="k">الطريق</span><input class="ed" data-sp="scenario.road"></div>
+    <div class="scen-i"><span class="k">السابقة</span><input class="ed" data-sp="scenario.before"></div>
+    <div class="scen-i"><span class="k">التالية</span><input class="ed" data-sp="scenario.after"></div>
+    <div class="scen-i"><span class="k">الكثافة</span><input class="ed" data-sp="scenario.density"></div>
+   </div></div>
+   <div class="grid g3" id="segments"></div><div class="demo" id="demo"></div></section>
+
+  <section id="fuelsec"><div class="shead divbar"><span class="no">02</span><h2>⛽ مبيعات الوقود</h2><span class="rule"></span></div>
+   <div class="grid g2">
+    <div class="card"><h3>مزيج المنتجات (عدّل المنتجات والنِسب)</h3>
+     <div style="display:flex;gap:16px;align-items:center"><div class="donut" id="donut"><div class="mid"><b id="dmid">—</b><span>لتر/شهر</span></div></div><div class="leg" id="leg"></div></div>
+     <button class="btn addrow" id="addprod" style="margin-top:10px">➕ أضف منتج بنزين</button>
+     <div class="fprod" id="fprod"></div></div>
+    <div class="card"><h3>التشغيل والاتجاه الشهري</h3>
+     <div class="ops">
+      <span>⛽ المضخات <input class="edn" type="number" data-sp="finance.pumps"></span>
+      <span>🛢️ سعة الخزان <input class="edn" type="number" data-sp="finance.tankCapacity"> لتر</span>
+      <span>👷 العمّال <input class="edn" type="number" data-sp="finance.workers"></span>
+      <span>🖐️ خدمة ذاتية <select class="ed" data-sp="meta.selfService"><option>لا</option><option>نعم</option><option>الاثنتان</option></select></span>
+     </div>
+     <div class="metric" style="margin-top:6px"><div class="t"><span>الاتجاه الشهري (مليون لتر)</span><span id="trend"></span></div><svg id="spark" viewBox="0 0 300 42" width="100%" height="42" preserveAspectRatio="none"></svg><div class="monthly" id="monthly"></div></div></div>
+   </div></section>
+
+  <section id="leasesec"><div class="shead divbar"><span class="no">03</span><h2>🏪 التأجير ومكوّنات المحطة</h2><span class="rule"></span></div>
+   <input class="ed pnote" data-sp="tenants.note">
+   <div class="monthbar">📅 <b>الشهر:</b><select id="monthsel" class="ed"></select><button class="btn" id="tcalc" style="margin-inline-start:auto">↻ احسب من الوحدات</button></div>
+   <div class="tsum" id="tsum"></div>
+   <div class="tbreak" id="tbreak"></div>
+   <div class="tsum" id="lsum" style="margin-bottom:13px"></div>
+   <div class="tfilter"><input id="tsearch" class="tsearchin" placeholder="🔍 ابحث باسم/نوع/خدمة..."><select id="tfstatus" class="ed"><option value="all">كل الحالات</option><option value="مؤجّرة">مؤجّرة فقط</option><option value="شاغرة">شاغرة فقط</option></select><span class="tcount" id="tcount"></span></div>
+   <div class="tlist" id="tlist"></div>
+   <button class="btn pri addrow" id="addunit">➕ أضف وحدة/مستأجر</button>
+   <div class="tanalysis"><div class="shead2">📊 تحليل مبيعات المستأجرين <span id="tanmonth" style="color:var(--muted);font-weight:600;font-size:12px"></span></div><div class="tanwrap" id="tanaltbl"></div></div>
+   <div class="planwrap">
+    <div class="shead2">🗺️ مخطّط المحطة</div>
+    <div class="plan-tools">
+     <label class="btn">⬆️ صورة المخطط<input type="file" id="planimg" accept="image/*" hidden></label>
+     <button class="btn" id="planclear">🗑️ إزالة الصورة</button>
+     <span class="hint2">اسحب الوحدة لتموضعها · اضغط لعرض تحليلها</span>
+    </div>
+    <div class="plan" id="plan"></div>
+    <div class="planinfo" id="planinfo">اضغط وحدة لعرض تحليلها.</div>
+   </div>
+   <div class="metric" style="margin-top:16px"><div class="t"><span>نسبة إشغال الوحدات</span><span><input class="edn" type="number" data-sp="leasing.franchiseOcc">٪</span></div><div class="track"><i id="occbar" style="background:var(--crit)"></i></div></div>
+   <div class="alert">🚨 <input class="ed" data-sp="notes.vacantAlert"> — <input class="edn" type="number" data-sp="leasing.vacant"></div>
+   <div class="vs" style="margin-top:14px"><div class="box us"><div class="h">🟠 العلامات التجارية في المحطة</div><div id="us"></div></div>
+   <div class="box"><div class="h">🏁 المنافسون</div><div id="them"></div></div></div>
+   <div class="adv">✅ <b>الميزة التنافسية:</b> <input class="ed" data-sp="advantage"></div>
+   <div class="gap">⚠️ <b>الفجوة:</b> <input class="ed" data-sp="gap"><div class="sug" id="suggested"></div></div></section>
+
+  <section id="partsec"><div class="shead divbar"><span class="no">04</span><h2>🤝 الشراكات وفرص البيع B2B</h2><span class="rule"></span></div>
+   <div class="shead2">⛽ عقود وقود الأساطيل — آليات التعاقد</div>
+   <input class="ed pnote" data-sp="fleet.note">
+   <div class="fguide">🧭 <b>آليات التعاقد:</b> بطاقة وقود أسطول · خصم حجمي متدرّج · عقد موسمي (حج/عمرة) · تزويد حصري · دفع آجل ٣٠ يوم · ولاء سائقين (تانكي) · مسار مخصّص وخدمة سريعة</div>
+   <div class="tsum" id="fsum"></div>
+   <div class="fleetlist" id="fleetlist"></div>
+   <button class="btn pri addrow" id="addfleet">➕ أضف فئة أسطول</button>
+   <div class="shead2" style="margin-top:22px">🏬 فرص الجوار التجاري (تجّار ومحلات ومورّدون)</div>
+   <input class="ed pnote" data-sp="pipeline.note">
+   <div class="psum" id="psum"></div>
+   <div class="pbars"><div class="bh">قيمة خط الأنابيب حسب قناة البيع (ر.س/شهر)</div><div id="pbars"></div></div>
+   <div class="plist" id="plist"></div>
+   <button class="btn pri addrow" id="addopp">➕ أضف فرصة مبيعات</button></section>
+
+  <section id="mktsec"><div class="shead divbar"><span class="no">05</span><h2>📣 التسويق — الدفع والولاء</h2><span class="rule"></span></div>
+   <div class="grid g2">
+    <div class="card"><h3>💳 طرق الدفع (عدّل النِسب)</h3><div id="pay"></div><div class="alert">⚑ <input class="ed" data-sp="notes.payAlert"></div></div>
+    <div class="card"><h3>🎁 تانكي · 🤝 الشراكات</h3>
+     <div style="font-size:12px;color:var(--muted);margin-bottom:2px">🎁 تانكي (الولاء)</div><textarea class="ed note-ed" data-sp="notes.tanki"></textarea>
+     <div style="font-size:12px;color:var(--muted);margin:8px 0 2px">🤝 الشراكات (الحملات)</div><textarea class="ed note-ed" data-sp="notes.partners"></textarea></div>
+   </div>
+   <div class="shead2" style="margin-top:20px">🎯 المكس التسويقي (٧Ps) — حسب نمط الموقع</div>
+   <input class="ed pnote" data-sp="marketing.note">
+   <div class="mixg" id="mixg"></div>
+   <div class="ig2" style="margin-top:16px">
+    <div><div class="cyc-h">توزيع ميزانية الترويج</div><div id="mbud"></div></div>
+    <div><div class="cyc-h">الحملات</div><div id="mcamp"></div><button class="btn pri addrow" id="addcamp">➕ أضف حملة</button></div>
+   </div></section>
+
+  <section id="fin"><div class="shead divbar"><span class="no">06</span><h2>💰 نموذج الربحية</h2><span class="rule"></span></div>
+   <div class="fin"><div class="card">
+     <div class="slbl">⛽ الوقود</div>
+     <div class="fld"><label>اللترات / شهر</label><div class="inp"><input type="number" data-sp="finance.liters"><span class="u">لتر</span></div></div>
+     <div class="fld"><label>هامش الوقود / لتر <span class="val" id="marginv"></span></label><input type="range" min="0" max="0.5" step="0.01" data-sp="finance.margin"></div>
+     <div class="slbl">🏪 التأجير</div>
+     <div class="fld"><label>عدد الوحدات</label><div class="inp"><input type="number" data-sp="finance.units"><span class="u">وحدة</span></div></div>
+     <div class="fld"><label>نسبة الإشغال <span class="val" id="occv"></span></label><input type="range" min="0" max="100" step="1" data-sp="finance.occ"></div>
+     <div class="fld"><label>متوسط الإيجار / وحدة</label><div class="inp"><input type="number" data-sp="finance.rent"><span class="u">ر.س</span></div></div>
+     <div class="fld"><label>دخل المتجر/الخدمات</label><div class="inp"><input type="number" data-sp="finance.store"><span class="u">ر.س</span></div></div>
+     <div class="slbl">🏭 التشغيل</div>
+     <div class="fld"><label>عدد العمّال</label><div class="inp"><input type="number" data-sp="finance.workers"><span class="u">عامل</span></div></div>
+     <div class="fld"><label>سعة الخزان</label><div class="inp"><input type="number" data-sp="finance.tankCapacity"><span class="u">لتر</span></div></div>
+     <div class="fld"><label>عدد المضخات</label><div class="inp"><input type="number" data-sp="finance.pumps"><span class="u">مضخة</span></div></div>
+     <div class="fld"><label>الزيارات / شهر</label><div class="inp"><input type="number" data-sp="finance.visits"><span class="u">زيارة</span></div></div>
+     <div class="slbl">💸 المصاريف الشهرية</div>
+     <div class="fld"><label>رواتب</label><div class="inp"><input type="number" data-sp="finance.salaries"><span class="u">ر.س</span></div></div>
+     <div class="fld"><label>إيجار/تشغيل</label><div class="inp"><input type="number" data-sp="finance.oprent"><span class="u">ر.س</span></div></div>
+     <div class="fld"><label>كهرباء وماء</label><div class="inp"><input type="number" data-sp="finance.utils"><span class="u">ر.س</span></div></div>
+     <div class="fld"><label>صيانة · أخرى</label><div class="inp"><input type="number" data-sp="finance.maint"><span class="u">ر.س</span></div></div>
+    </div>
+    <div><div class="res">
+     <div class="bigv win" id="verdict"><div><div style="font-size:12px;color:var(--muted)">حالة المحطة (شهرياً)</div><div class="st" id="vtext">—</div></div><div class="n" id="vnet">—<small>صافي</small></div></div>
+     <div class="r inc"><div class="v tnum" id="fuelinc">—</div><div class="l">دخل الوقود</div><div class="h" id="fuelinc_h"></div></div>
+     <div class="r inc"><div class="v tnum" id="rentinc">—</div><div class="l">دخل التأجير</div><div class="h" id="rentinc_h"></div></div>
+     <div class="r inc"><div class="v tnum" id="totinc">—</div><div class="l">إجمالي الدخل</div></div>
+     <div class="r exp"><div class="v tnum" id="totexp">—</div><div class="l">إجمالي المصاريف</div></div>
+     <div class="r"><div class="v tnum" id="cpl">—</div><div class="l">تكلفة التشغيل/لتر</div></div>
+     <div class="r"><div class="v tnum" id="cpw">—</div><div class="l">تكلفة الرواتب/عامل</div></div>
+     <div class="r"><div class="v tnum" id="tankdays">—</div><div class="l">تغطية الخزان</div><div class="h">بالمخزون الحالي</div></div>
+     <div class="r"><div class="v tnum" id="perpump">—</div><div class="l">لتر/مضخة شهرياً</div></div>
+     <div class="r"><div class="v tnum" id="breakeven">—</div><div class="l">نقطة التعادل</div><div class="h" id="be_h"></div></div>
+    </div></div>
+   </div></section>
+ </div>
+ <div class="pagefoot">درب · القسم التجاري — منصّة المبيعات</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const fmt=n=>Math.round(n).toLocaleString('en-US');
+const money=n=>Math.abs(n)>=1e6?(n/1e6).toFixed(2)+'M':fmt(n);
+const gp=(o,p)=>p.split('.').reduce((a,k)=>a==null?a:a[k],o);
+const sp=(o,p,v)=>{const ks=p.split('.'),last=ks.pop();let t=o;ks.forEach(k=>t=t[k]);t[last]=v;};
+const PC=['var(--fd)','var(--sky)','var(--accent)'];
+const FUEL=['بنزين 91','بنزين 95','بنزين 98','ديزل'];
+const FUELC={'بنزين 91':'#38bdf8','بنزين 95':'#f18a2b','بنزين 98':'#a78bfa','ديزل':'#6b7280'};
+const FB=['#3fb27f','#e06666','#ffd54a','#38bdf8','#f18a2b','#a78bfa'];
+const fcol=(n,i)=>FUELC[n]||FB[i%FB.length];
+const optW=(arr,v)=>{const a=arr.indexOf(v)>=0?arr:[v,...arr];return a.map(o=>`<option${o===v?' selected':''}>${o}</option>`).join('');};
+const CH=['⛽ وقود أسطول','🏪 تأجير','🤝 شراكة','🔄 بيع متقاطع'];
+const ST=['فرصة','تواصل','عرض مقدّم','متعاقد'];
+const STC={'فرصة':'var(--muted)','تواصل':'var(--sky)','عرض مقدّم':'var(--gold)','متعاقد':'var(--good)'};
+const PRI=['عالية','متوسطة','منخفضة'];
+const FPROD=['ديزل','بنزين 91','بنزين 95','بنزين 91/95','مختلط'];
+const CST=['مقترحة','جارية','منفّذة','مؤجّلة'];
+const FUND=['التسويق','الشريك','مشترك','المستأجر'];
+const UTYPE=['كشك','محل تجاري','دريف ثرو','سوبر ماركت','عربة/كارت','أخرى'];
+const SCAT=['مطاعم','كافيهات','آيس كريم','عصائر','كافتيريا','ماتشا','حلويات','زيوت','مغاسل','سوبر ماركت','بقالة','صيدلية','صراف','خدمات معتمرين','أخرى'];
+const SUB={'مطاعم':['فطور','غداء','فطاير','وجبات سريعة','جلسات','مشاوي','متنوع'],'كافيهات':['قهوة مختصة','تجاري'],'آيس كريم':['آيسكريم','جيلاتي','مثلجات'],'عصائر':['عصائر طازجة','كوكتيل','سموذي'],'كافتيريا':['وجبات خفيفة','مشروبات ساخنة','متنوع'],'ماتشا':['ماتشا','مشروبات باردة','مختص'],'حلويات':['حلويات','مخبوزات','شوكولاتة'],'زيوت':['تغيير زيت','خدمة شاملة'],'مغاسل':['آلية','يدوي'],'سوبر ماركت':['هايبر','ماركت صغير'],'بقالة':['ميني ماركت','بقالة'],'صيدلية':['صيدلية'],'صراف':['صراف آلي'],'خدمات معتمرين':['هدايا/عبايات','صرافة','عام'],'أخرى':['عام']};
+const subOf=c=>SUB[c]||['عام'];
+const TST=['مؤجّرة','شاغرة'];
+const opt=(arr,sel)=>arr.map(o=>`<option${o===sel?' selected':''}>${o}</option>`).join('');
+let D={},sel=0,planSel=-1,selMonth=0,openUnits=new Set(),unitFilter={q:'',status:'all'};const KEY='darb_sales_v3';
+const S=()=>D.stations[sel],P=()=>'stations.'+sel+'.';
+const MN=()=>(D.platform&&D.platform.months)||['1','2','3','4','5','6'];
+const tsales=(t,m)=>{const a=t&&t.salesM;return Array.isArray(a)?(+a[m]||0):0;};
+function net(st){const f=st.finance,L=+f.liters||0,m=+f.margin||0,occ=(+f.occ||0)/100;const exp=(+f.salaries||0)+(+f.oprent||0)+(+f.utils||0)+(+f.maint||0);return m*L+(+f.units||0)*occ*(+f.rent||0)+(+f.store||0)-exp;}
+const pipeTot=st=>st.pipeline.items.reduce((a,o)=>a+(+o.value||0),0);
+function setAll(){document.querySelectorAll('[data-p]').forEach(e=>{const v=gp(D,e.dataset.p);if(v!=null)e.value=v;});}
+function buildIntegration(){
+ const g=D.platform.integration;if(!g)return;
+ $('pillars').innerHTML=g.pillars.map((p,i)=>`<div class="pil"><b><input class="ed" data-p="platform.integration.pillars.${i}.t"></b><input class="ed" data-p="platform.integration.pillars.${i}.d"></div>`).join('');
+ $('cycle').innerHTML=g.cycle.map((c,i)=>`<div class="cyn"><span class="cyi">${c.ic}</span><b><input class="ed" data-p="platform.integration.cycle.${i}.t"></b><input class="ed cyd" data-p="platform.integration.cycle.${i}.d"></div>`).join('<span class="cya">←</span>')+'<div class="cyloop">↻ كل دورة ترفع الربح لكل زيارة</div>';
+ $('igrules').innerHTML=g.rules.map((r,i)=>`<div class="rul"><span class="rc"><textarea class="ed" rows="2" data-p="platform.integration.rules.${i}.0"></textarea></span><span class="rr"><textarea class="ed" rows="2" data-p="platform.integration.rules.${i}.1"></textarea></span></div>`).join('');
+ $('igphases').innerHTML=g.phases.map((p,i)=>`<div class="phs"><span class="pp"><input class="ed" data-p="platform.integration.phases.${i}.p"></span><div class="pb"><b><input class="ed" data-p="platform.integration.phases.${i}.t"></b><textarea class="ed" rows="2" data-p="platform.integration.phases.${i}.d"></textarea><small><input class="ed" data-p="platform.integration.phases.${i}.why"></small></div></div>`).join('');
+}
+function refreshScorecard(){
+ const g=D.platform.integration||{},tgt=+g.appTarget||5;let tv=0,tn=0;
+ const rows=D.stations.map((st,i)=>{const f=st.finance,v=+f.visits||0,n=net(st);tv+=v;tn+=n;
+  const exp=(+f.salaries||0)+(+f.oprent||0)+(+f.utils||0)+(+f.maint||0);
+  const nonFuel=(+f.units||0)*(+f.occ||0)/100*(+f.rent||0)+(+f.store||0);
+  const ppv=v>0?n/v:0,app=+((st.payment.find(p=>/تطبيق/.test(p[0]))||[])[1])||0,cov=exp>0?nonFuel/exp*100:0;
+  return `<div class="scrow${i===sel?' cur':''}" data-sel="${i}"><span class="scn">${st.station.name}<small>${(st.meta&&st.meta.code)||''}</small></span><span class="tnum">${money(v)}</span><span class="tnum" style="color:${ppv>=0?'var(--good)':'var(--crit)'};font-weight:800">${ppv.toFixed(2)}</span><span class="tnum" style="color:${app>=tgt?'var(--good)':'var(--crit)'}">${app}٪</span><span class="tnum" style="color:${cov>=100?'var(--good)':'var(--gold)'}">${Math.round(cov)}٪</span><span class="tnum">${money(n)}</span></div>`;}).join('');
+ const avg=tv>0?tn/tv:0;
+ $('scbody').innerHTML=rows+`<div class="scrow tot"><span class="scn">المحفظة</span><span class="tnum">${money(tv)}</span><span class="tnum" style="color:var(--accent2);font-weight:800">${avg.toFixed(2)}</span><span>—</span><span>—</span><span class="tnum">${money(tn)}</span></div><div class="scnote">رفع غير الوقود <b>1 ر.س لكل زيارة</b> على مستوى المحفظة = <b style="color:var(--gold)">+${money(tv)} ر.س/شهر</b> · مستهدف حصة التطبيق <b>${tgt}٪</b></div>`;
+}
+function build(){
+ const s=S(),pf=P();
+ buildIntegration();
+ $('curtag').textContent=((s.meta&&s.meta.code)||'')+' · '+s.station.name;
+ $('smeta').innerHTML=[['code','الرمز'],['city','المدينة'],['type','النوع'],['size','الحجم'],['area','المساحة']].map(([k,lb])=>`<span class="mi"><span class="k">${lb}</span><input class="ed" data-p="${pf}meta.${k}"></span>`).join('');
+ $('skpis').innerHTML=s.kpis.map((k,i)=>`<div class="hk"><div class="vr"><input class="ed" data-p="${pf}kpis.${i}.v"><input class="ed un" data-p="${pf}kpis.${i}.u"></div><input class="ed lb" data-p="${pf}kpis.${i}.l"></div>`).join('');
+ $('schips').innerHTML=s.chips.map((c,i)=>`<span class="chip"><input class="ed" data-p="${pf}chips.${i}"></span>`).join('');
+ $('segments').innerHTML=s.segments.map((sg,i)=>`<div class="card seg"><div class="tl"><span class="ic">${sg.ic}</span><input class="ed nm" data-p="${pf}segments.${i}.t"><span class="share"><input class="ed" data-p="${pf}segments.${i}.share"></span></div><div class="sfield"><span class="k">الملف</span><input class="ed" data-p="${pf}segments.${i}.profile"></div><div class="sfield"><span class="k">يحتاج</span><input class="ed" data-p="${pf}segments.${i}.need"></div><div class="sfield"><span class="k">العرض</span><input class="ed" data-p="${pf}segments.${i}.offer"></div><input class="ed ev" data-p="${pf}segments.${i}.ev"></div>`).join('');
+ $('demo').innerHTML=s.demo.map((d,i)=>`<span>📊 <input class="ed" data-p="${pf}demo.${i}"></span>`).join('');
+ $('us').innerHTML=s.us.map((r,i)=>`<div class="brow"><input class="ed k" data-p="${pf}us.${i}.0"><input class="ed" data-p="${pf}us.${i}.1"></div>`).join('');
+ $('them').innerHTML=s.them.map((r,i)=>`<div class="brow"><input class="ed k" data-p="${pf}them.${i}.0"><input class="ed" data-p="${pf}them.${i}.1"></div>`).join('');
+ $('suggested').innerHTML=s.suggested.map((sg,i)=>`<span class="it"><input class="ed" data-p="${pf}suggested.${i}.0"><select class="ed" data-p="${pf}suggested.${i}.1">${opt(PRI,sg[1])}</select></span>`).join('');
+ $('monthsel').innerHTML=MN().map((m,i)=>`<option value="${i}"${i===selMonth?' selected':''}>${m}</option>`).join('');
+ $('tsum').innerHTML=[['total','إجمالي الوحدات',''],['restaurants','🍔 مطاعم',''],['cafes','☕ كافيهات',''],['rented','مؤجّرة','occ'],['vacant','شاغرة','vac']].map(([k,lb,cl])=>`<div class="tc ${cl}"><input class="edn tcin" type="number" min="0" data-p="${pf}tenants.summary.${k}"><div class="l">${lb}</div></div>`).join('');
+ buildUnits();const _du=false&&s.tenants.items.map((t,i)=>`<div class="unit${t.status==='شاغرة'?' vac':''}"><div class="unit-t"><input class="ed uname" data-p="${pf}tenants.items.${i}.name"><span class="tst" data-ust="${i}">—</span><button class="xbtn" data-delu="${i}">✕</button></div><div class="unit-b"><label class="uf"><span>نوع الوحدة</span><select class="ed" data-p="${pf}tenants.items.${i}.unitType">${opt(UTYPE,t.unitType)}</select></label><label class="uf"><span>العدد</span><input class="edn unum" type="number" min="0" data-p="${pf}tenants.items.${i}.count"></label><label class="uf"><span>الخدمة</span><select class="ed svccat" data-p="${pf}tenants.items.${i}.serviceCat">${opt(SCAT,t.serviceCat)}</select></label><label class="uf"><span>النوع الفرعي</span><select class="ed" data-p="${pf}tenants.items.${i}.subType">${optW(subOf(t.serviceCat),t.subType)}</select></label><label class="uf"><span>الحالة</span><select class="ed" data-p="${pf}tenants.items.${i}.status">${opt(TST,t.status)}</select></label></div>${t.status==='مؤجّرة'?`<div class="unit-a"><label class="uf"><span>مبيعات المستأجر/شهر</span><input class="edn uwide" type="number" min="0" data-p="${pf}tenants.items.${i}.sales"></label><label class="uf"><span>الإيجار/شهر</span><input class="edn" type="number" min="0" data-p="${pf}tenants.items.${i}.rent"></label><label class="uf"><span>المساحة م²</span><input class="edn" type="number" min="0" data-p="${pf}tenants.items.${i}.area"></label><span class="uana" data-uana="${i}"></span></div>`:`<div class="unit-a vacnote">وحدة شاغرة — فرصة تأجير</div>`}</div>`).join('');
+ const mk=s.marketing;
+ $('mixg').innerHTML=mk.mix.map((m,i)=>`<div class="mixc"><div class="mixt"><span class="mixi">${m.ic}</span><b>${m.p}</b></div><textarea class="ed" rows="3" data-p="${pf}marketing.mix.${i}.d"></textarea></div>`).join('');
+ $('mbud').innerHTML=mk.budget.map((b,i)=>`<div class="metric"><div class="t"><span style="flex:1"><input class="ed" data-p="${pf}marketing.budget.${i}.0"></span><span><input class="edn" type="number" min="0" data-p="${pf}marketing.budget.${i}.1">٪</span></div><div class="track"><i data-mbar="${i}" style="background:var(--accent)"></i></div></div>`).join('')+'<div class="budnote" id="budnote"></div>';
+ $('mcamp').innerHTML=mk.campaigns.map((c,i)=>`<div class="camp"><div class="camp-t"><input class="ed cname" data-p="${pf}marketing.campaigns.${i}.name"><select class="ed" data-p="${pf}marketing.campaigns.${i}.status">${opt(CST,c.status)}</select><button class="xbtn" data-delc="${i}">✕</button></div><div class="camp-b"><input class="ed ctype" data-p="${pf}marketing.campaigns.${i}.type"><label class="uf"><span>المموّل</span><select class="ed" data-p="${pf}marketing.campaigns.${i}.funder">${opt(FUND,c.funder)}</select></label><label class="uf"><span>التكلفة</span><input class="edn" type="number" min="0" data-p="${pf}marketing.campaigns.${i}.cost"></label><label class="uf"><span>الأثر ٪</span><input class="edn" type="number" step="0.1" data-p="${pf}marketing.campaigns.${i}.lift"></label></div></div>`).join('');
+ $('fleetlist').innerHTML=s.fleet.items.map((f,i)=>`<div class="fleet"><div class="fleet-t"><input class="ed fseg" data-p="${pf}fleet.items.${i}.seg"><select class="ed" data-p="${pf}fleet.items.${i}.status">${opt(ST,f.status)}</select><button class="xbtn" data-delf="${i}">✕</button></div><div class="fleet-g"><label class="uf"><span>المنتج</span><select class="ed" data-p="${pf}fleet.items.${i}.product">${optW(FPROD,f.product)}</select></label><label class="uf"><span>الحجم لتر/شهر</span><input class="edn" type="number" min="0" data-p="${pf}fleet.items.${i}.liters"></label><span class="fprofit" data-fprofit="${i}">—</span></div><label class="fl"><span>🧭 آلية التعاقد</span><textarea class="ed" data-p="${pf}fleet.items.${i}.mechanism"></textarea></label><label class="fl"><span>🎯 الجهات المستهدفة</span><input class="ed" data-p="${pf}fleet.items.${i}.targets"></label></div>`).join('');
+ $('plist').innerHTML=s.pipeline.items.map((o,i)=>`<div class="opp"><div class="opp-t"><input class="ed oppname" data-p="${pf}pipeline.items.${i}.name"><span class="stg" data-stg="${i}">—</span><button class="xbtn" data-del="${i}">✕</button></div><input class="ed opptype" data-p="${pf}pipeline.items.${i}.type"><div class="opp-b"><select class="ed" data-p="${pf}pipeline.items.${i}.channel">${opt(CH,o.channel)}</select><span class="oppval"><input class="edn" type="number" data-p="${pf}pipeline.items.${i}.value">ر.س/شهر</span><select class="ed" data-p="${pf}pipeline.items.${i}.status">${opt(ST,o.status)}</select><select class="ed" data-p="${pf}pipeline.items.${i}.pri">${opt(PRI,o.pri)}</select></div></div>`).join('');
+ $('monthly').innerHTML=s.fuel.monthly.map((m,i)=>`<input class="edn" type="number" step="0.01" data-p="${pf}fuel.monthly.${i}">`).join('');
+ $('leg').innerHTML=s.fuel.mix.map((m,i)=>`<div class="legrow"><i class="sw" style="background:${fcol(m[0],i)}"></i><select class="ed fprodsel" data-p="${pf}fuel.mix.${i}.0">${optW(FUEL,m[0])}</select><input class="edn" type="number" data-p="${pf}fuel.mix.${i}.1">٪<button class="xbtn" data-delp="${i}">✕</button></div>`).join('')+`<div class="legrow" style="color:var(--muted);font-size:11.5px">متوسط <input class="edn" data-p="${pf}fuel.avg" style="width:52px"> ر.س/لتر</div>`;
+ $('pay').innerHTML=s.payment.map((pm,i)=>`<div class="metric"><div class="t"><span style="flex:1"><input class="ed" data-p="${pf}payment.${i}.0" style="max-width:150px"></span><span><input class="edn" type="number" data-p="${pf}payment.${i}.1">٪</span></div><div class="track"><i data-bar="${i}" style="background:${PC[i%3]}"></i></div></div>`).join('');
+ document.querySelectorAll('[data-sp]').forEach(e=>e.setAttribute('data-p',pf+e.dataset.sp));
+ setAll();
+}
+function refresh(){
+ let pAll=0,netAll=0,prof=0;D.stations.forEach(st=>{pAll+=pipeTot(st);const n=net(st);netAll+=n;if(n>=0)prof++;});
+ $('pfk').innerHTML=`<div class="pfc"><div class="v tnum">${D.stations.length}</div><div class="l">عدد المحطات</div></div><div class="pfc" style="border-color:var(--gold)"><div class="v tnum" style="color:var(--gold)">${money(pAll)}</div><div class="l">إجمالي خط الأنابيب (ر.س/شهر)</div></div><div class="pfc" style="border-color:${netAll>=0?'var(--good)':'var(--crit)'}"><div class="v tnum" style="color:${netAll>=0?'var(--good)':'var(--crit)'}">${(netAll>=0?'+':'')+money(netAll)}</div><div class="l">صافي المحفظة (شهرياً)</div></div><div class="pfc"><div class="v tnum">${prof}/${D.stations.length}</div><div class="l">محطات رابحة</div></div>`;
+ $('ov').innerHTML=D.stations.map((st,i)=>{const n=net(st),w=n>=0;const rev=st.kpis[0]||{};return `<div class="ovc${i===sel?' sel':''}" data-sel="${i}"><div class="code">${(st.meta&&st.meta.code)||''}</div><div class="nm">${st.station.name}</div><div class="mt">${(st.meta&&st.meta.type)||''} · ${(st.meta&&st.meta.city)||''}</div><div class="st"><div><div class="k">الإيراد (٦ش)</div><div class="b">${(rev.v||'—')} <span style="font-size:10px;color:var(--muted)">${rev.u||''}</span></div></div><div><div class="k">خط الأنابيب</div><div class="b" style="color:var(--gold)">${money(pipeTot(st))}</div></div></div><div class="foot"><span class="badge ${w?'win':'lose'}">${w?'🟢 رابحة':'🔴 خاسرة'} ${(w?'+':'')+money(n)}</span><span class="open">${i===sel?'✓ معروضة':'عرض ←'}</span>${D.stations.length>1?`<button class="xbtn" data-delst="${i}" style="position:absolute;top:10px;left:10px">✕</button>`:''}</div></div>`;}).join('');
+ refreshScorecard();
+ const s=S();
+ // tenants summary + badges
+ const T=s.tenants.items;
+ const byType={};T.forEach(x=>{byType[x.unitType]=(byType[x.unitType]||0)+(+x.count||1);});
+ $('tbreak').innerHTML='<span class="tbh">أنواع الوحدات:</span>'+Object.keys(byType).map(k=>`<span class="tb">${k} <b>${byType[k]}</b></span>`).join('');
+ T.forEach((t,i)=>{const b=document.querySelector(`[data-ust="${i}"]`);if(b){const oc=t.status==='مؤجّرة';b.textContent=t.status;b.style.color=oc?'var(--good)':'var(--crit)';b.style.background=oc?'var(--good-bg)':'var(--crit-bg)';}});
+ let tS=0,tR=0;T.forEach((t,i)=>{const a=document.querySelector(`[data-uana="${i}"]`);if(t.status==='مؤجّرة'){const sl=tsales(t,selMonth),rn=+t.rent||0,ar=+t.area||0;tS+=sl;tR+=rn;if(a){const ratio=sl>0?rn/sl*100:0,spm=ar>0?sl/ar:0;const pv=selMonth>0?tsales(t,selMonth-1):null,tr=(pv!=null&&sl!==pv)?(sl>pv?' <span style="color:var(--good)">▲</span>':' <span style="color:var(--crit)">▼</span>'):'';a.innerHTML=`نسبة الإيجار <b style="color:${sl>0?(ratio<=15?'var(--good)':'var(--crit)'):'var(--muted)'}">${sl>0?ratio.toFixed(1)+'٪':'—'}</b>${ar?` · <b>${money(spm)}</b> ر.س/م²`:''}${tr}`;}}});
+ $('lsum').innerHTML=`<div class="tc"><div class="v tnum">${money(tS)}</div><div class="l">مبيعات المستأجرين/شهر</div></div><div class="tc occ"><div class="v tnum">${money(tR)}</div><div class="l">دخل الإيجار/شهر</div></div><div class="tc"><div class="v tnum">${tS>0?(tR/tS*100).toFixed(1)+'٪':'—'}</div><div class="l">متوسط نسبة الإيجار</div></div>`;
+ (function(){const tm=$('tanmonth');if(tm)tm.textContent='· '+MN()[selMonth];const rented=T.map((t,i)=>({t,i})).filter(o=>o.t.status==='مؤجّرة');const el=$('tanaltbl');if(!el)return;if(!rented.length){el.innerHTML='<div class="tan-empty">لا مستأجرون بعد — أضف وحدات مؤجّرة ومبيعاتها لعرض التحليل.</div>';return;}const sv=o=>tsales(o.t,selMonth);const ws=rented.filter(o=>sv(o)>0),src=(ws.length?ws:rented).slice().sort((a,b)=>sv(b)-sv(a));const maxS=Math.max(1,...src.map(sv));let worstR=null;src.forEach(o=>{const sl=sv(o),rn=+o.t.rent||0;if(sl>0){const rr=rn/sl*100;if(worstR===null||rr>worstR.r)worstR={name:o.t.name,r:rr};}});const body=src.map((o,k)=>{const t=o.t,sl=tsales(t,selMonth),rn=+t.rent||0,ar=+t.area||0,ratio=sl>0?rn/sl*100:0,spm=ar>0?sl/ar:0;const pv=selMonth>0?tsales(t,selMonth-1):null,tr=(pv!=null&&sl!==pv)?(sl>pv?'<span style="color:var(--good)">▲</span>':'<span style="color:var(--crit)">▼</span>'):'';return `<div class="tanrow"><span class="tanrank">${k+1}</span><span class="tanname">${t.name}<small>${t.serviceCat}</small></span><span class="tanbar"><i style="width:${(sl/maxS*100).toFixed(1)}%"></i><b>${money(sl)} ${tr}</b></span><span class="tanm">${money(rn)}</span><span class="tanm" style="color:${sl>0?(ratio<=15?'var(--good)':'var(--crit)'):'var(--muted)'}">${sl>0?ratio.toFixed(1)+'٪':'—'}</span><span class="tanm">${ar?money(spm):'—'}</span></div>`;}).join('');const ins=`<div class="taninsight">🏆 الأعلى مبيعاً: <b>${src[0].t.name}</b> (${money(tsales(src[0].t,selMonth))} ر.س)${worstR?` · ⚠️ أعلى نسبة إيجار: <b>${worstR.name}</b> (${worstR.r.toFixed(1)}٪)`:''} · النسبة الصحّية ≤ 15٪</div>`;el.innerHTML=ins+`<div class="tanhead"><span></span><span>المستأجر</span><span>مبيعات ${MN()[selMonth]}</span><span>الإيجار</span><span>نسبة الإيجار</span><span>مبيعات/م²</span></div>${body}`;})();
+ buildPlan();
+ // products
+ const TL=+s.finance.liters||0,MG=+s.finance.margin||0;let sumL=0,sumR=0,sumP=0;
+ const frows=s.fuel.mix.map((m,i)=>{const sh=+m[1]||0,li=sh/100*TL,rv=li*MG;sumL+=li;sumR+=rv;sumP+=sh;return `<div class="fprow"><span class="fpname"><i style="background:${fcol(m[0],i)}"></i>${m[0]}</span><span class="tnum">${sh}٪</span><span class="tnum lit">${money(li)}</span><span class="tnum rev">${money(rv)}</span></div>`;}).join('');
+ $('fprod').innerHTML=`<div class="fptbl"><div class="fphead"><span>المنتج</span><span>الحصة</span><span>لتر/شهر</span><span>ربح/شهر</span></div>${frows}<div class="fptot"><span>الإجمالي</span><span class="tnum">${Math.round(sumP)}٪</span><span class="tnum">${money(sumL)}</span><span class="tnum" style="color:var(--good)">${money(sumR)}</span></div></div>`;
+ // marketing mix
+ const mk=s.marketing;let bsum=0;
+ mk.budget.forEach((b,i)=>{const v=+b[1]||0;bsum+=v;const el=document.querySelector(`[data-mbar="${i}"]`);if(el)el.style.width=Math.min(100,v)+'%';});
+ const cAll=mk.campaigns.reduce((a,c)=>a+(+c.cost||0),0),cOwn=mk.campaigns.filter(c=>c.funder==='التسويق').reduce((a,c)=>a+(+c.cost||0),0);
+ const bn=$('budnote');if(bn)bn.innerHTML=`الإجمالي <b style="color:${bsum===100?'var(--good)':'var(--crit)'}">${Math.round(bsum)}٪</b>${bsum!==100?' — يجب أن يساوي 100٪':''} · تكلفة الحملات <b>${money(cAll)}</b> ر.س (على التسويق <b>${money(cOwn)}</b> · مموّل خارجياً <b style="color:var(--good)">${money(cAll-cOwn)}</b>)`;
+ // fleet fuel contracts
+ const F=s.fleet.items,MGF=+s.finance.margin||0;let fL=0,fV=0,fC=0;
+ F.forEach((f,i)=>{const li=+f.liters||0,pr=li*MGF;fL+=li;fV+=pr;if(f.status==='متعاقد')fC+=pr;const el=document.querySelector(`[data-fprofit="${i}"]`);if(el)el.innerHTML=`ربح متوقّع <b>${money(pr)}</b> ر.س/شهر`;});
+ $('fsum').innerHTML=`<div class="tc"><div class="v tnum">${money(fL)}</div><div class="l">حجم الأساطيل لتر/شهر</div></div><div class="tc"><div class="v tnum" style="color:var(--gold)">${money(fV)}</div><div class="l">ربح متوقّع ر.س/شهر</div></div><div class="tc occ"><div class="v tnum">${money(fC)}</div><div class="l">متعاقد (ربح)</div></div><div class="tc"><div class="v tnum">${F.length}</div><div class="l">عدد الفئات</div></div>`;
+ // pipeline
+ const items=s.pipeline.items;let tot=0,con=0;const bc={};
+ items.forEach(o=>{const v=+o.value||0;tot+=v;if(o.status==='متعاقد')con+=v;bc[o.channel]=(bc[o.channel]||0)+v;});
+ $('psum').innerHTML=`<div class="pm tot"><div class="v tnum">${money(tot)}</div><div class="l">إجمالي خط الأنابيب (ر.س/شهر)</div></div><div class="pm con"><div class="v tnum" style="color:var(--good)">${money(con)}</div><div class="l">متعاقد ✓</div></div><div class="pm opn"><div class="v tnum" style="color:var(--gold)">${money(tot-con)}</div><div class="l">فرص مفتوحة</div></div><div class="pm"><div class="v tnum">${items.length}</div><div class="l">عدد الجهات</div></div>`;
+ const mx=Math.max(1,...CH.map(c=>bc[c]||0));
+ $('pbars').innerHTML=CH.map(c=>`<div class="metric"><div class="t"><span>${c}</span><b class="tnum">${money(bc[c]||0)}</b></div><div class="track"><i style="width:${(bc[c]||0)/mx*100}%;background:var(--accent)"></i></div></div>`).join('');
+ items.forEach((o,i)=>{const b=document.querySelector(`[data-stg="${i}"]`);if(b){b.textContent=o.status;b.style.color=STC[o.status]||'var(--muted)';}});
+ $('pipepill_t').textContent='خط الأنابيب '+money(tot)+' ر.س/شهر';
+ // fuel donut + spark
+ let acc=0,stops=[];s.fuel.mix.forEach((m,i)=>{const p=+m[1]||0;stops.push(`${fcol(m[0],i)} ${acc}% ${acc+p}%`);acc+=p;});
+ $('donut').style.background=`conic-gradient(${stops.join(',')})`;
+ document.querySelectorAll('#leg .sw').forEach((sw,i)=>{const m=s.fuel.mix[i];if(m)sw.style.background=fcol(m[0],i);});
+ $('dmid').textContent=((+s.finance.liters||0)/1e6).toFixed(1)+'M';
+ const d=s.fuel.monthly.map(Number),W=300,H=42,p=4,mxv=Math.max(...d),mn=Math.min(...d);
+ const X=i=>i/(d.length-1||1)*(W-2*p)+p,Y=v=>mxv===mn?H/2:H-p-(v-mn)/(mxv-mn)*(H-2*p);
+ let Lp='',A=`M ${X(0)} ${H}`;d.forEach((v,i)=>{Lp+=(i?' L':'M')+` ${X(i).toFixed(1)} ${Y(v).toFixed(1)}`;A+=` L ${X(i).toFixed(1)} ${Y(v).toFixed(1)}`;});A+=` L ${X(d.length-1)} ${H} Z`;
+ $('spark').innerHTML=`<path d="${A}" fill="var(--accent)" opacity="0.12"/><path d="${Lp}" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linejoin="round"/><circle cx="${X(d.length-1)}" cy="${Y(d[d.length-1])}" r="3.2" fill="var(--crit)"/>`;
+ $('trend').textContent=d[d.length-1]<d[0]?'تراجع':'نمو';$('trend').style.color=d[d.length-1]<d[0]?'var(--crit)':'var(--good)';
+ document.querySelectorAll('#pay [data-bar]').forEach(bar=>{const i=+bar.dataset.bar;bar.style.width=Math.max(+s.payment[i][1]||0,1)+'%';});
+ $('occbar').style.width=(+s.leasing.franchiseOcc||0)+'%';
+ calc();save();
+}
+function calc(){
+ const f=S().finance,L=+f.liters||0,m=+f.margin||0,units=+f.units||0,occ=(+f.occ||0)/100,rent=+f.rent||0,store=+f.store||0;
+ const sal=+f.salaries||0,exp=sal+(+f.oprent||0)+(+f.utils||0)+(+f.maint||0);
+ const workers=+f.workers||0,tank=+f.tankCapacity||0,pumps=+f.pumps||0;
+ $('marginv').textContent=m.toFixed(2);$('occv').textContent=Math.round(occ*100)+'٪';
+ const fuelInc=m*L,occU=units*occ,rentInc=occU*rent,nonFuel=rentInc+store,totInc=fuelInc+nonFuel,nt=totInc-exp;
+ const cpl=L>0?exp/L:0,rem=Math.max(0,exp-nonFuel),be=m>0?rem/m:Infinity;
+ $('fuelinc').textContent=fmt(fuelInc);$('fuelinc_h').textContent=`${m.toFixed(2)} × ${money(L)} لتر`;
+ $('rentinc').textContent=fmt(rentInc);$('rentinc_h').textContent=`${Math.round(occU)} وحدة × ${fmt(rent)}`;
+ $('totinc').textContent=fmt(totInc)+' ر.س';$('totexp').textContent=fmt(exp)+' ر.س';
+ $('cpl').textContent=cpl.toFixed(3)+' ر.س';
+ $('cpw').textContent=workers>0?fmt(sal/workers)+' ر.س':'—';
+ const daily=L/30,tdays=daily>0?tank/daily:0;
+ $('tankdays').textContent=tank>0&&daily>0?tdays.toFixed(1)+' يوم':'—';
+ $('perpump').textContent=pumps>0?money(L/pumps):'—';
+ $('breakeven').textContent=rem<=0?'مغطّاة ✓':(isFinite(be)?money(be)+' لتر':'—');
+ $('be_h').textContent=rem<=0?'غير الوقود يغطّي المصاريف':(isFinite(be)?`${(L/be).toFixed(1)}× نقطة التعادل`:'—');
+ const win=nt>=0,v=$('verdict');v.className='bigv '+(win?'win':'lose');
+ $('vtext').textContent=win?'🟢 رابحة':'🔴 خاسرة';$('vnet').innerHTML=(win?'+':'')+fmt(nt)+' ر.س<small>صافي الربح/الخسارة</small>';
+ const tp=$('toppill');tp.className='pill '+(win?'win':'lose');$('toppill_t').textContent=(win?'رابحة ':'خاسرة ')+(win?'+':'')+money(nt)+' ر.س/شهر';
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(D));$('saved').textContent='✓ محفوظ';setTimeout(()=>{$('saved').textContent='';},1000);}catch(e){}}
+function tallyUnits(it){const c=f=>(it||[]).filter(f).reduce((a,x)=>a+(+x.count||1),0);return {total:c(()=>true),restaurants:c(x=>x.serviceCat==='مطاعم'),cafes:c(x=>x.serviceCat==='كافيهات'),rented:c(x=>x.status==='مؤجّرة'),vacant:c(x=>x.status!=='مؤجّرة')};}
+const IGD={principle:'الوقود يجلب الحركة · غير الوقود يصنع الربح · التطبيق يربطهما · المندوب ينفّذها',unit:'وحدة القياس المشتركة: الربح لكل زيارة في كل منفذ.',appTarget:5,cycle:[{ic:'🤝',t:'عقود الأساطيل',d:'حجم مضمون'},{ic:'🏪',t:'جاذبية الموقع',d:'إشغال أعلى'},{ic:'⛽',t:'سبب زيارة',d:'وقود أكثر'},{ic:'📱',t:'التطبيق',d:'هوية العميل'},{ic:'📣',t:'تكرار',d:'مبيعات أعلى'}],pillars:[{t:'مالك منفذ واحد (P&L)',d:'—'},{t:'بطاقة أداء موحّدة',d:'—'},{t:'حوافز مشتركة ٦٠/٤٠',d:'—'}],rules:[['—','—']],phases:[{p:'٠–٣ أشهر',t:'التأسيس',d:'—',why:'—'}]};
+function normalize(o){if(!o.platform)o.platform={};
+ if(!o.platform.integration)o.platform.integration=JSON.parse(JSON.stringify(IGD));
+ const g=o.platform.integration;['cycle','pillars','rules','phases'].forEach(k=>{if(!Array.isArray(g[k])||!g[k].length)g[k]=JSON.parse(JSON.stringify(IGD[k]));});
+ if(g.appTarget==null)g.appTarget=5;if(!g.principle)g.principle=IGD.principle;if(!g.unit)g.unit=IGD.unit;
+ (o.stations||[]).forEach(st=>{if(st.finance&&st.finance.visits==null)st.finance.visits=0;});if(!Array.isArray(o.platform.months)||!o.platform.months.length)o.platform.months=['يناير 2026','فبراير 2026','مارس 2026','أبريل 2026','مايو 2026','يونيو 2026'];const nm=o.platform.months.length;(o.stations||[]).forEach(st=>{if(!st.tenants)st.tenants={note:'',items:[]};if(!st.tenants.plan)st.tenants.plan={image:'',note:''};if(!st.fleet)st.fleet={note:'',items:[]};
+ if(!st.marketing)st.marketing={note:'',mix:[],budget:[],campaigns:[]};
+ if(!Array.isArray(st.marketing.mix)||!st.marketing.mix.length)st.marketing.mix=[['📦','المنتج'],['🏷️','السعر'],['📍','المكان'],['📣','الترويج'],['👥','الناس'],['⚙️','العمليات'],['🏛️','الدليل المادي']].map(([ic,p])=>({ic,p,d:'—'}));
+ if(!Array.isArray(st.marketing.budget)||!st.marketing.budget.length)st.marketing.budget=[['تفعيل التطبيق',50],['حملات مشتركة مع المستأجرين',20],['ترويج B2B مباشر',20],['الدليل المادي والهوية',10]];
+ if(!Array.isArray(st.marketing.campaigns))st.marketing.campaigns=[];(st.tenants.items||[]).forEach(t=>{if(t.count==null)t.count=1;if(t.rent==null)t.rent=0;if(t.area==null)t.area=0;if(!Array.isArray(t.salesM))t.salesM=Array(nm).fill(+t.sales||0);while(t.salesM.length<nm)t.salesM.push(0);if(t.salesM.length>nm)t.salesM=t.salesM.slice(0,nm);delete t.sales;});if(!st.tenants.summary)st.tenants.summary=tallyUnits(st.tenants.items);});}
+function posOf(t,i,n){if(typeof t.x==='number'&&typeof t.y==='number')return{x:t.x,y:t.y};const cols=Math.max(3,Math.ceil(Math.sqrt((n||1)*1.7))),gx=90/cols,gy=Math.min(23,82/Math.max(1,Math.ceil((n||1)/cols)));return{x:4+(i%cols)*gx,y:5+Math.floor(i/cols)*gy};}
+function buildPlan(){const s=S(),pl=s.tenants.plan||{},el=$('plan');if(!el)return;const n=s.tenants.items.length;el.style.backgroundImage=pl.image?`url("${pl.image}")`:'';el.classList.toggle('empty',!pl.image);el.innerHTML=s.tenants.items.map((t,i)=>{const p=posOf(t,i,n);return `<div class="pbox ${t.status==='مؤجّرة'?'rented':'vac'}${i===planSel?' sel':''}" data-pbox="${i}" style="left:${p.x}%;top:${p.y}%"><b>${t.name}</b><span>${t.unitType}${(+t.count>1)?' ×'+t.count:''}</span></div>`;}).join('');}
+function showPlanInfo(i){const t=S().tenants.items[i],el=$('planinfo');if(!el)return;if(!t){el.textContent='اضغط أي وحدة في المخطط لعرض تحليل مبيعاتها.';return;}if(t.status==='مؤجّرة'){const sl=tsales(t,selMonth),rn=+t.rent||0,ar=+t.area||0,ratio=sl>0?rn/sl*100:0,spm=ar>0?sl/ar:0;el.innerHTML=`<b>${t.name}</b> · ${t.unitType} · ${t.serviceCat}/${t.subType} · <span style="color:var(--good);font-weight:800">مؤجّرة</span><br>مبيعات ${MN()[selMonth]} <b>${money(sl)}</b> ر.س · إيجار <b>${money(rn)}</b> ر.س · نسبة الإيجار <b style="color:${sl>0&&ratio<=15?'var(--good)':'var(--crit)'}">${sl>0?ratio.toFixed(1)+'٪':'—'}</b>${ar?` · <b>${money(spm)}</b> ر.س/م²`:''}`;}else{el.innerHTML=`<b>${t.name}</b> · ${t.unitType} · <span style="color:var(--crit);font-weight:800">شاغرة</span> — فرصة تأجير`;}}
+let _dI=-1,_dMoved=false,_dS=null;
+function planDown(e){const box=e.target.closest&&e.target.closest('[data-pbox]');if(!box)return;e.preventDefault();_dI=+box.dataset.pbox;_dMoved=false;_dS={x:e.clientX,y:e.clientY};}
+function planMove(e){if(_dI<0)return;if(Math.abs(e.clientX-_dS.x)+Math.abs(e.clientY-_dS.y)>4)_dMoved=true;if(!_dMoved)return;const el=$('plan'),r=el.getBoundingClientRect();let x=(e.clientX-r.left)/r.width*100,y=(e.clientY-r.top)/r.height*100;x=Math.max(0,Math.min(90,x));y=Math.max(0,Math.min(86,y));const t=S().tenants.items[_dI];if(!t)return;t.x=Math.round(x*10)/10;t.y=Math.round(y*10)/10;const box=el.querySelector(`[data-pbox="${_dI}"]`);if(box){box.style.left=t.x+'%';box.style.top=t.y+'%';}}
+function planUp(){if(_dI<0)return;const i=_dI;_dI=-1;if(_dMoved){save();}else{planSel=i;buildPlan();showPlanInfo(i);}}
+function resetFilter(){unitFilter.q='';unitFilter.status='all';const a=$('tsearch');if(a)a.value='';const b=$('tfstatus');if(b)b.value='all';}
+function buildUnits(){const s=S(),pf=P(),q=(unitFilter.q||'').trim(),fs=unitFilter.status;
+ const rows=s.tenants.items.map((t,i)=>[t,i]).filter(([t])=>{if(fs==='مؤجّرة'&&t.status!=='مؤجّرة')return false;if(fs==='شاغرة'&&t.status==='مؤجّرة')return false;if(q&&!(''+(t.name||'')+(t.unitType||'')+(t.serviceCat||'')+(t.subType||'')).includes(q))return false;return true;});
+ const tc=$('tcount');if(tc)tc.textContent=`عرض ${rows.length} من ${s.tenants.items.length}`;
+ $('tlist').innerHTML=rows.map(([t,i])=>{const open=openUnits.has(i),r=t.status==='مؤجّرة';
+  const head=`<div class="urow ${r?'r':'v'}" data-toggle="${i}"><span class="uarrow">${open?'▾':'▸'}</span><input class="ed uname" data-p="${pf}tenants.items.${i}.name"><span class="ubadge">${t.unitType}${(+t.count>1)?' ×'+t.count:''}</span><span class="ubadge svc">${t.serviceCat}</span><span class="ustt ${r?'g':'rr'}">${t.status}</span><button class="xbtn" data-delu="${i}">✕</button></div>`;
+  const det=open?`<div class="udetail"><div class="unit-b"><label class="uf"><span>نوع الوحدة</span><select class="ed" data-p="${pf}tenants.items.${i}.unitType">${opt(UTYPE,t.unitType)}</select></label><label class="uf"><span>العدد</span><input class="edn unum" type="number" min="0" data-p="${pf}tenants.items.${i}.count"></label><label class="uf"><span>الخدمة</span><select class="ed svccat" data-p="${pf}tenants.items.${i}.serviceCat">${opt(SCAT,t.serviceCat)}</select></label><label class="uf"><span>النوع الفرعي</span><select class="ed" data-p="${pf}tenants.items.${i}.subType">${optW(subOf(t.serviceCat),t.subType)}</select></label><label class="uf"><span>الحالة</span><select class="ed" data-p="${pf}tenants.items.${i}.status">${opt(TST,t.status)}</select></label></div>${r?`<div class="unit-a"><label class="uf"><span>مبيعات ${MN()[selMonth]}</span><input class="edn uwide" type="number" min="0" data-p="${pf}tenants.items.${i}.salesM.${selMonth}"></label><label class="uf"><span>الإيجار/شهر</span><input class="edn" type="number" min="0" data-p="${pf}tenants.items.${i}.rent"></label><label class="uf"><span>المساحة م²</span><input class="edn" type="number" min="0" data-p="${pf}tenants.items.${i}.area"></label><span class="uana" data-uana="${i}"></span></div>`:`<div class="unit-a vacnote">وحدة شاغرة — فرصة تأجير</div>`}</div>`:'';
+  return `<div class="unit ${r?'':'vac'}">${head}${det}</div>`;}).join('');
+ setAll();}
+function blankStation(){return {id:'MK000',meta:{code:'MK000',city:'—',type:'—',size:'—',area:'—',selfService:'لا'},station:{eyebrow:'محطة جديدة',name:'محطة جديدة',tagline:'—'},kpis:[{v:'—',u:'',l:'الإيراد (٦ش)'},{v:'—',u:'',l:'الوقود'},{v:'—',u:'',l:'التقييم'},{v:'—',u:'',l:'الفاتورة'}],chips:['—'],segments:[{ic:'👤',t:'شريحة',share:'—',profile:'—',need:'—',offer:'—',ev:'—'}],demo:['—'],tenants:{note:'يُستكمل بالجرد.',items:[],plan:{image:'',note:''},summary:{total:0,restaurants:0,cafes:0,rented:0,vacant:0}},us:[['—','—']],them:[['—','—']],advantage:'—',gap:'—',suggested:[['—','متوسطة']],scenario:{road:'—',before:'—',after:'—',density:'—'},fleet:{note:'عقود وقود الأساطيل — تُستكمل.',items:[]},marketing:{note:'المكس التسويقي — يُستكمل.',mix:[],budget:[],campaigns:[]},pipeline:{note:'فرص الموقع — تُستكمل.',items:[]},fuel:{mix:[['بنزين 91',34],['بنزين 95',33],['ديزل',33]],avg:'0',monthly:[0,0,0,0,0,0]},notes:{payAlert:'—',vacantAlert:'—',tanki:'—',partners:'—'},payment:[['نقدي',50],['شبكة (مدى)',49],['التطبيق',1]],leasing:{note:'—',franchiseOcc:0,vacant:0},finance:{liters:0,margin:0.15,units:0,occ:0,rent:0,store:0,salaries:0,oprent:0,utils:0,maint:0,workers:0,tankCapacity:0,pumps:0,visits:0}};}
+document.addEventListener('input',e=>{const el=e.target;if(!el.dataset||!el.dataset.p)return;let v=el.value;if(el.type==='number'||el.type==='range'||el.classList.contains('edn'))v=parseFloat(v)||0;const p=el.dataset.p;sp(D,p,v);
+ if(el.classList.contains('svccat')){sp(D,p.replace(/\.serviceCat$/,'.subType'),subOf(v)[0]);buildUnits();refresh();return;}
+ if(/\.tenants\.items\.\d+\.(status|unitType)$/.test(p)){buildUnits();refresh();return;}
+ refresh();});
+document.addEventListener('click',e=>{const t=e.target;if(!t.dataset)return;
+ if(t.dataset.delst!=null){e.stopPropagation();if(D.stations.length>1&&confirm('حذف هذه المحطة؟')){D.stations.splice(+t.dataset.delst,1);if(sel>=D.stations.length)sel=D.stations.length-1;planSel=-1;build();refresh();showPlanInfo(-1);}return;}
+ if(t.dataset.del!=null){S().pipeline.items.splice(+t.dataset.del,1);build();refresh();return;}
+ if(t.dataset.delu!=null){S().tenants.items.splice(+t.dataset.delu,1);openUnits.clear();planSel=-1;build();refresh();showPlanInfo(-1);return;}
+ if(t.dataset.delp!=null){if(S().fuel.mix.length>1){S().fuel.mix.splice(+t.dataset.delp,1);build();refresh();}return;}
+ if(t.dataset.delf!=null){S().fleet.items.splice(+t.dataset.delf,1);build();refresh();return;}
+ if(t.dataset.delc!=null){S().marketing.campaigns.splice(+t.dataset.delc,1);build();refresh();return;}
+ const urow=t.closest&&t.closest('.urow');if(urow&&!t.closest('input,select,textarea')){const i=+urow.dataset.toggle;if(openUnits.has(i))openUnits.delete(i);else openUnits.add(i);buildUnits();return;}
+ const card=t.closest&&t.closest('[data-sel]');if(card){sel=+card.dataset.sel;planSel=-1;openUnits.clear();resetFilter();build();refresh();showPlanInfo(-1);$('detail').scrollIntoView({behavior:'smooth',block:'start'});}});
+$('addst').onclick=()=>{D.stations.push(blankStation());sel=D.stations.length-1;planSel=-1;openUnits.clear();resetFilter();build();refresh();$('detail').scrollIntoView({behavior:'smooth'});};
+$('addopp').onclick=()=>{S().pipeline.items.push({name:'جهة جديدة',type:'النشاط / التقييم',channel:CH[0],value:0,status:'فرصة',pri:'متوسطة'});build();refresh();};
+$('addcamp').onclick=()=>{S().marketing.campaigns.push({name:'حملة جديدة',type:'النوع',funder:FUND[0],cost:0,lift:0,status:'مقترحة'});build();refresh();};
+$('addfleet').onclick=()=>{S().fleet.items.push({seg:'🚛 فئة أسطول جديدة',product:'ديزل',mechanism:'بطاقة وقود أسطول + خصم حجمي',targets:'—',liters:0,status:'فرصة'});build();refresh();};
+$('addunit').onclick=()=>{S().tenants.items.push({name:'وحدة جديدة',count:1,unitType:UTYPE[0],serviceCat:SCAT[0],subType:subOf(SCAT[0])[0],status:'شاغرة'});resetFilter();openUnits.add(S().tenants.items.length-1);build();refresh();};
+$('tsearch').addEventListener('input',e=>{unitFilter.q=e.target.value;buildUnits();});
+$('tfstatus').addEventListener('change',e=>{unitFilter.status=e.target.value;buildUnits();});
+$('monthsel').addEventListener('change',e=>{selMonth=+e.target.value;buildUnits();refresh();if(planSel>=0)showPlanInfo(planSel);});
+$('addprod').onclick=()=>{const have=S().fuel.mix.map(m=>m[0]);const nx=FUEL.find(f=>!have.includes(f))||'بنزين 98';S().fuel.mix.push([nx,0]);build();refresh();};
+$('plan').addEventListener('pointerdown',planDown);document.addEventListener('pointermove',planMove);document.addEventListener('pointerup',planUp);
+$('planimg').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{const s=S();if(!s.tenants.plan)s.tenants.plan={};s.tenants.plan.image=rd.result;buildPlan();save();};rd.readAsDataURL(f);e.target.value='';});
+$('planclear').onclick=()=>{const s=S();if(s.tenants.plan)s.tenants.plan.image='';buildPlan();save();};
+$('tcalc').onclick=()=>{S().tenants.summary=tallyUnits(S().tenants.items);build();refresh();};
+$('export').onclick=()=>{const b=new Blob([JSON.stringify(D,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='data.json';a.click();};
+$('reset').onclick=()=>{localStorage.removeItem(KEY);location.reload();};
+function start(o){D=o;normalize(D);sel=0;planSel=-1;selMonth=MN().length-1;openUnits.clear();resetFilter();build();refresh();}
+let ok=false;const c=localStorage.getItem(KEY);
+if(c){try{const j=JSON.parse(c);if(j&&Array.isArray(j.stations)&&j.stations.length&&j.stations[0].tenants){start(j);ok=true;}}catch(e){}}
+if(!ok)fetch('./data.json?_='+Date.now()).then(r=>r.json()).then(start).catch(()=>{document.querySelector('.wrap').insertAdjacentHTML('afterbegin','<p style="padding:24px;text-align:center;color:var(--muted)">تعذّر تحميل data.json</p>');});
+</script>
+</body>
+</html>
