@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نظام تتبّع الاستراتيجية — العمرة الجديدة (MK007)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1b1c1e;--panel:#242528;--elev:#2b2c2f;--ink:#f4f5f6;--ink2:#d5d7da;--muted:#9a9da2;--line:#3b3d41;
+--accent:#f18a2b;--accent2:#f7a94e;--good:#3fb27f;--gold:#ffd54a;--sky:#38bdf8;--crit:#e06666;
+--good-bg:rgba(63,178,127,.14);--crit-bg:rgba(224,102,102,.14);--gold-bg:rgba(255,213,74,.12);--sky-bg:rgba(56,189,248,.12);
+--sh:0 10px 28px rgba(0,0,0,.35)}
+body{background:var(--bg);color:var(--ink);font-family:Tajawal,Cairo,"Segoe UI",Tahoma,Arial,sans-serif;direction:rtl;line-height:1.6;-webkit-font-smoothing:antialiased}
+.tnum{font-variant-numeric:tabular-nums}
+.wrap{max-width:1240px;margin:0 auto;padding:0 clamp(14px,3vw,24px)}
+.top{position:sticky;top:0;z-index:40;background:rgba(27,28,30,.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .row{display:flex;align-items:center;gap:10px;padding:9px 0;flex-wrap:wrap}
+.mark{width:31px;height:31px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#e0922e);color:#1b1c1e;display:grid;place-items:center;font-weight:800;font-size:15px;flex:none}
+.nm{font-weight:800;font-size:14px}
+.code{font-size:10.5px;color:var(--accent2);background:var(--elev);border:1px solid var(--line);border-radius:999px;padding:2px 9px;font-weight:700}
+.tools{display:flex;gap:7px;margin-inline-start:auto;align-items:center;flex-wrap:wrap}
+.btn{font-family:inherit;font-size:12px;font-weight:700;padding:6px 11px;border-radius:9px;border:1px solid var(--line);background:var(--elev);color:var(--ink);cursor:pointer}
+.btn:hover{border-color:var(--accent)}.btn.pri{background:var(--accent);color:#1b1c1e;border-color:var(--accent)}
+.saved{font-size:11px;color:var(--good)}
+.mbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;background:var(--elev);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-top:14px;font-size:12.5px}
+.mbar b{color:var(--accent2)}
+select.ed{background:var(--elev);border:1px solid var(--line);border-radius:8px;color:var(--ink);font:inherit;font-size:12.5px;font-weight:700;padding:5px 9px}
+select.ed:focus{outline:none;border-color:var(--accent)}
+.hint{font-size:11px;color:var(--muted)}
+h1.t{font-size:clamp(19px,2.6vw,25px);font-weight:800;margin:18px 0 4px}
+.sub{color:var(--muted);font-size:12.5px;margin-bottom:16px}
+.health{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:18px 0 20px}
+.hc{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px 15px;border-top:2px solid var(--accent)}
+.hc .v{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.2}
+.hc .l{font-size:11px;color:var(--muted);margin-top:3px}
+.hc.g{border-top-color:var(--good)}.hc.g .v{color:var(--good)}
+.hc.a{border-top-color:var(--gold)}.hc.a .v{color:var(--gold)}
+.hc.r{border-top-color:var(--crit)}.hc.r .v{color:var(--crit)}
+.hc.s{border-top-color:var(--sky)}.hc.s .v{color:var(--sky)}
+.shead{display:flex;align-items:baseline;gap:12px;margin:28px 0 12px}
+.shead h2{font-size:17px;font-weight:800}.shead .rule{flex:1;height:1px;background:var(--line)}
+.kwrap{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel)}
+.khead,.krow{display:grid;grid-template-columns:1.7fr .9fr 1fr .9fr .8fr 1.5fr .5fr;gap:10px;padding:10px 14px;align-items:center}
+.khead{background:var(--elev);font-size:10px;font-weight:800;color:var(--muted);border-bottom:1px solid var(--line)}
+.krow{border-bottom:1px solid var(--line);font-size:12.5px}
+.krow:last-child{border-bottom:none}
+.krow:hover{background:rgba(255,255,255,.02)}
+.kn{display:flex;flex-direction:column;line-height:1.3;min-width:0}
+.kn b{font-size:13px;font-weight:800}
+.kn small{font-size:9.5px;color:var(--muted)}
+.edn{width:100%;background:var(--elev);border:1px solid var(--line);border-radius:8px;color:inherit;font:inherit;font-size:12.5px;font-variant-numeric:tabular-nums;padding:6px 8px;text-align:center;direction:ltr}
+.edn:focus{outline:none;border-color:var(--accent);background:rgba(241,138,43,.06)}
+.edn.empty{border-style:dashed}
+.gapv{font-weight:800;font-variant-numeric:tabular-nums;text-align:center}
+.gapv.g{color:var(--good)}.gapv.r{color:var(--crit)}.gapv.m{color:var(--muted)}
+.lamp{font-size:16px;text-align:center}
+.spark{height:24px;display:block;margin-top:3px}
+.prog{position:relative;height:19px;background:var(--elev);border-radius:5px;overflow:hidden}
+.prog i{position:absolute;top:0;bottom:0;right:0;border-radius:5px;background:linear-gradient(270deg,rgba(241,138,43,.7),rgba(241,138,43,.28))}
+.prog u{position:absolute;top:0;bottom:0;width:2px;background:var(--gold);text-decoration:none}
+.prog b{position:relative;font-size:10px;line-height:19px;padding:0 7px;font-variant-numeric:tabular-nums;white-space:nowrap}
+@media(max-width:1040px){
+ .khead{display:none}
+ .krow{grid-template-columns:1fr 1fr;gap:8px;padding:13px 14px}
+ .krow>*:nth-child(n+2)::before{content:attr(data-l);display:block;font-size:9px;color:var(--muted);font-weight:800;margin-bottom:3px}
+ .kn{grid-column:1/-1}
+}
+.ifilter{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:11px;align-items:center}
+.ilist{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:10px}
+.ini{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px 13px;border-inline-start:3px solid var(--muted)}
+.ini.done{border-inline-start-color:var(--good)}.ini.doing{border-inline-start-color:var(--sky)}
+.ini.late{border-inline-start-color:var(--crit)}
+.ini-t{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px}
+.ini-t b{font-size:12.5px;font-weight:800;flex:1;line-height:1.45}
+.qb{font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:999px;background:var(--elev);color:var(--accent2);flex:none}
+.ini-b{display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:8px;font-size:11px;color:var(--muted)}
+.ini-b .ow{flex:1;min-width:88px}
+.ini-b select{font-size:11px;padding:3px 7px}
+.ini-b .pin{width:52px;background:var(--elev);border:1px solid var(--line);border-radius:7px;color:inherit;font:inherit;font-size:11px;padding:3px 5px;text-align:center;direction:ltr}
+.ipro{height:5px;background:var(--elev);border-radius:3px;overflow:hidden;margin-top:8px}
+.ipro i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.note{background:var(--gold-bg);border:1px solid rgba(255,213,74,.3);border-radius:12px;padding:12px 16px;font-size:12px;color:var(--ink2);margin-top:18px;line-height:1.8}
+.note b{color:var(--gold)}
+.pagefoot{margin:40px 0 24px;color:var(--muted);font-size:11.5px;text-align:center;border-top:1px solid var(--line);padding-top:14px}
+.pagefoot a{color:var(--accent2);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="top"><div class="wrap row">
+ <div class="mark">د</div><div class="nm">نظام تتبّع الاستراتيجية</div><span class="code" id="stcode">—</span>
+ <span class="code" id="pill">—</span>
+ <div class="tools"><span class="saved" id="saved"></span>
+  <button class="btn" id="reset">↺ استرجاع</button>
+  <button class="btn pri" id="export">⬇️ تصدير tracking.json</button></div>
+</div></div>
+<div class="wrap">
+ <h1 class="t" id="title">—</h1>
+ <div class="sub" id="subtitle">—</div>
+ <div class="mbar">📅 <b>شهر التقرير:</b><select class="ed" id="msel"></select>
+  <span class="hint">المستهدف المرحلي يُحسب آلياً من الأساس إلى المستهدف عبر ١٢ شهراً — أدخل الفعلي فتتلوّن الحالة</span></div>
+
+ <div class="health" id="health"></div>
+
+ <div class="shead"><h2>📊 مؤشرات الأداء</h2><span class="rule"></span></div>
+ <div class="kwrap">
+  <div class="khead"><span>المؤشر</span><span>الأساس</span><span>المستهدف المرحلي</span><span>الفعلي</span><span>الفجوة</span><span>الإنجاز مقابل الزمن</span><span>الحالة</span></div>
+  <div id="krows"></div>
+ </div>
+
+ <div class="shead"><h2>🎯 المبادرات</h2><span class="rule"></span></div>
+ <div class="ifilter">
+  <select class="ed" id="qfil"><option value="all">كل الأرباع</option><option>الربع ١</option><option>الربع ٢</option><option>الربع ٣</option><option>الربع ٤</option></select>
+  <select class="ed" id="sfil"><option value="all">كل الحالات</option><option>لم تبدأ</option><option>جارية</option><option>منجزة</option><option>متعثّرة</option></select>
+  <span class="hint" id="icount"></span></div>
+ <div class="ilist" id="ilist"></div>
+
+ <div class="note"><b>الإيقاع والحوكمة:</b> يُدخل الفعلي شهرياً خلال أول خمسة أيام عمل · مراجعة شهرية لكل مؤشر أحمر مع الإدارة المالكة · مراجعة ربعية لخارطة الطريق مع مالك المنفذ · <b>التصعيد</b> عند بقاء مؤشر أحمر شهرين متتاليين أو تعثّر مبادرة في الربع.</div>
+ <div class="pagefoot">درب · القسم التجاري — نظام تتبّع استراتيجية العمرة الجديدة · <a href="../">الاستراتيجية</a> · <a href="../editor/">المحرّر</a></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const fmt=n=>Math.abs(n)>=1000?Math.round(n).toLocaleString('en-US'):(Math.round(n*100)/100).toLocaleString('en-US');
+const KEY='darb_tracking_mk007_v1';
+let T={},m=0,filt={q:'all',s:'all'};
+const ST=['لم تبدأ','جارية','منجزة','متعثّرة'];
+const opt=(a,v)=>a.map(o=>`<option${o===v?' selected':''}>${o}</option>`).join('');
+const has=v=>v!==null&&v!==undefined&&v!=='';
+// المستهدف المرحلي = الأساس + (المستهدف − الأساس) × (الشهر+1)/12
+const phased=(k,i)=>k.base+(k.target-k.base)*((i+1)/12);
+function status(k,i){
+ const a=k.actual[i];
+ if(!has(a))return{s:'n',lamp:'⚪'};
+ if(k.dir==='hold'){const d=Math.abs(+a-k.target);return d<=0.05*Math.max(1,Math.abs(k.target))?{s:'g',lamp:'🟢'}:{s:'r',lamp:'🔴'};}
+ if(k.target===k.base)return{s:'g',lamp:'🟢'};
+ const prog=(+a-k.base)/(k.target-k.base), need=(i+1)/12;
+ if(prog>=need*0.98)return{s:'g',lamp:'🟢'};
+ if(prog>=need*0.80)return{s:'a',lamp:'🟡'};
+ return{s:'r',lamp:'🔴'};
+}
+function sparkline(k){
+ const pts=k.actual.map((x,i)=>has(x)?[i,+x]:null).filter(Boolean);
+ if(pts.length<2)return '<svg class="spark" viewBox="0 0 120 24"></svg>';
+ const ys=pts.map(p=>p[1]).concat([k.base,k.target]);
+ const mx=Math.max(...ys),mn=Math.min(...ys),rg=(mx-mn)||1;
+ const X=i=>4+i/11*112, Y=y=>21-((y-mn)/rg)*18;
+ const d=pts.map((p,j)=>(j?'L':'M')+X(p[0]).toFixed(1)+' '+Y(p[1]).toFixed(1)).join(' ');
+ const ty=Y(k.target).toFixed(1), lp=pts[pts.length-1];
+ return `<svg class="spark" viewBox="0 0 120 24"><line x1="4" y1="${ty}" x2="116" y2="${ty}" stroke="#3fb27f" stroke-width="1" stroke-dasharray="3 3" opacity=".7"/><path d="${d}" fill="none" stroke="#f18a2b" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${X(lp[0]).toFixed(1)}" cy="${Y(lp[1]).toFixed(1)}" r="2.6" fill="#f7a94e"/></svg>`;
+}
+function build(){
+ $('stcode').textContent=T.meta.code+' · '+T.meta.name;
+ $('title').textContent='تتبّع الاستراتيجية — '+T.meta.name;
+ $('subtitle').textContent=T.meta.cycle+' · '+T.meta.note;
+ $('msel').innerHTML=T.meta.months.map((x,i)=>`<option value="${i}"${i===m?' selected':''}>${x} — الشهر ${i+1}</option>`).join('');
+ $('krows').innerHTML=T.kpis.map((k,ki)=>{
+  const p=phased(k,m),a=k.actual[m],st=status(k,m),h=has(a);
+  const gap=h?(+a-p):null;
+  const goodGap=k.dir==='down'?(gap<=0):(gap>=0);
+  const prog=(k.target!==k.base&&h)?((+a-k.base)/(k.target-k.base)):0;
+  const need=(m+1)/12;
+  return `<div class="krow">
+   <span class="kn"><b>${k.name}</b><small>${k.owner} · ${k.src} · ${k.unit}</small></span>
+   <span class="tnum" data-l="الأساس" style="text-align:center;color:var(--muted)">${fmt(k.base)}</span>
+   <span class="tnum" data-l="المستهدف المرحلي" style="text-align:center;color:var(--gold);font-weight:700">${fmt(p)}</span>
+   <span data-l="الفعلي"><input class="edn${h?'':' empty'}" type="number" step="any" data-k="${ki}" placeholder="أدخل" value="${h?a:''}"></span>
+   <span class="gapv ${h?(goodGap?'g':'r'):'m'}" data-l="الفجوة">${h?((gap>=0?'+':'')+fmt(gap)):'—'}</span>
+   <span data-l="الإنجاز مقابل الزمن"><span class="prog"><i style="width:${Math.max(0,Math.min(100,prog*100)).toFixed(1)}%"></i><u style="right:${(need*100).toFixed(1)}%"></u><b>${(prog*100).toFixed(0)}٪ · الزمن ${(need*100).toFixed(0)}٪</b></span>${sparkline(k)}</span>
+   <span class="lamp" data-l="الحالة">${st.lamp}</span>
+  </div>`;}).join('');
+ const items=T.initiatives.map((x,i)=>({x,i})).filter(({x})=>(filt.q==='all'||x.q===filt.q)&&(filt.s==='all'||x.st===filt.s));
+ $('icount').textContent=`عرض ${items.length} من ${T.initiatives.length}`;
+ $('ilist').innerHTML=items.map(({x,i})=>{
+  const cls=x.st==='منجزة'?'done':x.st==='جارية'?'doing':x.st==='متعثّرة'?'late':'';
+  return `<div class="ini ${cls}"><div class="ini-t"><b>${x.t}</b><span class="qb">${x.q}</span></div>
+   <div class="ini-b"><span class="ow">${x.o}</span>
+    <select class="ed" data-ist="${i}">${opt(ST,x.st)}</select>
+    <input class="pin" type="number" min="0" max="100" data-ip="${i}" value="${x.p}"><span>٪</span></div>
+   <div class="ipro"><i style="width:${Math.max(0,Math.min(100,+x.p||0))}%"></i></div></div>`;}).join('');
+ health();save();
+}
+function health(){
+ let g=0,a=0,r=0,n=0;
+ T.kpis.forEach(k=>{const s=status(k,m).s;if(s==='g')g++;else if(s==='a')a++;else if(s==='r')r++;else n++;});
+ const done=T.initiatives.filter(x=>x.st==='منجزة').length;
+ const late=T.initiatives.filter(x=>x.st==='متعثّرة').length;
+ const avg=T.initiatives.reduce((s,x)=>s+(+x.p||0),0)/(T.initiatives.length||1);
+ $('health').innerHTML=`
+  <div class="hc g"><div class="v">${g}</div><div class="l">🟢 على المسار</div></div>
+  <div class="hc a"><div class="v">${a}</div><div class="l">🟡 تحتاج متابعة</div></div>
+  <div class="hc r"><div class="v">${r}</div><div class="l">🔴 خارج المسار</div></div>
+  <div class="hc"><div class="v">${n}</div><div class="l">⚪ بانتظار الإدخال</div></div>
+  <div class="hc s"><div class="v">${done}/${T.initiatives.length}</div><div class="l">مبادرات منجزة</div></div>
+  <div class="hc"><div class="v">${Math.round(avg)}٪</div><div class="l">متوسط إنجاز المبادرات</div></div>`;
+ const tot=g+a+r; const p=$('pill');
+ if(tot===0){p.textContent='بانتظار إدخال الفعلي';p.style.color='var(--muted)';}
+ else if(r>0){p.textContent=`🔴 ${r} مؤشر خارج المسار`;p.style.color='var(--crit)';}
+ else if(a>0){p.textContent=`🟡 ${a} مؤشر يحتاج متابعة`;p.style.color='var(--gold)';}
+ else{p.textContent='🟢 كل المؤشرات على المسار';p.style.color='var(--good)';}
+ if(late>0)p.textContent+=` · ${late} مبادرة متعثّرة`;
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(T));$('saved').textContent='✓ محفوظ';setTimeout(()=>{$('saved').textContent='';},900);}catch(e){}}
+document.addEventListener('input',e=>{const el=e.target;
+ if(el.dataset.k!==undefined){const v=el.value;T.kpis[+el.dataset.k].actual[m]=(v===''?null:parseFloat(v));health();save();
+  const row=el.closest('.krow');const k=T.kpis[+el.dataset.k],p=phased(k,m),st=status(k,m),h=has(k.actual[m]);
+  const gap=h?(k.actual[m]-p):null,goodGap=k.dir==='down'?(gap<=0):(gap>=0);
+  const prog=(k.target!==k.base&&h)?((k.actual[m]-k.base)/(k.target-k.base)):0,need=(m+1)/12;
+  row.querySelector('.gapv').className='gapv '+(h?(goodGap?'g':'r'):'m');
+  row.querySelector('.gapv').textContent=h?((gap>=0?'+':'')+fmt(gap)):'—';
+  row.querySelector('.lamp').textContent=st.lamp;
+  row.querySelector('.prog i').style.width=Math.max(0,Math.min(100,prog*100)).toFixed(1)+'%';
+  row.querySelector('.prog b').textContent=`${(prog*100).toFixed(0)}٪ · الزمن ${(need*100).toFixed(0)}٪`;
+  const sv=row.querySelector('.spark');if(sv)sv.outerHTML=sparkline(k);
+  el.classList.toggle('empty',!h);return;}
+ if(el.dataset.ip!==undefined){T.initiatives[+el.dataset.ip].p=parseFloat(el.value)||0;
+  el.closest('.ini').querySelector('.ipro i').style.width=Math.max(0,Math.min(100,+el.value||0))+'%';health();save();return;}});
+document.addEventListener('change',e=>{const el=e.target;
+ if(el.id==='msel'){m=+el.value;build();return;}
+ if(el.id==='qfil'){filt.q=el.value;build();return;}
+ if(el.id==='sfil'){filt.s=el.value;build();return;}
+ if(el.dataset.ist!==undefined){T.initiatives[+el.dataset.ist].st=el.value;build();return;}});
+$('export').onclick=()=>{const b=new Blob([JSON.stringify(T,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='tracking.json';a.click();};
+$('reset').onclick=()=>{if(confirm('استرجاع البيانات الأصلية؟ ستُفقد الإدخالات المحفوظة.')){localStorage.removeItem(KEY);location.reload();}};
+function start(o){T=o;m=0;build();}
+let ok=false;const c=localStorage.getItem(KEY);
+if(c){try{const j=JSON.parse(c);if(j&&j.kpis&&j.initiatives){start(j);ok=true;}}catch(e){}}
+if(!ok)fetch('./tracking.json?_='+Date.now()).then(r=>r.json()).then(start).catch(()=>{document.querySelector('.wrap').insertAdjacentHTML('afterbegin','<p style="padding:24px;text-align:center;color:var(--muted)">تعذّر تحميل tracking.json</p>');});
+</script>
+</body>
+</html>
