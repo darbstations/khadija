@@ -290,6 +290,31 @@ for dname,key,records in K.DEPARTMENTS:
     ws.freeze_panes="A4"
     DEPT_RANGES.append((dname,safe_title(dname),start,end))
 
+# ============ أهم المؤشرات (Top 5 لكل إدارة) — لوحة المتابعة التنفيذية (قيَم حيّة) ============
+top=wb.create_sheet("أهم المؤشرات (Top 5)"); rtl(top)
+for i,w in enumerate([4,48,18,12,13,14,8],1): top.column_dimensions[get_column_letter(i)].width=w
+top.merge_cells("A1:G1"); C(top,1,1,"أهم 5 مؤشرات رئيسية لكل إدارة — لوحة المتابعة التنفيذية (قيَم حيّة مرتبطة بأوراق الإدارات)",f=F_(13,True,WHITE),fillc=NAVY,al="center",border=False); top.row_dimensions[1].height=26
+for c,h in enumerate(["#","المؤشر","المستهدف","المُحقَّق","نسبة التحقيق","الحالة","الوزن"],1): C(top,2,c,h,f=F_(9,True,WHITE),fillc=BLUE,al="center")
+top.row_dimensions[2].height=24
+tr=3
+for (dname,key,records),(dn2,sh,start,end) in zip(K.DEPARTMENTS,DEPT_RANGES):
+    weights=round_weights_pct(K.kpi_weights(records))
+    idx=sorted(range(len(records)),key=lambda i:(weights[i], -i),reverse=True)[:5]  # أعلى 5 وزناً
+    dw=int(round(K.DEPT_WEIGHTS.get(key,0)*100))
+    top.merge_cells(f"A{tr}:G{tr}")
+    C(top,tr,1,f"▾ {dname} · وزن الإدارة {dw}%",f=F_(10,True,WHITE),fillc=ORANGE,al="right"); top.row_dimensions[tr].height=22; tr+=1
+    for n,i in enumerate(idx,1):
+        r=start+i
+        C(top,tr,1,n,f=F_(9,True),al="center")
+        top.cell(tr,2).value=f"='{sh}'!C{r}"; C(top,tr,2,f=F_(9),al="right",wrap=True)
+        top.cell(tr,3).value=f"='{sh}'!I{r}"; C(top,tr,3,f=F_(8,color="666666"),al="center",wrap=True)
+        top.cell(tr,4).value=f"='{sh}'!M{r}"; C(top,tr,4,f=F_(9),al="center")
+        top.cell(tr,5).value=f"='{sh}'!N{r}"; C(top,tr,5,f=F_(9,True,NAVY),fmt="0%",al="center")
+        top.cell(tr,6).value=f"='{sh}'!O{r}"; C(top,tr,6,f=F_(9,True),al="center")
+        top.cell(tr,7).value=f"='{sh}'!G{r}"; C(top,tr,7,f=F_(8),fmt="0%",al="center")
+        top.row_dimensions[tr].height=22; tr+=1
+top.freeze_panes="A3"
+
 # ============ قاعدة المؤشرات (تجميع — للوحة والاستراتيجية) ============
 cons=wb.create_sheet("قاعدة المؤشرات"); rtl(cons)
 for i,w in enumerate([4,20,42,16,24,16,12,14,10],1): cons.column_dimensions[get_column_letter(i)].width=w
@@ -751,7 +776,7 @@ for dname,key,records in K.DEPARTMENTS:
 mt.freeze_panes="H4"; mt.auto_filter.ref=f"A3:{last}{mr-1}"
 
 # ترتيب الأوراق
-order=["تقرير المجلس","الاستراتيجية والمستهدفات","الخريطة الاستراتيجية","اللوحة الموجزة","تحليل الانحراف","التتبّع الشهري","سجل المخاطر","ESG والاستدامة","مراجعة وحوكمة المؤشرات","بطاقة تعريف المؤشرات"]+[sh for _,sh,_,_ in DEPT_RANGES]+["سجل المشاريع","قاعدة المؤشرات"]
+order=["تقرير المجلس","أهم المؤشرات (Top 5)","الاستراتيجية والمستهدفات","الخريطة الاستراتيجية","اللوحة الموجزة","تحليل الانحراف","التتبّع الشهري","سجل المخاطر","ESG والاستدامة","مراجعة وحوكمة المؤشرات","بطاقة تعريف المؤشرات"]+[sh for _,sh,_,_ in DEPT_RANGES]+["سجل المشاريع","قاعدة المؤشرات"]
 wb._sheets.sort(key=lambda s: order.index(s.title) if s.title in order else 99)
 for s in wb.worksheets: rtl(s)
 cons.sheet_state="hidden"
