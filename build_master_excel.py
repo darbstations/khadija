@@ -326,7 +326,7 @@ top.freeze_panes="A3"
 # ============ قاعدة المؤشرات (تجميع — للوحة والاستراتيجية) ============
 cons=wb.create_sheet("قاعدة المؤشرات"); rtl(cons)
 for i,w in enumerate([4,20,42,16,24,16,12,14,10],1): cons.column_dimensions[get_column_letter(i)].width=w
-for c,h in enumerate(["#","الإدارة","المؤشر","الركيزة","المشروع","منظور BSC","نسبة التحقيق","الحالة","الوزن","و×ن","الوزن المتاح"],1):
+for c,h in enumerate(["#","الإدارة","المؤشر","الركيزة","المشروع","منظور BSC","نسبة التحقيق","الحالة","الوزن","و×ن","الوزن المتاح","المحور"],1):
     C(cons,1,c,h,f=F_(9,True,WHITE),fillc=BLUE,al="center")
 cr=2; seq=1
 for dname,sh,s,e in DEPT_RANGES:
@@ -343,12 +343,40 @@ for dname,sh,s,e in DEPT_RANGES:
         # أعمدة الترجيح: و×ن = الوزن×التحقيق (للمؤشرات المُعبّأة فقط) · الوزن المتاح = الوزن إن وُجد رقم
         C(cons,cr,10,f'=IF($G{cr}="",0,$G{cr}*$I{cr})',f=F_(8),al="center")
         C(cons,cr,11,f'=IF($G{cr}="",0,$I{cr})',f=F_(8),al="center")
+        C(cons,cr,12,f"='{sh}'!B{rr}",f=F_(8),al="right")  # المحور (لحساب المؤشر الجامع)
         cr+=1; seq+=1
 CE=cr-1
 ACH=f"'قاعدة المؤشرات'!$G$2:$G${CE}"; DEPC=f"'قاعدة المؤشرات'!$B$2:$B${CE}"
 PILC=f"'قاعدة المؤشرات'!$D$2:$D${CE}"; PROJC=f"'قاعدة المؤشرات'!$E$2:$E${CE}"
 PERC=f"'قاعدة المؤشرات'!$F$2:$F${CE}"; STC=f"'قاعدة المؤشرات'!$H$2:$H${CE}"
 WXN=f"'قاعدة المؤشرات'!$J$2:$J${CE}"; WAV=f"'قاعدة المؤشرات'!$K$2:$K${CE}"  # و×ن · الوزن المتاح
+AXISC=f"'قاعدة المؤشرات'!$L$2:$L${CE}"  # المحور
+
+# ============ المؤشرات الجامعة (متوسط موزون حيّ لكل محور — الخيار (أ): ورقة مستقلة) ============
+aggw=wb.create_sheet("المؤشرات الجامعة"); rtl(aggw)
+for i,w in enumerate([4,20,32,10,13,15,46],1): aggw.column_dimensions[get_column_letter(i)].width=w
+aggw.merge_cells("A1:G1"); C(aggw,1,1,"المؤشرات الجامعة — مؤشر واحد لكل محور (متوسط موزون حيّ من مؤشراته التفصيلية · لا يُحسب في الإجمالي)",f=F_(13,True,WHITE),fillc=NAVY,al="center",border=False); aggw.row_dimensions[1].height=26
+for c,h in enumerate(["#","الإدارة","المحور (مؤشر جامع)","عدد المؤشرات","نسبة التحقيق (موزون)","الحالة","المؤشرات التفصيلية المشمولة"],1): C(aggw,2,c,h,f=F_(9,True,WHITE),fillc=BLUE,al="center")
+aggw.row_dimensions[2].height=28
+gr_=3; gseq=1; _cur=None
+for dname,key,records in K.DEPARTMENTS:
+    axes=[]
+    for rec in records:
+        if rec[0] and rec[0] not in axes: axes.append(rec[0])
+    for ax in axes:
+        subs=[rec[1] for rec in records if rec[0]==ax and rec[1]]
+        C(aggw,gr_,1,gseq,f=F_(8),al="center")
+        C(aggw,gr_,2,dname,f=F_(8),al="right")
+        C(aggw,gr_,3,ax,f=F_(9,True,NAVY),al="right",wrap=True)
+        C(aggw,gr_,4,len(subs),f=F_(8),al="center")
+        aggw.cell(gr_,5).value=(f'=IFERROR(SUMIFS({WXN},{DEPC},"{dname}",{AXISC},"{ax}")/'
+                                f'SUMIFS({WAV},{DEPC},"{dname}",{AXISC},"{ax}"),"")')
+        C(aggw,gr_,5,f=F_(10,True,ORANGE),fmt="0%",al="center")
+        aggw.cell(gr_,6).value=f'=IF($E{gr_}="","⏳ بانتظار هدف",IF($E{gr_}>=1,"✅ محقق",IF($E{gr_}>=0.85,"🟡 قريب","🔴 تحت الهدف")))'
+        C(aggw,gr_,6,f=F_(9,True),al="center")
+        C(aggw,gr_,7," · ".join(subs),f=F_(8,color="666666"),al="right",wrap=True)
+        aggw.row_dimensions[gr_].height=26; gr_+=1; gseq+=1
+aggw.freeze_panes="A3"; aggw.auto_filter.ref=f"A2:G{gr_-1}"
 
 # ============ الاستراتيجية والمستهدفات ============
 ws=wb.create_sheet("الاستراتيجية والمستهدفات"); rtl(ws)
@@ -784,7 +812,7 @@ for dname,key,records in K.DEPARTMENTS:
 mt.freeze_panes="H4"; mt.auto_filter.ref=f"A3:{last}{mr-1}"
 
 # ترتيب الأوراق
-order=["تقرير المجلس","أهم المؤشرات (Top 5)","الاستراتيجية والمستهدفات","الخريطة الاستراتيجية","اللوحة الموجزة","تحليل الانحراف","التتبّع الشهري","سجل المخاطر","ESG والاستدامة","مراجعة وحوكمة المؤشرات","بطاقة تعريف المؤشرات"]+[sh for _,sh,_,_ in DEPT_RANGES]+["سجل المشاريع","قاعدة المؤشرات"]
+order=["تقرير المجلس","أهم المؤشرات (Top 5)","المؤشرات الجامعة","الاستراتيجية والمستهدفات","الخريطة الاستراتيجية","اللوحة الموجزة","تحليل الانحراف","التتبّع الشهري","سجل المخاطر","ESG والاستدامة","مراجعة وحوكمة المؤشرات","بطاقة تعريف المؤشرات"]+[sh for _,sh,_,_ in DEPT_RANGES]+["سجل المشاريع","قاعدة المؤشرات"]
 wb._sheets.sort(key=lambda s: order.index(s.title) if s.title in order else 99)
 for s in wb.worksheets: rtl(s)
 cons.sheet_state="hidden"
