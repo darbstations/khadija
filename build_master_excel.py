@@ -259,20 +259,27 @@ for dname,key,records in K.DEPARTMENTS:
     for i,(axis,nm,unit,pol,agg,tgt,ttxt,fmt,pillar,project) in enumerate(records):
         r=start+i
         C(ws,r,1,i+1,f=F_(9,True),al="center")
-        C(ws,r,2,axis,f=F_(9),al="right",wrap=True)
-        C(ws,r,3,nm,f=F_(9),al="right",wrap=True)
-        C(ws,r,4,unit,al="center")
-        C(ws,r,5,pol,al="center")
-        C(ws,r,6,prio_label(nm),f=F_(8),al="center")
-        C(ws,r,7,weights[i],fmt="0%",al="center")
-        C(ws,r,8,tgt if tgt is not None else "",fmt=FMT[fmt] if tgt is not None else None,al="center")
-        C(ws,r,9,ttxt,f=F_(8,color="666666"),al="center",wrap=True)
-        C(ws,r,10,pillar,f=F_(9,color=ORANGE),al="center")
-        C(ws,r,11,project,f=F_(8),al="right",wrap=True)
-        C(ws,r,12,K.perspective(nm),f=F_(8),al="center")
-        ach_v=eff_actual(nm,pol,tgt)
-        C(ws,r,13,ach_v if ach_v is not None else None,fillc=GREEN_IN,fmt=FMT[fmt],al="center",lock=False)
-        dv.add(ws.cell(r,13))
+        blank = not (nm and str(nm).strip())   # صف قالب فارغ للإدخال اليدوي
+        if blank:
+            for c in (2,3,16,17): C(ws,r,c,None,fillc=GREEN_IN,al="right",lock=False,wrap=True)
+            for c in (4,5,6,7,8,9,10,11,12,18): C(ws,r,c,None,fillc=GREEN_IN,al="center",lock=False)
+            C(ws,r,7,None,fillc=GREEN_IN,fmt="0%",al="center",lock=False)
+            C(ws,r,13,None,fillc=GREEN_IN,al="center",lock=False); dv.add(ws.cell(r,13))
+        else:
+            C(ws,r,2,axis,f=F_(9),al="right",wrap=True)
+            C(ws,r,3,nm,f=F_(9),al="right",wrap=True)
+            C(ws,r,4,unit,al="center")
+            C(ws,r,5,pol,al="center")
+            C(ws,r,6,prio_label(nm),f=F_(8),al="center")
+            C(ws,r,7,weights[i],fmt="0%",al="center")
+            C(ws,r,8,tgt if tgt is not None else "",fmt=FMT[fmt] if tgt is not None else None,al="center")
+            C(ws,r,9,ttxt,f=F_(8,color="666666"),al="center",wrap=True)
+            C(ws,r,10,pillar,f=F_(9,color=ORANGE),al="center")
+            C(ws,r,11,project,f=F_(8),al="right",wrap=True)
+            C(ws,r,12,K.perspective(nm),f=F_(8),al="center")
+            ach_v=eff_actual(nm,pol,tgt)
+            C(ws,r,13,ach_v if ach_v is not None else None,fillc=GREEN_IN,fmt=FMT[fmt],al="center",lock=False)
+            dv.add(ws.cell(r,13))
         # نسبة التحقيق — مع سقف 100% (MIN) لمنع تضخّم المتوسط
         ws.cell(r,14).value=(f'=IF($H{r}="","",IF($M{r}="","",MIN(1,IF($H{r}=0,IF($M{r}<=0,1,0),'
             f'IF($E{r}="↓",IFERROR($H{r}/$M{r},0),IFERROR($M{r}/$H{r},0))))))')
@@ -280,10 +287,11 @@ for dname,key,records in K.DEPARTMENTS:
         _gr,_yl=thresholds(nm)   # حدود تنبيه مخصّصة لكل مؤشر
         ws.cell(r,15).value=f'=IF($N{r}="","⏳ بانتظار هدف",IF($N{r}>={_gr},"✅ محقق",IF($N{r}>={_yl},"🟡 قريب","🔴 تحت الهدف")))'
         C(ws,r,15,f=F_(9,True),al="center")
-        desc=DESC_OVERRIDE.get(nm) or MAINT_METHODS.get(nm) or measure_method(nm,unit,pol,fmt,agg)   # وصف/طريقة قياس تفصيلية لكل مؤشر
-        C(ws,r,16,desc,f=F_(8,color="555555"),al="right",wrap=True)
-        C(ws,r,17,kpi_source(nm,axis,key),f=F_(8,color="555555"),al="right",wrap=True)  # مصدر البيانات
-        C(ws,r,18,kpi_freq(nm,ttxt),f=F_(8),al="center")  # دورية القياس
+        if not blank:
+            desc=DESC_OVERRIDE.get(nm) or MAINT_METHODS.get(nm) or measure_method(nm,unit,pol,fmt,agg)   # وصف/طريقة قياس تفصيلية لكل مؤشر
+            C(ws,r,16,desc,f=F_(8,color="555555"),al="right",wrap=True)
+            C(ws,r,17,kpi_source(nm,axis,key),f=F_(8,color="555555"),al="right",wrap=True)  # مصدر البيانات
+            C(ws,r,18,kpi_freq(nm,ttxt),f=F_(8),al="center")  # دورية القياس
         ws.row_dimensions[r].height=26
     end=start+len(records)-1
     ws.auto_filter.ref=f"A3:{last}{end}"
