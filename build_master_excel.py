@@ -370,11 +370,11 @@ AXISC=f"'قاعدة المؤشرات'!$L$2:$L${CE}"  # المحور
 
 # ============ المؤشرات الجامعة (متوسط موزون حيّ لكل محور — الخيار (أ): ورقة مستقلة) ============
 aggw=wb.create_sheet("المؤشرات الجامعة"); rtl(aggw)
-for i,w in enumerate([4,20,32,10,13,15,46],1): aggw.column_dimensions[get_column_letter(i)].width=w
-aggw.merge_cells("A1:G1"); C(aggw,1,1,"المؤشرات الجامعة — مؤشر واحد لكل محور (متوسط موزون حيّ من مؤشراته التفصيلية · لا يُحسب في الإجمالي)",f=F_(13,True,WHITE),fillc=NAVY,al="center",border=False); aggw.row_dimensions[1].height=26
-for c,h in enumerate(["#","الإدارة","المحور (مؤشر جامع)","عدد المؤشرات","نسبة التحقيق (موزون)","الحالة","المؤشرات التفصيلية المشمولة"],1): C(aggw,2,c,h,f=F_(9,True,WHITE),fillc=BLUE,al="center")
-aggw.row_dimensions[2].height=28
-gr_=3; gseq=1; _cur=None
+for i,w in enumerate([4,19,30,9,13,13,13,11,42],1): aggw.column_dimensions[get_column_letter(i)].width=w
+aggw.merge_cells("A1:I1"); C(aggw,1,1,"المؤشرات الجامعة — مؤشر واحد لكل محور (متوسط موزون حيّ) + كشف الأضعف لمنع خداع المتوسطات · لا يُحسب في الإجمالي",f=F_(12,True,WHITE),fillc=NAVY,al="center",border=False); aggw.row_dimensions[1].height=26
+for c,h in enumerate(["#","الإدارة","المحور (مؤشر جامع)","عدد المؤشرات","نسبة التحقيق (موزون)","الحالة","أدنى نسبة تفصيلية","عدد تحت الهدف","المؤشرات التفصيلية المشمولة"],1): C(aggw,2,c,h,f=F_(8,True,WHITE),fillc=BLUE,al="center")
+aggw.row_dimensions[2].height=30
+gr_=3; gseq=1
 for dname,key,records in K.DEPARTMENTS:
     axes=[]
     for rec in records:
@@ -390,9 +390,14 @@ for dname,key,records in K.DEPARTMENTS:
         C(aggw,gr_,5,f=F_(10,True,ORANGE),fmt="0%",al="center")
         aggw.cell(gr_,6).value=f'=IF($E{gr_}="","⏳ بانتظار هدف",IF($E{gr_}>=1,"✅ محقق",IF($E{gr_}>=0.85,"🟡 قريب","🔴 تحت الهدف")))'
         C(aggw,gr_,6,f=F_(9,True),al="center")
-        C(aggw,gr_,7," · ".join(subs),f=F_(8,color="666666"),al="right",wrap=True)
+        # كشف الأضعف: أدنى نسبة تفصيلية + عدد المؤشرات تحت الهدف (يمنع إخفاء المتوسط للضعف)
+        aggw.cell(gr_,7).value=f'=IF($E{gr_}="","",MINIFS({ACH},{DEPC},"{dname}",{AXISC},"{ax}"))'
+        C(aggw,gr_,7,f=F_(9,True,RED),fmt="0%",al="center")
+        aggw.cell(gr_,8).value=f'=COUNTIFS({STC},"🔴 تحت الهدف",{DEPC},"{dname}",{AXISC},"{ax}")'
+        C(aggw,gr_,8,f=F_(9,True,RED),al="center")
+        C(aggw,gr_,9," · ".join(subs),f=F_(8,color="666666"),al="right",wrap=True)
         aggw.row_dimensions[gr_].height=26; gr_+=1; gseq+=1
-aggw.freeze_panes="A3"; aggw.auto_filter.ref=f"A2:G{gr_-1}"
+aggw.freeze_panes="A3"; aggw.auto_filter.ref=f"A2:I{gr_-1}"
 
 # ============ الاستراتيجية والمستهدفات ============
 ws=wb.create_sheet("الاستراتيجية والمستهدفات"); rtl(ws)
