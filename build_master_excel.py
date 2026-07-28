@@ -244,7 +244,8 @@ def logo(ws,anchor="B1",w=150):
 # أعمدة: A# B محور C مؤشر D وحدة E قطبية F أولوية G وزن% H مستهدف I نص المستهدف J ركيزة K مشروع L منظور M المُحقَّق N نسبة التحقيق O الحالة
 HEAD=["#","المحور","المؤشر","الوحدة","القطبية","الأولوية","الوزن %","المستهدف","نص المستهدف","الركيزة","المشروع","منظور BSC","المُحقَّق","نسبة التحقيق","الحالة","الوصف / طريقة القياس","مصدر البيانات","دورية القياس"]
 WID=[4,16,40,9,7,12,8,12,16,12,22,15,12,12,14,48,24,11]
-DEPT_RANGES=[]
+DEPT_RANGES=[]; ROWMAP={}; DEPT_DETAILS={}
+INLINE_AGG=bool(os.environ.get("INLINE_AGG"))   # الخيار (ب): إدراج المؤشر الجامع داخل أوراق الإدارات
 def safe_title(name): return name[:31]
 for dname,key,records in K.DEPARTMENTS:
     ws=wb.create_sheet(safe_title(dname)); rtl(ws)
@@ -256,8 +257,22 @@ for dname,key,records in K.DEPARTMENTS:
     ws.row_dimensions[3].height=28
     dv=DataValidation(type="decimal",operator="greaterThanOrEqual",formula1="0",allow_blank=True); ws.add_data_validation(dv)
     weights=round_weights_pct(K.kpi_weights(records)); start=4
+    ROWMAP[safe_title(dname)]={}; DEPT_DETAILS[safe_title(dname)]=[]
+    r=start; seen_axes=set()
+    def _agg_formula(dn,ax):
+        JJ="'قاعدة المؤشرات'!$J:$J"; KK="'قاعدة المؤشرات'!$K:$K"; BB="'قاعدة المؤشرات'!$B:$B"; LL="'قاعدة المؤشرات'!$L:$L"
+        return f'=IFERROR(SUMIFS({JJ},{BB},"{dn}",{LL},"{ax}")/SUMIFS({KK},{BB},"{dn}",{LL},"{ax}"),"")'
     for i,(axis,nm,unit,pol,agg,tgt,ttxt,fmt,pillar,project) in enumerate(records):
-        r=start+i
+        # الخيار (ب): إدراج صف «جامع» عند أول ظهور لكل محور
+        if INLINE_AGG and axis and axis not in seen_axes:
+            seen_axes.add(axis); n=sum(1 for rr in records if rr[0]==axis and rr[1])
+            C(ws,r,2,axis,f=F_(9,True,WHITE),fillc=STEEL,al="right",wrap=True)
+            C(ws,r,3,f"🔷 جامع: {axis} ({n})",f=F_(9,True,WHITE),fillc=STEEL,al="right",wrap=True)
+            for c in (1,4,5,6,7,8,9,10,11,12,13,16,17,18): C(ws,r,c,None,fillc=STEEL)
+            ws.cell(r,14).value=_agg_formula(dname,axis); C(ws,r,14,f=F_(9,True,WHITE),fillc=STEEL,fmt="0%",al="center")
+            ws.cell(r,15).value=f'=IF($N{r}="","🔷 —",IF($N{r}>=1,"🔷 ✅",IF($N{r}>=0.85,"🔷 🟡","🔷 🔴")))'
+            C(ws,r,15,f=F_(9,True,WHITE),fillc=STEEL,al="center"); ws.row_dimensions[r].height=22; r+=1
+        ROWMAP[safe_title(dname)][i]=r; DEPT_DETAILS[safe_title(dname)].append(r)
         C(ws,r,1,i+1,f=F_(9,True),al="center")
         blank = not (nm and str(nm).strip())   # صف قالب فارغ للإدخال اليدوي
         if blank:
@@ -293,7 +308,8 @@ for dname,key,records in K.DEPARTMENTS:
             C(ws,r,17,kpi_source(nm,axis,key),f=F_(8,color="555555"),al="right",wrap=True)  # مصدر البيانات
             C(ws,r,18,kpi_freq(nm,ttxt),f=F_(8),al="center")  # دورية القياس
         ws.row_dimensions[r].height=26
-    end=start+len(records)-1
+        r+=1
+    end=r-1
     ws.auto_filter.ref=f"A3:{last}{end}"
     ws.freeze_panes="A4"
     DEPT_RANGES.append((dname,safe_title(dname),start,end))
@@ -312,7 +328,7 @@ for (dname,key,records),(dn2,sh,start,end) in zip(K.DEPARTMENTS,DEPT_RANGES):
     top.merge_cells(f"A{tr}:G{tr}")
     C(top,tr,1,f"▾ {dname} · وزن الإدارة {dw}%",f=F_(10,True,WHITE),fillc=ORANGE,al="right"); top.row_dimensions[tr].height=22; tr+=1
     for n,i in enumerate(idx,1):
-        r=start+i
+        r=ROWMAP[sh][i]
         C(top,tr,1,n,f=F_(9,True),al="center")
         top.cell(tr,2).value=f"='{sh}'!C{r}"; C(top,tr,2,f=F_(9),al="right",wrap=True)
         top.cell(tr,3).value=f"='{sh}'!I{r}"; C(top,tr,3,f=F_(8,color="666666"),al="center",wrap=True)
@@ -330,7 +346,7 @@ for c,h in enumerate(["#","الإدارة","المؤشر","الركيزة","ال
     C(cons,1,c,h,f=F_(9,True,WHITE),fillc=BLUE,al="center")
 cr=2; seq=1
 for dname,sh,s,e in DEPT_RANGES:
-    for rr in range(s,e+1):
+    for rr in DEPT_DETAILS[sh]:   # الصفوف التفصيلية فقط (تُستبعد صفوف الجامع لمنع المرجع الدائري)
         C(cons,cr,1,seq,f=F_(8),al="center")
         C(cons,cr,2,dname,f=F_(8),al="right")
         C(cons,cr,3,f"='{sh}'!C{rr}",f=F_(8),al="right")
