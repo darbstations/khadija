@@ -249,10 +249,11 @@ INLINE_AGG = os.environ.get("FLAT")!="1"   # افتراضياً: مؤشر أسا
 # أسماء المؤشرات الأساسية (الجامعة) لكل محور متعدد المؤشرات — واضحة وقابلة للقياس
 AXIS_PARENT={
  ("operations","الربحية"):"نمو مبيعات الوقود",
- ("operations","حماية الإيراد"):"جاهزية وتوفّر المحطة",
- ("operations","تجربة العميل"):"مؤشر تجربة العميل العام",
+ ("operations","تجربة العميل"):"تجربة العميل العام",
 }
+AXIS_NO_PARENT={("operations","حماية الإيراد")}   # محاور تبقى فرعياتها مستقلة بلا مؤشر أساسي
 def parent_name(key,axis): return AXIS_PARENT.get((key,axis), f"مؤشر {axis} العام")
+def has_parent(key,axis,cnt): return cnt>1 and (key,axis) not in AXIS_NO_PARENT
 def safe_title(name): return name[:31]
 for dname,key,records in K.DEPARTMENTS:
     ws=wb.create_sheet(safe_title(dname)); rtl(ws)
@@ -275,7 +276,7 @@ for dname,key,records in K.DEPARTMENTS:
         return f'=IFERROR(SUMIFS({JJ},{BB},"{dn}",{LL},"{ax}")/SUMIFS({KK},{BB},"{dn}",{LL},"{ax}"),"")'
     for i,(axis,nm,unit,pol,agg,tgt,ttxt,fmt,pillar,project) in enumerate(records):
         # مؤشر أساسي لكل محور متعدد المؤشرات (له وزن = مجموع أوزان فرعياته · قيمته = متوسط موزون)
-        if INLINE_AGG and axis and axis not in seen_axes and axis_cnt.get(axis,0)>1:
+        if INLINE_AGG and axis and axis not in seen_axes and has_parent(key,axis,axis_cnt.get(axis,0)):
             seen_axes.add(axis)
             aw=sum(weights[j] for j,rr in enumerate(records) if rr[0]==axis and rr[1])
             C(ws,r,2,axis,f=F_(9,True,WHITE),fillc=NAVY,al="right",wrap=True)
@@ -288,7 +289,7 @@ for dname,key,records in K.DEPARTMENTS:
             ws.cell(r,15).value=f'=IF($N{r}="","⏳ بانتظار هدف",IF($N{r}>=1,"✅ محقق",IF($N{r}>=0.85,"🟡 قريب","🔴 تحت الهدف")))'
             C(ws,r,15,f=F_(9,True,WHITE),fillc=NAVY,al="center"); ws.row_dimensions[r].height=24; r+=1
         ROWMAP[safe_title(dname)][i]=r; DEPT_DETAILS[safe_title(dname)].append(r)
-        if INLINE_AGG and axis and axis_cnt.get(axis,0)>1: ws.row_dimensions[r].outline_level=1  # فرعي مندرج
+        if INLINE_AGG and axis and has_parent(key,axis,axis_cnt.get(axis,0)): ws.row_dimensions[r].outline_level=1  # فرعي مندرج
         C(ws,r,1,i+1,f=F_(9,True),al="center")
         blank = not (nm and str(nm).strip())   # صف قالب فارغ للإدخال اليدوي
         if blank:
