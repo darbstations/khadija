@@ -245,7 +245,14 @@ def logo(ws,anchor="B1",w=150):
 HEAD=["#","المحور","المؤشر","الوحدة","القطبية","الأولوية","الوزن %","المستهدف","نص المستهدف","الركيزة","المشروع","منظور BSC","المُحقَّق","نسبة التحقيق","الحالة","الوصف / طريقة القياس","مصدر البيانات","دورية القياس"]
 WID=[4,16,40,9,7,12,8,12,16,12,22,15,12,12,14,48,24,11]
 DEPT_RANGES=[]; ROWMAP={}; DEPT_DETAILS={}
-INLINE_AGG=bool(os.environ.get("INLINE_AGG"))   # الخيار (ب): إدراج المؤشر الجامع داخل أوراق الإدارات
+INLINE_AGG = os.environ.get("FLAT")!="1"   # افتراضياً: مؤشر أساسي لكل محور تندرج تحته الفرعية (FLAT=1 للتعطيل)
+# أسماء المؤشرات الأساسية (الجامعة) لكل محور متعدد المؤشرات — واضحة وقابلة للقياس
+AXIS_PARENT={
+ ("operations","الربحية"):"نمو مبيعات الوقود",
+ ("operations","حماية الإيراد"):"جاهزية وتوفّر المحطة",
+ ("operations","تجربة العميل"):"مؤشر تجربة العميل العام",
+}
+def parent_name(key,axis): return AXIS_PARENT.get((key,axis), f"مؤشر {axis} العام")
 def safe_title(name): return name[:31]
 for dname,key,records in K.DEPARTMENTS:
     ws=wb.create_sheet(safe_title(dname)); rtl(ws)
@@ -259,20 +266,29 @@ for dname,key,records in K.DEPARTMENTS:
     weights=round_weights_pct(K.kpi_weights(records)); start=4
     ROWMAP[safe_title(dname)]={}; DEPT_DETAILS[safe_title(dname)]=[]
     r=start; seen_axes=set()
+    if INLINE_AGG: ws.sheet_properties.outlinePr.summaryBelow=False   # الأساسي فوق الفرعية
+    axis_cnt={}
+    for rr in records:
+        if rr[0] and rr[1]: axis_cnt[rr[0]]=axis_cnt.get(rr[0],0)+1
     def _agg_formula(dn,ax):
         JJ="'قاعدة المؤشرات'!$J:$J"; KK="'قاعدة المؤشرات'!$K:$K"; BB="'قاعدة المؤشرات'!$B:$B"; LL="'قاعدة المؤشرات'!$L:$L"
         return f'=IFERROR(SUMIFS({JJ},{BB},"{dn}",{LL},"{ax}")/SUMIFS({KK},{BB},"{dn}",{LL},"{ax}"),"")'
     for i,(axis,nm,unit,pol,agg,tgt,ttxt,fmt,pillar,project) in enumerate(records):
-        # الخيار (ب): إدراج صف «جامع» عند أول ظهور لكل محور
-        if INLINE_AGG and axis and axis not in seen_axes:
-            seen_axes.add(axis); n=sum(1 for rr in records if rr[0]==axis and rr[1])
-            C(ws,r,2,axis,f=F_(9,True,WHITE),fillc=STEEL,al="right",wrap=True)
-            C(ws,r,3,f"🔷 جامع: {axis} ({n})",f=F_(9,True,WHITE),fillc=STEEL,al="right",wrap=True)
-            for c in (1,4,5,6,7,8,9,10,11,12,13,16,17,18): C(ws,r,c,None,fillc=STEEL)
-            ws.cell(r,14).value=_agg_formula(dname,axis); C(ws,r,14,f=F_(9,True,WHITE),fillc=STEEL,fmt="0%",al="center")
-            ws.cell(r,15).value=f'=IF($N{r}="","🔷 —",IF($N{r}>=1,"🔷 ✅",IF($N{r}>=0.85,"🔷 🟡","🔷 🔴")))'
-            C(ws,r,15,f=F_(9,True,WHITE),fillc=STEEL,al="center"); ws.row_dimensions[r].height=22; r+=1
+        # مؤشر أساسي لكل محور متعدد المؤشرات (له وزن = مجموع أوزان فرعياته · قيمته = متوسط موزون)
+        if INLINE_AGG and axis and axis not in seen_axes and axis_cnt.get(axis,0)>1:
+            seen_axes.add(axis)
+            aw=sum(weights[j] for j,rr in enumerate(records) if rr[0]==axis and rr[1])
+            C(ws,r,2,axis,f=F_(9,True,WHITE),fillc=NAVY,al="right",wrap=True)
+            C(ws,r,3,f"📊 {parent_name(key,axis)}",f=F_(10,True,WHITE),fillc=NAVY,al="right",wrap=True)
+            C(ws,r,4,None,fillc=NAVY); C(ws,r,5,None,fillc=NAVY)
+            C(ws,r,6,"🔷 أساسي",f=F_(8,True,WHITE),fillc=NAVY,al="center")
+            C(ws,r,7,round(aw,4),f=F_(10,True,WHITE),fillc=NAVY,fmt="0%",al="center")   # وزن المحور = مجموع الفرعية
+            for c in (8,9,10,11,12,13,16,17,18): C(ws,r,c,None,fillc=NAVY)
+            ws.cell(r,14).value=_agg_formula(dname,axis); C(ws,r,14,f=F_(11,True,WHITE),fillc=NAVY,fmt="0%",al="center")
+            ws.cell(r,15).value=f'=IF($N{r}="","⏳ بانتظار هدف",IF($N{r}>=1,"✅ محقق",IF($N{r}>=0.85,"🟡 قريب","🔴 تحت الهدف")))'
+            C(ws,r,15,f=F_(9,True,WHITE),fillc=NAVY,al="center"); ws.row_dimensions[r].height=24; r+=1
         ROWMAP[safe_title(dname)][i]=r; DEPT_DETAILS[safe_title(dname)].append(r)
+        if INLINE_AGG and axis and axis_cnt.get(axis,0)>1: ws.row_dimensions[r].outline_level=1  # فرعي مندرج
         C(ws,r,1,i+1,f=F_(9,True),al="center")
         blank = not (nm and str(nm).strip())   # صف قالب فارغ للإدخال اليدوي
         if blank:
