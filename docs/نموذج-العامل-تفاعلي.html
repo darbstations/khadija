@@ -1,0 +1,821 @@
+<title>نموذج حافز العامل — درب</title>
+
+<style>
+/* ══ tokens ══ */
+:root{
+  --ground:#F3F5F4; --panel:#FFFFFF; --panel-2:#EDF0EE;
+  --line:#D9E0DD; --line-soft:#E8EDEA;
+  --ink:#0E1A22; --ink-2:#3A4C57; --muted:#6E8794;
+  --amber:#B87516; --amber-lit:#E8A33D;
+  --earn:#3F8C57; --earn-bg:#E4F0E7;
+  --block:#C0463C; --block-bg:#FAE6E4;
+  --readout-bg:#0B1218; --readout-line:#1E2E39;
+  --shadow:0 1px 2px rgba(14,26,34,.06), 0 8px 24px -12px rgba(14,26,34,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --ground:#0C141B; --panel:#131F29; --panel-2:#18242F;
+    --line:#22323F; --line-soft:#1B2933;
+    --ink:#E6EDF1; --ink-2:#B4C4CE; --muted:#78909E;
+    --amber:#E8A33D; --amber-lit:#E8A33D;
+    --earn:#5CB578; --earn-bg:#162C1F;
+    --block:#E0685D; --block-bg:#2E1917;
+    --readout-bg:#070C11; --readout-line:#1B2A34;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="light"]{
+  --ground:#F3F5F4; --panel:#FFFFFF; --panel-2:#EDF0EE;
+  --line:#D9E0DD; --line-soft:#E8EDEA;
+  --ink:#0E1A22; --ink-2:#3A4C57; --muted:#6E8794;
+  --amber:#B87516; --amber-lit:#E8A33D;
+  --earn:#3F8C57; --earn-bg:#E4F0E7;
+  --block:#C0463C; --block-bg:#FAE6E4;
+  --readout-bg:#0B1218; --readout-line:#1E2E39;
+  --shadow:0 1px 2px rgba(14,26,34,.06), 0 8px 24px -12px rgba(14,26,34,.18);
+}
+:root[data-theme="dark"]{
+  --ground:#0C141B; --panel:#131F29; --panel-2:#18242F;
+  --line:#22323F; --line-soft:#1B2933;
+  --ink:#E6EDF1; --ink-2:#B4C4CE; --muted:#78909E;
+  --amber:#E8A33D; --amber-lit:#E8A33D;
+  --earn:#5CB578; --earn-bg:#162C1F;
+  --block:#E0685D; --block-bg:#2E1917;
+  --readout-bg:#070C11; --readout-line:#1B2A34;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+}
+
+/* ══ base ══ */
+body{
+  direction:rtl;
+  background:var(--ground); color:var(--ink);
+  font-family:"SF Arabic","Segoe UI","Noto Sans Arabic","Dubai","Geeza Pro",Tahoma,Arial,sans-serif;
+  font-size:15px; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+.num{
+  font-family:ui-monospace,"SF Mono","Cascadia Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;
+}
+/* pure figures are isolated LTR runs so signs and commas never re-order;
+   cells that mix Arabic with a number stay in the page's RTL flow */
+.cell .v, .field .ro, .field input, .growth .val, .sc h3 em,
+td.calc, td.diff, .pct, td.pay,
+#t-base, #t-target, #t-actual, #t-diff, #t-pct, #t-pay{
+  direction:ltr; unicode-bidi:isolate;
+}
+/* the mono face carries no Arabic shaping — hand Arabic runs back to the body font */
+td.pay .cap{direction:rtl; unicode-bidi:isolate; font-family:inherit;}
+.cap, #t-n, #t-gate, footer.pg{
+  font-family:"SF Arabic","Segoe UI","Noto Sans Arabic","Dubai","Geeza Pro",Tahoma,Arial,sans-serif;
+}
+.sc dd{font-variant-numeric:tabular-nums;}
+.wrap{max-width:1240px; margin:0 auto; padding:0 20px 72px;}
+h1,h2,h3{text-wrap:balance; margin:0;}
+button,input,select{font:inherit; color:inherit;}
+:focus-visible{outline:2px solid var(--amber-lit); outline-offset:2px; border-radius:4px;}
+@media (prefers-reduced-motion:reduce){*{animation:none !important; transition:none !important;}}
+
+.eyebrow{
+  font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--muted); font-weight:600;
+}
+
+/* ══ header ══ */
+.top{
+  display:flex; flex-wrap:wrap; align-items:flex-end; gap:20px;
+  padding:32px 0 22px; border-bottom:1px solid var(--line);
+}
+.brand{display:flex; align-items:center; gap:12px; flex:1 1 300px;}
+.mark{
+  width:38px; height:38px; flex:none; border-radius:9px;
+  background:var(--readout-bg); display:grid; place-items:center;
+  border:1px solid var(--readout-line);
+}
+.mark svg{width:20px; height:20px;}
+.top h1{font-size:23px; font-weight:700; letter-spacing:-.01em; line-height:1.25;}
+.top .sub{font-size:13px; color:var(--muted); margin-top:2px;}
+.stationpick{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+.stationpick label{font-size:12px; color:var(--muted); font-weight:600;}
+select,input[type="text"],input[type="number"]{
+  background:var(--panel); border:1px solid var(--line); border-radius:7px;
+  padding:7px 10px; font-size:14px; min-width:0;
+}
+select{cursor:pointer; padding-inline-end:28px;}
+
+/* ══ readout ══ */
+.readout{
+  margin:22px 0 26px; background:var(--readout-bg);
+  border:1px solid var(--readout-line); border-radius:14px;
+  padding:4px; box-shadow:var(--shadow);
+}
+.readout-inner{
+  display:grid; grid-template-columns:repeat(5,1fr);
+  border-radius:11px; overflow:hidden;
+}
+.cell{padding:18px 16px 16px; position:relative; min-width:0;}
+.cell + .cell::before{
+  content:""; position:absolute; inset-block:14px; inset-inline-start:0;
+  width:1px; background:var(--readout-line);
+}
+.cell .k{
+  font-size:10.5px; letter-spacing:.1em; color:#5D7382; font-weight:600;
+  display:block; margin-bottom:7px;
+}
+.cell .v{
+  font-size:clamp(20px,2.6vw,31px); font-weight:600; line-height:1;
+  color:#DDE7ED; display:block;
+}
+.cell .u{font-size:11px; color:#5D7382; margin-top:6px; display:block;}
+.cell.lit .v{color:var(--amber-lit); text-shadow:0 0 22px rgba(232,163,61,.32);}
+.cell.pos .v{color:#6FCB8C;}
+.cell.neg .v{color:#E8756A;}
+/* flow arrows between readout cells */
+.cell + .cell::after{
+  content:"‹"; position:absolute; inset-inline-start:-6px; top:50%;
+  transform:translateY(-50%); color:var(--readout-line);
+  font-size:17px; line-height:1; background:var(--readout-bg);
+  padding:2px 0; z-index:1;
+}
+@media (max-width:860px){
+  .readout-inner{grid-template-columns:repeat(2,1fr);}
+  .cell + .cell::after{display:none;}
+  .cell:nth-child(odd) + .cell::before{display:block;}
+  .cell:nth-child(2) ~ .cell{border-top:1px solid var(--readout-line);}
+  .cell:nth-child(odd)::before{display:none;}
+  .cell:last-child{grid-column:1 / -1;}   /* net gain gets the full final row */
+}
+
+/* ══ layout ══ */
+.cols{display:grid; grid-template-columns:290px 1fr; gap:24px; align-items:start;}
+@media (max-width:960px){.cols{grid-template-columns:1fr;}}
+/* grid items default to min-width:auto, which lets the roster's min-width
+   push the whole page wide instead of scrolling inside .scroller */
+.cols > *{min-width:0;}
+
+.card{
+  background:var(--panel); border:1px solid var(--line);
+  border-radius:12px; box-shadow:var(--shadow); min-width:0;
+}
+.card > header{
+  padding:14px 16px; border-bottom:1px solid var(--line-soft);
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.card > header h2{font-size:14.5px; font-weight:700;}
+.card > header .hint{font-size:11.5px; color:var(--muted);}
+
+aside{position:sticky; top:16px;}
+@media (max-width:960px){aside{position:static;}}
+
+/* ══ settings rail ══ */
+.field{
+  display:grid; grid-template-columns:1fr auto; align-items:center;
+  gap:10px; padding:11px 16px; border-bottom:1px solid var(--line-soft);
+}
+.field:last-of-type{border-bottom:0;}
+.field .lbl{font-size:13px; color:var(--ink-2); line-height:1.35;}
+.field .lbl small{display:block; font-size:11px; color:var(--muted); margin-top:1px;}
+.field input{width:88px; text-align:center; padding:6px 8px;}
+.field .ro{
+  width:88px; text-align:center; padding:6px 8px; border-radius:7px;
+  background:var(--panel-2); border:1px dashed var(--line);
+  color:var(--ink-2); font-size:14px;
+}
+.chip{
+  display:inline-block; font-size:10px; font-weight:700; letter-spacing:.06em;
+  padding:2px 7px; border-radius:999px; vertical-align:middle;
+  background:var(--earn-bg); color:var(--earn); margin-inline-start:6px;
+}
+
+/* growth slider — the live control */
+.growth{padding:16px; border-bottom:1px solid var(--line-soft); background:var(--panel-2);}
+.growth .row{display:flex; align-items:baseline; justify-content:space-between; gap:10px;}
+.growth .row .t{font-size:13px; font-weight:700;}
+.growth .row .val{font-size:24px; font-weight:700; color:var(--amber);}
+.growth p{margin:4px 0 12px; font-size:11.5px; color:var(--muted); line-height:1.5;}
+input[type="range"]{
+  -webkit-appearance:none; appearance:none; width:100%; height:22px;
+  background:transparent; cursor:pointer; direction:ltr;
+}
+input[type="range"]::-webkit-slider-runnable-track{
+  height:5px; border-radius:99px; background:var(--line);
+}
+input[type="range"]::-moz-range-track{height:5px; border-radius:99px; background:var(--line);}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none; width:18px; height:18px; border-radius:50%;
+  background:var(--amber); border:3px solid var(--panel); margin-top:-6.5px;
+  box-shadow:0 1px 5px rgba(0,0,0,.3);
+}
+input[type="range"]::-moz-range-thumb{
+  width:12px; height:12px; border-radius:50%;
+  background:var(--amber); border:3px solid var(--panel);
+  box-shadow:0 1px 5px rgba(0,0,0,.3);
+}
+.ticks{
+  display:flex; justify-content:space-between; direction:ltr;
+  font-size:10px; color:var(--muted); margin-top:2px;
+}
+
+/* ══ roster table ══ */
+.scroller{overflow-x:auto; min-width:0;}
+table{border-collapse:collapse; width:100%; min-width:800px;}
+thead th{
+  font-size:11px; font-weight:600; letter-spacing:.04em; color:var(--muted);
+  text-align:center; padding:10px 8px; border-bottom:1px solid var(--line);
+  white-space:nowrap; background:var(--panel); position:sticky; top:0; z-index:2;
+}
+thead th:first-child{text-align:start;}
+tbody td{
+  padding:5px 8px; border-bottom:1px solid var(--line-soft);
+  text-align:center; font-size:14px; vertical-align:middle;
+}
+tbody tr{position:relative;}
+/* page is RTL: a negative x-offset draws the stripe on the row's leading (right) edge */
+tbody tr.flag > td:first-child{box-shadow:inset -3px 0 0 var(--amber-lit);}
+tbody td input[type="text"],tbody td input[type="number"]{
+  width:100%; padding:6px 8px; background:transparent; border:1px solid transparent;
+  border-radius:6px; text-align:center;
+}
+tbody td input:hover{border-color:var(--line);}
+tbody td input:focus{background:var(--panel-2); border-color:var(--line);}
+td.name{text-align:start; min-width:132px;}
+td.name input{text-align:start; font-weight:600;}
+td.calc{color:var(--ink-2);}
+td.diff.up{color:var(--earn); font-weight:600;}
+td.diff.dn{color:var(--block);}
+.bar{
+  position:relative; height:6px; border-radius:99px; background:var(--line);
+  min-width:56px; overflow:hidden; direction:ltr;
+}
+.bar i{position:absolute; inset-block:0; left:0; border-radius:99px; background:var(--muted);}
+.bar.up i{background:var(--earn);}
+.bar.dn i{background:var(--block);}
+.pct{display:block; font-size:10.5px; color:var(--muted); margin-top:3px;}
+
+.gate{display:inline-flex; border:1px solid var(--line); border-radius:99px; overflow:hidden;}
+.gate button{
+  border:0; background:transparent; cursor:pointer; padding:4px 10px;
+  font-size:11.5px; color:var(--muted); white-space:nowrap; line-height:1.5;
+}
+.gate button[aria-pressed="true"]{background:var(--earn-bg); color:var(--earn); font-weight:700;}
+.gate button.no[aria-pressed="true"]{background:var(--block-bg); color:var(--block);}
+
+td.pay{font-weight:700; white-space:nowrap;}
+td.pay.on{color:var(--earn);}
+td.pay.off{color:var(--muted); font-weight:400;}
+.cap{
+  display:block; font-size:9.5px; font-weight:700; letter-spacing:.05em;
+  color:var(--amber); margin-top:1px;
+}
+.kill{
+  border:0; background:transparent; cursor:pointer; color:var(--muted);
+  font-size:17px; line-height:1; padding:4px 7px; border-radius:6px;
+}
+.kill:hover{color:var(--block); background:var(--block-bg);}
+tfoot td{
+  padding:11px 8px; font-weight:700; text-align:center; font-size:14px;
+  border-top:1px solid var(--line); background:var(--panel-2);
+}
+tfoot td:first-child{text-align:start;}
+
+.tablefoot{
+  padding:12px 16px; display:flex; flex-wrap:wrap; gap:10px;
+  align-items:center; justify-content:space-between;
+}
+.btn{
+  border:1px solid var(--line); background:var(--panel); cursor:pointer;
+  padding:7px 14px; border-radius:8px; font-size:13px; font-weight:600;
+}
+.btn:hover{background:var(--panel-2);}
+.btn.primary{background:var(--amber); border-color:var(--amber); color:#0B1218;}
+.btn.primary:hover{filter:brightness(1.08);}
+.legend{font-size:11.5px; color:var(--muted); display:flex; gap:14px; flex-wrap:wrap;}
+.legend span{display:inline-flex; align-items:center; gap:5px;}
+.legend i{width:9px; height:9px; border-radius:2px; display:inline-block;}
+
+/* ══ scenarios ══ */
+.scen{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; padding:16px;}
+@media (max-width:720px){.scen{grid-template-columns:1fr;}}
+.sc{
+  border:1px solid var(--line); border-radius:10px; padding:14px;
+  background:var(--panel-2);
+}
+.sc h3{font-size:13px; font-weight:700; display:flex; justify-content:space-between; align-items:baseline;}
+.sc h3 em{font-style:normal; font-size:17px; color:var(--amber);}
+.sc dl{margin:10px 0 0; display:grid; grid-template-columns:1fr auto; gap:5px 10px; font-size:12.5px;}
+.sc dt{color:var(--muted);}
+.sc dd{margin:0; text-align:end; color:var(--ink-2);}
+.sc dd.net{color:var(--earn); font-weight:700;}
+.sc .note{margin-top:11px; padding-top:10px; border-top:1px solid var(--line);
+  font-size:11.5px; color:var(--muted); line-height:1.5;}
+.sc .capped{color:var(--amber); font-weight:600;}
+
+/* ══ rules ══ */
+.rules{display:grid; grid-template-columns:repeat(auto-fit,minmax(255px,1fr)); gap:0;}
+.rules section{padding:16px; border-inline-start:1px solid var(--line-soft);}
+.rules section:first-child{border-inline-start:0;}
+.rules h3{font-size:12.5px; font-weight:700; margin-bottom:9px;}
+.rules h3.warn{color:var(--block);}
+.rules ul{margin:0; padding:0; list-style:none; display:grid; gap:7px;}
+.rules li{
+  font-size:12.5px; color:var(--ink-2); line-height:1.55;
+  padding-inline-start:13px; position:relative;
+}
+.rules li::before{
+  content:""; position:absolute; inset-inline-start:0; top:8px;
+  width:5px; height:5px; border-radius:50%; background:var(--muted);
+}
+.rules h3.warn ~ ul li::before{background:var(--block);}
+
+.gates{padding:16px; display:grid; gap:9px;}
+.gates .g{
+  display:grid; grid-template-columns:1fr auto; gap:10px; align-items:baseline;
+  padding-bottom:9px; border-bottom:1px solid var(--line-soft); font-size:13px;
+}
+.gates .g:last-child{border-bottom:0; padding-bottom:0;}
+.gates .g b{font-weight:600;}
+.gates .g small{display:block; color:var(--muted); font-size:11.5px;}
+.gates .g .lim{font-size:12px; color:var(--amber); font-weight:600; white-space:nowrap;}
+
+.stack{display:grid; gap:24px; margin-top:24px;}
+footer.pg{
+  margin-top:28px; padding-top:16px; border-top:1px solid var(--line);
+  font-size:11.5px; color:var(--muted); line-height:1.7;
+}
+@media print{
+  body{background:#fff;}
+  aside{position:static;}
+  .btn,.kill,.tablefoot{display:none;}
+  .card{box-shadow:none; break-inside:avoid;}
+}
+</style>
+
+<div class="wrap">
+
+  <div class="top">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#E8A33D" stroke-width="1.7"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 20V5a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v15"/>
+          <path d="M3 20h11"/><path d="M6 8h5"/>
+          <path d="M16 10h2a1 1 0 0 1 1 1v6a1.5 1.5 0 0 0 3 0V9l-3-3"/>
+        </svg>
+      </div>
+      <div>
+        <h1>نموذج حافز العامل</h1>
+        <div class="sub">الحافز على الزيادة فوق المستهدف · مشروط ببوابة الجودة · بسقف شهري</div>
+      </div>
+    </div>
+    <div class="stationpick">
+      <label for="station">المحطة</label>
+      <select id="station"></select>
+      <select id="month" aria-label="الشهر">
+        <option>أغسطس ٢٠٢٦</option><option>سبتمبر ٢٠٢٦</option>
+        <option>أكتوبر ٢٠٢٦</option><option>نوفمبر ٢٠٢٦</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ══ pump readout: how the value actually flows ══ -->
+  <div class="readout">
+    <div class="readout-inner">
+      <div class="cell" id="c-visits">
+        <span class="k">الزيادة</span>
+        <span class="v num">0</span>
+        <span class="u">زيارة / يوم</span>
+      </div>
+      <div class="cell" id="c-liters">
+        <span class="k">اللترات الإضافية</span>
+        <span class="v num">0</span>
+        <span class="u">لتر / شهر</span>
+      </div>
+      <div class="cell" id="c-margin">
+        <span class="k">الهامش الإضافي</span>
+        <span class="v num">0</span>
+        <span class="u">ريال / شهر</span>
+      </div>
+      <div class="cell lit" id="c-pay">
+        <span class="k">الحافز المصروف</span>
+        <span class="v num">0</span>
+        <span class="u">ريال / شهر</span>
+      </div>
+      <div class="cell" id="c-net">
+        <span class="k">صافي المكسب للشركة</span>
+        <span class="v num">0</span>
+        <span class="u">ريال / شهر</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cols">
+
+    <!-- ══ settings rail ══ -->
+    <aside>
+      <div class="card">
+        <header><h2>مُدخلات المحطة</h2><span class="hint">تُعبّأ مرة واحدة</span></header>
+
+        <div class="growth">
+          <div class="row">
+            <span class="t">نسبة النمو المستهدف</span>
+            <span class="val num" id="growth-val">5%</span>
+          </div>
+          <p>حرّكها لترى مستهدف كل عامل والحافز والصافي يتحرّكون معها.</p>
+          <input type="range" id="growth" min="0" max="20" step="1" value="5"
+                 aria-label="نسبة النمو المستهدف">
+          <div class="ticks"><span>0%</span><span>10%</span><span>20%</span></div>
+        </div>
+
+        <div class="field">
+          <span class="lbl">لتر لكل زيارة<small>من بيانات المحطة</small></span>
+          <span class="ro num" id="lpv">—</span>
+        </div>
+        <div class="field">
+          <span class="lbl">هامش المساهمة<small>هللة / لتر — من قائمة الدخل</small></span>
+          <input type="number" id="margin" value="13.36" step="0.01" min="0" class="num">
+        </div>
+        <div class="field">
+          <span class="lbl">نسبة الحافز من الهامش<small>قرار الإدارة</small></span>
+          <input type="number" id="share" value="15" step="1" min="0" max="100" class="num">
+        </div>
+        <div class="field">
+          <span class="lbl">سقف الحافز الشهري<span class="chip">معتمد</span><small>ريال لكل عامل</small></span>
+          <input type="number" id="cap" value="100" step="10" min="0" class="num">
+        </div>
+        <div class="field">
+          <span class="lbl">أيام الشهر</span>
+          <input type="number" id="days" value="30" step="1" min="1" max="31" class="num">
+        </div>
+      </div>
+    </aside>
+
+    <!-- ══ roster ══ -->
+    <main>
+      <div class="card">
+        <header>
+          <h2>بطاقات العمال</h2>
+          <span class="hint">عبّئ خط الأساس والفعلي وبوابة الجودة — الباقي محسوب</span>
+        </header>
+        <div class="scroller">
+          <table>
+            <thead>
+              <tr>
+                <th>العامل</th><th>الوردية</th><th>خط الأساس</th><th>المستهدف</th>
+                <th>الفعلي</th><th>الفارق</th><th>الإنجاز</th><th>بوابة الجودة</th>
+                <th>الحافز</th><th><span aria-hidden="true"></span></th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+            <tfoot>
+              <tr>
+                <td>الإجمالي</td>
+                <td id="t-n">0</td>
+                <td class="num" id="t-base">0</td>
+                <td class="num" id="t-target">0</td>
+                <td class="num" id="t-actual">0</td>
+                <td class="num" id="t-diff">0</td>
+                <td class="num" id="t-pct">—</td>
+                <td id="t-gate">—</td>
+                <td class="num" id="t-pay">0</td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <div class="tablefoot">
+          <div>
+            <button class="btn primary" id="add">إضافة عامل</button>
+            <button class="btn" id="print">طباعة</button>
+          </div>
+          <div class="legend">
+            <span><i style="background:var(--earn)"></i> فوق المستهدف</span>
+            <span><i style="background:var(--block)"></i> دون المستهدف</span>
+            <span><i style="background:var(--amber-lit)"></i> زيادة محجوبة بالجودة</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="card">
+          <header>
+            <h2>ماذا لو — ثلاثة سيناريوهات نمو</h2>
+            <span class="hint">محسوبة على مجموع خط الأساس للعمال المدرجين</span>
+          </header>
+          <div class="scen" id="scen"></div>
+        </div>
+
+        <div class="card">
+          <header><h2>بوابة الجودة</h2><span class="hint">تُقيَّم شهرياً لكل عامل</span></header>
+          <div class="gates">
+            <div class="g"><span><b>لا شكوى مثبتة</b><small>شكاوى العامل خلال الشهر</small></span><span class="lim">صفر</span></div>
+            <div class="g"><span><b>زمن التعبئة</b><small>متوسط الزمن في ساعة الذروة</small></span><span class="lim">≤ الحد المعتمد</span></div>
+            <div class="g"><span><b>الحضور في الذروة</b><small>الذروة هي حيث تُكسب الزيارة أو تُفقد</small></span><span class="lim">١٠٠٪</span></div>
+            <div class="g"><span><b>النظافة والمظهر</b><small>تقييم المشرف الأسبوعي</small></span><span class="lim">مقبول فأعلى</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="rules">
+            <section>
+              <h3>قواعد الاحتساب</h3>
+              <ul>
+                <li>الحافز على الزيادة فوق المستهدف فقط — لا على الحجم الكلي.</li>
+                <li>لا يُصرف إطلاقاً إذا كانت بوابة الجودة غير مستوفاة.</li>
+                <li>سقف ١٠٠ ريال شهرياً لكل عامل يمنع المبالغة في شهر استثنائي.</li>
+                <li>الفارق السالب لا يُخصم — لكنه لا يُكافأ.</li>
+              </ul>
+            </section>
+            <section>
+              <h3>قواعد خط الأساس</h3>
+              <ul>
+                <li>يُحسب من متوسط الثلاثة أشهر السابقة لنفس الوردية.</li>
+                <li>يُراجع كل ربع حتى لا يبقى الحافز على المستوى نفسه دائماً.</li>
+                <li>يُعدَّل إذا تغيّر عدد المضخات أو ساعات الوردية.</li>
+              </ul>
+            </section>
+            <section>
+              <h3 class="warn">ما يُبطل النموذج</h3>
+              <ul>
+                <li>خط أساس متساهل يحوّل الحافز إلى تكلفة ثابتة بلا مقابل.</li>
+                <li>غياب قياس زمن الخدمة يفرّغ بوابة الجودة من معناها.</li>
+                <li>احتساب الحافز على الحجم الكلي يكافئ الموسم لا الأداء.</li>
+              </ul>
+            </section>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="pg">
+    خط الأساس ولتر/الزيارة محسوبان من متوسط آخر ثلاثة أشهر فعلية لكل محطة — لا من أعلى شهر.
+    هامش المساهمة ١٣٫٣٦ هللة/لتر مأخوذ من قائمة الدخل. الأرقام في هذه الصفحة تطابق
+    ملف «نموذج العامل» في الإكسل حرفاً بحرف.
+  </footer>
+</div>
+
+<script>
+"use strict";
+
+/* بيانات المحطات — متوسط آخر ثلاثة أشهر فعلية */
+const STATIONS = [
+  {name:"الشرايع",        code:"MK019", lpv:23.15, vpd:378,  note:"محطة تجريبية — مناديل وخدمة"},
+  {name:"عرفات الشوقية",  code:"MK017", lpv:21.32, vpd:1290, note:"محطة تجريبية — بنزين"},
+  {name:"العمرة الجديدة", code:"MK007", lpv:29.10, vpd:4274, note:"الأعلى حجماً"},
+  {name:"العزيزية",       code:"MK072", lpv:20.31, vpd:2500, note:"تعافت بعد الحج"},
+  {name:"المعيصم",        code:"MK002", lpv:20.92, vpd:600,  note:"تغيّر مسار الطريق"}
+];
+
+const SHIFTS = ["صباحية","مسائية","ليلية"];
+
+let workers = [
+  {name:"أحمد",  shift:"صباحية", base:95,  actual:102, gate:true},
+  {name:"سالم",  shift:"صباحية", base:92,  actual:88,  gate:true},
+  {name:"يوسف",  shift:"مسائية", base:110, actual:128, gate:true},
+  {name:"خالد",  shift:"مسائية", base:88,  actual:96,  gate:false},
+  {name:"ماجد",  shift:"ليلية",  base:55,  actual:60,  gate:true},
+  {name:"فهد",   shift:"ليلية",  base:48,  actual:49,  gate:true}
+];
+
+const $  = (s) => document.querySelector(s);
+const n0 = new Intl.NumberFormat("en-US", {maximumFractionDigits:0});
+const n2 = new Intl.NumberFormat("en-US", {minimumFractionDigits:2, maximumFractionDigits:2});
+const el = (t, cls) => { const e = document.createElement(t); if (cls) e.className = cls; return e; };
+
+/* ── settings ─────────────────────────────────────────── */
+function settings(){
+  const st = STATIONS[+$("#station").value] || STATIONS[0];
+  return {
+    st,
+    lpv:    st.lpv,
+    margin: Math.max(0, +$("#margin").value || 0),   // هللة / لتر
+    share:  Math.max(0, +$("#share").value  || 0) / 100,
+    cap:    Math.max(0, +$("#cap").value    || 0),
+    days:   Math.max(1, +$("#days").value   || 30),
+    growth: (+$("#growth").value || 0) / 100
+  };
+}
+
+/* المعادلة نفسها الموجودة في ملف الإكسل */
+const targetOf = (base, g) => Math.round(base * (1 + g));
+function payOf(diff, gate, s){
+  if (!gate || diff <= 0) return 0;
+  return Math.min(diff * s.lpv * (s.margin / 100) * s.share * s.days, s.cap);
+}
+
+/* ── station select ───────────────────────────────────── */
+function buildStations(){
+  const sel = $("#station");
+  STATIONS.forEach((s, i) => {
+    const o = el("option");
+    o.value = i; o.textContent = s.name + " · " + s.code;
+    sel.appendChild(o);
+  });
+}
+
+/* ── roster ───────────────────────────────────────────── */
+function buildRows(){
+  const tb = $("#rows");
+  tb.textContent = "";
+
+  workers.forEach((w, i) => {
+    const tr = el("tr");
+
+    const tdName = el("td", "name");
+    const inName = el("input"); inName.type = "text"; inName.value = w.name;
+    inName.setAttribute("aria-label", "اسم العامل");
+    inName.addEventListener("input", () => { w.name = inName.value; });
+    tdName.appendChild(inName); tr.appendChild(tdName);
+
+    const tdShift = el("td");
+    const sel = el("select");
+    sel.setAttribute("aria-label", "الوردية");
+    SHIFTS.forEach(sh => {
+      const o = el("option"); o.value = sh; o.textContent = sh;
+      if (sh === w.shift) o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.addEventListener("change", () => { w.shift = sel.value; });
+    tdShift.appendChild(sel); tr.appendChild(tdShift);
+
+    ["base","actual"].forEach((key, k) => {
+      const td = el("td");
+      const inp = el("input"); inp.type = "number"; inp.min = "0"; inp.step = "1";
+      inp.className = "num"; inp.value = w[key];
+      inp.setAttribute("aria-label", k === 0 ? "خط الأساس" : "الفعلي");
+      inp.addEventListener("input", () => { w[key] = +inp.value || 0; recalc(); });
+      td.appendChild(inp);
+      tr.appendChild(td);
+      if (k === 0) {                                    // المستهدف بين الأساس والفعلي
+        const t = el("td", "calc num"); t.dataset.role = "target"; tr.appendChild(t);
+      }
+    });
+
+    const tdDiff = el("td", "diff num"); tdDiff.dataset.role = "diff"; tr.appendChild(tdDiff);
+
+    const tdBar = el("td");
+    const bar = el("div", "bar"); bar.appendChild(el("i"));
+    const pct = el("span", "pct num");
+    tdBar.append(bar, pct); tr.appendChild(tdBar);
+
+    const tdGate = el("td");
+    const g = el("div", "gate");
+    const yes = el("button"); yes.type = "button"; yes.textContent = "مستوفاة";
+    const no  = el("button", "no"); no.type = "button"; no.textContent = "غير مستوفاة";
+    yes.addEventListener("click", () => { w.gate = true;  recalc(); });
+    no .addEventListener("click", () => { w.gate = false; recalc(); });
+    g.append(yes, no); tdGate.appendChild(g); tr.appendChild(tdGate);
+
+    const tdPay = el("td", "pay num"); tdPay.dataset.role = "pay"; tr.appendChild(tdPay);
+
+    const tdKill = el("td");
+    const kill = el("button", "kill"); kill.type = "button"; kill.textContent = "×";
+    kill.title = "حذف العامل";
+    kill.setAttribute("aria-label", "حذف العامل");
+    kill.addEventListener("click", () => { workers.splice(i, 1); buildRows(); recalc(); });
+    tdKill.appendChild(kill); tr.appendChild(tdKill);
+
+    tb.appendChild(tr);
+  });
+}
+
+/* ── recalc: the whole page is one function ───────────── */
+function recalc(){
+  const s = settings();
+  $("#lpv").textContent = s.lpv ? n2.format(s.lpv) : "—";
+  $("#growth-val").textContent = Math.round(s.growth * 100) + "%";
+
+  let tBase = 0, tTarget = 0, tActual = 0, tDiff = 0, tPay = 0, capped = 0, blocked = 0;
+
+  [...$("#rows").children].forEach((tr, i) => {
+    const w = workers[i];
+    const target = targetOf(w.base, s.growth);
+    const diff   = w.actual - target;
+    const pay    = payOf(diff, w.gate, s);
+    const ratio  = target > 0 ? w.actual / target : 0;
+
+    tr.querySelector('[data-role="target"]').textContent = n0.format(target);
+
+    const td = tr.querySelector('[data-role="diff"]');
+    td.textContent = (diff > 0 ? "+" : "") + n0.format(diff);
+    td.className = "diff num " + (diff > 0 ? "up" : diff < 0 ? "dn" : "");
+
+    const bar = tr.querySelector(".bar");
+    bar.className = "bar " + (ratio >= 1 ? "up" : "dn");
+    bar.firstChild.style.width = Math.min(ratio / 1.3, 1) * 100 + "%";
+    tr.querySelector(".pct").textContent = target > 0 ? Math.round(ratio * 100) + "%" : "—";
+
+    const [yes, no] = tr.querySelectorAll(".gate button");
+    yes.setAttribute("aria-pressed", String(w.gate));
+    no .setAttribute("aria-pressed", String(!w.gate));
+
+    const tp = tr.querySelector('[data-role="pay"]');
+    tp.textContent = "";
+    tp.append(document.createTextNode(n0.format(Math.round(pay))));
+    tp.className = "pay num " + (pay > 0 ? "on" : "off");
+    const atCap = pay > 0 && Math.abs(pay - s.cap) < 0.005;
+    if (atCap){ const c = el("span", "cap"); c.textContent = "بلغ السقف"; tp.appendChild(c); capped++; }
+
+    const held = diff > 0 && !w.gate;
+    tr.className = held ? "flag" : "";
+    if (held) blocked++;
+
+    tBase += w.base; tTarget += target; tActual += w.actual; tDiff += diff; tPay += pay;
+  });
+
+  $("#t-n").textContent      = workers.length + " عامل";
+  $("#t-base").textContent   = n0.format(tBase);
+  $("#t-target").textContent = n0.format(tTarget);
+  $("#t-actual").textContent = n0.format(tActual);
+  $("#t-diff").textContent   = (tDiff > 0 ? "+" : "") + n0.format(tDiff);
+  $("#t-pct").textContent    = tTarget > 0 ? Math.round(tActual / tTarget * 100) + "%" : "—";
+  $("#t-gate").textContent   = blocked ? blocked + " محجوب" : capped ? capped + " عند السقف" : "—";
+  $("#t-pay").textContent    = n0.format(Math.round(tPay));
+
+  /* readout — visits → liters → margin → payout → net */
+  const liters = tDiff * s.lpv * s.days;
+  const margin = liters * (s.margin / 100);
+  const net    = margin - tPay;
+  setCell("#c-visits", (tDiff > 0 ? "+" : "") + n0.format(tDiff), tDiff);
+  setCell("#c-liters", n0.format(Math.round(liters)), liters);
+  setCell("#c-margin", n0.format(Math.round(margin)), margin);
+  $("#c-pay").querySelector(".v").textContent = n0.format(Math.round(tPay));
+  setCell("#c-net", (net > 0 ? "+" : "") + n0.format(Math.round(net)), net);
+
+  scenarios(s, tBase);
+}
+
+function setCell(sel, text, signal){
+  const c = $(sel);
+  c.querySelector(".v").textContent = text;
+  c.classList.toggle("pos", signal > 0);
+  c.classList.toggle("neg", signal < 0);
+}
+
+/* ── scenarios ────────────────────────────────────────── */
+const SCEN = [
+  {name:"متحفظ", g:0.03, note:"زيادة يومية بسيطة تُدرَك بالانضباط وحده."},
+  {name:"أساسي", g:0.05, note:"النسبة المعتمدة في النموذج أعلاه."},
+  {name:"طموح",  g:0.10, note:"يتطلب حملة ميدانية مصاحبة لا انضباطاً فقط."}
+];
+
+function scenarios(s, baseTotal){
+  const host = $("#scen");
+  host.textContent = "";
+  SCEN.forEach(sc => {
+    const add    = Math.round(baseTotal * sc.g);
+    const liters = add * s.lpv * s.days;
+    const margin = liters * (s.margin / 100);
+    const roof   = workers.length * s.cap;
+    const raw    = margin * s.share;
+    const pay    = Math.min(raw, roof);
+    const net    = margin - pay;
+    const atRoof = raw >= roof && roof > 0;
+
+    const card = el("div", "sc");
+    const h = el("h3");
+    h.append(document.createTextNode(sc.name), Object.assign(el("em", "num"),
+      {textContent: Math.round(sc.g * 100) + "%"}));
+    card.appendChild(h);
+
+    const dl = el("dl");
+    const put = (k, v, cls) => {
+      dl.appendChild(Object.assign(el("dt"), {textContent:k}));
+      dl.appendChild(Object.assign(el("dd", cls), {textContent:v}));
+    };
+    put("زيارة/يوم إضافية", n0.format(add));
+    put("لترات شهرياً",     n0.format(Math.round(liters)));
+    put("الهامش الإضافي",   n0.format(Math.round(margin)) + " ر.س");
+    put("الحافز المتوقع",   n0.format(Math.round(pay)) + " ر.س", atRoof ? "capped" : "");
+    put("صافي المكسب",      n0.format(Math.round(net)) + " ر.س", "net");
+    card.appendChild(dl);
+
+    const note = el("div", "note");
+    note.textContent = atRoof
+      ? "السقف بلغ حدّه عند " + n0.format(roof) + " ريال — كل زيادة بعده تذهب كاملة للشركة."
+      : sc.note;
+    card.appendChild(note);
+    host.appendChild(card);
+  });
+}
+
+/* ── wire up ──────────────────────────────────────────── */
+buildStations();
+buildRows();
+
+["#margin","#share","#cap","#days","#growth","#station"].forEach(sel => {
+  $(sel).addEventListener("input",  recalc);
+  $(sel).addEventListener("change", recalc);
+});
+
+$("#add").addEventListener("click", () => {
+  workers.push({name:"", shift:"صباحية", base:0, actual:0, gate:true});
+  buildRows(); recalc();
+  const rows = $("#rows").children;
+  rows[rows.length - 1].querySelector("input").focus();
+});
+
+$("#print").addEventListener("click", () => window.print());
+
+recalc();
+</script>
