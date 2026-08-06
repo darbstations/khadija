@@ -191,6 +191,18 @@ export const REDEMPTION_CHANNELS = [
 /** باقات/بطاقات درب — منتجات مدفوعة مسبقاً تُشترى من محفظة درب (مستقلة عن النقاط) */
 export const BUNDLES = [
   {
+    id: "offers495",
+    name: "باقة العروض",
+    emoji: "⭐",
+    tag: "الأوفر قيمة · خصم 32%",
+    price: 495,
+    items: [
+      { label: "رصيد بنزين", qty: "250 ﷼", worth: 250 },
+      { label: "غسلات داخلي + خارجي", qty: "7 غسلات", worth: 210 },
+      { label: "أكواب قهوة", qty: "15 كوب", worth: 270 },
+    ],
+  },
+  {
     id: "theeban",
     name: "بطاقة ذيبان",
     emoji: "🦊",
