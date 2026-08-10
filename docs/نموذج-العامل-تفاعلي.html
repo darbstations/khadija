@@ -260,6 +260,17 @@ td.diff.dn{color:var(--block);}
 .gate button[aria-pressed="true"]{background:var(--earn-bg); color:var(--earn); font-weight:700;}
 .gate button.no[aria-pressed="true"]{background:var(--block-bg); color:var(--block);}
 
+/* baseline cell: empty input = derived value shown as placeholder */
+td.basecell{min-width:104px;}
+td.basecell input::placeholder{color:var(--ink-2); opacity:1;}
+td.basecell .ovr{
+  display:block; font-size:9.5px; font-weight:700; letter-spacing:.05em;
+  color:var(--amber); margin-top:1px; min-height:12px;
+}
+td.basecell.low .ovr{color:var(--block);}
+td.basecell.low input{border-color:var(--block); background:var(--block-bg);}
+td.basecell.ovr-on input{border-color:var(--amber);}
+
 td.pay{font-weight:700; white-space:nowrap;}
 td.pay.on{color:var(--earn);}
 td.pay.off{color:var(--muted); font-weight:400;}
@@ -336,6 +347,34 @@ tfoot td:first-child{text-align:start;}
 .gates .g b{font-weight:600;}
 .gates .g small{display:block; color:var(--muted); font-size:11.5px;}
 .gates .g .lim{font-size:12px; color:var(--amber); font-weight:600; white-space:nowrap;}
+
+/* ══ shift vs demand ══ */
+.shift{padding:14px 16px; display:grid; gap:12px;}
+.shift .sr{display:grid; gap:5px;}
+.shift .sr .hd{display:flex; justify-content:space-between; align-items:baseline; font-size:12.5px;}
+.shift .sr .hd b{font-weight:600;}
+.shift .sr .hd span{color:var(--muted); font-size:11.5px;}
+.split{display:flex; height:9px; border-radius:99px; overflow:hidden; background:var(--line);}
+.split i{display:block; height:100%;}
+.split i.d{background:var(--muted);}
+.split i.e{background:var(--amber);}
+.shift .load{
+  display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:2px;
+}
+.shift .load div{
+  border:1px solid var(--line); border-radius:8px; padding:8px 10px; background:var(--panel-2);
+}
+.shift .load .k{font-size:10.5px; color:var(--muted); display:block;}
+.shift .load .v{
+  font-size:17px; font-weight:700; display:block; margin-top:2px;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  font-variant-numeric:tabular-nums; direction:ltr; unicode-bidi:isolate;
+}
+.shift .verdict{
+  font-size:11.5px; line-height:1.55; color:var(--ink-2);
+  border-top:1px solid var(--line-soft); padding-top:10px;
+}
+.shift .verdict b{color:var(--amber);}
 
 .stack{display:grid; gap:24px; margin-top:24px;}
 footer.pg{
@@ -446,6 +485,18 @@ footer.pg{
           <span class="lbl">أيام الشهر</span>
           <input type="number" id="days" value="30" step="1" min="1" max="31" class="num">
         </div>
+        <div class="field">
+          <span class="lbl">يُشترط صافي محطة موجب<small>يمنع الصرف في شهر خاسر</small></span>
+          <div class="gate" id="netgate">
+            <button type="button" data-v="1">نعم</button>
+            <button type="button" class="no" data-v="0">لا</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="shiftcard">
+        <header><h2>الوردية مقابل الطلب</h2><span class="hint">من ٢١٢ يوماً فعلياً</span></header>
+        <div class="shift" id="shift"></div>
       </div>
     </aside>
 
@@ -526,19 +577,19 @@ footer.pg{
               </ul>
             </section>
             <section>
-              <h3>قواعد خط الأساس</h3>
+              <h3>لماذا يُشتق خط الأساس</h3>
               <ul>
-                <li>يُحسب من متوسط الثلاثة أشهر السابقة لنفس الوردية.</li>
-                <li>يُراجع كل ربع حتى لا يبقى الحافز على المستوى نفسه دائماً.</li>
-                <li>يُعدَّل إذا تغيّر عدد المضخات أو ساعات الوردية.</li>
+                <li>يُحسب من حصة الوردية الفعلية من الزيارات ÷ عدد عمالها — لا يُقدَّر.</li>
+                <li>عامل المساء يخدم زيارات أكثر بنفس العدد، والاشتقاق ينصفه.</li>
+                <li>اترك الخانة فارغة ليُشتق؛ أي رقم تكتبه يُوسم، وتخفيضه يُوسم بالأحمر.</li>
               </ul>
             </section>
             <section>
               <h3 class="warn">ما يُبطل النموذج</h3>
               <ul>
-                <li>خط أساس متساهل يحوّل الحافز إلى تكلفة ثابتة بلا مقابل.</li>
+                <li>تخفيض خط الأساس دون مبرر مكتوب يحوّل الحافز إلى تكلفة ثابتة.</li>
                 <li>غياب قياس زمن الخدمة يفرّغ بوابة الجودة من معناها.</li>
-                <li>احتساب الحافز على الحجم الكلي يكافئ الموسم لا الأداء.</li>
+                <li>الصرف في شهر صافيه سالب — الحافز فردي والشركة تقبض الصافي.</li>
               </ul>
             </section>
           </div>
@@ -548,64 +599,84 @@ footer.pg{
   </div>
 
   <footer class="pg">
-    خط الأساس ولتر/الزيارة محسوبان من متوسط آخر ثلاثة أشهر فعلية لكل محطة — لا من أعلى شهر.
-    هامش المساهمة ١٣٫٣٦ هللة/لتر مأخوذ من قائمة الدخل. الأرقام في هذه الصفحة تطابق
-    ملف «نموذج العامل» في الإكسل حرفاً بحرف.
+    بيانات المحطات من تقرير المطابقة التشغيلية — يناير إلى يوليو ٢٠٢٦، ٢١٢ يوماً فعلياً.
+    الوردية الصباحية ٦ صباحاً إلى ٦ مساءً والمسائية ٦ مساءً إلى ٦ صباحاً، وحصص الزيارات
+    محسوبة على هذا الحد. هامش المساهمة ١٣٫٣٦ هللة/لتر من قائمة الدخل.
+    الأرقام هنا تطابق ملف «نموذج العامل» في الإكسل حرفاً بحرف.
   </footer>
 </div>
 
 <script>
 "use strict";
 
-/* بيانات المحطات — متوسط آخر ثلاثة أشهر فعلية */
+/* بيانات المحطات — تقرير المطابقة التشغيلية، يناير–يوليو ٢٠٢٦ (٢١٢ يوماً) */
 const STATIONS = [
-  {name:"الشرايع",        code:"MK019", lpv:23.15, vpd:378,  note:"محطة تجريبية — مناديل وخدمة"},
-  {name:"عرفات الشوقية",  code:"MK017", lpv:21.32, vpd:1290, note:"محطة تجريبية — بنزين"},
-  {name:"العمرة الجديدة", code:"MK007", lpv:29.10, vpd:4274, note:"الأعلى حجماً"},
-  {name:"العزيزية",       code:"MK072", lpv:20.31, vpd:2500, note:"تعافت بعد الحج"},
-  {name:"المعيصم",        code:"MK002", lpv:20.92, vpd:600,  note:"تغيّر مسار الطريق"}
+  {name:"عرفات الشرائع", code:"MK019", fname:"عرفات الشرائع", lpv:23.16, visits:443,
+   dayW:2, eveW:2, dayShare:.4390, eveShare:.5610, peak:"17:00 · 21:00 · 22:00",
+   std:5, act:6, note:"محطة تجريبية — مناديل وخدمة"},
+  {name:"عرفات الشوقية", code:"MK017", fname:"عرفات الشوقية", lpv:21.07, visits:1269,
+   dayW:3, eveW:3, dayShare:.4471, eveShare:.5529, peak:"17:00 · 21:00 · 22:00",
+   std:9, act:9, note:"محطة تجريبية — بنزين"},
+  {name:"الفردوس", code:"MK023", fname:"بن درويش", lpv:20.01, visits:790,
+   dayW:2, eveW:2, dayShare:.4511, eveShare:.5489, peak:"17:00 · 21:00 · 22:00",
+   std:7, act:7, note:"محطة تجريبية — بنزين · عقد تشغيل"},
+  {name:"النورية", code:"MK007", fname:"العمرة", lpv:30.56, visits:4261,
+   dayW:11, eveW:9, dayShare:.4899, eveShare:.5101, peak:"17:00 · 21:00 · 22:00",
+   std:32, act:34, note:"الأعلى حجماً — حملات المستأجرين"},
+  {name:"المعيصم", code:"MK002", fname:"المعيصم", lpv:20.99, visits:864,
+   dayW:2, eveW:2, dayShare:.4964, eveShare:.5036, peak:"17:00 · 18:00 · 19:00",
+   std:7, act:8, note:"تغيّر مسار الطريق"}
 ];
 
-const SHIFTS = ["صباحية","مسائية","ليلية"];
+const SHIFTS = ["صباحية", "مسائية"];
 
+/* الطاقم الفعلي للشرائع: عاملان صباحاً وعاملان مساءً */
 let workers = [
-  {name:"أحمد",  shift:"صباحية", base:95,  actual:102, gate:true},
-  {name:"سالم",  shift:"صباحية", base:92,  actual:88,  gate:true},
-  {name:"يوسف",  shift:"مسائية", base:110, actual:128, gate:true},
-  {name:"خالد",  shift:"مسائية", base:88,  actual:96,  gate:false},
-  {name:"ماجد",  shift:"ليلية",  base:55,  actual:60,  gate:true},
-  {name:"فهد",   shift:"ليلية",  base:48,  actual:49,  gate:true}
+  {name:"أحمد", shift:"صباحية", override:null, actual:101, gate:true},
+  {name:"سالم", shift:"صباحية", override:null, actual:95,  gate:true},
+  {name:"يوسف", shift:"مسائية", override:null, actual:136, gate:true},
+  {name:"خالد", shift:"مسائية", override:null, actual:134, gate:false}
 ];
 
 const $  = (s) => document.querySelector(s);
 const n0 = new Intl.NumberFormat("en-US", {maximumFractionDigits:0});
 const n2 = new Intl.NumberFormat("en-US", {minimumFractionDigits:2, maximumFractionDigits:2});
+const pc = (x) => (x * 100).toFixed(1) + "%";
 const el = (t, cls) => { const e = document.createElement(t); if (cls) e.className = cls; return e; };
 
-/* ── settings ─────────────────────────────────────────── */
+let netGate = true;
+
 function settings(){
   const st = STATIONS[+$("#station").value] || STATIONS[0];
   return {
-    st,
-    lpv:    st.lpv,
-    margin: Math.max(0, +$("#margin").value || 0),   // هللة / لتر
+    st, lpv: st.lpv,
+    margin: Math.max(0, +$("#margin").value || 0),        // هللة / لتر
     share:  Math.max(0, +$("#share").value  || 0) / 100,
     cap:    Math.max(0, +$("#cap").value    || 0),
     days:   Math.max(1, +$("#days").value   || 30),
-    growth: (+$("#growth").value || 0) / 100
+    growth: (+$("#growth").value || 0) / 100,
+    netGate
   };
 }
 
-/* المعادلة نفسها الموجودة في ملف الإكسل */
-const targetOf = (base, g) => Math.round(base * (1 + g));
-function payOf(diff, gate, s){
+/* خط الأساس يُشتق من حصة الوردية من الزيارات ÷ عدد عمالها */
+function derivedBase(shift, st){
+  return shift === "صباحية"
+    ? st.visits * st.dayShare / Math.max(st.dayW, 1)
+    : st.visits * st.eveShare / Math.max(st.eveW, 1);
+}
+const effBase   = (w, st) => w.override != null ? w.override : Math.round(derivedBase(w.shift, st));
+const targetOf  = (base, g) => Math.round(base * (1 + g));
+
+function payOf(diff, gate, s, netDiff){
   if (!gate || diff <= 0) return 0;
+  if (s.netGate && netDiff <= 0) return 0;             // بوابة المحطة
   return Math.min(diff * s.lpv * (s.margin / 100) * s.share * s.days, s.cap);
 }
 
-/* ── station select ───────────────────────────────────── */
 function buildStations(){
   const sel = $("#station");
+  sel.textContent = "";
   STATIONS.forEach((s, i) => {
     const o = el("option");
     o.value = i; o.textContent = s.name + " · " + s.code;
@@ -613,7 +684,6 @@ function buildStations(){
   });
 }
 
-/* ── roster ───────────────────────────────────────────── */
 function buildRows(){
   const tb = $("#rows");
   tb.textContent = "";
@@ -635,21 +705,30 @@ function buildRows(){
       if (sh === w.shift) o.selected = true;
       sel.appendChild(o);
     });
-    sel.addEventListener("change", () => { w.shift = sel.value; });
+    sel.addEventListener("change", () => { w.shift = sel.value; recalc(); });
     tdShift.appendChild(sel); tr.appendChild(tdShift);
 
-    ["base","actual"].forEach((key, k) => {
-      const td = el("td");
-      const inp = el("input"); inp.type = "number"; inp.min = "0"; inp.step = "1";
-      inp.className = "num"; inp.value = w[key];
-      inp.setAttribute("aria-label", k === 0 ? "خط الأساس" : "الفعلي");
-      inp.addEventListener("input", () => { w[key] = +inp.value || 0; recalc(); });
-      td.appendChild(inp);
-      tr.appendChild(td);
-      if (k === 0) {                                    // المستهدف بين الأساس والفعلي
-        const t = el("td", "calc num"); t.dataset.role = "target"; tr.appendChild(t);
-      }
+    /* خط الأساس: فارغ = المشتق · أي رقم = تعديل معتمد */
+    const tdBase = el("td", "basecell");
+    const inBase = el("input"); inBase.type = "number"; inBase.min = "0"; inBase.step = "1";
+    inBase.className = "num"; inBase.value = w.override != null ? w.override : "";
+    inBase.setAttribute("aria-label", "خط الأساس — اتركه فارغاً ليُشتق تلقائياً");
+    inBase.addEventListener("input", () => {
+      w.override = inBase.value === "" ? null : (+inBase.value || 0);
+      recalc();
     });
+    const badge = el("span", "ovr");
+    tdBase.append(inBase, badge); tr.appendChild(tdBase);
+
+    const tdTarget = el("td", "calc num"); tdTarget.dataset.role = "target";
+    tr.appendChild(tdTarget);
+
+    const tdAct = el("td");
+    const inAct = el("input"); inAct.type = "number"; inAct.min = "0"; inAct.step = "1";
+    inAct.className = "num"; inAct.value = w.actual;
+    inAct.setAttribute("aria-label", "الفعلي");
+    inAct.addEventListener("input", () => { w.actual = +inAct.value || 0; recalc(); });
+    tdAct.appendChild(inAct); tr.appendChild(tdAct);
 
     const tdDiff = el("td", "diff num"); tdDiff.dataset.role = "diff"; tr.appendChild(tdDiff);
 
@@ -670,8 +749,7 @@ function buildRows(){
 
     const tdKill = el("td");
     const kill = el("button", "kill"); kill.type = "button"; kill.textContent = "×";
-    kill.title = "حذف العامل";
-    kill.setAttribute("aria-label", "حذف العامل");
+    kill.title = "حذف العامل"; kill.setAttribute("aria-label", "حذف العامل");
     kill.addEventListener("click", () => { workers.splice(i, 1); buildRows(); recalc(); });
     tdKill.appendChild(kill); tr.appendChild(tdKill);
 
@@ -679,20 +757,36 @@ function buildRows(){
   });
 }
 
-/* ── recalc: the whole page is one function ───────────── */
 function recalc(){
-  const s = settings();
-  $("#lpv").textContent = s.lpv ? n2.format(s.lpv) : "—";
+  const s = settings(), st = s.st;
+  $("#lpv").textContent = n2.format(s.lpv);
   $("#growth-val").textContent = Math.round(s.growth * 100) + "%";
+  [...$("#netgate").children].forEach(b =>
+    b.setAttribute("aria-pressed", String((b.dataset.v === "1") === netGate)));
 
-  let tBase = 0, tTarget = 0, tActual = 0, tDiff = 0, tPay = 0, capped = 0, blocked = 0;
+  /* صافي فروق المحطة يُحسب أولاً — بوابة المحطة تعتمد عليه */
+  const rows = workers.map(w => {
+    const base = effBase(w, st);
+    const target = targetOf(base, s.growth);
+    return {w, base, target, diff: w.actual - target};
+  });
+  const netDiff = rows.reduce((a, r) => a + r.diff, 0);
+
+  let tBase = 0, tTarget = 0, tActual = 0, tPay = 0, capped = 0, blocked = 0, over = 0;
 
   [...$("#rows").children].forEach((tr, i) => {
-    const w = workers[i];
-    const target = targetOf(w.base, s.growth);
-    const diff   = w.actual - target;
-    const pay    = payOf(diff, w.gate, s);
-    const ratio  = target > 0 ? w.actual / target : 0;
+    const {w, base, target, diff} = rows[i];
+    const pay = payOf(diff, w.gate, s, netDiff);
+    const ratio = target > 0 ? w.actual / target : 0;
+
+    const bc = tr.querySelector(".basecell");
+    const inp = bc.querySelector("input");
+    inp.placeholder = n0.format(Math.round(derivedBase(w.shift, st)));
+    const isOver = w.override != null;
+    const low = isOver && w.override < Math.round(derivedBase(w.shift, st));
+    bc.querySelector(".ovr").textContent = low ? "مخفَّض" : isOver ? "معدَّل" : "";
+    bc.className = "basecell" + (low ? " low" : isOver ? " ovr-on" : "");
+    if (isOver) over++;
 
     tr.querySelector('[data-role="target"]').textContent = n0.format(target);
 
@@ -713,35 +807,40 @@ function recalc(){
     tp.textContent = "";
     tp.append(document.createTextNode(n0.format(Math.round(pay))));
     tp.className = "pay num " + (pay > 0 ? "on" : "off");
-    const atCap = pay > 0 && Math.abs(pay - s.cap) < 0.005;
-    if (atCap){ const c = el("span", "cap"); c.textContent = "بلغ السقف"; tp.appendChild(c); capped++; }
+    if (pay > 0 && Math.abs(pay - s.cap) < 0.005){
+      const c = el("span", "cap"); c.textContent = "بلغ السقف"; tp.appendChild(c); capped++;
+    } else if (diff > 0 && w.gate && s.netGate && netDiff <= 0){
+      const c = el("span", "cap"); c.textContent = "المحطة سالبة"; tp.appendChild(c);
+    }
 
     const held = diff > 0 && !w.gate;
     tr.className = held ? "flag" : "";
     if (held) blocked++;
 
-    tBase += w.base; tTarget += target; tActual += w.actual; tDiff += diff; tPay += pay;
+    tBase += base; tTarget += target; tActual += w.actual; tPay += pay;
   });
 
   $("#t-n").textContent      = workers.length + " عامل";
   $("#t-base").textContent   = n0.format(tBase);
   $("#t-target").textContent = n0.format(tTarget);
   $("#t-actual").textContent = n0.format(tActual);
-  $("#t-diff").textContent   = (tDiff > 0 ? "+" : "") + n0.format(tDiff);
+  $("#t-diff").textContent   = (netDiff > 0 ? "+" : "") + n0.format(netDiff);
   $("#t-pct").textContent    = tTarget > 0 ? Math.round(tActual / tTarget * 100) + "%" : "—";
-  $("#t-gate").textContent   = blocked ? blocked + " محجوب" : capped ? capped + " عند السقف" : "—";
+  $("#t-gate").textContent   = blocked ? blocked + " محجوب"
+                             : over ? over + " معدَّل"
+                             : capped ? capped + " عند السقف" : "—";
   $("#t-pay").textContent    = n0.format(Math.round(tPay));
 
-  /* readout — visits → liters → margin → payout → net */
-  const liters = tDiff * s.lpv * s.days;
+  const liters = netDiff * s.lpv * s.days;
   const margin = liters * (s.margin / 100);
   const net    = margin - tPay;
-  setCell("#c-visits", (tDiff > 0 ? "+" : "") + n0.format(tDiff), tDiff);
+  setCell("#c-visits", (netDiff > 0 ? "+" : "") + n0.format(netDiff), netDiff);
   setCell("#c-liters", n0.format(Math.round(liters)), liters);
   setCell("#c-margin", n0.format(Math.round(margin)), margin);
   $("#c-pay").querySelector(".v").textContent = n0.format(Math.round(tPay));
   setCell("#c-net", (net > 0 ? "+" : "") + n0.format(Math.round(net)), net);
 
+  shiftPanel(st);
   scenarios(s, tBase);
 }
 
@@ -752,7 +851,54 @@ function setCell(sel, text, signal){
   c.classList.toggle("neg", signal < 0);
 }
 
-/* ── scenarios ────────────────────────────────────────── */
+/* ── الوردية مقابل الطلب ─────────────────────────────── */
+function shiftPanel(st){
+  const host = $("#shift");
+  host.textContent = "";
+  const tot = st.dayW + st.eveW;
+  const staffEve = st.eveW / tot;
+  const gap = st.eveShare - staffEve;
+  const matched = tot * st.eveShare;
+  const move = matched - st.eveW;
+  const bd = derivedBase("صباحية", st), be = derivedBase("مسائية", st);
+
+  const mk = (label, dv, ev, dcls, ecls) => {
+    const sr = el("div", "sr");
+    const hd = el("div", "hd");
+    hd.append(Object.assign(el("b"), {textContent:label}),
+              Object.assign(el("span"), {textContent:`صباحاً ${pc(dv)} · مساءً ${pc(ev)}`}));
+    const sp = el("div", "split");
+    const a = el("i", dcls); a.style.width = dv * 100 + "%";
+    const b = el("i", ecls); b.style.width = ev * 100 + "%";
+    sp.append(a, b); sr.append(hd, sp);
+    return sr;
+  };
+  host.appendChild(mk("حصة الزيارات", st.dayShare, st.eveShare, "d", "e"));
+  host.appendChild(mk("توزيع العمالة", 1 - staffEve, staffEve, "d", "e"));
+
+  const load = el("div", "load");
+  [["حِمل عامل الصباح", bd], ["حِمل عامل المساء", be]].forEach(([k, v]) => {
+    const d = el("div");
+    d.append(Object.assign(el("span", "k"), {textContent:k}),
+             Object.assign(el("span", "v"), {textContent:n0.format(Math.round(v))}));
+    load.appendChild(d);
+  });
+  host.appendChild(load);
+
+  const v = el("div", "verdict");
+  const heavier = Math.round((be / bd - 1) * 100);
+  const line1 = heavier > 1
+    ? `عامل المساء يخدم <b>${heavier}٪</b> زيارات أكثر من عامل الصباح بنفس العدد. `
+    : `الورديتان متوازنتان في هذه المحطة. `;
+  const line2 = Math.abs(move) >= 0.5
+    ? `الفجوة ${pc(Math.abs(gap))} — تكفي لنقل <b>${Math.abs(Math.round(move))} عامل</b> إلى المساء.`
+    : `الفجوة ${pc(Math.abs(gap))} — أقل من عامل واحد، فعالجها بمواعيد الدخول لا بالعدد.`;
+  v.innerHTML = line1 + line2 +
+    ` ساعات الذروة: <b>${st.peak}</b>. الطاقم المعياري ${st.std} والفعلي ${st.act}.`;
+  host.appendChild(v);
+}
+
+/* ── السيناريوهات ─────────────────────────────────────── */
 const SCEN = [
   {name:"متحفظ", g:0.03, note:"زيادة يومية بسيطة تُدرَك بالانضباط وحده."},
   {name:"أساسي", g:0.05, note:"النسبة المعتمدة في النموذج أعلاه."},
@@ -774,8 +920,8 @@ function scenarios(s, baseTotal){
 
     const card = el("div", "sc");
     const h = el("h3");
-    h.append(document.createTextNode(sc.name), Object.assign(el("em", "num"),
-      {textContent: Math.round(sc.g * 100) + "%"}));
+    h.append(document.createTextNode(sc.name),
+             Object.assign(el("em", "num"), {textContent: Math.round(sc.g * 100) + "%"}));
     card.appendChild(h);
 
     const dl = el("dl");
@@ -799,7 +945,7 @@ function scenarios(s, baseTotal){
   });
 }
 
-/* ── wire up ──────────────────────────────────────────── */
+/* ── التشغيل ──────────────────────────────────────────── */
 buildStations();
 buildRows();
 
@@ -807,9 +953,15 @@ buildRows();
   $(sel).addEventListener("input",  recalc);
   $(sel).addEventListener("change", recalc);
 });
+$("#netgate").addEventListener("click", (e) => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  netGate = b.dataset.v === "1";
+  recalc();
+});
 
 $("#add").addEventListener("click", () => {
-  workers.push({name:"", shift:"صباحية", base:0, actual:0, gate:true});
+  workers.push({name:"", shift:"صباحية", override:null, actual:0, gate:true});
   buildRows(); recalc();
   const rows = $("#rows").children;
   rows[rows.length - 1].querySelector("input").focus();
