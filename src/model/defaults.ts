@@ -195,6 +195,7 @@ export const BUNDLES = [
     name: "باقة العروض",
     emoji: "⭐",
     tag: "الأوفر قيمة · خصم 32%",
+    desc: "قيمتها أكبر من سعرها — تكفّي مشاويرك",
     price: 495,
     items: [
       { label: "رصيد بنزين", qty: "250 ﷼", worth: 250 },
@@ -204,9 +205,10 @@ export const BUNDLES = [
   },
   {
     id: "theeban",
-    name: "بطاقة ذيبان",
-    emoji: "🦊",
+    name: "دبرة",
+    emoji: "🧭",
     tag: "اقتصادية",
+    desc: "دبّر صرفك وضبّط مشاويرك",
     price: 500,
     items: [
       { label: "رصيد بنزين", qty: "300 ﷼", worth: 300 },
@@ -216,9 +218,10 @@ export const BUNDLES = [
   },
   {
     id: "faza3",
-    name: "بطاقة فزيع",
-    emoji: "🦅",
+    name: "فزعة",
+    emoji: "🤝",
     tag: "الأكثر طلباً",
+    desc: "خدمات أكثر تسند مشاويرك",
     price: 1000,
     items: [
       { label: "رصيد بنزين", qty: "600 ﷼", worth: 600 },
@@ -231,6 +234,7 @@ export const BUNDLES = [
     name: "بطاقة الشاهين",
     emoji: "🦅",
     tag: "بريميوم",
+    desc: "للي مشاويره ما تنتهي — رصيد وخدمات تكفّي شهور",
     price: 2000,
     items: [
       { label: "رصيد بنزين", qty: "1,300 ﷼", worth: 1300 },

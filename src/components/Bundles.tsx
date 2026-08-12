@@ -99,6 +99,7 @@ export default function Bundles() {
                 <Badge tone="accent">{b.tag}</Badge>
               </div>
               <div className="mt-2 text-lg font-extrabold">{b.name}</div>
+              {b.desc && <div className="text-xs text-darb-mut mb-1">{b.desc}</div>}
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-extrabold text-darb-orange">{fmtSar(b.price)}</span>
                 <span className="text-xs text-darb-accent">أو {fmtInt(pointsPrice)} نقطة</span>
