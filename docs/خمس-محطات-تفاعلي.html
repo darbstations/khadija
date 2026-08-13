@@ -1,0 +1,467 @@
+<title>الخطة التشغيلية — خمس محطات</title>
+
+<style>
+/* ══ tokens ══ */
+:root{
+  --ground:#F3F5F4; --panel:#FFFFFF; --panel-2:#EDF0EE;
+  --line:#D9E0DD; --line-soft:#E8EDEA;
+  --ink:#0E1A22; --ink-2:#3A4C57; --muted:#6E8794;
+  --amber:#B87516; --amber-lit:#E8A33D;
+  --earn:#3F8C57; --earn-bg:#E4F0E7;
+  --block:#C0463C; --block-bg:#FAE6E4;
+  --readout-bg:#0B1218; --readout-line:#1E2E39;
+  --shadow:0 1px 2px rgba(14,26,34,.06), 0 8px 24px -12px rgba(14,26,34,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0C141B; --panel:#131F29; --panel-2:#18242F;
+    --line:#22323F; --line-soft:#1B2933;
+    --ink:#E6EDF1; --ink-2:#B4C4CE; --muted:#78909E;
+    --amber:#E8A33D; --earn:#5CB578; --earn-bg:#162C1F;
+    --block:#E0685D; --block-bg:#2E1917;
+    --readout-bg:#070C11; --readout-line:#1B2A34;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0C141B; --panel:#131F29; --panel-2:#18242F;
+  --line:#22323F; --line-soft:#1B2933;
+  --ink:#E6EDF1; --ink-2:#B4C4CE; --muted:#78909E;
+  --amber:#E8A33D; --earn:#5CB578; --earn-bg:#162C1F;
+  --block:#E0685D; --block-bg:#2E1917;
+  --readout-bg:#070C11; --readout-line:#1B2A34;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+}
+
+body{
+  direction:rtl; background:var(--ground); color:var(--ink);
+  font-family:"SF Arabic","Segoe UI","Noto Sans Arabic","Dubai","Geeza Pro",Tahoma,Arial,sans-serif;
+  font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased;
+}
+.num{
+  font-family:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,monospace;
+  font-variant-numeric:tabular-nums;
+}
+.fig{direction:ltr; unicode-bidi:isolate;}
+.wrap{max-width:1240px; margin:0 auto; padding:0 20px 72px;}
+h1,h2,h3,h4{text-wrap:balance; margin:0;}
+button,input,select{font:inherit; color:inherit;}
+:focus-visible{outline:2px solid var(--amber-lit); outline-offset:2px; border-radius:4px;}
+@media (prefers-reduced-motion:reduce){*{animation:none !important; transition:none !important;}}
+
+/* ══ header ══ */
+.top{padding:32px 0 18px; border-bottom:1px solid var(--line);}
+.brand{display:flex; align-items:center; gap:12px;}
+.mark{
+  width:38px; height:38px; flex:none; border-radius:9px; background:var(--readout-bg);
+  display:grid; place-items:center; border:1px solid var(--readout-line);
+}
+.mark svg{width:20px; height:20px;}
+.top h1{font-size:23px; font-weight:700; letter-spacing:-.01em; line-height:1.25;}
+.top .sub{font-size:13px; color:var(--muted); margin-top:2px;}
+
+.chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:18px;}
+.chips button{
+  border:1px solid var(--line); background:var(--panel); border-radius:999px;
+  padding:7px 15px; cursor:pointer; font-size:13.5px; display:flex; align-items:center; gap:8px;
+}
+.chips button:hover{background:var(--panel-2);}
+.chips button[aria-pressed="true"]{
+  background:var(--readout-bg); border-color:var(--readout-bg); color:#E6EDF1; font-weight:700;
+}
+.chips .cd{font-size:11px; color:var(--muted); font-family:ui-monospace,Menlo,monospace;}
+.chips button[aria-pressed="true"] .cd{color:#7E97A6;}
+
+/* ══ readout ══ */
+.readout{
+  margin:22px 0 26px; background:var(--readout-bg); border:1px solid var(--readout-line);
+  border-radius:14px; padding:4px; box-shadow:var(--shadow);
+}
+.readout-inner{display:grid; grid-template-columns:repeat(5,1fr); border-radius:11px; overflow:hidden;}
+.cell{padding:18px 16px 16px; position:relative; min-width:0;}
+.cell + .cell::before{
+  content:""; position:absolute; inset-block:14px; inset-inline-start:0;
+  width:1px; background:var(--readout-line);
+}
+.cell .k{font-size:10.5px; letter-spacing:.1em; color:#5D7382; font-weight:600; display:block; margin-bottom:7px;}
+.cell .v{font-size:clamp(19px,2.4vw,29px); font-weight:600; line-height:1; color:#DDE7ED; display:block;
+  direction:ltr; unicode-bidi:isolate;}
+.cell .u{font-size:11px; color:#5D7382; margin-top:6px; display:block;}
+.cell.lit .v{color:var(--amber-lit); text-shadow:0 0 22px rgba(232,163,61,.32);}
+.cell.good .v{color:#6FCB8C;} .cell.bad .v{color:#E8756A;}
+@media (max-width:900px){
+  .readout-inner{grid-template-columns:repeat(2,1fr);}
+  .cell:nth-child(2) ~ .cell{border-top:1px solid var(--readout-line);}
+  .cell:nth-child(odd)::before{display:none;}
+  .cell:last-child{grid-column:1 / -1;}
+}
+
+/* ══ cards ══ */
+.card{background:var(--panel); border:1px solid var(--line); border-radius:12px;
+  box-shadow:var(--shadow); min-width:0;}
+.card > header{
+  padding:14px 16px; border-bottom:1px solid var(--line-soft);
+  display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+}
+.card > header h2{font-size:14.5px; font-weight:700;}
+.card > header .hint{font-size:11.5px; color:var(--muted);}
+.stack{display:grid; gap:22px;}
+.two{display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start;}
+@media (max-width:900px){.two{grid-template-columns:1fr;}}
+
+/* ══ tables ══ */
+.scroller{overflow-x:auto; min-width:0;}
+table{border-collapse:collapse; width:100%;}
+thead th{
+  font-size:11px; font-weight:600; letter-spacing:.04em; color:var(--muted);
+  text-align:center; padding:10px 8px; border-bottom:1px solid var(--line); white-space:nowrap;
+}
+thead th:first-child{text-align:start;}
+tbody td{padding:9px 8px; border-bottom:1px solid var(--line-soft); text-align:center; font-size:13.5px;}
+tbody td:first-child{text-align:start; font-weight:600;}
+tbody tr:last-child td{border-bottom:0;}
+/* a rival inside 500 m is the threat, not a win — flag it as such */
+tbody tr.close td{background:var(--block-bg);}
+tbody tr.close td:first-child{box-shadow:inset -3px 0 0 var(--block);}
+.up{color:var(--earn); font-weight:700;} .dn{color:var(--block); font-weight:700;}
+.near{color:var(--block); font-weight:700;}
+
+/* ══ shift ══ */
+.shift{padding:16px; display:grid; gap:13px;}
+.sr{display:grid; gap:5px;}
+.sr .hd{display:flex; justify-content:space-between; align-items:baseline; font-size:12.5px;}
+.sr .hd span{color:var(--muted); font-size:11.5px;}
+.split{display:flex; height:9px; border-radius:99px; overflow:hidden; background:var(--line);}
+.split i{display:block; height:100%;}
+.split i.d{background:var(--muted);} .split i.e{background:var(--amber);}
+.load{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+.load div{border:1px solid var(--line); border-radius:8px; padding:8px 10px; background:var(--panel-2);}
+.load .k{font-size:10.5px; color:var(--muted); display:block;}
+.load .v{font-size:17px; font-weight:700; display:block; margin-top:2px;
+  font-family:ui-monospace,Menlo,monospace; font-variant-numeric:tabular-nums;
+  direction:ltr; unicode-bidi:isolate;}
+.verdict{font-size:11.5px; line-height:1.55; color:var(--ink-2);
+  border-top:1px solid var(--line-soft); padding-top:10px;}
+.verdict b{color:var(--amber);}
+
+/* ══ swot ══ */
+.swot{display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line-soft);}
+@media (max-width:700px){.swot{grid-template-columns:1fr;}}
+.sq{background:var(--panel); padding:14px 16px;}
+.sq h4{font-size:12px; font-weight:700; letter-spacing:.06em; margin-bottom:9px;}
+.sq.s h4{color:var(--earn);} .sq.w h4{color:var(--block);}
+.sq.o h4{color:var(--amber);} .sq.t h4{color:var(--ink-2);}
+.sq ul{margin:0; padding:0; list-style:none; display:grid; gap:7px;}
+.sq li{font-size:12.5px; color:var(--ink-2); line-height:1.55; padding-inline-start:13px; position:relative;}
+.sq li::before{content:""; position:absolute; inset-inline-start:0; top:8px;
+  width:5px; height:5px; border-radius:50%; background:currentColor; opacity:.45;}
+.sq.s li::before{background:var(--earn);} .sq.w li::before{background:var(--block);}
+.sq.o li::before{background:var(--amber);}
+
+/* ══ pest ══ */
+.pest{padding:16px; display:grid; gap:12px;}
+.pr{display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:start;
+  padding-bottom:12px; border-bottom:1px solid var(--line-soft);}
+.pr:last-child{border-bottom:0; padding-bottom:0;}
+.pk{width:30px; height:30px; border-radius:8px; display:grid; place-items:center;
+  font-weight:700; font-size:13px; color:#fff; font-family:ui-monospace,Menlo,monospace;}
+.pr b{font-size:13px; display:block; margin-bottom:5px;}
+.pr ul{margin:0; padding:0; list-style:none; display:grid; gap:5px;}
+.pr li{font-size:12.5px; color:var(--ink-2); line-height:1.55;}
+
+/* ══ personas ══ */
+.pers{padding:16px; display:grid; gap:12px;}
+.pc{border:1px solid var(--line); border-radius:10px; padding:13px 15px; background:var(--panel-2);}
+.pc .ph{display:flex; align-items:baseline; gap:9px; flex-wrap:wrap;}
+.pc .pn{font-size:14px; font-weight:700;}
+.pc .ps{font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:999px;
+  background:var(--earn-bg); color:var(--earn);}
+.pc p{margin:7px 0 0; font-size:12.5px; color:var(--ink-2); line-height:1.6;}
+.pc .pl{margin-top:8px; font-size:12px; color:var(--ink-2); line-height:1.55;}
+.pc .pl b{color:var(--ink);}
+.pc .pl.act{color:var(--amber); border-top:1px solid var(--line); padding-top:8px;}
+.pc .pl.act b{color:var(--amber);}
+
+/* ══ misc ══ */
+.note{padding:13px 16px; font-size:12.5px; color:var(--ink-2); line-height:1.6;
+  border-top:1px solid var(--line-soft);}
+.note b{color:var(--amber);}
+.lede{
+  background:var(--panel); border:1px solid var(--line); border-left:0; border-right:0;
+  border-radius:12px; padding:16px 18px; box-shadow:var(--shadow); border:1px solid var(--line);
+}
+.lede h2{font-size:16px; font-weight:700; margin-bottom:7px;}
+.lede p{margin:0; font-size:13.5px; color:var(--ink-2); line-height:1.65;}
+.lede em{font-style:normal; color:var(--amber); font-weight:700;}
+footer.pg{margin-top:26px; padding-top:16px; border-top:1px solid var(--line);
+  font-size:11.5px; color:var(--muted); line-height:1.7;}
+</style>
+
+<div class="wrap">
+
+  <div class="top">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#E8A33D" stroke-width="1.7"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 20V5a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v15"/>
+          <path d="M3 20h11"/><path d="M6 8h5"/>
+          <path d="M16 10h2a1 1 0 0 1 1 1v6a1.5 1.5 0 0 0 3 0V9l-3-3"/>
+        </svg>
+      </div>
+      <div>
+        <h1>الخطة التشغيلية — خمس محطات</h1>
+        <div class="sub">التشغيل والوردية والمنافسة في صفحة واحدة · مكة · النصف الأول ٢٠٢٦</div>
+      </div>
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="اختيار المحطة"></div>
+  </div>
+
+  <div class="readout">
+    <div class="readout-inner">
+      <div class="cell" id="c-vis"><span class="k">الزيارات</span><span class="v">—</span><span class="u">زيارة / يوم</span></div>
+      <div class="cell" id="c-lpv"><span class="k">لتر لكل زيارة</span><span class="v">—</span><span class="u">لتر</span></div>
+      <div class="cell" id="c-comp"><span class="k">منافسون ≤ ٥ كم</span><span class="v">—</span><span class="u">محطة</span></div>
+      <div class="cell lit" id="c-near"><span class="k">أقرب منافس</span><span class="v">—</span><span class="u">متر</span></div>
+      <div class="cell" id="c-rate"><span class="k">تقييمنا مقابلهم</span><span class="v">—</span><span class="u">نجمة على خرائط جوجل</span></div>
+    </div>
+  </div>
+
+  <div class="stack">
+
+    <div class="lede">
+      <h2>ما يقوله دمج التشغيل بالموقع</h2>
+      <p>درب <em>أعلى تقييماً من كل منافسيها</em> في المواقع الخمسة — بفارق ٠٫٨ إلى ١٫٣ نجمة.
+         فالحركة المفقودة ليست خسارة في جودة الخدمة، بل <em>اعتراض بالموقع</em>:
+         المحطة الوحيدة النامية أقرب منافس لها على بُعد ٢٬٤٥٠ متراً، والثلاث الهابطة
+         عند كلٍّ منها منافس دون ٥٠٠ متر. هذا يطابق ما أثبتته البيانات الشهرية —
+         سلة العميل ثابتة والفقد في عدد الزيارات.</p>
+    </div>
+
+    <div class="card">
+      <header>
+        <h2>القرب مقابل النمو — الخمس محطات</h2>
+        <span class="hint">المنافسون من خرائط جوجل يوليو ٢٠٢٦ · النمو من إيراد الفترة</span>
+      </header>
+      <div class="scroller">
+        <table id="cross">
+          <thead><tr>
+            <th>المحطة</th><th>الكود</th><th>منافسون ≤٥كم</th><th>أقرب منافس</th>
+            <th>تقييمنا</th><th>متوسطهم</th><th>الفارق</th><th>النمو</th><th>زيارة/يوم</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="note" id="crossnote"></div>
+    </div>
+
+    <div class="two">
+      <div class="card">
+        <header><h2>الوردية مقابل الطلب</h2><span class="hint">٢١٢ يوماً فعلياً</span></header>
+        <div class="shift" id="shift"></div>
+      </div>
+      <div class="card">
+        <header><h2 id="ctitle">المنافسون ضمن ٥ كم</h2><span class="hint" id="cdens"></span></header>
+        <div class="note" id="csum" style="border-top:0"></div>
+        <div class="scroller"><table id="comps">
+          <thead><tr><th>المحطة المنافسة</th><th>المسافة</th><th>التقييم</th><th>المراجعات</th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+        <div class="note" id="sibs"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <header><h2>تحليل SWOT</h2><span class="hint">مبيعات + موقع + منافسة</span></header>
+      <div class="swot" id="swot"></div>
+    </div>
+
+    <div class="two">
+      <div class="card">
+        <header><h2>تحليل PEST</h2><span class="hint">بيئة مكة الكلية</span></header>
+        <div class="pest" id="pest"></div>
+      </div>
+      <div class="card">
+        <header><h2>بيرسونا العملاء</h2><span class="hint">مشتقة من مزيج الوقود والأوقات والدفع</span></header>
+        <div class="pers" id="pers"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="pg">
+    التشغيل والورديات من تقرير المطابقة التشغيلية — يناير إلى يوليو ٢٠٢٦، ٢١٢ يوماً فعلياً،
+    والوردية الصباحية ٦ ص إلى ٦ م. المنافسون والتقييمات من خرائط جوجل (يوليو ٢٠٢٦).
+    الخمس محطات هي نطاق هذه الدراسة — واثنتان منها تجريبيتان للوقود وواحدة لحملات المستأجرين.
+  </footer>
+</div>
+
+<script>
+"use strict";
+const ST = [{"code":"MK019","name":"عرفات الشرائع","fname":"عرفات الشرائع","hood":"الخضراء","contract":"ايجار","rating":4.9,"revDay":23930,"rank":47,"growth":"-25","lpv":23.16,"visits":443,"liters":10255,"dayW":2,"eveW":2,"dayShare":0.439,"eveShare":0.561,"peak":"17:00 · 21:00 · 22:00","std":5,"act":6,"pumps":6,"nozzles":24,"nComp":23,"density":"منافسة مرتفعة","compAvg":3.6,"nearName":"Aldrees","nearDist":"488 م","competitors":[{"name":"Aldrees","dist":"488 م","rating":"3.2","reviews":"48"},{"name":"Aldrees","dist":"824 م","rating":"4.0","reviews":"207"},{"name":"بتروجين Petrogen","dist":"923 م","rating":"4.6","reviews":"18"},{"name":"NAFT","dist":"1,382 م","rating":"3.0","reviews":"6"},{"name":"Aldrees","dist":"1,804 م","rating":"3.9","reviews":"14"},{"name":"محطة ساسكو","dist":"1,861 م","rating":"4.0","reviews":"21"},{"name":"Aldrees","dist":"1,909 م","rating":"3.3","reviews":"21"},{"name":"محطة المعيصم","dist":"1,967 م","rating":"3.8","reviews":"2,273"},{"name":"محطة تميز للوقود","dist":"2,152 م","rating":"4.0","reviews":"9"},{"name":"اومكو","dist":"2,169 م","rating":"3.2","reviews":"108"}],"siblings":"🧡 محطات درب شقيقة ضمن النطاق: محطة درب (1,586 م)، محطة درب (2,077 م)، محطة درب (4,939 م) — تغطية شبكية وليست منافسة.","swot":{"القوة":["سمعة قوية على خرائط جوجل: 4.9★ من 2,274 مراجعة","تشغيل فعّال على مدار الساعة — الليل والمساء منتجان معًا","موقع حيوية — منطقة حيوية"],"الضعف":["تراجع ربعي -25٪ في Q2 — يتطلب خطة استرداد","اعتماد مفرط على الكاش (100٪) — فرصة ولاء ودقة بيانات مهدرة","استخدام شبه معدوم لتطبيقات الوقود — لا رؤية لسلوك العميل المتكرر"],"الفرص":["70٪ من المنافسين بتقييم أقل من 4.0★ — التفوق الخدمي يسحب عملاءهم","تفوق سمعة واضح: 4.9★ مقابل متوسط منافسين 3.6★","تحويل عملاء الكاش لبرنامج ولاء/تطبيق يرفع التكرار ويجمع البيانات","تعظيم سلة المساء: ربط الوقود بالمتجر والمغسلة في ساعات الذروة","مواسم العمرة والحج — شراكات نقل زوار وتموين حافلات"],"التهديدات":["سوق مشبع: 23 محطة منافسة ≤5كم تضغط على الحصة","منافسون معروفون قريبون (الدريس، نفط، ساسكو) بقدرات تسعير وخدمات","موسمية حادة: ما بعد رمضان/الحج ينخفض الطلب — ظهر في تراجع Q2 بعدة محطات","هامش الوقود المنظّم يجعل أي حرب خدمات/سرعة تُحسم لصالح الأفضل تشغيلًا","تذبذب يومي مرتفع (CV 38%) يصعّب جدولة العمالة والمخزون"]},"pest":{"سياسي/تنظيمي":["تنظيمات موسم الحج والعمرة (تصاريح، مسارات، إغلاقات مؤقتة) تؤثر مباشرة على حركة المرور","تسعير الوقود خاضع للمراجعة الحكومية الدورية (أرامكو) — هامش الوقود شبه ثابت والتنافس يتحول للخدمات"],"اقتصادي":["اقتصاد مدفوع بالزوار: ملايين المعتمرين والحجاج سنويًا يرفعون الطلب على النقل والوقود","مشاريع توسعة الحرم والمشاعر وفنادق ضخمة تزيد حركة الإنشاء والشاحنات"],"اجتماعي":["تركيبة سكانية متنوعة (سكان + عمالة خدمات + زوار موسميون) بأنماط تنقل مختلفة","ذروة موسمية حادة (رمضان، الحج) يليها هدوء نسبي — إدارة الطاقة الاستيعابية أساسية"],"تقني":["حافلات نقل الحجاج الحديثة وقطار المشاعر يعيدان توزيع الطلب على الوقود","انتشار مدفوعات NFC وتطبيقات الوقود (Syarah/Petro App) وأنظمة الولاء الرقمية"]},"personas":[{"name":"المعتمر والزائر","share":"ذروة رمضان والمواسم","desc":"زائر بسيارة خاصة أو سائق نقل زوار، لا يعرف المنطقة، يبحث عن محطة واضحة وآمنة قرب محاور الحرم.","needs":"لافتات واضحة، مسار دخول سهل، متجر مجهز، مصلى ودورات مياه نظيفة","action":"الظهور على خرائط جوجل بتقييم عالٍ + عروض مواسم العمرة"},{"name":"رائد المساء","share":"48٪ من الزيارات مساءً","desc":"موظف/عائلة تتحرك بعد العصر للتسوق والمشاوير، تفضل التعبئة مع قضاء حاجات المتجر.","needs":"خدمة سريعة وقت الذروة، متجر ومقهى، إضاءة وأمان","action":"عروض المساء (6–10م) وربطها بالمتجر والمغسلة"},{"name":"ساهر الليل","share":"17٪ من الزيارات بعد منتصف الليل","desc":"شباب وسائقو توصيل وعمال مناوبات يتحركون بعد منتصف الليل.","needs":"تشغيل 24 ساعة بكامل الخدمات، قهوة ليلية، أمان","action":"عروض ما بعد منتصف الليل لسائقي التطبيقات"},{"name":"عميل الكاش","share":"100٪ من الإيراد نقدًا","desc":"عمالة وسائقون يفضلون النقد، حساسون للسعر ويكررون الزيارة.","needs":"صرف سريع، كاشير جاهز، عروض بسيطة واضحة","action":"تحفيز التحول للتطبيق بمكافأة أول شحنة رقمية"}],"compSummaryText":"الأقرب: Aldrees على بعد 488 م · متوسط تقييم المنافسين 3.6★ — درب أعلى بـ1.3 نقطة. مصدر الرصد: خرائط جوجل (يوليو 2026)."},{"code":"MK017","name":"عرفات الشوقية","fname":"عرفات الشوقية","hood":"الشوقية","contract":"ايجار","rating":4.9,"revDay":61488,"rank":20,"growth":"+7","lpv":21.07,"visits":1269,"liters":26742,"dayW":3,"eveW":3,"dayShare":0.4471,"eveShare":0.5529,"peak":"17:00 · 21:00 · 22:00","std":9,"act":9,"pumps":9,"nozzles":36,"nComp":6,"density":"منافسة متوسطة","compAvg":4.1,"nearName":"محطة نوفل","nearDist":"2,450 م","competitors":[{"name":"محطة نوفل","dist":"2,450 م","rating":"3.8","reviews":"289"},{"name":"Aldrees","dist":"2,491 م","rating":"4.0","reviews":"620"},{"name":"محطة تلال الأديب للوقود","dist":"4,079 م","rating":"4.3","reviews":"268"},{"name":"محطة الدريس في شارع المنصور","dist":"4,256 م","rating":"4.5","reviews":"2"},{"name":"Aldrees","dist":"4,401 م","rating":"4.4","reviews":"37"},{"name":"بتروجين Petrogen","dist":"4,689 م","rating":"1.0","reviews":"2"}],"siblings":"🧡 محطات درب شقيقة ضمن النطاق: محطة درب (2,298 م)، محطة درب (2,794 م)، محطة درب (2,830 م)، محطة درب (4,690 م) — تغطية شبكية وليست منافسة.","swot":{"القوة":["سمعة قوية على خرائط جوجل: 4.9★ من 4,066 مراجعة","تشغيل فعّال على مدار الساعة — الليل والمساء منتجان معًا","موقع حيوية — منطقة حيوية"],"الضعف":["اعتماد مفرط على الكاش (100٪) — فرصة ولاء ودقة بيانات مهدرة","استخدام شبه معدوم لتطبيقات الوقود — لا رؤية لسلوك العميل المتكرر"],"الفرص":["تفوق سمعة واضح: 4.9★ مقابل متوسط منافسين 4.1★","تحويل عملاء الكاش لبرنامج ولاء/تطبيق يرفع التكرار ويجمع البيانات","تعظيم سلة المساء: ربط الوقود بالمتجر والمغسلة في ساعات الذروة","مواسم العمرة والحج — شراكات نقل زوار وتموين حافلات","البناء على زخم النمو الحالي بتوسيع الخدمات (غيار زيت سريع/مقهى)"],"التهديدات":["منافسون معروفون قريبون (الدريس) بقدرات تسعير وخدمات","موسمية حادة: ما بعد رمضان/الحج ينخفض الطلب — ظهر في تراجع Q2 بعدة محطات","هامش الوقود المنظّم يجعل أي حرب خدمات/سرعة تُحسم لصالح الأفضل تشغيلًا"]},"pest":{"سياسي/تنظيمي":["تنظيمات موسم الحج والعمرة (تصاريح، مسارات، إغلاقات مؤقتة) تؤثر مباشرة على حركة المرور","تسعير الوقود خاضع للمراجعة الحكومية الدورية (أرامكو) — هامش الوقود شبه ثابت والتنافس يتحول للخدمات"],"اقتصادي":["اقتصاد مدفوع بالزوار: ملايين المعتمرين والحجاج سنويًا يرفعون الطلب على النقل والوقود","مشاريع توسعة الحرم والمشاعر وفنادق ضخمة تزيد حركة الإنشاء والشاحنات"],"اجتماعي":["تركيبة سكانية متنوعة (سكان + عمالة خدمات + زوار موسميون) بأنماط تنقل مختلفة","ذروة موسمية حادة (رمضان، الحج) يليها هدوء نسبي — إدارة الطاقة الاستيعابية أساسية"],"تقني":["حافلات نقل الحجاج الحديثة وقطار المشاعر يعيدان توزيع الطلب على الوقود","انتشار مدفوعات NFC وتطبيقات الوقود (Syarah/Petro App) وأنظمة الولاء الرقمية"]},"personas":[{"name":"المعتمر والزائر","share":"ذروة رمضان والمواسم","desc":"زائر بسيارة خاصة أو سائق نقل زوار، لا يعرف المنطقة، يبحث عن محطة واضحة وآمنة قرب محاور الحرم.","needs":"لافتات واضحة، مسار دخول سهل، متجر مجهز، مصلى ودورات مياه نظيفة","action":"الظهور على خرائط جوجل بتقييم عالٍ + عروض مواسم العمرة"},{"name":"رائد المساء","share":"48٪ من الزيارات مساءً","desc":"موظف/عائلة تتحرك بعد العصر للتسوق والمشاوير، تفضل التعبئة مع قضاء حاجات المتجر.","needs":"خدمة سريعة وقت الذروة، متجر ومقهى، إضاءة وأمان","action":"عروض المساء (6–10م) وربطها بالمتجر والمغسلة"},{"name":"عميل الكاش","share":"100٪ من الإيراد نقدًا","desc":"عمالة وسائقون يفضلون النقد، حساسون للسعر ويكررون الزيارة.","needs":"صرف سريع، كاشير جاهز، عروض بسيطة واضحة","action":"تحفيز التحول للتطبيق بمكافأة أول شحنة رقمية"}],"compSummaryText":"الأقرب: محطة نوفل على بعد 2,450 م · متوسط تقييم المنافسين 4.1★ — درب أعلى بـ0.8 نقطة. مصدر الرصد: خرائط جوجل (يوليو 2026)."},{"code":"MK023","name":"الفردوس","fname":"بن درويش","hood":"الخضراء","contract":"تشغيل","rating":4.9,"revDay":36469,"rank":38,"growth":"-12","lpv":20.01,"visits":790,"liters":15821,"dayW":2,"eveW":2,"dayShare":0.4511,"eveShare":0.5489,"peak":"17:00 · 21:00 · 22:00","std":7,"act":7,"pumps":4,"nozzles":16,"nComp":28,"density":"منافسة مرتفعة","compAvg":3.6,"nearName":"Aldrees","nearDist":"411 م","competitors":[{"name":"Aldrees","dist":"411 م","rating":"3.3","reviews":"21"},{"name":"Aldrees","dist":"1,048 م","rating":"4.0","reviews":"207"},{"name":"Aldrees","dist":"1,208 م","rating":"3.2","reviews":"48"},{"name":"Aldrees","dist":"1,230 م","rating":"3.3","reviews":"8"},{"name":"محطة بترومين للوقود","dist":"1,423 م","rating":"3.7","reviews":"231"},{"name":"محطة امداد الخليج للوقود الشرائع","dist":"1,578 م","rating":"4.0","reviews":"312"},{"name":"محطة ساسكو","dist":"1,701 م","rating":"4.0","reviews":"21"},{"name":"محطة تميز للوقود","dist":"1,735 م","rating":"4.0","reviews":"9"},{"name":"اومكو","dist":"1,755 م","rating":"3.2","reviews":"108"},{"name":"محطة بترومين","dist":"1,796 م","rating":"3.7","reviews":"92"}],"siblings":"🧡 محطات درب شقيقة ضمن النطاق: محطة درب (1,586 م)، محطة درب (3,062 م) — تغطية شبكية وليست منافسة.","swot":{"القوة":["سمعة قوية على خرائط جوجل: 4.9★ من 2,116 مراجعة","تشغيل فعّال على مدار الساعة — الليل والمساء منتجان معًا","موقع حيوية — منطقة حيوية"],"الضعف":["تراجع ربعي -12٪ في Q2 — يتطلب خطة استرداد","اعتماد مفرط على الكاش (100٪) — فرصة ولاء ودقة بيانات مهدرة","استخدام شبه معدوم لتطبيقات الوقود — لا رؤية لسلوك العميل المتكرر","متوسط فاتورة منخفض (45 ر.س) — أغلب العملاء تعبئة جزئية"],"الفرص":["68٪ من المنافسين بتقييم أقل من 4.0★ — التفوق الخدمي يسحب عملاءهم","تفوق سمعة واضح: 4.9★ مقابل متوسط منافسين 3.6★","تحويل عملاء الكاش لبرنامج ولاء/تطبيق يرفع التكرار ويجمع البيانات","تعظيم سلة المساء: ربط الوقود بالمتجر والمغسلة في ساعات الذروة","مواسم العمرة والحج — شراكات نقل زوار وتموين حافلات"],"التهديدات":["سوق مشبع: 28 محطة منافسة ≤5كم تضغط على الحصة","منافسون معروفون قريبون (الدريس، بترومين، ساسكو) بقدرات تسعير وخدمات","موسمية حادة: ما بعد رمضان/الحج ينخفض الطلب — ظهر في تراجع Q2 بعدة محطات","هامش الوقود المنظّم يجعل أي حرب خدمات/سرعة تُحسم لصالح الأفضل تشغيلًا"]},"pest":{"سياسي/تنظيمي":["تنظيمات موسم الحج والعمرة (تصاريح، مسارات، إغلاقات مؤقتة) تؤثر مباشرة على حركة المرور","تسعير الوقود خاضع للمراجعة الحكومية الدورية (أرامكو) — هامش الوقود شبه ثابت والتنافس يتحول للخدمات"],"اقتصادي":["اقتصاد مدفوع بالزوار: ملايين المعتمرين والحجاج سنويًا يرفعون الطلب على النقل والوقود","مشاريع توسعة الحرم والمشاعر وفنادق ضخمة تزيد حركة الإنشاء والشاحنات"],"اجتماعي":["تركيبة سكانية متنوعة (سكان + عمالة خدمات + زوار موسميون) بأنماط تنقل مختلفة","ذروة موسمية حادة (رمضان، الحج) يليها هدوء نسبي — إدارة الطاقة الاستيعابية أساسية"],"تقني":["حافلات نقل الحجاج الحديثة وقطار المشاعر يعيدان توزيع الطلب على الوقود","انتشار مدفوعات NFC وتطبيقات الوقود (Syarah/Petro App) وأنظمة الولاء الرقمية"]},"personas":[{"name":"المعتمر والزائر","share":"ذروة رمضان والمواسم","desc":"زائر بسيارة خاصة أو سائق نقل زوار، لا يعرف المنطقة، يبحث عن محطة واضحة وآمنة قرب محاور الحرم.","needs":"لافتات واضحة، مسار دخول سهل، متجر مجهز، مصلى ودورات مياه نظيفة","action":"الظهور على خرائط جوجل بتقييم عالٍ + عروض مواسم العمرة"},{"name":"رائد المساء","share":"47٪ من الزيارات مساءً","desc":"موظف/عائلة تتحرك بعد العصر للتسوق والمشاوير، تفضل التعبئة مع قضاء حاجات المتجر.","needs":"خدمة سريعة وقت الذروة، متجر ومقهى، إضاءة وأمان","action":"عروض المساء (6–10م) وربطها بالمتجر والمغسلة"},{"name":"عميل الكاش","share":"100٪ من الإيراد نقدًا","desc":"عمالة وسائقون يفضلون النقد، حساسون للسعر ويكررون الزيارة.","needs":"صرف سريع، كاشير جاهز، عروض بسيطة واضحة","action":"تحفيز التحول للتطبيق بمكافأة أول شحنة رقمية"}],"compSummaryText":"الأقرب: Aldrees على بعد 411 م · متوسط تقييم المنافسين 3.6★ — درب أعلى بـ1.3 نقطة. مصدر الرصد: خرائط جوجل (يوليو 2026)."},{"code":"MK007","name":"النورية","fname":"العمرة","hood":"العمرة الجديدة","contract":"ايجار","rating":4.8,"revDay":273982,"rank":1,"growth":"-22","lpv":30.56,"visits":4261,"liters":130213,"dayW":11,"eveW":9,"dayShare":0.4899,"eveShare":0.5101,"peak":"17:00 · 21:00 · 22:00","std":32,"act":34,"pumps":18,"nozzles":36,"nComp":4,"density":"منافسة منخفضة","compAvg":4.0,"nearName":"محطة المملكة","nearDist":"2,194 م","competitors":[{"name":"محطة المملكة","dist":"2,194 م","rating":"3.7","reviews":"900"},{"name":"Aldrees","dist":"2,367 م","rating":"3.8","reviews":"731"},{"name":"Aldrees","dist":"3,420 م","rating":"3.9","reviews":"2,109"},{"name":"محطة بترولي","dist":"4,376 م","rating":"4.4","reviews":"4,773"}],"siblings":"","swot":{"القوة":["ضمن أعلى 25٪ من الشبكة بإيراد يومي 274 ألف ر.س (المرتبة 1 من 55)","سمعة قوية على خرائط جوجل: 4.8★ من 1,173 مراجعة","متوسط فاتورة مرتفع (65 ر.س مقابل وسيط الشبكة 53)","قاعدة ديزل تجارية تمنح إيرادًا مستقرًا غير موسمي","تشغيل فعّال على مدار الساعة — الليل والمساء منتجان معًا"],"الضعف":["تراجع ربعي -22٪ في Q2 — يتطلب خطة استرداد"],"الفرص":["كثافة منافسة منخفضة (4 محطات ≤5كم بحسب خرائط جوجل) — مجال للاستحواذ على الحصة","75٪ من المنافسين بتقييم أقل من 4.0★ — التفوق الخدمي يسحب عملاءهم","تفوق سمعة واضح: 4.8★ مقابل متوسط منافسين 4.0★","تحويل عملاء الكاش لبرنامج ولاء/تطبيق يرفع التكرار ويجمع البيانات","تعظيم سلة المساء: ربط الوقود بالمتجر والمغسلة في ساعات الذروة"],"التهديدات":["منافسون معروفون قريبون (الدريس، بترولي) بقدرات تسعير وخدمات","موسمية حادة: ما بعد رمضان/الحج ينخفض الطلب — ظهر في تراجع Q2 بعدة محطات","هامش الوقود المنظّم يجعل أي حرب خدمات/سرعة تُحسم لصالح الأفضل تشغيلًا"]},"pest":{"سياسي/تنظيمي":["تنظيمات موسم الحج والعمرة (تصاريح، مسارات، إغلاقات مؤقتة) تؤثر مباشرة على حركة المرور","تسعير الوقود خاضع للمراجعة الحكومية الدورية (أرامكو) — هامش الوقود شبه ثابت والتنافس يتحول للخدمات"],"اقتصادي":["اقتصاد مدفوع بالزوار: ملايين المعتمرين والحجاج سنويًا يرفعون الطلب على النقل والوقود","مشاريع توسعة الحرم والمشاعر وفنادق ضخمة تزيد حركة الإنشاء والشاحنات","نشاط الشحن واللوجستيات في المحيط يرفع حصة الديزل"],"اجتماعي":["تركيبة سكانية متنوعة (سكان + عمالة خدمات + زوار موسميون) بأنماط تنقل مختلفة","ذروة موسمية حادة (رمضان، الحج) يليها هدوء نسبي — إدارة الطاقة الاستيعابية أساسية"],"تقني":["حافلات نقل الحجاج الحديثة وقطار المشاعر يعيدان توزيع الطلب على الوقود","انتشار مدفوعات NFC وتطبيقات الوقود (Syarah/Petro App) وأنظمة الولاء الرقمية"]},"personas":[{"name":"الناقل التجاري","share":"ديزل 28٪ من الإيراد","desc":"سائق شاحنة/أسطول على خط طويل، يتزود بكميات كبيرة ويحتاج مسارات واسعة وخدمة سريعة واستراحة.","needs":"مضخات ديزل سريعة، موقف شاحنات، دورات مياه نظيفة، قهوة وطعام سريع","action":"عقود أساطيل وخصومات كميات + بطاقة سائق مميز"},{"name":"المعتمر والزائر","share":"ذروة رمضان والمواسم","desc":"زائر بسيارة خاصة أو سائق نقل زوار، لا يعرف المنطقة، يبحث عن محطة واضحة وآمنة قرب محاور الحرم.","needs":"لافتات واضحة، مسار دخول سهل، متجر مجهز، مصلى ودورات مياه نظيفة","action":"الظهور على خرائط جوجل بتقييم عالٍ + عروض مواسم العمرة"},{"name":"رائد المساء","share":"43٪ من الزيارات مساءً","desc":"موظف/عائلة تتحرك بعد العصر للتسوق والمشاوير، تفضل التعبئة مع قضاء حاجات المتجر.","needs":"خدمة سريعة وقت الذروة، متجر ومقهى، إضاءة وأمان","action":"عروض المساء (6–10م) وربطها بالمتجر والمغسلة"},{"name":"عابر الطريق","share":"متوسط تعبئة 31 لترًا","desc":"مسافر بين المدن يملأ الخزان كاملًا، توقفه قصير وحاسم: وقود + حمام + قهوة.","needs":"مداخل/مخارج سلسة من الطريق، خدمة سريعة، استراحة نظيفة","action":"لوحات على الطريق قبل المحطة + تجهيز \"توقف 5 دقائق\""}],"compSummaryText":"الأقرب: محطة المملكة على بعد 2,194 م · متوسط تقييم المنافسين 4.0★ — درب أعلى بـ0.8 نقطة. مصدر الرصد: خرائط جوجل (يوليو 2026)."},{"code":"MK002","name":"المعيصم","fname":"المعيصم","hood":"المعيصم","contract":"ايجار","rating":4.8,"revDay":43215,"rank":32,"growth":"-53","lpv":20.99,"visits":864,"liters":18130,"dayW":2,"eveW":2,"dayShare":0.4964,"eveShare":0.5036,"peak":"17:00 · 18:00 · 19:00","std":7,"act":8,"pumps":10,"nozzles":40,"nComp":18,"density":"منافسة مرتفعة","compAvg":3.7,"nearName":"محطة المعيصم","nearDist":"181 م","competitors":[{"name":"محطة المعيصم","dist":"181 م","rating":"3.8","reviews":"2,273"},{"name":"Aldrees","dist":"517 م","rating":"3.9","reviews":"14"},{"name":"Aldrees","dist":"547 م","rating":"3.6","reviews":"20"},{"name":"NAFT","dist":"695 م","rating":"3.0","reviews":"6"},{"name":"بتروجين Petrogen","dist":"1,165 م","rating":"4.6","reviews":"18"},{"name":"محطة أورانج","dist":"1,561 م","rating":"3.2","reviews":"18"},{"name":"محطة ساسكو","dist":"1,806 م","rating":"4.0","reviews":"21"},{"name":"Aldrees","dist":"2,042 م","rating":"4.0","reviews":"207"},{"name":"محطة تميز للوقود","dist":"2,116 م","rating":"4.0","reviews":"9"},{"name":"اومكو","dist":"2,116 م","rating":"3.2","reviews":"108"}],"siblings":"🧡 محطات درب شقيقة ضمن النطاق: محطة درب (2,077 م)، محطة درب (2,900 م)، محطة درب (3,062 م) — تغطية شبكية وليست منافسة.","swot":{"القوة":["سمعة قوية على خرائط جوجل: 4.8★ من 2,310 مراجعة","موقع حيوية — منطقة حيوية"],"الضعف":["تراجع ربعي -53٪ في Q2 — يتطلب خطة استرداد","اعتماد مفرط على الكاش (100٪) — فرصة ولاء ودقة بيانات مهدرة","استخدام شبه معدوم لتطبيقات الوقود — لا رؤية لسلوك العميل المتكرر"],"الفرص":["61٪ من المنافسين بتقييم أقل من 4.0★ — التفوق الخدمي يسحب عملاءهم","تفوق سمعة واضح: 4.8★ مقابل متوسط منافسين 3.7★","تحويل عملاء الكاش لبرنامج ولاء/تطبيق يرفع التكرار ويجمع البيانات","تعظيم سلة المساء: ربط الوقود بالمتجر والمغسلة في ساعات الذروة","مواسم العمرة والحج — شراكات نقل زوار وتموين حافلات"],"التهديدات":["سوق مشبع: 18 محطة منافسة ≤5كم تضغط على الحصة","منافسون معروفون قريبون (الدريس، نفط، ساسكو) بقدرات تسعير وخدمات","موسمية حادة: ما بعد رمضان/الحج ينخفض الطلب — ظهر في تراجع Q2 بعدة محطات","هامش الوقود المنظّم يجعل أي حرب خدمات/سرعة تُحسم لصالح الأفضل تشغيلًا","تذبذب يومي مرتفع (CV 66%) يصعّب جدولة العمالة والمخزون"]},"pest":{"سياسي/تنظيمي":["تنظيمات موسم الحج والعمرة (تصاريح، مسارات، إغلاقات مؤقتة) تؤثر مباشرة على حركة المرور","تسعير الوقود خاضع للمراجعة الحكومية الدورية (أرامكو) — هامش الوقود شبه ثابت والتنافس يتحول للخدمات"],"اقتصادي":["اقتصاد مدفوع بالزوار: ملايين المعتمرين والحجاج سنويًا يرفعون الطلب على النقل والوقود","مشاريع توسعة الحرم والمشاعر وفنادق ضخمة تزيد حركة الإنشاء والشاحنات"],"اجتماعي":["تركيبة سكانية متنوعة (سكان + عمالة خدمات + زوار موسميون) بأنماط تنقل مختلفة","ذروة موسمية حادة (رمضان، الحج) يليها هدوء نسبي — إدارة الطاقة الاستيعابية أساسية"],"تقني":["حافلات نقل الحجاج الحديثة وقطار المشاعر يعيدان توزيع الطلب على الوقود","انتشار مدفوعات NFC وتطبيقات الوقود (Syarah/Petro App) وأنظمة الولاء الرقمية"]},"personas":[{"name":"المعتمر والزائر","share":"ذروة رمضان والمواسم","desc":"زائر بسيارة خاصة أو سائق نقل زوار، لا يعرف المنطقة، يبحث عن محطة واضحة وآمنة قرب محاور الحرم.","needs":"لافتات واضحة، مسار دخول سهل، متجر مجهز، مصلى ودورات مياه نظيفة","action":"الظهور على خرائط جوجل بتقييم عالٍ + عروض مواسم العمرة"},{"name":"رائد المساء","share":"47٪ من الزيارات مساءً","desc":"موظف/عائلة تتحرك بعد العصر للتسوق والمشاوير، تفضل التعبئة مع قضاء حاجات المتجر.","needs":"خدمة سريعة وقت الذروة، متجر ومقهى، إضاءة وأمان","action":"عروض المساء (6–10م) وربطها بالمتجر والمغسلة"},{"name":"ابن الحي الوفي","share":"91 يمثل 56٪ من الإيراد","desc":"ساكن قريب يعبئ مرات متكررة بمبالغ صغيرة (سيدان اقتصادية)، يقدّر المعاملة والسرعة.","needs":"سرعة وثقة عيار المضخة، برنامج ولاء، خدمات دورية (زيت/غسيل)","action":"ولاء الحي: كل 10 تعبئات غسلة مجانية"},{"name":"عميل الكاش","share":"100٪ من الإيراد نقدًا","desc":"عمالة وسائقون يفضلون النقد، حساسون للسعر ويكررون الزيارة.","needs":"صرف سريع، كاشير جاهز، عروض بسيطة واضحة","action":"تحفيز التحول للتطبيق بمكافأة أول شحنة رقمية"}],"compSummaryText":"الأقرب: محطة المعيصم على بعد 181 م · متوسط تقييم المنافسين 3.7★ — درب أعلى بـ1.1 نقطة. مصدر الرصد: خرائط جوجل (يوليو 2026)."}];
+
+const $  = (s) => document.querySelector(s);
+const n0 = new Intl.NumberFormat("en-US", {maximumFractionDigits:0});
+const el = (t, c) => { const e = document.createElement(t); if (c) e.className = c; return e; };
+const digits = (s) => +String(s).replace(/[^\d]/g, "") || 0;
+let cur = 0;
+
+/* ── chips ── */
+ST.forEach((s, i) => {
+  const b = el("button"); b.type = "button";
+  b.append(Object.assign(el("span"), {textContent: s.name}),
+           Object.assign(el("span", "cd"), {textContent: s.code}));
+  b.addEventListener("click", () => { cur = i; render(); });
+  $("#chips").appendChild(b);
+});
+
+/* ── cross-station table (static) ── */
+{
+  const tb = $("#cross").querySelector("tbody");
+  [...ST].sort((a, b) => digits(b.nearDist) - digits(a.nearDist)).forEach(s => {
+    const tr = el("tr");
+    const g = parseFloat(s.growth);
+    const cells = [
+      [s.name, ""], [s.code, "num fig"],
+      [n0.format(s.nComp), "num fig"],
+      [n0.format(digits(s.nearDist)) + " م", "num fig " + (digits(s.nearDist) < 500 ? "near" : "")],
+      [s.rating.toFixed(1) + "★", "num fig"],
+      [s.compAvg.toFixed(1) + "★", "num fig"],
+      ["+" + (s.rating - s.compAvg).toFixed(1), "num fig up"],
+      [(g > 0 ? "+" : "") + g + "%", "num fig " + (g > 0 ? "up" : "dn")],
+      [n0.format(s.visits), "num fig"],
+    ];
+    cells.forEach(([t, c]) => {
+      const td = el("td", c || null); td.textContent = t; tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
+  const far = [...ST].sort((a, b) => digits(b.nearDist) - digits(a.nearDist));
+  $("#crossnote").innerHTML =
+    "الجدول مرتّب من أبعد منافس إلى أقربه. المحطتان اللتان أقرب منافس لهما فوق كيلومترين " +
+    "(<b>" + far[0].name + "</b> و<b>" + far[1].name + "</b>) هما الأفضل أداءً، " +
+    "والثلاث التي عندها منافس دون ٥٠٠ متر كلها هابطة. " +
+    "القرب ليس السبب الوحيد — المعيصم فقدت مسار طريق والنورية تأثرت بقيود الحج — " +
+    "لكنه العامل المشترك بين الهابطات.";
+}
+
+/* ── per-station ── */
+function render(){
+  const s = ST[cur];
+  [...$("#chips").children].forEach((b, i) => b.setAttribute("aria-pressed", String(i === cur)));
+
+  const put = (sel, v, u, cls) => {
+    const c = $(sel);
+    c.querySelector(".v").textContent = v;
+    if (u) c.querySelector(".u").textContent = u;
+    c.classList.remove("good", "bad");
+    if (cls) c.classList.add(cls);
+  };
+  put("#c-vis", n0.format(s.visits));
+  put("#c-lpv", s.lpv.toFixed(2));
+  put("#c-comp", n0.format(s.nComp), "محطة · " + s.density,
+      s.nComp >= 18 ? "bad" : s.nComp <= 6 ? "good" : null);
+  put("#c-near", n0.format(digits(s.nearDist)), s.nearName);
+  put("#c-rate", s.rating.toFixed(1) + " ← " + s.compAvg.toFixed(1), "نحن ← هم", "good");
+
+  /* الوردية */
+  const host = $("#shift"); host.textContent = "";
+  const tot = s.dayW + s.eveW, staffEve = s.eveW / tot;
+  const bd = s.visits * s.dayShare / s.dayW, be = s.visits * s.eveShare / s.eveW;
+  const pc = (x) => (x * 100).toFixed(1) + "%";
+  const bar = (label, dv, ev) => {
+    const r = el("div", "sr"), h = el("div", "hd");
+    h.append(Object.assign(el("b"), {textContent: label}),
+             Object.assign(el("span"), {textContent: `صباحاً ${pc(dv)} · مساءً ${pc(ev)}`}));
+    const sp = el("div", "split");
+    const a = el("i", "d"); a.style.width = dv * 100 + "%";
+    const b = el("i", "e"); b.style.width = ev * 100 + "%";
+    sp.append(a, b); r.append(h, sp); return r;
+  };
+  host.append(bar("حصة الزيارات", s.dayShare, s.eveShare),
+              bar("توزيع العمالة", 1 - staffEve, staffEve));
+  const load = el("div", "load");
+  [["حِمل عامل الصباح", bd], ["حِمل عامل المساء", be]].forEach(([k, v]) => {
+    const d = el("div");
+    d.append(Object.assign(el("span", "k"), {textContent: k}),
+             Object.assign(el("span", "v"), {textContent: n0.format(Math.round(v))}));
+    load.appendChild(d);
+  });
+  host.appendChild(load);
+  const move = tot * s.eveShare - s.eveW, heavier = Math.round((be / bd - 1) * 100);
+  const v = el("div", "verdict");
+  v.innerHTML =
+    (heavier > 1 ? `عامل المساء يخدم <b>${heavier}٪</b> زيارات أكثر بنفس العدد. `
+                 : "الورديتان متوازنتان هنا. ") +
+    (Math.abs(move) >= 0.5
+      ? `الفجوة تكفي لنقل <b>${Math.abs(Math.round(move))} عامل</b> إلى المساء.`
+      : "الفجوة أقل من عامل — عالجها بمواعيد الدخول لا بالعدد.") +
+    ` ساعات الذروة <b>${s.peak}</b> · على المضخات ${s.dayW}+${s.eveW} من طاقم ${s.act}.`;
+  host.appendChild(v);
+
+  /* المنافسون */
+  $("#cdens").textContent = s.density + " · " + s.nComp + " محطة";
+  $("#csum").textContent = s.compSummaryText || "";
+  const cb = $("#comps").querySelector("tbody"); cb.textContent = "";
+  s.competitors.forEach(c => {
+    const tr = el("tr");
+    [[c.name, ""], [c.dist, "num fig"], [c.rating + "★", "num fig"],
+     [c.reviews, "num fig"]].forEach(([t, cl]) => {
+      const td = el("td", cl || null); td.textContent = t; tr.appendChild(td);
+    });
+    if (digits(c.dist) < 500) tr.className = "close";
+    cb.appendChild(tr);
+  });
+  $("#sibs").textContent = s.siblings || "لا محطات درب شقيقة ضمن النطاق.";
+
+  /* SWOT */
+  const sw = $("#swot"); sw.textContent = "";
+  [["القوة", "s"], ["الضعف", "w"], ["الفرص", "o"], ["التهديدات", "t"]].forEach(([k, c]) => {
+    const q = el("div", "sq " + c);
+    q.appendChild(Object.assign(el("h4"), {textContent: k}));
+    const ul = el("ul");
+    (s.swot[k] || []).forEach(t => ul.appendChild(Object.assign(el("li"), {textContent: t})));
+    q.appendChild(ul); sw.appendChild(q);
+  });
+
+  /* PEST */
+  const pe = $("#pest"); pe.textContent = "";
+  const COL = {"سياسي/تنظيمي": "#6E5AA8", "اقتصادي": "#2F7D8C",
+               "اجتماعي": "#B8663C", "تقني": "#3F7A56"};
+  Object.entries(s.pest).forEach(([k, arr]) => {
+    const r = el("div", "pr");
+    const kk = el("span", "pk");
+    kk.style.background = COL[k] || "#5A6B7A";
+    kk.textContent = k[0] === "س" ? "P" : k[0] === "ا" && k.includes("قتصاد") ? "E"
+                   : k.includes("جتماع") ? "S" : "T";
+    const body = el("div");
+    body.appendChild(Object.assign(el("b"), {textContent: k}));
+    const ul = el("ul");
+    arr.forEach(t => ul.appendChild(Object.assign(el("li"), {textContent: t})));
+    body.appendChild(ul); r.append(kk, body); pe.appendChild(r);
+  });
+
+  /* بيرسونا */
+  const pr = $("#pers"); pr.textContent = "";
+  s.personas.forEach(p => {
+    const c = el("div", "pc"), h = el("div", "ph");
+    h.append(Object.assign(el("span", "pn"), {textContent: p.name}),
+             Object.assign(el("span", "ps"), {textContent: p.share}));
+    c.appendChild(h);
+    if (p.desc) c.appendChild(Object.assign(el("p"), {textContent: p.desc}));
+    if (p.needs){
+      const d = el("div", "pl");
+      d.append(Object.assign(el("b"), {textContent: "يحتاج: "}), document.createTextNode(p.needs));
+      c.appendChild(d);
+    }
+    if (p.action){
+      const d = el("div", "pl act");
+      d.append(Object.assign(el("b"), {textContent: "التحرك التسويقي: "}), document.createTextNode(p.action));
+      c.appendChild(d);
+    }
+    pr.appendChild(c);
+  });
+}
+
+render();
+</script>

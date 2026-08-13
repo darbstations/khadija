@@ -1,0 +1,268 @@
+<div class="wrap">
+
+  <div class="top">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#E8A33D" stroke-width="1.7"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 20V5a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v15"/>
+          <path d="M3 20h11"/><path d="M6 8h5"/>
+          <path d="M16 10h2a1 1 0 0 1 1 1v6a1.5 1.5 0 0 0 3 0V9l-3-3"/>
+        </svg>
+      </div>
+      <div>
+        <h1>الخطة التشغيلية — خمس محطات</h1>
+        <div class="sub">التشغيل والوردية والمنافسة في صفحة واحدة · مكة · النصف الأول ٢٠٢٦</div>
+      </div>
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="اختيار المحطة"></div>
+  </div>
+
+  <div class="readout">
+    <div class="readout-inner">
+      <div class="cell" id="c-vis"><span class="k">الزيارات</span><span class="v">—</span><span class="u">زيارة / يوم</span></div>
+      <div class="cell" id="c-lpv"><span class="k">لتر لكل زيارة</span><span class="v">—</span><span class="u">لتر</span></div>
+      <div class="cell" id="c-comp"><span class="k">منافسون ≤ ٥ كم</span><span class="v">—</span><span class="u">محطة</span></div>
+      <div class="cell lit" id="c-near"><span class="k">أقرب منافس</span><span class="v">—</span><span class="u">متر</span></div>
+      <div class="cell" id="c-rate"><span class="k">تقييمنا مقابلهم</span><span class="v">—</span><span class="u">نجمة على خرائط جوجل</span></div>
+    </div>
+  </div>
+
+  <div class="stack">
+
+    <div class="lede">
+      <h2>ما يقوله دمج التشغيل بالموقع</h2>
+      <p>درب <em>أعلى تقييماً من كل منافسيها</em> في المواقع الخمسة — بفارق ٠٫٨ إلى ١٫٣ نجمة.
+         فالحركة المفقودة ليست خسارة في جودة الخدمة، بل <em>اعتراض بالموقع</em>:
+         المحطة الوحيدة النامية أقرب منافس لها على بُعد ٢٬٤٥٠ متراً، والثلاث الهابطة
+         عند كلٍّ منها منافس دون ٥٠٠ متر. هذا يطابق ما أثبتته البيانات الشهرية —
+         سلة العميل ثابتة والفقد في عدد الزيارات.</p>
+    </div>
+
+    <div class="card">
+      <header>
+        <h2>القرب مقابل النمو — الخمس محطات</h2>
+        <span class="hint">المنافسون من خرائط جوجل يوليو ٢٠٢٦ · النمو من إيراد الفترة</span>
+      </header>
+      <div class="scroller">
+        <table id="cross">
+          <thead><tr>
+            <th>المحطة</th><th>الكود</th><th>منافسون ≤٥كم</th><th>أقرب منافس</th>
+            <th>تقييمنا</th><th>متوسطهم</th><th>الفارق</th><th>النمو</th><th>زيارة/يوم</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="note" id="crossnote"></div>
+    </div>
+
+    <div class="two">
+      <div class="card">
+        <header><h2>الوردية مقابل الطلب</h2><span class="hint">٢١٢ يوماً فعلياً</span></header>
+        <div class="shift" id="shift"></div>
+      </div>
+      <div class="card">
+        <header><h2 id="ctitle">المنافسون ضمن ٥ كم</h2><span class="hint" id="cdens"></span></header>
+        <div class="note" id="csum" style="border-top:0"></div>
+        <div class="scroller"><table id="comps">
+          <thead><tr><th>المحطة المنافسة</th><th>المسافة</th><th>التقييم</th><th>المراجعات</th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+        <div class="note" id="sibs"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <header><h2>تحليل SWOT</h2><span class="hint">مبيعات + موقع + منافسة</span></header>
+      <div class="swot" id="swot"></div>
+    </div>
+
+    <div class="two">
+      <div class="card">
+        <header><h2>تحليل PEST</h2><span class="hint">بيئة مكة الكلية</span></header>
+        <div class="pest" id="pest"></div>
+      </div>
+      <div class="card">
+        <header><h2>بيرسونا العملاء</h2><span class="hint">مشتقة من مزيج الوقود والأوقات والدفع</span></header>
+        <div class="pers" id="pers"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="pg">
+    التشغيل والورديات من تقرير المطابقة التشغيلية — يناير إلى يوليو ٢٠٢٦، ٢١٢ يوماً فعلياً،
+    والوردية الصباحية ٦ ص إلى ٦ م. المنافسون والتقييمات من خرائط جوجل (يوليو ٢٠٢٦).
+    الخمس محطات هي نطاق هذه الدراسة — واثنتان منها تجريبيتان للوقود وواحدة لحملات المستأجرين.
+  </footer>
+</div>
+
+<script>
+"use strict";
+const ST = __DATA__;
+
+const $  = (s) => document.querySelector(s);
+const n0 = new Intl.NumberFormat("en-US", {maximumFractionDigits:0});
+const el = (t, c) => { const e = document.createElement(t); if (c) e.className = c; return e; };
+const digits = (s) => +String(s).replace(/[^\d]/g, "") || 0;
+let cur = 0;
+
+/* ── chips ── */
+ST.forEach((s, i) => {
+  const b = el("button"); b.type = "button";
+  b.append(Object.assign(el("span"), {textContent: s.name}),
+           Object.assign(el("span", "cd"), {textContent: s.code}));
+  b.addEventListener("click", () => { cur = i; render(); });
+  $("#chips").appendChild(b);
+});
+
+/* ── cross-station table (static) ── */
+{
+  const tb = $("#cross").querySelector("tbody");
+  [...ST].sort((a, b) => digits(b.nearDist) - digits(a.nearDist)).forEach(s => {
+    const tr = el("tr");
+    const g = parseFloat(s.growth);
+    const cells = [
+      [s.name, ""], [s.code, "num fig"],
+      [n0.format(s.nComp), "num fig"],
+      [n0.format(digits(s.nearDist)) + " م", "num fig " + (digits(s.nearDist) < 500 ? "near" : "")],
+      [s.rating.toFixed(1) + "★", "num fig"],
+      [s.compAvg.toFixed(1) + "★", "num fig"],
+      ["+" + (s.rating - s.compAvg).toFixed(1), "num fig up"],
+      [(g > 0 ? "+" : "") + g + "%", "num fig " + (g > 0 ? "up" : "dn")],
+      [n0.format(s.visits), "num fig"],
+    ];
+    cells.forEach(([t, c]) => {
+      const td = el("td", c || null); td.textContent = t; tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
+  const far = [...ST].sort((a, b) => digits(b.nearDist) - digits(a.nearDist));
+  $("#crossnote").innerHTML =
+    "الجدول مرتّب من أبعد منافس إلى أقربه. المحطتان اللتان أقرب منافس لهما فوق كيلومترين " +
+    "(<b>" + far[0].name + "</b> و<b>" + far[1].name + "</b>) هما الأفضل أداءً، " +
+    "والثلاث التي عندها منافس دون ٥٠٠ متر كلها هابطة. " +
+    "القرب ليس السبب الوحيد — المعيصم فقدت مسار طريق والنورية تأثرت بقيود الحج — " +
+    "لكنه العامل المشترك بين الهابطات.";
+}
+
+/* ── per-station ── */
+function render(){
+  const s = ST[cur];
+  [...$("#chips").children].forEach((b, i) => b.setAttribute("aria-pressed", String(i === cur)));
+
+  const put = (sel, v, u, cls) => {
+    const c = $(sel);
+    c.querySelector(".v").textContent = v;
+    if (u) c.querySelector(".u").textContent = u;
+    c.classList.remove("good", "bad");
+    if (cls) c.classList.add(cls);
+  };
+  put("#c-vis", n0.format(s.visits));
+  put("#c-lpv", s.lpv.toFixed(2));
+  put("#c-comp", n0.format(s.nComp), "محطة · " + s.density,
+      s.nComp >= 18 ? "bad" : s.nComp <= 6 ? "good" : null);
+  put("#c-near", n0.format(digits(s.nearDist)), s.nearName);
+  put("#c-rate", s.rating.toFixed(1) + " ← " + s.compAvg.toFixed(1), "نحن ← هم", "good");
+
+  /* الوردية */
+  const host = $("#shift"); host.textContent = "";
+  const tot = s.dayW + s.eveW, staffEve = s.eveW / tot;
+  const bd = s.visits * s.dayShare / s.dayW, be = s.visits * s.eveShare / s.eveW;
+  const pc = (x) => (x * 100).toFixed(1) + "%";
+  const bar = (label, dv, ev) => {
+    const r = el("div", "sr"), h = el("div", "hd");
+    h.append(Object.assign(el("b"), {textContent: label}),
+             Object.assign(el("span"), {textContent: `صباحاً ${pc(dv)} · مساءً ${pc(ev)}`}));
+    const sp = el("div", "split");
+    const a = el("i", "d"); a.style.width = dv * 100 + "%";
+    const b = el("i", "e"); b.style.width = ev * 100 + "%";
+    sp.append(a, b); r.append(h, sp); return r;
+  };
+  host.append(bar("حصة الزيارات", s.dayShare, s.eveShare),
+              bar("توزيع العمالة", 1 - staffEve, staffEve));
+  const load = el("div", "load");
+  [["حِمل عامل الصباح", bd], ["حِمل عامل المساء", be]].forEach(([k, v]) => {
+    const d = el("div");
+    d.append(Object.assign(el("span", "k"), {textContent: k}),
+             Object.assign(el("span", "v"), {textContent: n0.format(Math.round(v))}));
+    load.appendChild(d);
+  });
+  host.appendChild(load);
+  const move = tot * s.eveShare - s.eveW, heavier = Math.round((be / bd - 1) * 100);
+  const v = el("div", "verdict");
+  v.innerHTML =
+    (heavier > 1 ? `عامل المساء يخدم <b>${heavier}٪</b> زيارات أكثر بنفس العدد. `
+                 : "الورديتان متوازنتان هنا. ") +
+    (Math.abs(move) >= 0.5
+      ? `الفجوة تكفي لنقل <b>${Math.abs(Math.round(move))} عامل</b> إلى المساء.`
+      : "الفجوة أقل من عامل — عالجها بمواعيد الدخول لا بالعدد.") +
+    ` ساعات الذروة <b>${s.peak}</b> · على المضخات ${s.dayW}+${s.eveW} من طاقم ${s.act}.`;
+  host.appendChild(v);
+
+  /* المنافسون */
+  $("#cdens").textContent = s.density + " · " + s.nComp + " محطة";
+  $("#csum").textContent = s.compSummaryText || "";
+  const cb = $("#comps").querySelector("tbody"); cb.textContent = "";
+  s.competitors.forEach(c => {
+    const tr = el("tr");
+    [[c.name, ""], [c.dist, "num fig"], [c.rating + "★", "num fig"],
+     [c.reviews, "num fig"]].forEach(([t, cl]) => {
+      const td = el("td", cl || null); td.textContent = t; tr.appendChild(td);
+    });
+    if (digits(c.dist) < 500) tr.className = "close";
+    cb.appendChild(tr);
+  });
+  $("#sibs").textContent = s.siblings || "لا محطات درب شقيقة ضمن النطاق.";
+
+  /* SWOT */
+  const sw = $("#swot"); sw.textContent = "";
+  [["القوة", "s"], ["الضعف", "w"], ["الفرص", "o"], ["التهديدات", "t"]].forEach(([k, c]) => {
+    const q = el("div", "sq " + c);
+    q.appendChild(Object.assign(el("h4"), {textContent: k}));
+    const ul = el("ul");
+    (s.swot[k] || []).forEach(t => ul.appendChild(Object.assign(el("li"), {textContent: t})));
+    q.appendChild(ul); sw.appendChild(q);
+  });
+
+  /* PEST */
+  const pe = $("#pest"); pe.textContent = "";
+  const COL = {"سياسي/تنظيمي": "#6E5AA8", "اقتصادي": "#2F7D8C",
+               "اجتماعي": "#B8663C", "تقني": "#3F7A56"};
+  Object.entries(s.pest).forEach(([k, arr]) => {
+    const r = el("div", "pr");
+    const kk = el("span", "pk");
+    kk.style.background = COL[k] || "#5A6B7A";
+    kk.textContent = k[0] === "س" ? "P" : k[0] === "ا" && k.includes("قتصاد") ? "E"
+                   : k.includes("جتماع") ? "S" : "T";
+    const body = el("div");
+    body.appendChild(Object.assign(el("b"), {textContent: k}));
+    const ul = el("ul");
+    arr.forEach(t => ul.appendChild(Object.assign(el("li"), {textContent: t})));
+    body.appendChild(ul); r.append(kk, body); pe.appendChild(r);
+  });
+
+  /* بيرسونا */
+  const pr = $("#pers"); pr.textContent = "";
+  s.personas.forEach(p => {
+    const c = el("div", "pc"), h = el("div", "ph");
+    h.append(Object.assign(el("span", "pn"), {textContent: p.name}),
+             Object.assign(el("span", "ps"), {textContent: p.share}));
+    c.appendChild(h);
+    if (p.desc) c.appendChild(Object.assign(el("p"), {textContent: p.desc}));
+    if (p.needs){
+      const d = el("div", "pl");
+      d.append(Object.assign(el("b"), {textContent: "يحتاج: "}), document.createTextNode(p.needs));
+      c.appendChild(d);
+    }
+    if (p.action){
+      const d = el("div", "pl act");
+      d.append(Object.assign(el("b"), {textContent: "التحرك التسويقي: "}), document.createTextNode(p.action));
+      c.appendChild(d);
+    }
+    pr.appendChild(c);
+  });
+}
+
+render();
+</script>
