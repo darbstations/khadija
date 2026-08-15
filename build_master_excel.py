@@ -254,8 +254,8 @@ def logo(ws,anchor="B1",w=150):
 
 # ============ جداول الإدارات (كل إدارة ورقة مستقلة) ============
 # أعمدة: A# B محور C مؤشر D وحدة E قطبية F أولوية G وزن% H مستهدف I نص المستهدف J ركيزة K مشروع L منظور M المُحقَّق N نسبة التحقيق O الحالة
-HEAD=["#","المحور","المؤشر","الوحدة","القطبية","الأولوية","الوزن %","المستهدف","نص المستهدف","الركيزة","المشروع","منظور BSC","المُحقَّق","نسبة التحقيق","الحالة","الوصف / طريقة القياس","مصدر البيانات","دورية القياس"]
-WID=[4,16,40,9,7,12,8,12,16,12,22,15,12,12,14,48,24,11]
+HEAD=["#","المحور","المؤشر","الوحدة","القطبية","الأولوية","الوزن %","المستهدف","نص المستهدف","الركيزة","المشروع","منظور BSC","المُحقَّق","نسبة التحقيق","الحالة","الوصف / طريقة القياس","مصدر البيانات","دورية القياس","خط الأساس 2025","مالك المؤشر"]
+WID=[4,16,40,9,7,12,8,12,16,12,22,15,12,12,14,48,24,11,14,20]
 DEPT_RANGES=[]; ROWMAP={}; DEPT_DETAILS={}
 INLINE_AGG = os.environ.get("FLAT")!="1"   # افتراضياً: مؤشر أساسي لكل محور تندرج تحته الفرعية (FLAT=1 للتعطيل)
 # أسماء المؤشرات الأساسية (الجامعة) لكل محور متعدد المؤشرات — واضحة وقابلة للقياس
@@ -309,7 +309,7 @@ for dname,key,records in K.DEPARTMENTS:
             C(ws,r,4,None,fillc=NAVY); C(ws,r,5,None,fillc=NAVY)
             C(ws,r,6,"🔷 أساسي",f=F_(8,True,WHITE),fillc=NAVY,al="center")
             C(ws,r,7,round(aw,4),f=F_(10,True,WHITE),fillc=NAVY,fmt="0%",al="center")   # وزن المحور = مجموع الفرعية
-            for c in (8,9,10,11,12,13,16,17,18): C(ws,r,c,None,fillc=NAVY)
+            for c in (8,9,10,11,12,13,16,17,18,19,20): C(ws,r,c,None,fillc=NAVY)
             ws.cell(r,14).value=_agg_formula(dname,axis); C(ws,r,14,f=F_(11,True,WHITE),fillc=NAVY,fmt="0%",al="center")
             ws.cell(r,15).value=f'=IF($N{r}="","⏳ بانتظار هدف",IF($N{r}>=1,"✅ محقق",IF($N{r}>=0.85,"🟡 قريب","🔴 تحت الهدف")))'
             C(ws,r,15,f=F_(9,True,WHITE),fillc=NAVY,al="center"); ws.row_dimensions[r].height=24; r+=1
@@ -319,7 +319,7 @@ for dname,key,records in K.DEPARTMENTS:
         blank = not (nm and str(nm).strip())   # صف قالب فارغ للإدخال اليدوي
         if blank:
             for c in (2,3,16,17): C(ws,r,c,None,fillc=GREEN_IN,al="right",lock=False,wrap=True)
-            for c in (4,5,6,7,8,9,10,11,12,18): C(ws,r,c,None,fillc=GREEN_IN,al="center",lock=False)
+            for c in (4,5,6,7,8,9,10,11,12,18,19,20): C(ws,r,c,None,fillc=GREEN_IN,al="center",lock=False)
             C(ws,r,7,None,fillc=GREEN_IN,fmt="0%",al="center",lock=False)
             C(ws,r,13,None,fillc=GREEN_IN,al="center",lock=False); dv.add(ws.cell(r,13))
         else:
@@ -349,6 +349,8 @@ for dname,key,records in K.DEPARTMENTS:
             C(ws,r,16,desc,f=F_(8,color="555555"),al="right",wrap=True)
             C(ws,r,17,kpi_source(nm,axis,key),f=F_(8,color="555555"),al="right",wrap=True)  # مصدر البيانات
             C(ws,r,18,kpi_freq(nm,ttxt),f=F_(8),al="center")  # دورية القياس
+            C(ws,r,19,None,fillc=GREEN_IN,al="center",lock=False)  # خط الأساس 2025 (إدخال يدوي)
+            C(ws,r,20,kpi_owner(key,axis),f=F_(8),al="center")     # مالك المؤشر
         ws.row_dimensions[r].height=26
         r+=1
     end=r-1
