@@ -6,19 +6,24 @@ from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.formatting.rule import CellIsRule, FormulaRule, DataBarRule, ColorScaleRule
 
-F = "Arial"; NAVY = "1F3864"; GRAY = "44546A"
-FH = PatternFill("solid", fgColor=NAVY); FS = PatternFill("solid", fgColor="D9E2F3")
-FI = PatternFill("solid", fgColor="FFFF00"); SECT = PatternFill("solid", fgColor="DDEBF7")
-OK = PatternFill("solid", fgColor="C6E0B4"); WARN = PatternFill("solid", fgColor="FFE699")
-BAD = PatternFill("solid", fgColor="F8CBAD"); CALC = PatternFill("solid", fgColor="F2F2F2")
-BLUE = Font(name=F, size=10, color="0000FF"); BLACK = Font(name=F, size=10)
-GREEN = Font(name=F, size=10, color="008000")
+import brand as B
+
+# الأسماء القديمة محفوظة كواجهة — القيم صارت من هوية درب
+F = B.FONT; NAVY = B.BGRAY; GRAY = B.INK2
+ORANGE = B.ORANGE
+FH = PatternFill("solid", fgColor=B.BGRAY); FS = PatternFill("solid", fgColor=B.T_BAND)
+FI = PatternFill("solid", fgColor=B.T_GOLD); SECT = PatternFill("solid", fgColor=B.T_ORANGE)
+OK = PatternFill("solid", fgColor=B.T_GOOD); WARN = PatternFill("solid", fgColor=B.T_GOLD)
+BAD = PatternFill("solid", fgColor=B.T_BAD); CALC = PatternFill("solid", fgColor=B.T_NEUTRAL)
+BLUE = Font(name=F, size=10, color=B.BLUE); BLACK = Font(name=F, size=10, color=B.INK)
+GREEN = Font(name=F, size=10, color=B.GOOD)
 HEAD = Font(name=F, size=10, bold=True, color="FFFFFF")
-TITLE = Font(name=F, size=16, bold=True, color=NAVY)
-SUB = Font(name=F, size=10, color=GRAY); BOLD = Font(name=F, size=10, bold=True)
-H2 = Font(name=F, size=12, bold=True, color=NAVY)
-SMALL = Font(name=F, size=9, color=GRAY)
-thin = Side(style="thin", color="BFBFBF"); BOX = Border(thin, thin, thin, thin)
+TITLE = Font(name=F, size=16, bold=True, color=B.BGRAY)
+SUB = Font(name=F, size=10, color=B.INK2)
+BOLD = Font(name=F, size=10, bold=True, color=B.INK)
+H2 = Font(name=F, size=12, bold=True, color=B.ORANGE)
+SMALL = Font(name=F, size=9, color=B.INK3)
+thin = Side(style="thin", color=B.LINE2); BOX = Border(thin, thin, thin, thin)
 WRAP = Alignment(wrap_text=True, vertical="top", horizontal="right", readingOrder=2)
 CTR = Alignment(horizontal="center", vertical="center", wrap_text=True, readingOrder=2)
 RGT = Alignment(horizontal="right", vertical="center", readingOrder=2)
@@ -35,13 +40,31 @@ def setup(ws, widths, freeze="A4"):
     for i, w in enumerate(widths, 1):
         ws.column_dimensions[get_column_letter(i)].width = w
     ws.freeze_panes = freeze
+    # الطباعة: عرضية بعرض صفحة واحدة — الأوراق أعرض من ورقة عمودية
+    ws.page_setup.orientation = "landscape"
+    ws.page_setup.fitToWidth = 1
+    ws.page_setup.fitToHeight = 0
+    ws.sheet_properties.pageSetUpPr.fitToPage = True
+    ws.print_options.horizontalCentered = True
+    ws.page_margins.left = ws.page_margins.right = 0.3
+    ws.page_margins.top = ws.page_margins.bottom = 0.4
+
+
+RULE = PatternFill("solid", fgColor=B.ORANGE)
 
 
 def title(ws, t, sub, nc):
     ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=nc)
     c = ws.cell(1, 1, t); c.font = TITLE; c.alignment = RGT; ws.row_dimensions[1].height = 26
     ws.merge_cells(start_row=2, start_column=1, end_row=2, end_column=nc)
-    c = ws.cell(2, 1, sub); c.font = SUB; c.alignment = RGT; ws.row_dimensions[2].height = 18
+    c = ws.cell(2, 1, sub); c.font = SUB; c.alignment = RGT; ws.row_dimensions[2].height = 16
+
+
+def rule(ws, row, nc, h=3.5):
+    """شريط الهوية البرتقالي"""
+    for j in range(1, nc + 1):
+        ws.cell(row, j).fill = RULE
+    ws.row_dimensions[row].height = h
 
 
 def header(ws, row, cols, h=30):
@@ -227,24 +250,24 @@ def build_worker(wb, ST, DEND, name="نموذج العامل", idx=None):
 
     cf = ws.conditional_formatting
     cf.add(f"H{HR+1}:H{L}", CellIsRule(operator="greaterThan", formula=["0"], fill=OK,
-                                       font=Font(name=F, size=10, color="375623")))
+                                       font=Font(name=F, size=10, color=B.D_GOOD)))
     cf.add(f"H{HR+1}:H{L}", CellIsRule(operator="lessThan", formula=["0"], fill=BAD,
-                                       font=Font(name=F, size=10, color="C00000")))
+                                       font=Font(name=F, size=10, color=B.D_BAD)))
     cf.add(f"I{HR+1}:I{L}", DataBarRule(start_type="num", start_value=0,
-                                        end_type="num", end_value=1.3, color="5B9BD5"))
+                                        end_type="num", end_value=1.3, color=B.ORANGE))
     cf.add(f"K{HR+1}:K{L}", CellIsRule(operator="greaterThan", formula=["0"], fill=OK,
-                                       font=Font(name=F, size=10, bold=True, color="375623")))
+                                       font=Font(name=F, size=10, bold=True, color=B.D_GOOD)))
     cf.add(f"J{HR+1}:J{L}", FormulaRule(formula=[f'$J{HR+1}="مستوفاة"'], fill=OK))
     cf.add(f"J{HR+1}:J{L}", FormulaRule(formula=[f'$J{HR+1}="غير مستوفاة"'], fill=BAD,
-                                        font=Font(name=F, size=10, bold=True, color="C00000")))
+                                        font=Font(name=F, size=10, bold=True, color=B.D_BAD)))
     cf.add(f"B{HR+1}:B{L}", FormulaRule(
         formula=[f'AND($H{HR+1}>0,$J{HR+1}="غير مستوفاة")'], fill=WARN))
     cf.add(f"K{HR+1}:K{L}", FormulaRule(
         formula=[f'AND($K{HR+1}>0,$K{HR+1}=$C${R_CAP})'], fill=WARN,
-        font=Font(name=F, size=10, bold=True, color="833C00")))
+        font=Font(name=F, size=10, bold=True, color=B.D_GOLD)))
     cf.add(f"E{HR+1}:E{L}", FormulaRule(
         formula=[f'AND($E{HR+1}<>"",$E{HR+1}<$D{HR+1})'], fill=BAD,
-        font=Font(name=F, size=10, bold=True, color="C00000")))
+        font=Font(name=F, size=10, bold=True, color=B.D_BAD)))
 
     r = L + 3
     r = band(ws, r, NC, "③ ملخص المحطة — يتحدّث مع كل رقم تُدخله")
@@ -277,18 +300,18 @@ def build_worker(wb, ST, DEND, name="نموذج العامل", idx=None):
         ws.row_dimensions[rr].height = 20
     NET = SM + 5
     cf.add(f"C{NET}", CellIsRule(operator="greaterThan", formula=["0"], fill=OK,
-                                 font=Font(name=F, size=10, bold=True, color="375623")))
+                                 font=Font(name=F, size=10, bold=True, color=B.D_GOOD)))
     cf.add(f"C{NET}", CellIsRule(operator="lessThan", formula=["0"], fill=BAD,
-                                 font=Font(name=F, size=10, bold=True, color="C00000")))
+                                 font=Font(name=F, size=10, bold=True, color=B.D_BAD)))
     cf.add(f"C{SM+8}", CellIsRule(operator="greaterThan", formula=["0"], fill=WARN,
-                                  font=Font(name=F, size=10, bold=True, color="833C00")))
+                                  font=Font(name=F, size=10, bold=True, color=B.D_GOLD)))
     cf.add(f"C{SM+6}", FormulaRule(formula=[f"$C${SM+6}>$C${R_PCT}"], fill=BAD,
-                                   font=Font(name=F, size=10, bold=True, color="C00000")))
+                                   font=Font(name=F, size=10, bold=True, color=B.D_BAD)))
     r2 = SM + len(SUMR) + 1
     ws.merge_cells(start_row=r2, start_column=2, end_row=r2, end_column=NC)
     ws.cell(r2, 2, "إذا تجاوزت النسبة الفعلية المعتمدة فالسبب أن الحافز يُصرف على مكسب كل عامل "
                    "بينما الشركة تقبض الصافي فقط — شرط «صافي محطة موجب» أعلاه يمنع الصرف "
-                   "في شهر خاسر.").font = Font(name=F, size=9, color="C00000")
+                   "في شهر خاسر.").font = Font(name=F, size=9, color=B.D_BAD)
     ws.cell(r2, 2).alignment = RGT
     r = SM + len(SUMR) + 2
 
@@ -319,7 +342,7 @@ def build_worker(wb, ST, DEND, name="نموذج العامل", idx=None):
                                               end_type="max", end_color="C6E0B4"))
     cf.add(f"G{SC+1}:G{SC+3}", FormulaRule(
         formula=[f"$G{SC+1}>=({NWK})*$C${R_CAP}*0.99"], fill=WARN,
-        font=Font(name=F, size=10, bold=True, color="833C00")))
+        font=Font(name=F, size=10, bold=True, color=B.D_GOLD)))
     ws.cell(SC + 4, 2, "الخانة البرتقالية تعني أن السقف بلغ حدّه — "
                        "الزيادة بعده تذهب كاملة للشركة").font = SMALL
     ws.cell(SC + 4, 2).alignment = RGT
@@ -405,9 +428,9 @@ def build_shift(wb, ST, name="مطابقة الوردية مع الطلب", idx=
     end = 3 + len(ST)
     mw.conditional_formatting.add(f"H4:H{end}", CellIsRule(
         operator="greaterThan", formula=["0.02"], fill=BAD,
-        font=Font(name=F, size=10, bold=True, color="C00000")))
+        font=Font(name=F, size=10, bold=True, color=B.D_BAD)))
     mw.conditional_formatting.add(f"K4:K{end}", ColorScaleRule(
-        start_type="min", start_color="FFFFFF", end_type="max", end_color="F8CBAD"))
+        start_type="min", start_color="FFFFFF", end_type="max", end_color=B.T_BAD))
 
     bullets(mw, end + 2, MC, [
         ("ما تقوله الأرقام", [

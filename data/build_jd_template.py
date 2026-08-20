@@ -6,6 +6,7 @@ from openpyxl.styles import Font
 from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.formatting.rule import CellIsRule, FormulaRule, DataBarRule
 import worker_model as W
+import brand as B
 
 wb = Workbook()
 NC = 10
@@ -16,9 +17,10 @@ NC = 10
 ws = wb.active; ws.title = "الوصف الوظيفي"
 W.setup(ws, [4, 22, 34, 34, 12, 12, 12, 12, 12, 20], freeze="A4")
 W.title(ws, "الوصف الوظيفي — أخصائي مبيعات الوقود",
-        "قالب عام قابل للتكييف على أي منطقة أو قناة — الخانات الصفراء تُعبَّأ", NC)
+        "قالب عام قابل للتكييف على أي منطقة أو قناة — الخانات الملوّنة تُعبَّأ", NC)
+W.rule(ws, 3, NC)
 
-r = W.band(ws, 3, NC, "① بيانات الوظيفة")
+r = W.band(ws, 4, NC, "① بيانات الوظيفة")
 INFO = [("المسمى الوظيفي", "أخصائي مبيعات وقود"), ("الإدارة", "الإدارة التجارية"),
         ("القسم", "مبيعات الوقود — قناة الشركات"), ("يرفع إلى", "مدير مبيعات الوقود"),
         ("الموقع / النطاق", ""), ("الدرجة الوظيفية", ""),
@@ -31,13 +33,18 @@ for i, (k, v) in enumerate(INFO):
 r += len(INFO) + 1
 
 r = W.band(ws, r, NC, "② الغرض من الوظيفة")
-ws.merge_cells(start_row=r, start_column=2, end_row=r + 1, end_column=NC)
-c = ws.cell(r, 2, "تنمية حجم مبيعات الوقود للعملاء من المنشآت وأصحاب الأساطيل داخل النطاق "
-                  "المحدد، عبر التعاقد المباشر وتثبيت الحجم القائم، بما يحقق نمواً صافياً في "
-                  "الهامش لا مجرد تحويل حجم قائم إلى عقود مخفَّضة.")
-c.font = Font(name=W.F, size=11); c.alignment = W.WRAP
-ws.row_dimensions[r].height = 20; ws.row_dimensions[r + 1].height = 20
-r += 3
+# أسطر منفصلة لا خلية مدمجة عبر صفوف — الدمج الرأسي لا يضمن ظهور النص كاملاً
+PURPOSE = [
+    "تنمية حجم مبيعات الوقود للعملاء من المنشآت وأصحاب الأساطيل داخل النطاق المحدد،",
+    "عبر التعاقد المباشر وتثبيت الحجم القائم بشرط نمو موثّق فوق خط الأساس،",
+    "بما يحقق نمواً صافياً في الهامش لا مجرد تحويل حجم قائم إلى عقود مخفَّضة.",
+]
+for k, line in enumerate(PURPOSE):
+    ws.merge_cells(start_row=r + k, start_column=2, end_row=r + k, end_column=NC)
+    c = ws.cell(r + k, 2, line)
+    c.font = Font(name=W.F, size=11, color=B.INK); c.alignment = W.RGT
+    ws.row_dimensions[r + k].height = 18
+r += len(PURPOSE) + 2
 
 r = W.band(ws, r, NC, "③ المسؤوليات الرئيسية")
 W.header(ws, r, ["#", "المسؤولية", "الوصف", "المخرج المتوقع"] + [""] * 5 + ["الدورية"])
@@ -138,10 +145,11 @@ W.bullets(ws, r, NC, [
 # ══════════════════════════════════════════════════════════════════
 ks = wb.create_sheet("مؤشرات الأداء")
 KC = 11
-W.setup(ks, [4, 26, 34, 30, 16, 9, 12, 13, 10, 10, 26], freeze="A5")
+W.setup(ks, [4, 26, 34, 30, 16, 9, 12, 13, 10, 10, 26], freeze="A6")
 W.title(ks, "مؤشرات الأداء — أخصائي مبيعات الوقود",
         "ثلاث فئات: نتيجة · حركة · حماية — والأوزان تُعدَّل حسب مرحلة السوق", KC)
-W.header(ks, 3, ["#", "المؤشر", "التعريف", "طريقة الحساب", "المصدر", "الاتجاه",
+W.rule(ks, 3, KC)
+W.header(ks, 4, ["#", "المؤشر", "التعريف", "طريقة الحساب", "المصدر", "الاتجاه",
                  "الوزن", "المستهدف", "الحد الأدنى", "الدورية", "لماذا هذا المؤشر"])
 KPI = [
     ("نتيجة", "الحجم المتعاقَد", "إجمالي اللترات المغطاة بعقود نافذة",
@@ -182,7 +190,7 @@ CAT = {"نتيجة": W.OK, "حركة": W.FS, "حماية": W.WARN}
 dv_dir = DataValidation(type="list", formula1='"أعلى أفضل,أقل أفضل"', allow_blank=False)
 ks.add_data_validation(dv_dir)
 for i, (cat, nm, dfn, calc, src, direc, wt, why) in enumerate(KPI):
-    rr = 4 + i
+    rr = 5 + i
     ks.cell(rr, 1, i + 1).alignment = W.CTR
     ks.cell(rr, 2, nm).font = W.BOLD; ks.cell(rr, 2).alignment = W.RGT
     ks.cell(rr, 2).fill = CAT[cat]
@@ -200,16 +208,16 @@ for i, (cat, nm, dfn, calc, src, direc, wt, why) in enumerate(KPI):
         if j not in (2, 7, 8, 9): ks.cell(rr, j).font = W.BLACK
     ks.row_dimensions[rr].height = 30
     dv_dir.add(ks.cell(rr, 6))
-KEND = 3 + len(KPI)
+KEND = 4 + len(KPI)
 ks.cell(KEND + 1, 2, "مجموع الأوزان").font = W.BOLD
-ks.cell(KEND + 1, 7, f"=SUM(G4:G{KEND})").number_format = "0%"
+ks.cell(KEND + 1, 7, f"=SUM(G5:G{KEND})").number_format = "0%"
 for j in (2, 7):
     ks.cell(KEND + 1, j).border = W.BOX; ks.cell(KEND + 1, j).fill = W.FS
     ks.cell(KEND + 1, j).alignment = W.CTR
 ks.cell(KEND + 1, 7).font = W.BOLD
 ks.conditional_formatting.add(f"G{KEND+1}", CellIsRule(
     operator="notEqual", formula=["1"], fill=W.BAD,
-    font=Font(name=W.F, size=10, bold=True, color="C00000")))
+    font=Font(name=W.F, size=10, bold=True, color=B.D_BAD)))
 ks.cell(KEND + 1, 8, "يجب أن يساوي ١٠٠٪ — يتلوّن بالأحمر إن اختلّ").font = W.SMALL
 ks.cell(KEND + 1, 8).alignment = W.RGT
 
@@ -233,10 +241,11 @@ W.bullets(ks, r, KC, [
 # ══════════════════════════════════════════════════════════════════
 es = wb.create_sheet("نموذج التقييم")
 EC = 9
-W.setup(es, [4, 26, 10, 13, 13, 13, 12, 12, 30], freeze="A6")
+W.setup(es, [4, 26, 10, 13, 13, 13, 12, 12, 30], freeze="A7")
 W.title(es, "نموذج التقييم الربعي", "عبّئ الفعلي فقط — النسبة والنقاط تُحتسب", EC)
+W.rule(es, 3, EC)
 
-r = W.band(es, 3, EC, "① بيانات التقييم")
+r = W.band(es, 4, EC, "① بيانات التقييم")
 for i, k in enumerate(["اسم الموظف", "الفترة", "المقيِّم"]):
     es.cell(r, 2 + i * 2, k).font = W.BOLD
     W.inp(es, r, 3 + i * 2, "General")
@@ -248,7 +257,7 @@ W.header(es, HR, ["#", "المؤشر", "الاتجاه", "الوزن", "المس
                   "نسبة الإنجاز", "النقاط", "ملاحظة"])
 for i in range(len(KPI)):
     rr = HR + 1 + i
-    src = 4 + i
+    src = 5 + i
     es.cell(rr, 1, i + 1).alignment = W.CTR
     W.calc(es, rr, 2, f"='مؤشرات الأداء'!B{src}", "General", link=True)
     W.calc(es, rr, 3, f"='مؤشرات الأداء'!F{src}", "General", link=True)
@@ -273,13 +282,13 @@ for j in range(1, EC + 1):
     es.cell(L + 1, j).border = W.BOX; es.cell(L + 1, j).fill = W.FS
     es.cell(L + 1, j).font = W.BOLD; es.cell(L + 1, j).alignment = W.CTR
 es.conditional_formatting.add(f"G{HR+1}:G{L}", DataBarRule(
-    start_type="num", start_value=0, end_type="num", end_value=1.2, color="5B9BD5"))
+    start_type="num", start_value=0, end_type="num", end_value=1.2, color=B.ORANGE))
 es.conditional_formatting.add(f"H{L+1}", CellIsRule(
     operator="greaterThanOrEqual", formula=["1"], fill=W.OK,
-    font=Font(name=W.F, size=10, bold=True, color="375623")))
+    font=Font(name=W.F, size=10, bold=True, color=B.D_GOOD)))
 es.conditional_formatting.add(f"H{L+1}", CellIsRule(
     operator="lessThan", formula=["0.7"], fill=W.BAD,
-    font=Font(name=W.F, size=10, bold=True, color="C00000")))
+    font=Font(name=W.F, size=10, bold=True, color=B.D_BAD)))
 
 r = L + 3
 r = W.band(es, r, EC, "③ سُلّم التقدير")

@@ -4,6 +4,7 @@ import json, re, collections, pathlib
 from openpyxl.styles import Font
 from openpyxl.formatting.rule import CellIsRule, ColorScaleRule
 import worker_model as W
+import brand as B
 
 SHEET = "السيطرة الميدانية"
 RIVALS = "المنافسون"
@@ -71,7 +72,7 @@ def build_control(wb, ST, idx=None):
         ws.row_dimensions[rr].height = 20
     bend = r + len(cnt)
     ws.conditional_formatting.add(f"D{r+1}:D{bend}", ColorScaleRule(
-        start_type="min", start_color="FFFFFF", end_type="max", end_color="F8CBAD"))
+        start_type="min", start_color="FFFFFF", end_type="max", end_color=B.T_BAD))
     sasco = cnt.get("ساسكو", 0) + cnt.get("نفط", 0)
     ws.cell(bend + 1, 2, f"ساسكو ونفط علامة واحدة بعد الاستحواذ: {sasco} مرة "
                          f"({sasco/total*100:.0f}٪) — وتبقى دون نصف حضور الدريس").font = W.SMALL
@@ -112,16 +113,16 @@ def build_control(wb, ST, idx=None):
     send = r + len(ST)
     ws.conditional_formatting.add(f"F{r+1}:F{send}", CellIsRule(
         operator="lessThan", formula=["500"], fill=W.BAD,
-        font=Font(name=W.F, size=10, bold=True, color="C00000")))
+        font=Font(name=W.F, size=10, bold=True, color=B.D_BAD)))
     ws.conditional_formatting.add(f"J{r+1}:J{send}", CellIsRule(
         operator="greaterThan", formula=["0"], fill=W.OK,
-        font=Font(name=W.F, size=10, bold=True, color="375623")))
+        font=Font(name=W.F, size=10, bold=True, color=B.D_GOOD)))
     ws.conditional_formatting.add(f"J{r+1}:J{send}", CellIsRule(
         operator="lessThan", formula=["0"], fill=W.BAD,
-        font=Font(name=W.F, size=10, color="C00000")))
+        font=Font(name=W.F, size=10, color=B.D_BAD)))
     ws.conditional_formatting.add(f"I{r+1}:I{send}", CellIsRule(
         operator="greaterThan", formula=["0"], fill=W.OK,
-        font=Font(name=W.F, size=10, bold=True, color="375623")))
+        font=Font(name=W.F, size=10, bold=True, color=B.D_GOOD)))
     r = send + 2
 
     # ── ③ مصفوفة العلامات لكل محطة
@@ -141,7 +142,7 @@ def build_control(wb, ST, idx=None):
     ws.conditional_formatting.add(
         f"C{r+1}:{chr(ord('C') + len(blist) - 1)}{mend}",
         ColorScaleRule(start_type="num", start_value=0, start_color="FFFFFF",
-                       end_type="max", end_color="F8CBAD"))
+                       end_type="max", end_color=B.T_BAD))
     r = mend + 2
 
     W.bullets(ws, r, NC, [
@@ -217,7 +218,7 @@ def build_rivals(wb, idx=None):
         if nm == "درب باي":
             for j in range(1, NC + 1):
                 ws.cell(rr, j).fill = W.BAD
-            ws.cell(rr, 2).font = Font(name=W.F, size=10, bold=True, color="C00000")
+            ws.cell(rr, 2).font = Font(name=W.F, size=10, bold=True, color=B.D_BAD)
         elif ev:
             ws.cell(rr, NC).fill = W.WARN
         ws.row_dimensions[rr].height = 30

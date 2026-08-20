@@ -3,45 +3,45 @@
 <style>
 /* ══ tokens ══ */
 :root{
-  --ground:#F3F5F4; --panel:#FFFFFF; --panel-2:#EDF0EE;
-  --line:#D9E0DD; --line-soft:#E8EDEA;
-  --ink:#0E1A22; --ink-2:#3A4C57; --muted:#6E8794;
-  --amber:#B87516; --amber-lit:#E8A33D;
-  --earn:#3F8C57; --earn-bg:#E4F0E7;
-  --block:#C0463C; --block-bg:#FAE6E4;
-  --readout-bg:#0B1218; --readout-line:#1E2E39;
-  --shadow:0 1px 2px rgba(14,26,34,.06), 0 8px 24px -12px rgba(14,26,34,.18);
+  --ground:#F7F4EF; --panel:#FFFFFF; --panel-2:#F1ECE4;
+  --line:#ECE6DD; --line-soft:#F3EEE7;
+  --ink:#3D3D3D; --ink-2:#6E6A64; --muted:#9B968E;
+  --amber:#D06A12; --amber-lit:#F5831F;
+  --earn:#2E8B6F; --earn-bg:#DCEDE6;
+  --block:#C0503A; --block-bg:#F6E1DB;
+  --readout-bg:#55565A; --readout-line:#6E6F73;
+  --shadow:0 1px 2px rgba(61,61,61,.04), 0 8px 24px rgba(61,61,61,.08);
 }
 @media (prefers-color-scheme: dark){
   :root{
-    --ground:#0C141B; --panel:#131F29; --panel-2:#18242F;
-    --line:#22323F; --line-soft:#1B2933;
-    --ink:#E6EDF1; --ink-2:#B4C4CE; --muted:#78909E;
-    --amber:#E8A33D; --amber-lit:#E8A33D;
-    --earn:#5CB578; --earn-bg:#162C1F;
-    --block:#E0685D; --block-bg:#2E1917;
-    --readout-bg:#070C11; --readout-line:#1B2A34;
-    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    --ground:#26272A; --panel:#2F3033; --panel-2:#37383C;
+  --line:#45464A; --line-soft:#3A3B3F;
+  --ink:#F2EFEA; --ink-2:#CFC9C0; --muted:#9B968E;
+  --amber:#F7A94B; --amber-lit:#F5831F;
+  --earn:#5FBF9E; --earn-bg:#1E3A32;
+  --block:#E08069; --block-bg:#3D241E;
+  --readout-bg:#1C1D1F; --readout-line:#3B3C40;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
   }
 }
 :root[data-theme="light"]{
-  --ground:#F3F5F4; --panel:#FFFFFF; --panel-2:#EDF0EE;
-  --line:#D9E0DD; --line-soft:#E8EDEA;
-  --ink:#0E1A22; --ink-2:#3A4C57; --muted:#6E8794;
-  --amber:#B87516; --amber-lit:#E8A33D;
-  --earn:#3F8C57; --earn-bg:#E4F0E7;
-  --block:#C0463C; --block-bg:#FAE6E4;
-  --readout-bg:#0B1218; --readout-line:#1E2E39;
-  --shadow:0 1px 2px rgba(14,26,34,.06), 0 8px 24px -12px rgba(14,26,34,.18);
+  --ground:#F7F4EF; --panel:#FFFFFF; --panel-2:#F1ECE4;
+  --line:#ECE6DD; --line-soft:#F3EEE7;
+  --ink:#3D3D3D; --ink-2:#6E6A64; --muted:#9B968E;
+  --amber:#D06A12; --amber-lit:#F5831F;
+  --earn:#2E8B6F; --earn-bg:#DCEDE6;
+  --block:#C0503A; --block-bg:#F6E1DB;
+  --readout-bg:#55565A; --readout-line:#6E6F73;
+  --shadow:0 1px 2px rgba(61,61,61,.04), 0 8px 24px rgba(61,61,61,.08);
 }
 :root[data-theme="dark"]{
-  --ground:#0C141B; --panel:#131F29; --panel-2:#18242F;
-  --line:#22323F; --line-soft:#1B2933;
-  --ink:#E6EDF1; --ink-2:#B4C4CE; --muted:#78909E;
-  --amber:#E8A33D; --amber-lit:#E8A33D;
-  --earn:#5CB578; --earn-bg:#162C1F;
-  --block:#E0685D; --block-bg:#2E1917;
-  --readout-bg:#070C11; --readout-line:#1B2A34;
+  --ground:#26272A; --panel:#2F3033; --panel-2:#37383C;
+  --line:#45464A; --line-soft:#3A3B3F;
+  --ink:#F2EFEA; --ink-2:#CFC9C0; --muted:#9B968E;
+  --amber:#F7A94B; --amber-lit:#F5831F;
+  --earn:#5FBF9E; --earn-bg:#1E3A32;
+  --block:#E08069; --block-bg:#3D241E;
+  --readout-bg:#1C1D1F; --readout-line:#3B3C40;
   --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
 }
 
@@ -119,17 +119,17 @@ select{cursor:pointer; padding-inline-end:28px;}
   width:1px; background:var(--readout-line);
 }
 .cell .k{
-  font-size:10.5px; letter-spacing:.1em; color:#5D7382; font-weight:600;
+  font-size:10.5px; letter-spacing:.1em; color:#CFC9C0; font-weight:600;
   display:block; margin-bottom:7px;
 }
 .cell .v{
   font-size:clamp(20px,2.6vw,31px); font-weight:600; line-height:1;
-  color:#DDE7ED; display:block;
+  color:#F7F4EF; display:block;
 }
-.cell .u{font-size:11px; color:#5D7382; margin-top:6px; display:block;}
-.cell.lit .v{color:var(--amber-lit); text-shadow:0 0 22px rgba(232,163,61,.32);}
-.cell.pos .v{color:#6FCB8C;}
-.cell.neg .v{color:#E8756A;}
+.cell .u{font-size:11px; color:#CFC9C0; margin-top:6px; display:block;}
+.cell.lit .v{color:var(--amber-lit); text-shadow:0 0 22px rgba(245,131,31,.38);}
+.cell.pos .v{color:#8FDCC0;}
+.cell.neg .v{color:#F2A99A;}
 /* flow arrows between readout cells */
 .cell + .cell::after{
   content:"‹"; position:absolute; inset-inline-start:-6px; top:50%;
