@@ -470,8 +470,8 @@ footer.pg{
           <span class="ro num" id="lpv">—</span>
         </div>
         <div class="field">
-          <span class="lbl">هامش المساهمة<small>هللة / لتر — من قائمة الدخل</small></span>
-          <input type="number" id="margin" value="13.36" step="0.01" min="0" class="num">
+          <span class="lbl">هامش المساهمة<small>هللة / لتر — من تقرير يوليو ٢٠٢٦</small></span>
+          <input type="number" id="margin" value="11.40" step="0.01" min="0" class="num">
         </div>
         <div class="field">
           <span class="lbl">نسبة الحافز من الهامش<small>قرار الإدارة</small></span>
@@ -601,7 +601,7 @@ footer.pg{
   <footer class="pg">
     بيانات المحطات من تقرير المطابقة التشغيلية — يناير إلى يوليو ٢٠٢٦، ٢١٢ يوماً فعلياً.
     الوردية الصباحية ٦ صباحاً إلى ٦ مساءً والمسائية ٦ مساءً إلى ٦ صباحاً، وحصص الزيارات
-    محسوبة على هذا الحد. هامش المساهمة ١٣٫٣٦ هللة/لتر من قائمة الدخل.
+    محسوبة على هذا الحد. هامش المساهمة لكل محطة من تقرير درب التجاري — يوليو ٢٠٢٦ (النسخة المصححة).
     الأرقام هنا تطابق ملف «نموذج العامل» في الإكسل حرفاً بحرف.
   </footer>
 </div>
@@ -613,19 +613,19 @@ footer.pg{
 const STATIONS = [
   {name:"عرفات الشرائع", code:"MK019", fname:"عرفات الشرائع", lpv:23.16, visits:443,
    dayW:2, eveW:2, dayShare:.4390, eveShare:.5610, peak:"17:00 · 21:00 · 22:00",
-   std:5, act:6, note:"محطة تجريبية — مناديل وخدمة"},
+   mrg:11.4, std:5, act:6, note:"محطة تجريبية — مناديل وخدمة"},
   {name:"عرفات الشوقية", code:"MK017", fname:"عرفات الشوقية", lpv:21.07, visits:1269,
    dayW:3, eveW:3, dayShare:.4471, eveShare:.5529, peak:"17:00 · 21:00 · 22:00",
-   std:9, act:9, note:"محطة تجريبية — بنزين"},
+   mrg:12.58, std:9, act:9, note:"محطة تجريبية — بنزين"},
   {name:"الفردوس", code:"MK023", fname:"بن درويش", lpv:20.01, visits:790,
    dayW:2, eveW:2, dayShare:.4511, eveShare:.5489, peak:"17:00 · 21:00 · 22:00",
-   std:7, act:7, note:"محطة تجريبية — بنزين · عقد تشغيل"},
+   mrg:11.29, std:7, act:7, note:"محطة تجريبية — بنزين · عقد تشغيل"},
   {name:"النورية", code:"MK007", fname:"العمرة", lpv:30.56, visits:4261,
    dayW:11, eveW:9, dayShare:.4899, eveShare:.5101, peak:"17:00 · 21:00 · 22:00",
-   std:32, act:34, note:"الأعلى حجماً — حملات المستأجرين"},
+   mrg:10.15, std:32, act:34, note:"الأعلى حجماً — حملات المستأجرين"},
   {name:"المعيصم", code:"MK002", fname:"المعيصم", lpv:20.99, visits:864,
    dayW:2, eveW:2, dayShare:.4964, eveShare:.5036, peak:"17:00 · 18:00 · 19:00",
-   std:7, act:8, note:"تغيّر مسار الطريق"}
+   mrg:13.11, std:7, act:8, note:"تغيّر مسار الطريق"}
 ];
 
 const SHIFTS = ["صباحية", "مسائية"];
@@ -952,6 +952,11 @@ buildRows();
 ["#margin","#share","#cap","#days","#growth","#station"].forEach(sel => {
   $(sel).addEventListener("input",  recalc);
   $(sel).addEventListener("change", recalc);
+});
+$("#station").addEventListener("change", () => {
+  const st = STATIONS[+$("#station").value];
+  if (st && st.mrg) $("#margin").value = st.mrg;   // هامش المحطة من تقرير يوليو
+  recalc();
 });
 $("#netgate").addEventListener("click", (e) => {
   const b = e.target.closest("button");

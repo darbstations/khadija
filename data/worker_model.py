@@ -31,8 +31,19 @@ RGT = Alignment(horizontal="right", vertical="center", readingOrder=2)
 DATA_SHEET = "بيانات الورديات"
 
 
-def stations(path="outlets/data/station-shifts.csv"):
-    return list(csv.DictReader(open(path, encoding="utf-8")))
+def stations(path="outlets/data/station-shifts.csv", margins="outlets/data/station-margins.json"):
+    rows = list(csv.DictReader(open(path, encoding="utf-8")))
+    try:
+        import json
+        mg = json.load(open(margins, encoding="utf-8"))
+    except FileNotFoundError:
+        mg = {}
+    for r in rows:                      # الهامش والنموذج من تقرير يوليو ٢٠٢٦ المصحح
+        m = mg.get(r["code"], {})
+        r["halalas"] = m.get("halalas", "")
+        r["bmodel"] = m.get("model", "")
+        r["derived"] = m.get("derived", False)
+    return rows
 
 
 def setup(ws, widths, freeze="A4"):
@@ -111,8 +122,9 @@ def build_data(wb, ST, idx=None):
     dw = wb.create_sheet(DATA_SHEET) if idx is None else wb.create_sheet(DATA_SHEET, idx)
     cols = ["#", "المحطة", "لتر/زيارة", "زيارات/يوم", "عمال صباحية", "عمال مسائية",
             "حصة الصباح", "حصة المساء", "ساعات الذروة", "الطاقم المعياري", "الفعلي",
-            "الكود", "اسم المقياس", "العقد", "المضخات"]
-    setup(dw, [4, 17, 10, 11, 12, 12, 11, 11, 20, 12, 9, 9, 15, 9, 9], freeze="A4")
+            "الكود", "اسم المقياس", "العقد", "المضخات",
+            "هامش المساهمة (هللة/لتر)", "نموذج العمل"]
+    setup(dw, [4, 17, 10, 11, 12, 12, 11, 11, 20, 12, 9, 9, 15, 9, 9, 16, 11], freeze="A4")
     title(dw, "بيانات المحطات المرجعية",
           "من تقرير المطابقة التشغيلية — يناير إلى يوليو ٢٠٢٦ (٢١٢ يوماً فعلياً)", len(cols))
     header(dw, 3, cols)
@@ -121,9 +133,11 @@ def build_data(wb, ST, idx=None):
         vals = [i + 1, s["name"], float(s["lpv"]), int(s["visits_day"]), int(s["day_w"]),
                 int(s["eve_w"]), float(s["txn_day_share"]) / 100,
                 float(s["txn_eve_share"]) / 100, s["peak_hours"], int(s["std"]),
-                int(s["act"]), s["code"], s["fname"], s["contract"], int(s["pumps"])]
+                int(s["act"]), s["code"], s["fname"], s["contract"], int(s["pumps"]),
+                float(s["halalas"]) if s.get("halalas") not in ("", None) else None,
+                s.get("bmodel", "")]
         fmts = [None, None, "0.00", "#,##0", "0", "0", "0.0%", "0.0%",
-                None, "0", "0", None, None, None, "0"]
+                None, "0", "0", None, None, None, "0", "0.00", None]
         for j, (v, fm) in enumerate(zip(vals, fmts), 1):
             c = dw.cell(rr, j, v); c.border = BOX; c.alignment = CTR
             c.font = BOLD if j == 2 else BLACK
@@ -136,13 +150,13 @@ def build_data(wb, ST, idx=None):
     ]):
         dw.cell(end + 2 + k, 2, txt).font = SMALL
         dw.cell(end + 2 + k, 2).alignment = RGT
-    dw.cell(3, 17, "الورديات").font = BOLD
+    dw.cell(3, 20, "الورديات").font = BOLD
     for i, s in enumerate(["صباحية", "مسائية"]):
-        dw.cell(4 + i, 17, s).alignment = CTR
-    dw.cell(3, 18, "بوابة الجودة").font = BOLD
+        dw.cell(4 + i, 20, s).alignment = CTR
+    dw.cell(3, 21, "بوابة الجودة").font = BOLD
     for i, s in enumerate(["مستوفاة", "غير مستوفاة"]):
-        dw.cell(4 + i, 18, s).alignment = CTR
-    dw.column_dimensions["Q"].width = 12; dw.column_dimensions["R"].width = 14
+        dw.cell(4 + i, 21, s).alignment = CTR
+    dw.column_dimensions["T"].width = 12; dw.column_dimensions["U"].width = 14
     return end
 
 
@@ -173,7 +187,7 @@ def build_worker(wb, ST, DEND, name="نموذج العامل", idx=None):
         ("عمال المضخات — مسائية",     '0;;""',         "F", None, "٦ م – ٦ ص"),
         ("حصة الصباح من الزيارات",    '0.0%;;""',      "G", None, "من الحركة الفعلية"),
         ("حصة المساء من الزيارات",    '0.0%;;""',      "H", None, "من الحركة الفعلية"),
-        ("هامش المساهمة (هللة/لتر)",  "0.00",  "in", 13.36, "من قائمة الدخل"),
+        ("هامش المساهمة (هللة/لتر)", '0.00;;""', "P", None, "من تقرير يوليو ٢٠٢٦"),
         ("نسبة الحافز من الهامش",     "0.0%",  "in", 0.15,  "قرار الإدارة"),
         ("سقف الحافز الشهري للعامل",  "#,##0", "in", 100,   "معتمد: ١٠٠ ريال"),
         ("أيام الشهر",                "0",     "in", 30,    ""),
@@ -207,8 +221,8 @@ def build_worker(wb, ST, DEND, name="نموذج العامل", idx=None):
                     "الحافز (ريال)", "ملاحظة"])
     ROWS = 20
     L = HR + ROWS
-    dv_sh = DataValidation(type="list", formula1=f"='{D}'!$Q$4:$Q$5", allow_blank=True)
-    dv_gt = DataValidation(type="list", formula1=f"='{D}'!$R$4:$R$5", allow_blank=True)
+    dv_sh = DataValidation(type="list", formula1=f"='{D}'!$T$4:$T$5", allow_blank=True)
+    dv_gt = DataValidation(type="list", formula1=f"='{D}'!$U$4:$U$5", allow_blank=True)
     dv_gt.error = "اكتب: مستوفاة أو غير مستوفاة"; dv_gt.errorTitle = "قيمة غير معتمدة"
     ws.add_data_validation(dv_sh); ws.add_data_validation(dv_gt)
 

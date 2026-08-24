@@ -5,6 +5,7 @@ from openpyxl import load_workbook
 import worker_model as W
 import competition_model as C
 import rebrand as R
+import financial_model as FIN
 
 P = "docs/commercial-plan.xlsx"
 ST = W.stations()
@@ -14,11 +15,15 @@ old = wb.sheetnames.index("نموذج العامل")
 comp = wb.sheetnames.index("المنافسون")
 print("قبل:", " · ".join(wb.sheetnames))
 
-for name in ("نموذج العامل", W.DATA_SHEET, "مطابقة الوردية مع الطلب", C.SHEET, C.RIVALS):
+for name in ("نموذج العامل", W.DATA_SHEET, "مطابقة الوردية مع الطلب",
+             C.SHEET, C.RIVALS, FIN.SHEET):
     if name in wb.sheetnames:
         del wb[name]
 
 # المنافسون يُعاد بناؤها (أُضيفت درب باي وأُعيد تصنيف Fleet Plus)
+# الأداء المالي يسبق كل شيء — هو إطار قراءة الخطة كلها
+FIN.build_financial(wb, idx=1)
+comp = wb.sheetnames.index(C.RIVALS) if C.RIVALS in wb.sheetnames else comp + 1
 C.build_rivals(wb, idx=comp)
 # والسيطرة الميدانية تليها مباشرة — فهي شاهدها
 C.build_control(wb, FIVE, idx=comp + 1)

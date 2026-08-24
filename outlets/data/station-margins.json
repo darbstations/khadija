@@ -1,0 +1,57 @@
+{
+ "MK007": {
+  "name": "النورية",
+  "model": "استثماري",
+  "fuel_pct": 5.53,
+  "halalas": 10.15,
+  "liters7": 27605156,
+  "rank": "ربحية #2",
+  "net": 1605,
+  "rev": 50659,
+  "derived": false
+ },
+ "MK017": {
+  "name": "عرفات الشوقية",
+  "model": "إيجاري",
+  "fuel_pct": 6.68,
+  "halalas": 12.58,
+  "liters7": 5669304,
+  "rank": "خاسرة #14",
+  "net": -23,
+  "rev": 10676,
+  "derived": false
+ },
+ "MK002": {
+  "name": "المعيصم",
+  "model": "إيجاري",
+  "fuel_pct": 6.68,
+  "halalas": 13.11,
+  "liters7": 3843560,
+  "rank": "خاسرة #6",
+  "net": -136,
+  "rev": 7544,
+  "derived": false
+ },
+ "MK019": {
+  "name": "عرفات الشرائع",
+  "model": "إيجاري",
+  "fuel_pct": 6.0,
+  "halalas": 11.4,
+  "liters7": 2174060,
+  "rank": "غير مدرجة",
+  "net": null,
+  "rev": null,
+  "derived": true
+ },
+ "MK023": {
+  "name": "الفردوس",
+  "model": "تشغيلي",
+  "fuel_pct": 5.94,
+  "halalas": 11.29,
+  "liters7": 3354052,
+  "rank": "غير مدرجة",
+  "net": null,
+  "rev": null,
+  "derived": true
+ }
+}
