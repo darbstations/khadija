@@ -6,6 +6,7 @@ import worker_model as W
 import competition_model as C
 import rebrand as R
 import financial_model as FIN
+import units_model as UN
 
 P = "docs/commercial-plan.xlsx"
 ST = W.stations()
@@ -16,7 +17,7 @@ comp = wb.sheetnames.index("المنافسون")
 print("قبل:", " · ".join(wb.sheetnames))
 
 for name in ("نموذج العامل", W.DATA_SHEET, "مطابقة الوردية مع الطلب",
-             C.SHEET, C.RIVALS, FIN.SHEET):
+             C.SHEET, C.RIVALS, FIN.SHEET, UN.SHEET):
     if name in wb.sheetnames:
         del wb[name]
 
@@ -32,6 +33,17 @@ old = wb.sheetnames.index("تجربة الشرايع")
 end = W.build_data(wb, ST)                  # تُضاف في النهاية
 W.build_worker(wb, ST, end, idx=old)
 W.build_shift(wb, ST, idx=old + 1)
+
+# سجل الوحدات يلي ورقة العقار والتأجير — فهو مصدر أرقامها
+UN.build_units(wb, UN.units(), idx=wb.sheetnames.index("العقار والتأجير") + 1)
+
+# تصحيح رقم الشغور الخاطئ في ورقة الإطار
+fr = wb["الإطار"]
+for row in fr.iter_rows():
+    for c in row:
+        if isinstance(c.value, str) and "96 وحدة شاغرة" in c.value:
+            c.value = "إشغال المشغّلة ٧٩٪ · ٦٨٩ وحدة تحت التنفيذ · ٢٦٩ في الامتياز"
+            print("صُحّح رقم الشغور في الإطار", c.coordinate)
 
 # الأوراق القديمة (بُنيت بسكربت سابق) تُعاد لألوان الهوية
 BUILT = {"المنافسون", C.SHEET, "نموذج العامل", "مطابقة الوردية مع الطلب", W.DATA_SHEET}
