@@ -602,53 +602,88 @@ divider("القسم الرابع", "خطة المبيعات", "مستهدف لك
 
 /* ═══ ١٨ · مستهدف الوردية والعامل ═══ */
 {
-  const s = page("من مستهدف المحطة إلى مستهدف العامل", "الوردية تأخذ حصتها من منحنى الطلب الفعلي، والعامل يأخذ حصته من الوردية");
-  s.addShape(p.ShapeType.roundRect, { x: M, y: 1.5, w: CW, h: 0.72, rectRadius: 0.04,
-    fill: { color: BGRAY } });
-  s.addText("مستهدف العامل  =  ( زيارات المحطة × حصة الوردية ) ÷ عمال الوردية      ×      مستهدف اللتر لكل زيارة",
-    { x: M + 0.2, y: 1.62, w: CW - 0.4, h: 0.5, fontFace: F, fontSize: 15,
-      bold: true, color: W, align: "center", margin: 0 });
+  const s = page("من مستهدف المحطة إلى مستهدف العامل",
+                 "ثلاث طبقات — والوحدة «معاملة» في الطبقتين الأوليين، والريال في الثالثة فقط");
 
-  const five = ["MK007", "MK017", "MK002", "MK023", "MK019"];
-  const wk = { MK007: [11, 9], MK017: [3, 3], MK002: [2, 2], MK023: [2, 2], MK019: [2, 2] };
-  const rows = five.map((c, i) => {
-    const r = ST.find(x => x.code === c) || {};
-    const [dw, ew] = wk[c];
-    const dv = r.vpd * (1 - r.night), ev = r.vpd * r.night;
-    return { c: [{ t: r.name.slice(0, 18), a: "right", b: true }, c, ar(r.vpd),
-                 pc(r.night), ar(dw) + " / " + ar(ew),
-                 { t: ar(dv / dw), b: true }, { t: ar(ev / ew), b: true, c: ORANGE },
-                 ar1(r.lpv), { t: ar1(r.tgt_lpv), b: true, c: D_GOOD }],
-             fill: i % 2 ? T_NEU : W };
-  });
-  table(s, M, 2.55, CW, [
-    { t: "المحطة", w: 16, a: "right" }, { t: "الكود", w: 8 }, { t: "زيارة/يوم", w: 10 },
-    { t: "حصة المساء", w: 10 }, { t: "عمال ص/م", w: 10 },
-    { t: "مستهدف الصباحي", w: 13 }, { t: "مستهدف المسائي", w: 13 },
-    { t: "لتر/زيارة", w: 10 }, { t: "المستهدف", w: 10 }],
-    rows, { rh: 0.40, fs: 11, hfs: 10 });
-  s.addText("زيارات الوردية لكل عامل · والسلة المستهدفة من معيار الشريحة",
-    { x: M, y: 2.25, w: CW, h: 0.28, fontFace: F, fontSize: 11, color: INK2, ...rtl });
+  /* ① المثال المحسوب — سلسلة من اليمين لليسار */
+  s.addText("① كيف يُشتقّ الرقم — العمرة الجديدة MK007", { x: M, y: 1.46, w: CW, h: 0.3,
+    fontFace: F, fontSize: 13.5, bold: true, color: ORANGE, ...rtl });
+  const bw = 2.62, gp = 0.34, y0 = 1.76, bh = 0.82;
+  /* الصندوق الأول على اليمين */
+  s.addShape(p.ShapeType.roundRect, { x: SW - M - bw, y: y0 + 0.42, w: bw, h: bh,
+    rectRadius: 0.05, fill: { color: BGRAY } });
+  s.addText("٤٬٢٦١", { x: SW - M - bw, y: y0 + 0.5, w: bw, h: 0.44, fontFace: F,
+    fontSize: 25, bold: true, color: W, align: "center", margin: 0 });
+  s.addText("معاملة يومياً — كل المحطة", { x: SW - M - bw, y: y0 + 0.93, w: bw, h: 0.3,
+    fontFace: F, fontSize: 10.5, color: "D6D2CC", align: "center", margin: 0 });
 
-  s.addText("مؤشرات العامل الخمسة", { x: M, y: 5.05, w: CW, h: 0.34, fontFace: F,
-    fontSize: 15, bold: true, color: ORANGE, ...rtl });
-  const kpi = [["زيارات الوردية", "من منحنى الطلب", "٤٠٪"], ["اللتر لكل زيارة", "معيار الشريحة", "٣٠٪"],
-               ["جودة الخدمة", "بوابة — لا حافز دونها", "بوابة"],
-               ["تسجيل وسيلة الدفع", "يقفل ثغرة الـ٣٦٪", "١٥٪"],
-               ["تحويل الحملة", "هدايا مسلّمة/١٠٠ زيارة", "١٥٪"]];
-  const cwid = (CW - 4 * 0.16) / 5;
-  kpi.forEach((k, i) => {
-    const x = rtlx(i, cwid, 0.16);
-    s.addShape(p.ShapeType.roundRect, { x, y: 5.42, w: cwid, h: 1.05, rectRadius: 0.04,
-      fill: { color: k[2] === "بوابة" ? T_BAD : BG }, line: { color: k[2] === "بوابة" ? BAD : LINE2, width: 1 } });
-    s.addText(k[2], { x: x + 0.08, y: 5.48, w: cwid - 0.16, h: 0.3, fontFace: F,
-      fontSize: 15, bold: true, color: k[2] === "بوابة" ? D_BAD : ORANGE, align: "center", margin: 0 });
-    s.addText(k[0], { x: x + 0.08, y: 5.8, w: cwid - 0.16, h: 0.3, fontFace: F,
+  const step = (x, y, ttl, big, sub, col) => {
+    s.addShape(p.ShapeType.roundRect, { x, y, w: bw, h: bh, rectRadius: 0.05,
+      fill: { color: col === ORANGE ? T_OR : T_NEU }, line: { color: col, width: 1.2 } });
+    s.addText(ttl, { x: x + 0.08, y: y + 0.06, w: bw - 0.16, h: 0.26, fontFace: F,
+      fontSize: 10, color: INK2, align: "center", margin: 0 });
+    s.addText(big, { x: x + 0.08, y: y + 0.28, w: bw - 0.16, h: 0.36, fontFace: F,
       fontSize: 11.5, bold: true, color: BGRAY, align: "center", margin: 0 });
-    s.addText(k[1], { x: x + 0.08, y: 6.11, w: cwid - 0.16, h: 0.3, fontFace: F,
-      fontSize: 9.5, color: INK2, align: "center", margin: 0 });
+    s.addText(sub, { x: x + 0.08, y: y + 0.62, w: bw - 0.16, h: 0.26, fontFace: F,
+      fontSize: 12.5, bold: true, color: col, align: "center", margin: 0 });
+  };
+  const arrow = (x, y) => s.addText("◀", { x, y, w: gp, h: bh, fontFace: F,
+    fontSize: 13, color: INK3, align: "center", valign: "middle", margin: 0 });
+
+  const x1 = SW - M - bw - gp - bw, x2 = x1 - gp - bw, x3 = x2 - gp - bw;
+  arrow(SW - M - bw - gp, y0 + 0.43);
+  step(x1, y0, "الصباح ٦ص – ٦م", "٢٬٠٨٧ معاملة ÷ ١١ عاملاً", "= ١٩٠ معاملة للعامل", BGRAY);
+  step(x1, y0 + 0.9, "المساء ٦م – ٦ص", "٢٬١٧٤ معاملة ÷ ٩ عمال", "= ٢٤٢ معاملة للعامل", ORANGE);
+  arrow(x1 - gp, y0 + 0.43);
+  step(x2, y0 + 0.43, "الفارق بين الورديتين", "المساء ٥١٪ من الطلب · ٤٥٪ من الطاقم",
+       "المسائي يخدم +٢٧٪", BAD);
+  arrow(x2 - gp, y0 + 0.43);
+  step(x3, y0 + 0.43, "ما نطلبه فعلاً", "فاقد ذروة وردية المساء",
+       "٥١ معاملة تُستردّ", GOOD);
+
+  /* ② الجدول */
+  s.addText("② الأرقام — كلها بالمعاملة", { x: M, y: 3.56, w: CW, h: 0.3,
+    fontFace: F, fontSize: 13.5, bold: true, color: ORANGE, ...rtl });
+  const SH = [["العمرة الجديدة", "MK007", 4261, 2087, 2174, "١١ / ٩", 190, 242, "+٢٧٪", 34, 51],
+              ["عرفات الشوقية", "MK017", 1269, 567, 702, "٣ / ٣", 189, 234, "+٢٤٪", 1, 1],
+              ["المعيصم", "MK002", 865, 429, 436, "٢ / ٢", 214, 218, "+٢٪", 1, 9],
+              ["بن درويش", "MK023", 790, 357, 434, "٢ / ٢", 178, 217, "+٢٢٪", 0, 0],
+              ["الشرايع", "MK019", 443, 194, 248, "٢ / ٢", 97, 124, "+٢٨٪", 1, 1]];
+  const rows = SH.map((r, i) => ({
+    c: [{ t: r[0], a: "right", b: true }, r[1], ar(r[2]), ar(r[3]), ar(r[4]), r[5],
+        { t: ar(r[6]), b: true }, { t: ar(r[7]), b: true, c: ORANGE },
+        { t: r[8], c: D_BAD }, { t: ar(r[9] + r[10]), b: true, c: D_GOOD }],
+    fill: i % 2 ? T_NEU : W }));
+  table(s, M, 3.86, CW, [
+    { t: "المحطة", w: 15, a: "right" }, { t: "الكود", w: 8 },
+    { t: "معاملات المحطة/يوم", w: 12 }, { t: "منها صباحاً", w: 10 },
+    { t: "منها مساءً", w: 10 }, { t: "عمال ص / م", w: 9 },
+    { t: "عبء الصباحي", w: 10 }, { t: "عبء المسائي", w: 10 },
+    { t: "الفارق", w: 8 }, { t: "المستهدف اليومي", w: 11 }],
+    rows, { rh: 0.335, fs: 10.5, hfs: 9.5 });
+
+  /* ③ الطبقات الثلاث */
+  const L = [["الطبقة ١ · عبء الوردية", "معاملة",
+              "معاملات الوردية ÷ عمالها. حِمل لا مستهدف: العامل لا يصنع المعاملة.", BGRAY],
+             ["الطبقة ٢ · مستهدف الوردية", "معاملة",
+              "ما تفقده المحطة في ساعات ذروتها مقارنة بشريحتها. هذا وحده ما يُطالَب به.", ORANGE],
+             ["الطبقة ٣ · الحافز", "ريال",
+              "اللترات الإضافية × هامش المحطة × نسبة، ببوابة جودة وسقف ١٠٠ ريال.", GOOD]];
+  const cwid = (CW - 2 * 0.2) / 3;
+  L.forEach((k, i) => {
+    const x = rtlx(i, cwid, 0.2);
+    s.addShape(p.ShapeType.roundRect, { x, y: 6.06, w: cwid, h: 0.88, rectRadius: 0.05,
+      fill: { color: BG }, line: { color: k[3], width: 1.2 } });
+    s.addShape(p.ShapeType.rect, { x, y: 6.06, w: cwid, h: 0.05, fill: { color: k[3] } });
+    s.addText(k[0], { x: x + 1.02, y: 6.14, w: cwid - 1.12, h: 0.28, fontFace: F,
+      fontSize: 11.5, bold: true, color: BGRAY, ...rtl });
+    s.addShape(p.ShapeType.roundRect, { x: x + 0.1, y: 6.15, w: 0.78, h: 0.25,
+      rectRadius: 0.03, fill: { color: k[3] } });
+    s.addText(k[1], { x: x + 0.1, y: 6.15, w: 0.78, h: 0.25, fontFace: F,
+      fontSize: 9.5, bold: true, color: W, align: "center", valign: "middle", margin: 0 });
+    s.addText(k[2], { x: x + 0.1, y: 6.42, w: cwid - 0.2, h: 0.5, fontFace: F,
+      fontSize: 10, color: INK, ...rtl });
   });
-  note(s, "أعداد العمال متاحة لخمس محطات فقط — تعميم المستهدف على الشبكة يتطلب جدول عمالة لكل محطة ووردية.");
 }
 
 /* ═══ ١٩ · نموذج الحافز ═══ */
