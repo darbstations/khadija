@@ -862,44 +862,76 @@ divider("القسم الخامس", "التأجير والحملات", "باقا�
 
 /* ═══ التطبيق — قناة الأفراد ═══ */
 {
-  const s = page("التطبيق — قناة الأفراد ومحطات الأحياء", "يبدأ التشغيل أول ديسمبر ٢٠٢٦");
+  const s = page("التطبيق — قناة الأفراد ومحطات الأحياء",
+                 "يبدأ أول ديسمبر ٢٠٢٦ في محطات مكة · محفظة وبرنامج ولاء");
   const cw = (CW - 3 * 0.18) / 4;
-  const st = [["٣٠٬٨٥٦", "معاملة يومياً", "الحضرية والأحياء — سوقه", ORANGE],
-              ["١١٫٣", "مليون معاملة سنوياً", "قاعدته المحتملة", BGRAY],
-              ["٣٦٪", "بلا هوية عميل اليوم", "٢٢٦ مليون ريال", BAD],
-              ["٣٫٠٪", "حصة التطبيقات اليوم", "وكلها أساطيل لا أفراد", BAD]];
+  const st = [["٢١", "محطة في مكة", "قاعدة الإطلاق", ORANGE],
+              ["٢٥٦٫٥", "MLPA", "٤٧٪ من حجم الشبكة", BGRAY],
+              ["١٠٫٠", "مليون معاملة سنوياً", "٢٧٬٣٧٠ يومياً", BGRAY],
+              ["١٫٨٤", "ريال صافي المعاملة", "سقف ما يحتمله الولاء", GOOD]];
   st.forEach((v, i) => stat(s, rtlx(i, cw, 0.18), 1.36, cw, 1.5, v[0], v[1], v[3], v[2]));
+  head(s, 3.06, "الأداتان — اقتصادهما متعاكس");
+  const two = [["المحفظة", "تكسب لنا", GOOD,
+                [["وفر رسوم البطاقة", "٢٤٦ إلى ٦١٥ ألف ريال لو تحوّل ٢٠٪"],
+                 ["عائم نقدي", "رصيد مدفوع مقدماً — وتكلفة تحوّل للمنافس"],
+                 ["هوية ١٠٠٪", "كل معاملة محفظة معروفة الصاحب"]]],
+               ["برنامج الولاء", "يكلّفنا", BAD,
+                [["استرداد ٠٫٥٪", "٠٫٢٨ ر = ١٥٪ من صافي المعاملة"],
+                 ["استرداد ١٪", "٠٫٥٦ ر = ٣٠٪ من الصافي"],
+                 ["استرداد ٢٪", "١٫١٢ ر = ٦١٪ من الصافي — مرفوض"]]]];
   const cw2 = (CW - 0.24) / 2;
-  const bx = [rtlx(0, cw2, 0.24), rtlx(1, cw2, 0.24)];
-  s.addShape(p.ShapeType.roundRect, { x: bx[0], y: 3.06, w: cw2, h: 1.62, rectRadius: 0.05,
-    fill: { color: T_BAD }, line: { color: BAD, width: 1.2 } });
-  s.addText("ما لا نبني عليه القرار", { x: bx[0] + 0.16, y: 3.16, w: cw2 - 0.32, h: 0.3,
-    fontFace: F, fontSize: 13.5, bold: true, color: D_BAD, ...rtl });
-  s.addText("رفع التردد وحده يعطي ٢٩ إلى ٢٨٧ ألف ريال سنوياً حسب التبني — رقم متواضع أمام كلفة تطبيق وتشغيله.",
-    { x: bx[0] + 0.16, y: 3.5, w: cw2 - 0.32, h: 1.04, fontFace: F, fontSize: 12, color: INK, ...rtl });
-  s.addShape(p.ShapeType.roundRect, { x: bx[1], y: 3.06, w: cw2, h: 1.62, rectRadius: 0.05,
-    fill: { color: T_GOOD }, line: { color: GOOD, width: 1.2 } });
-  s.addText("وما نبنيه عليه", { x: bx[1] + 0.16, y: 3.16, w: cw2 - 0.32, h: 0.3,
-    fontFace: F, fontSize: 13.5, bold: true, color: D_GOOD, ...rtl });
-  s.addText("الهوية. التطبيق يحوّل ٣٦٪ من الإيراد من مجهول إلى عميل معروف — وهو ما يجعل كل حملة قابلة للاستهداف والقياس.",
-    { x: bx[1] + 0.16, y: 3.5, w: cw2 - 0.32, h: 1.04, fontFace: F, fontSize: 12, color: INK, ...rtl });
-  head(s, 4.88, "ما يفتحه — ولا يُفتح بغيره");
-  const use = [["استهداف المناديل", "بدل كل من تجاوز ٥٠ ريالاً، فقط من تعبئته دون معدّله"],
-               ["مكافأة المستأجر", "توصيلها بكلفة صفر — لا طباعة ولا كوبون ورقي"],
-               ["قياس التردد", "المؤشر الوحيد الذي لا نقيسه اليوم إطلاقاً"],
-               ["محرّك الأحياء", "التردد هو محرّك الشريحة — والتطبيق أداته الوحيدة الرخيصة"]];
-  const cw3 = (CW - 3 * 0.18) / 4;
-  use.forEach((u, i) => {
-    const x = rtlx(i, cw3, 0.18);
-    s.addShape(p.ShapeType.roundRect, { x, y: 5.22, w: cw3, h: 1.1, rectRadius: 0.04,
-      fill: { color: BG }, line: { color: ORANGE, width: 1 } });
-    s.addShape(p.ShapeType.rect, { x, y: 5.22, w: cw3, h: 0.05, fill: { color: ORANGE } });
-    s.addText(u[0], { x: x + 0.1, y: 5.34, w: cw3 - 0.2, h: 0.3, fontFace: F,
-      fontSize: 12.5, bold: true, color: BGRAY, align: "center", margin: 0 });
-    s.addText(u[1], { x: x + 0.1, y: 5.66, w: cw3 - 0.2, h: 0.56, fontFace: F,
-      fontSize: 10, color: INK, align: "center", margin: 0 });
+  two.forEach((t, i) => {
+    const x = rtlx(i, cw2, 0.24);
+    s.addShape(p.ShapeType.roundRect, { x, y: 3.4, w: cw2, h: 2.1, rectRadius: 0.05,
+      fill: { color: W }, line: { color: t[2], width: 1.4 } });
+    s.addShape(p.ShapeType.rect, { x, y: 3.4, w: cw2, h: 0.5, fill: { color: t[2] } });
+    s.addText(t[0], { x: x + cw2 - 2.2, y: 3.46, w: 2.08, h: 0.38, fontFace: F,
+      fontSize: 14, bold: true, color: W, ...rtl });
+    s.addText(t[1], { x: x + 0.12, y: 3.47, w: 2.0, h: 0.36, fontFace: F,
+      fontSize: 13, bold: true, color: W, align: "left", margin: 0 });
+    t[3].forEach((r, k) => {
+      const y = 4.02 + k * 0.48;
+      s.addText(r[0], { x: x + cw2 - 2.1, y, w: 1.98, h: 0.3, fontFace: F,
+        fontSize: 11.5, bold: true, color: BGRAY, ...rtl });
+      s.addText(r[1], { x: x + 0.12, y: y + 0.02, w: cw2 - 2.3, h: 0.3, fontFace: F,
+        fontSize: 10, color: INK2, align: "left", margin: 0 });
+    });
   });
-  foot(s, "يلزم تثبيته قبل الإطلاق: هل يتضمن الدفع · وبأي عملة يكافئ · وهل يربط المستأجرين · وفي كم محطة يبدأ");
+  band(s, 5.68, "مبدأ التصميم: الاسترداد يُموَّل من وفر رسوم البطاقة لا من هامش الوقود — عند ٠٫٥٪ يكاد يغطّي نفسه", ORANGE);
+  foot(s, "رسوم البطاقة الفعلية تحتاج تأكيد المالية — هي التي تحدد سقف الاسترداد");
+}
+
+/* ═══ التطبيق — قواعد التصميم ═══ */
+{
+  const s = page("التطبيق — أربع قواعد قبل الإطلاق", "تُثبَّت الآن، لا بعد ديسمبر");
+  const rules = [
+    ["كافئ التردد لا الإنفاق", "الاسترداد على الفاتورة يدفع ثمن حجم كان سيأتي بلا مكافأة. المكافأة على الزيارة السادسة في الشهر تدفع ثمن الزيارة الإضافية وحدها.",
+     "سقفها ١٫٨٤ ريال — صافي المعاملة في مكة", ORANGE],
+    ["المحفظة تموّل الولاء", "وفر رسوم البطاقة ٢٤٦ إلى ٦١٥ ألف ريال عند تحوّل ٢٠٪. الاسترداد ٠٫٥٪ على الحجم المتحوّل يكلّف ٣٠٧ ألفاً — فيغطّي نفسه تقريباً.",
+     "الشرط: رسوم البطاقة ٠٫٥٪ فأعلى", GOOD],
+    ["الهوية أولاً", "٣٦٪ من الإيراد بلا هوية عميل. كل معاملة محفظة تُغلق هذه الفجوة عند مصدرها — وهذا أثمن ما في التطبيق.",
+     "المؤشر الأول: نسبة المعاملات المعرَّفة", BLUE],
+    ["اربطه بالحملات لا بجانبه", "علبة المناديل بلا التطبيق تُوزَّع على من كان سيتجاوز العتبة أصلاً. مع التطبيق تُستهدف لمن تعبئته دون معدّله هو.",
+     "ومكافأة المستأجر تُوصَّل بكلفة صفر", BGRAY]];
+  const cw = (CW - 0.22) / 2;
+  rules.forEach((r, i) => {
+    const x = rtlx(i % 2, cw, 0.22), y = 1.36 + Math.floor(i / 2) * 2.5;
+    s.addShape(p.ShapeType.roundRect, { x, y, w: cw, h: 2.28, rectRadius: 0.05,
+      fill: { color: BG }, line: { color: r[3], width: 1.3 } });
+    s.addShape(p.ShapeType.ellipse, { x: x + cw - 0.62, y: y + 0.16, w: 0.44, h: 0.44,
+      fill: { color: r[3] } });
+    s.addText(String(i + 1), { x: x + cw - 0.62, y: y + 0.2, w: 0.44, h: 0.36, fontFace: F,
+      fontSize: 15, bold: true, color: W, align: "center", margin: 0 });
+    s.addText(r[0], { x: x + 0.14, y: y + 0.18, w: cw - 0.86, h: 0.36, fontFace: F,
+      fontSize: 15, bold: true, color: BGRAY, ...rtl });
+    s.addText(r[1], { x: x + 0.14, y: y + 0.62, w: cw - 0.28, h: 1.1, fontFace: F,
+      fontSize: 11.5, color: INK, ...rtl });
+    s.addShape(p.ShapeType.rect, { x: x + 0.14, y: y + 1.76, w: cw - 0.28, h: 0.02,
+      fill: { color: LINE2 } });
+    s.addText(r[2], { x: x + 0.14, y: y + 1.84, w: cw - 0.28, h: 0.32, fontFace: F,
+      fontSize: 11, bold: true, color: r[3], ...rtl });
+  });
+  band(s, 6.4, "مكة قاعدة إطلاق لا تجربة: ٢١ محطة و٤٧٪ من حجم الشبكة — فما يُثبَّت هنا يُعمَّم لا يُراجَع");
 }
 
 /* ═══ ٢٤ · علبة المناديل ═══ */
