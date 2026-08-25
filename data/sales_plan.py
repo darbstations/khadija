@@ -207,6 +207,34 @@ def conditions(rows, recon, units, access):
         r["conds"] = c
 
 
+def fleet_plan(rows, units):
+    """وقود الشركات: قائمة صيد لكل محطة، وعملتا الدفع — هللة أو خدمة"""
+    U = {u["code"]: u for u in units}
+
+    def n(c, k):
+        try: return int(float((U.get(c) or {}).get(k) or 0))
+        except (ValueError, TypeError): return 0
+    tg = []
+    for r in rows:
+        tg.append(dict(code=r["code"], name=r["name"], seg=r["seg"],
+                       dl=r["lpd"] * r["diesel"], dsh=r["diesel"], fl=r["fleet"],
+                       svc=n(r["code"], "carwash_n"), svc_v=n(r["code"], "carwash_vacant"),
+                       lpv=r["lpv"]))
+    tg.sort(key=lambda x: -x["dl"])
+    net = MARGIN - OPEX_NET
+    V = 16000                     # أسطول نموذجي: ٢٠ شاحنة × ٢٠٠ لتر × ٤ تعبئات
+    return dict(
+        targets=tg[:10],
+        diesel_lpd=sum(x["dl"] for x in tg),
+        top10_share=sum(x["dl"] for x in tg[:10]) / sum(x["dl"] for x in tg),
+        no_service=sum(1 for x in tg[:10] if x["svc"] == 0),
+        ladder=[dict(cut=d, left=net * 100 - d, share=d / (net * 100)) for d in (1, 2, 3, 5)],
+        sample=dict(vol=V, margin=V * MARGIN, net=V * net,
+                    disc_cost=V * 0.02, disc_face=V * 0.02,
+                    svc_cost=20 * 15, svc_face=20 * 28),
+        wash_litres=15 / net)
+
+
 def litre_economics():
     """تفكيك اللتر الواحد وتعبئة الخمسين ريالاً"""
     out = []
@@ -292,7 +320,7 @@ def build():
                      raw_rows=net["raw_rows"], files=net["files"]),
         segments=segsum, stations=sorted(rows, key=lambda x: -x["sar_total"]),
         shifts=shifts, events=EVENTS, packages=PACKAGES, products=PRODUCTS,
-        litre=litre_economics(), access=access,
+        litre=litre_economics(), access=access, fleet=fleet_plan(rows, units),
         five=[dict(code=f["code"], name=f["name"], rating=f["rating"], n=f["nComp"],
                    avg=f["compAvg"], near=f["nearDist"], who=f["nearName"],
                    density=f["density"]) for f in five],

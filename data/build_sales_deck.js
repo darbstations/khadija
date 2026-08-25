@@ -340,6 +340,65 @@ divider("القسم الأول", "أين نقف", "الشبكة · الاتجا�
   foot(s, "محفظة كاش إن: ٣١٨ ريالاً و٨ عمليات في سبعة أشهر — قناة غير مفعّلة");
 }
 
+/* ═══ وقود الشركات — خطة التعاقد ═══ */
+{
+  const s = page("وقود الشركات — خطة التعاقد", "لكل محطة قائمة صيد · وعملتان للدفع: هللة أو خدمة");
+  const FL = D.fleet;
+  band(s, 1.32, "٨١ مليون ريال ديزل يُشترى نقداً أو بالبطاقة — ٤٥٫٢ مليون لتر بلا تعاقد · هامشها ٥٬١٦٩٬٠٦٠ ريال");
+  s.addText("① قائمة الصيد — أعلى ١٠ محطات ديزلاً", { x: M, y: 2.06, w: CW * 0.56,
+    h: 0.3, fontFace: F, fontSize: 13.5, bold: true, color: ORANGE, ...rtl });
+  const rows = FL.targets.map((r, i) => ({
+    c: [{ t: r.name.slice(0, 19), a: "right", b: true }, r.code,
+        { t: ar(r.dl), b: true }, pc0(r.dsh), pc(r.fl),
+        { t: r.svc ? ar(r.svc) : "لا يوجد", b: !r.svc, c: r.svc ? INK : D_BAD },
+        { t: r.svc ? (r.fl < 0.05 ? "خدمات" : "خدمات + هللة") : "هللة فقط",
+          b: true, c: r.svc ? D_GOOD : D_BAD }],
+    fill: r.svc ? (i % 2 ? T_NEU : W) : T_BAD }));
+  table(s, M, 2.38, CW * 0.56, [
+    { t: "المحطة", w: 26, a: "right" }, { t: "الكود", w: 11 },
+    { t: "ديزل لتر/يوم", w: 15 }, { t: "حصته", w: 10 },
+    { t: "الدفع المؤسسي", w: 13 }, { t: "وحدات خدمة", w: 12 },
+    { t: "العملة الممكنة", w: 17 }], rows, { rh: 0.335, fs: 10, hfs: 9.5 });
+
+  const x2 = M + CW * 0.59, w2 = CW * 0.41;
+  s.addText("② بأي عملة ندفع", { x: x2, y: 2.06, w: w2, h: 0.3, fontFace: F,
+    fontSize: 13.5, bold: true, color: ORANGE, ...rtl });
+  const lr = FL.ladder.map((l, i) => ({
+    c: [{ t: ar(l.cut) + " هللة", a: "right", b: true },
+        { t: ar2(l.left) + " هللة", b: true, c: l.share > 0.5 ? D_BAD : D_GOOD },
+        { t: pc0(l.share), c: l.share > 0.5 ? D_BAD : INK }],
+    fill: i % 2 ? T_NEU : W }));
+  table(s, x2, 2.38, w2, [{ t: "الخصم", w: 34, a: "right" },
+    { t: "يبقى من الصافي", w: 36 }, { t: "ما نتنازل عنه", w: 30 }],
+    lr, { rh: 0.34, fs: 10.5, hfs: 10 });
+
+  const S = FL.sample;
+  s.addText("أسطول نموذجي: ٢٠ شاحنة · ١٦٬٠٠٠ لتر شهرياً · صافيه لنا ١٬١٣٦ ريالاً",
+    { x: x2, y: 4.14, w: w2, h: 0.28, fontFace: F, fontSize: 10.5, color: INK2, ...rtl });
+  const cur = [["خصم ٢ هللة", ar(S.disc_cost), ar(S.disc_face), "١٫٠٠", BGRAY],
+               ["٢٠ غسلة", ar(S.svc_cost), ar(S.svc_face), "١٫٨٧", GOOD]];
+  const cw = (w2 - 0.18) / 2;
+  cur.forEach((c, i) => {
+    const x = x2 + w2 - cw - i * (cw + 0.18);
+    s.addShape(p.ShapeType.roundRect, { x, y: 4.46, w: cw, h: 1.52, rectRadius: 0.05,
+      fill: { color: c[4] === GOOD ? T_GOOD : BG }, line: { color: c[4], width: 1.2 } });
+    s.addText(c[0], { x: x + 0.08, y: 4.53, w: cw - 0.16, h: 0.3, fontFace: F,
+      fontSize: 13, bold: true, color: c[4] === GOOD ? D_GOOD : BGRAY,
+      align: "center", margin: 0 });
+    [["كلفتها علينا", c[1] + " ر"], ["قيمتها للعميل", c[2] + " ر"],
+     ["لكل ريال ننفقه", c[3] + " ر قيمة"]].forEach((r, k) => {
+      const y = 4.86 + k * 0.36;
+      s.addText(r[0], { x: x + 0.08, y, w: cw - 0.16, h: 0.18, fontFace: F,
+        fontSize: 9, color: INK3, align: "center", margin: 0 });
+      s.addText(r[1], { x: x + 0.08, y: y + 0.15, w: cw - 0.16, h: 0.22, fontFace: F,
+        fontSize: 12, bold: true, color: c[4] === GOOD ? D_GOOD : BGRAY,
+        align: "center", margin: 0 });
+    });
+  });
+  band(s, 6.1, "الخدمة تعطي ١٫٨٧ ريال قيمة لكل ريال ننفقه — وتملأ وحدات الخدمة الشاغرة · لكن ٣ من أعلى ١٠ محطات ديزلاً بلا وحدة خدمة أصلاً", ORANGE);
+  foot(s, "غسلة بكلفة ١٥ ريالاً تعادل ٢١١ لتراً من الصافي — فالسقف غسلة لكل ألف لتر");
+}
+
 /* ═══ ٨ · القسم الثاني ═══ */
 divider("القسم الثاني", "المنافسون", "خمسة منتجات — ولكلٍّ مسيطر مختلف");
 
