@@ -16,12 +16,16 @@ STAFF = "outlets/data/station-staff.csv"
 NET = "outlets/data/network-sales.json"
 FIVE = "data/five.json"
 UNITS = "outlets/data/units-registry.csv"
+Q2 = "outlets/data/q2-stations.csv"
 OUT = "data/sales-plan.json"
 
-# ── ثوابت من تقرير يوليو ٢٠٢٦ (الشبكة المشغّلة: ٣٥٬٥٣٦ ألف ÷ ٣١٠٫٧ مليون لتر)
-MARGIN = 0.1144          # هامش المساهمة — ريال لكل لتر
-OPEX_NET = 28704000 / 661_500_000    # مصاريف التشغيل ÷ لترات الشبكة كلها
-OPEX_OP = 28704000 / 310_700_000     # ÷ لترات المشغّلة وحدها
+# ── ثوابت مقيسة من تقرير ربحية محطات التشغيل — الربع الثاني ٢٠٢٦ (٢١ محطة)
+#    مجمل الربح ٥٬٤٤٢٬٢٢٥ ÷ ٤٩٬٠٧٩٬٦٨٦ لتر · المصاريف التشغيلية ٢٬٣٨٥٬٩٩١
+MARGIN = 0.1109          # مجمل الربح — ريال لكل لتر (كان ٠٫١١٤٤ من تقرير يوليو)
+OPEX_NET = 0.0486        # المصاريف التشغيلية — ريال لكل لتر (مقيسة لا موزَّعة)
+OPEX_OP = 0.0486         # الأساس نفسه: محطات مشغّلة حصراً
+COMM_PETROL = 0.03       # العمولة المعيارية — ريال لكل لتر بنزين
+COMM_DIESEL = 0.015      # ريال لكل لتر ديزل
 CLOSE = 0.40             # نغلق ٤٠٪ من الفجوة خلال ٦ أشهر
 VAT = 1.15
 BOX = 0.45               # كلفة علبة المناديل — مؤكَّدة من الإدارة التجارية
@@ -207,6 +211,77 @@ def conditions(rows, recon, units, access):
         r["conds"] = c
 
 
+def contracts(rows):
+    """هيكل عمولة درب في محطات التشغيل — مقيس من تقرير الربع الثاني ٢٠٢٦"""
+    ds = {r["code"]: r["diesel"] for r in rows}
+    out = []
+    for r in csv.DictReader(open(Q2, encoding="utf-8")):
+        v = _f(r["q2_vol"], None)
+        if not v:
+            continue
+        d = ds.get(r["code"], 0.20)
+        std = v * (1 - d) * COMM_PETROL + v * d * COMM_DIESEL
+        act = _f(r["q2_darb"], 0.0)
+        t = r["terms"]
+        if "تحت مسمى نسبة المالك" in t:
+            act = _f(r["q2_net"], 0.0); kind = "عمولة أعلى من المعياري"
+        elif "نسبة" in t:
+            kind = "نسبة ثابتة من الصافي"
+        elif "دون المعياري" in t or "٠٫٠١٥ بنزين" in t:
+            kind = "عمولة دون المعياري"
+        else:
+            kind = "عمولة معيارية"
+        out.append(dict(code=r["code"], name=r["name"], kind=kind, terms=t,
+                        vol=v, diesel=d, act=act, std=std, gap=act - std,
+                        net=_f(r["q2_net"], 0.0), staff=_f(r["q2_staff"], None),
+                        margin=_f(r["q2_margin"], None),
+                        sales=_f(r["q2_sales"], None),
+                        dvol=_f(r["q2_vol"], 0.0) - _f(r["q1_vol"], 0.0)
+                        if _f(r["q1_vol"], None) else None,
+                        dnet=_f(r["q2_net"], 0.0) - _f(r["q1_net"], 0.0)
+                        if _f(r["q1_net"], None) else None,
+                        ddarb=_f(r["q2_darb"], 0.0) - _f(r["q1_darb"], 0.0)
+                        if _f(r["q1_darb"], None) else None))
+    K = {}
+    for o in out:
+        k = K.setdefault(o["kind"], dict(kind=o["kind"], n=0, vol=0.0, act=0.0, std=0.0))
+        k["n"] += 1; k["vol"] += o["vol"]; k["act"] += o["act"]; k["std"] += o["std"]
+    for k in K.values():
+        k["gap"] = k["act"] - k["std"]; k["year"] = k["gap"] * 4
+    return dict(stations=sorted(out, key=lambda x: x["gap"]),
+                kinds=sorted(K.values(), key=lambda x: x["gap"]),
+                gap_year=sum(o["gap"] for o in out) * 4,
+                darb_real=sum(o["act"] for o in out),
+                net_total=sum(o["net"] for o in out),
+                gross_cpl=11.09, opex_cpl=4.86, net_cpl=6.23)
+
+
+def shift_gap(rows):
+    """توزيع الطاقم مقابل منحنى الطلب — الآن على كل محطة لها عمالة"""
+    staff = {}
+    for r in csv.DictReader(open(Q2, encoding="utf-8")):
+        v = _f(r["q2_staff"], None)
+        if v: staff[r["code"]] = int(v)
+    out = []
+    for r in rows:
+        n = staff.get(r["code"])
+        if not n:
+            continue
+        eve = r["night"]                       # حصة ١٨:٠٠–٠٦:٠٠ من المعاملات
+        half = n / 2
+        want_e = n * eve                        # الطاقم المسائي المطابق للطلب
+        out.append(dict(code=r["code"], name=r["name"], seg=r["seg"], staff=n,
+                        vpd=r["vpd"], eve=eve, half=half, want_e=want_e,
+                        move=want_e - half,
+                        load_d=r["vpd"] * (1 - eve) / half,
+                        load_e=r["vpd"] * eve / half,
+                        imb=(r["vpd"] * eve / half) / (r["vpd"] * (1 - eve) / half) - 1))
+    out.sort(key=lambda x: -x["move"])
+    return dict(rows=out, n=len(out),
+                total_staff=sum(x["staff"] for x in out),
+                movable=sum(x["move"] for x in out if x["move"] >= 0.5))
+
+
 def fleet_plan(rows, units):
     """وقود الشركات: قائمة صيد لكل محطة، وعملتا الدفع — هللة أو خدمة"""
     U = {u["code"]: u for u in units}
@@ -321,6 +396,7 @@ def build():
         segments=segsum, stations=sorted(rows, key=lambda x: -x["sar_total"]),
         shifts=shifts, events=EVENTS, packages=PACKAGES, products=PRODUCTS,
         litre=litre_economics(), access=access, fleet=fleet_plan(rows, units),
+        contracts=contracts(rows), shiftgap=shift_gap(rows),
         five=[dict(code=f["code"], name=f["name"], rating=f["rating"], n=f["nComp"],
                    avg=f["compAvg"], near=f["nearDist"], who=f["nearName"],
                    density=f["density"]) for f in five],
