@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(1100px 560px at 82% -12%, rgba(241, 138, 43, 0.16) 0%, #1b1c1e 52%);
+  color: #f4f5f6;
+  font-family: Tajawal, Cairo, "Segoe UI", Tahoma, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* رقم الإدخال بدون أسهم */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #23314f;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@layer components {
+  .card {
+    @apply bg-darb-card/80 border border-darb-line rounded-2xl p-4 shadow-lg shadow-black/20;
+  }
+  .stat {
+    @apply bg-darb-panel border border-darb-line rounded-xl p-3;
+  }
+  .pill {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold;
+  }
+  .th {
+    @apply text-right text-darb-mut font-bold text-xs px-3 py-2 border-b border-darb-line whitespace-nowrap;
+  }
+  .td {
+    @apply text-right px-3 py-2 border-b border-darb-line/60 text-sm;
+  }
+}
+
+@media print {
+  body {
+    background: #fff;
+    color: #111;
+  }
+  header,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+  .card {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}

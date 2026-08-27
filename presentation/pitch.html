@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تانكي · برنامج ولاء درب</title>
+<style>
+  :root {
+    --bg: #F7F4EF; --surface: #FFFFFF; --ink: #221D16; --muted: #6F6A62;
+    --line: #E8E2D9; --brand: #E07C16; --brand-2: #B45E0E; --grey: #6D6E70;
+    --good: #2f8f63; --chip: #FBF0E2;
+    --shadow: 0 1px 2px rgba(34,29,22,.05), 0 12px 32px -18px rgba(34,29,22,.25);
+    --maxw: 1080px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1B1C1E; --surface: #26282B; --ink: #F1EEE8; --muted: #A6A29B;
+      --line: #34363A; --brand: #F18A2B; --brand-2: #F6A24E; --grey: #8A8D92;
+      --good: #47b783; --chip: #2c2418;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 16px 40px -20px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #F7F4EF; --surface: #FFFFFF; --ink: #221D16; --muted: #6F6A62;
+    --line: #E8E2D9; --brand: #E07C16; --brand-2: #B45E0E; --grey: #6D6E70;
+    --good: #2f8f63; --chip: #FBF0E2;
+    --shadow: 0 1px 2px rgba(34,29,22,.05), 0 12px 32px -18px rgba(34,29,22,.25);
+  }
+  :root[data-theme="dark"] {
+    --bg: #1B1C1E; --surface: #26282B; --ink: #F1EEE8; --muted: #A6A29B;
+    --line: #34363A; --brand: #F18A2B; --brand-2: #F6A24E; --grey: #8A8D92;
+    --good: #47b783; --chip: #2c2418;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 16px 40px -20px rgba(0,0,0,.6);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink); direction: rtl;
+    font-family: "Segoe UI", Tahoma, "Tajawal", system-ui, sans-serif;
+    line-height: 1.7; -webkit-font-smoothing: antialiased;
+    font-variant-numeric: tabular-nums;
+  }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 22px; }
+  .eyebrow {
+    font-size: 12px; font-weight: 800; letter-spacing: 2px; color: var(--brand);
+    text-transform: uppercase; margin: 0 0 10px;
+  }
+  h1, h2, h3 { text-wrap: balance; line-height: 1.25; margin: 0; }
+  .muted { color: var(--muted); }
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 18px; padding: 22px; box-shadow: var(--shadow);
+  }
+  .grid { display: grid; gap: 14px; }
+  .g2 { grid-template-columns: repeat(2, 1fr); }
+  .g3 { grid-template-columns: repeat(3, 1fr); }
+  .g4 { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 820px) { .g3, .g4 { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .g2, .g3, .g4 { grid-template-columns: 1fr; } }
+  section { padding: 56px 0; border-top: 1px solid var(--line); }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px; background: var(--chip);
+    color: var(--brand-2); border-radius: 999px; padding: 5px 12px;
+    font-size: 12.5px; font-weight: 800;
+  }
+  .num { font-size: 30px; font-weight: 900; color: var(--brand); line-height: 1.1; }
+  .lbl { font-size: 12.5px; color: var(--muted); font-weight: 700; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: right; padding: 11px 12px; border-bottom: 1px solid var(--line); font-size: 14.5px; }
+  th { font-size: 12px; letter-spacing: .3px; color: var(--muted); font-weight: 800; }
+  td b, .strong { font-weight: 800; }
+  .tblwrap { overflow-x: auto; border-radius: 14px; border: 1px solid var(--line); }
+  .tblwrap table th, .tblwrap table td { border-bottom: 1px solid var(--line); }
+  .pill-good { color: var(--good); font-weight: 800; }
+  ul.clean { margin: 10px 0 0; padding: 0 18px 0 0; }
+  ul.clean li { margin: 7px 0; }
+  .foot { padding: 34px 0 60px; text-align: center; color: var(--muted); font-size: 13px; }
+
+  /* Hero */
+  .hero { padding: 64px 0 20px; text-align: center; }
+  .logo { display: inline-block; height: 58px; margin-bottom: 22px; }
+  .hero h1 { font-size: clamp(40px, 7vw, 68px); font-weight: 900; letter-spacing: -1px; }
+  .hero .tag { font-size: clamp(16px, 2.4vw, 21px); color: var(--muted); margin-top: 12px; font-weight: 600; }
+  .thesis {
+    max-width: 720px; margin: 26px auto 0; font-size: clamp(17px, 2.5vw, 22px);
+    line-height: 1.6; font-weight: 600;
+  }
+  .thesis b { color: var(--brand); }
+  .kpis { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 34px; }
+  .kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px 22px; min-width: 150px; box-shadow: var(--shadow); }
+  .flow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .flow .step { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; font-weight: 700; font-size: 14px; }
+  .arrow { color: var(--brand); font-weight: 900; }
+</style>
+</head>
+<body>
+
+
+<header class="hero wrap">
+  <svg class="logo" viewBox="0 0 300 100" role="img" aria-label="درب">
+    <rect x="4" y="4" width="292" height="92" rx="46" fill="#6D6E70"/>
+    <rect x="13" y="13" width="274" height="74" rx="37" fill="#F7F4EF"/>
+    <path d="M 186 31 H 246 a 16 16 0 0 1 16 16 v 5 a 17 17 0 0 1 -17 17 H 210 l 20 -13 h 14 a 4 4 0 0 0 4 -4 v -3 a 4 4 0 0 0 -4 -4 H 186 Z" fill="#E07C16"/>
+    <path d="M 186 60 H 208 l -8 13 H 186 Z" fill="#E07C16"/>
+    <text x="110" y="52" text-anchor="middle" font-family="Segoe UI, Tahoma, sans-serif" font-size="42" font-weight="800" fill="#5b5c5e">درب</text>
+    <text x="110" y="84" text-anchor="middle" font-family="Segoe UI, Tahoma, sans-serif" font-size="30" font-weight="700" fill="#5b5c5e">Darb</text>
+  </svg>
+  <p class="eyebrow">شرح البرنامج · للتجار الشركاء</p>
+  <h1>تـانكي</h1>
+  <p class="tag">برنامج ولاء محطات درب — كيف يعمل، وماذا يعني لك كشريك</p>
+  <p class="thesis">
+    عملاء درب <b>يكسبون</b> نقاطاً ويستبدلونها عندك — فتصلك <b>عملاء جدد وعائدون</b>،
+    وتدفع فقط على <b>مبيعات حقيقية</b> يجيبها البرنامج.
+  </p>
+  <div class="kpis">
+    <div class="kpi"><div class="num">50K+</div><div class="lbl">عملاء درب المحتملون</div></div>
+    <div class="kpi"><div class="num">+15–30%</div><div class="lbl">نمو متوقع بالولاء</div></div>
+    <div class="kpi"><div class="num">~5%</div><div class="lbl">نقطة تعادل التاجر</div></div>
+    <div class="kpi"><div class="num">200</div><div class="lbl">نقطة = ريال</div></div>
+  </div>
+</header>
+
+<section class="wrap">
+  <p class="eyebrow">الفكرة</p>
+  <h2 style="font-size:clamp(26px,4vw,38px); max-width:760px;">نقاط موحّدة · تُكتسب من كل مكان · تُستبدل في كل مكان</h2>
+  <div class="grid g3" style="margin-top:26px;">
+    <div class="card"><div class="num" style="font-size:26px;">⛽ + 🛍️</div><h3 style="margin-top:10px; font-size:18px;">مصدران للكسب</h3><p class="muted" style="margin:8px 0 0;">البنزين (تموّله درب) والمتاجر (يموّلها التاجر) — في <b class="strong">رصيد واحد</b> عند العميل.</p></div>
+    <div class="card"><div class="num" style="font-size:26px;">👛</div><h3 style="margin-top:10px; font-size:18px;">محفظة + نقاط</h3><p class="muted" style="margin:8px 0 0;">محفظة دفع مغلقة (بنزين وباقات) + رصيد نقاط للمكافآت — مفصولان بوضوح.</p></div>
+    <div class="card"><div class="num" style="font-size:26px;">🔒</div><h3 style="margin-top:10px; font-size:18px;">مضمون بالكامل</h3><p class="muted" style="margin:8px 0 0;">كل نقطة مغطّاة بريال حقيقي في حساب أمانة (Escrow) — النظام لا يخسر.</p></div>
+  </div>
+</section>
+
+<section class="wrap">
+  <p class="eyebrow">Earn · الكسب</p>
+  <h2 style="font-size:clamp(24px,4vw,34px);">كيف يجمع العميل نقاطه؟</h2>
+  <p class="muted" style="max-width:640px; margin-top:8px;">القاعدة الذهبية: كل ريال يكسب نقاطاً <b class="strong">مرة واحدة</b> — عند الشراء (بمسح الرمز)، لا عند تحريك الفلوس.</p>
+  <div class="grid g3" style="margin-top:22px;">
+    <div class="card"><span class="chip">⛽ بنزين</span><p style="margin:12px 0 0;"><b>1 نقطة لكل ريال</b> (0.5%). تموّلها درب.</p></div>
+    <div class="card"><span class="chip">🛍️ متاجر</span><p style="margin:12px 0 0;"><b>2 نقطة لكل ريال</b> (1%). يموّلها التاجر ضمن نسبته.</p></div>
+    <div class="card"><span class="chip">🔋 شحن المحفظة</span><p style="margin:12px 0 0;">يكسب عند الشحن (محفظة البنزين) — دون تكرار عند الصرف.</p></div>
+  </div>
+</section>
+
+<section class="wrap">
+  <p class="eyebrow">Burn · الاستبدال</p>
+  <h2 style="font-size:clamp(24px,4vw,34px);">كيف يستبدل العميل نقاطه؟</h2>
+  <div class="grid g3" style="margin-top:22px;">
+    <div class="card"><h3 style="font-size:17px;">🛍️ عروض التجار</h3><p class="muted" style="margin:8px 0 0;">الأعلى قيمة (×1.5–1.9) — يموّلها التاجر لجذب العميل.</p></div>
+    <div class="card"><h3 style="font-size:17px;">⛽ خصم بنزين</h3><p class="muted" style="margin:8px 0 0;">قيمة اسمية مباشرة على التعبئة.</p></div>
+    <div class="card"><h3 style="font-size:17px;">🪪 باقات درب</h3><p class="muted" style="margin:8px 0 0;">بطاقات مجمّعة (بنزين + خدمات) شراءً أو استبدالاً.</p></div>
+    <div class="card"><h3 style="font-size:17px;">🎁 قسائم وكروت شحن</h3><p class="muted" style="margin:8px 0 0;">جرير · أمازون · شحن STC/Mobily/Zain · اشتراكات رقمية.</p></div>
+    <div class="card"><h3 style="font-size:17px;">✈️ تحويل وإهداء</h3><p class="muted" style="margin:8px 0 0;">أميال طيران/قطاف · إهداء النقاط للعائلة.</p></div>
+    <div class="card"><h3 style="font-size:17px;">🎁 سحب مجاني</h3><p class="muted" style="margin:8px 0 0;">جوائز كبرى بدخول مجاني بلا نقاط — حلال (لا مقابل مدفوع).</p></div>
+  </div>
+</section>
+
+<section class="wrap">
+  <p class="eyebrow">القيمة</p>
+  <h2 style="font-size:clamp(24px,4vw,34px);">قيمة النقطة والاستبدال</h2>
+  <div class="grid g2" style="margin-top:22px; align-items:start;">
+    <div class="card">
+      <div class="lbl">قيمة النقطة</div>
+      <div class="num" style="font-size:38px;">200 نقطة = ريال</div>
+      <p class="muted" style="margin-top:6px;">النقطة = نص هللة · القاعدة: عدد النقاط ÷ 200 = القيمة بالريال.</p>
+    </div>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>المكافأة</th><th>النقاط</th><th>القيمة</th></tr></thead>
+        <tbody>
+          <tr><td>خصم بنزين</td><td>200</td><td>1 ﷼</td></tr>
+          <tr><td>قهوة (عرض تاجر)</td><td>1,600</td><td class="pill-good">15 ﷼ ×1.9</td></tr>
+          <tr><td>باقة ذيبان</td><td>100,000</td><td>500 ﷼</td></tr>
+          <tr><td>كرت شحن</td><td>2,000</td><td>10 ﷼</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <p class="eyebrow">المستويات</p>
+  <h2 style="font-size:clamp(24px,4vw,34px);">أبيض · فضي · برتقالي</h2>
+  <p class="muted" style="max-width:640px; margin-top:8px;">الكاش باك موحّد للعدالة، والتميّز في المزايا التي تتصاعد مع المستوى.</p>
+  <div class="grid g3" style="margin-top:22px;">
+    <div class="card"><h3 style="font-size:18px;">🤍 الأبيض</h3><ul class="clean muted"><li>كاش باك 0.5%</li><li>دعم فني (للجميع)</li><li>خصومات شركاء تصل 15%</li><li>عروض خارجية أساسية</li></ul></div>
+    <div class="card"><h3 style="font-size:18px;">🩶 الفضي</h3><ul class="clean muted"><li>نقاط مضاعفة ×1.5 بالمناسبات</li><li>خصومات شركاء تصل 30%</li><li>عروض خارجية أوسع</li></ul></div>
+    <div class="card" style="border-color:var(--brand);"><h3 style="font-size:18px; color:var(--brand);">🟠 البرتقالي</h3><ul class="clean muted"><li>نقاط مضاعفة ×2</li><li>خصومات شركاء تصل 50% + خصم باقات</li><li>عروض خارجية حصرية · وصول مبكر</li></ul></div>
+  </div>
+</section>
+
+<section class="wrap">
+  <p class="eyebrow">للتجار · الشراكة</p>
+  <h2 style="font-size:clamp(24px,4vw,34px);">Earn &amp; Burn — تربح من الطرفين</h2>
+  <div class="grid g2" style="margin-top:22px; align-items:start;">
+    <div class="card">
+      <h3 style="font-size:17px;">🟢 Earn — عند الشراء</h3>
+      <p class="muted" style="margin:8px 0 0;">التاجر يدفع نسبة متفاوضاً عليها (مثلاً 3%) على مبيعات عملاء البرنامج: <b class="strong">1% للعميل نقاطاً + الباقي لدرب</b>.</p>
+      <h3 style="font-size:17px; margin-top:18px;">🔴 Burn — عند الاستبدال</h3>
+      <p class="muted" style="margin:8px 0 0;">قيمة المكافأة من الإسكرو، والتاجر يدفع <b class="strong">رسوم تسويق</b> لأن درب وصّلت له عميلاً يصرف عنده.</p>
+    </div>
+    <div class="card">
+      <h3 style="font-size:17px;">ماذا يكسب التاجر؟</h3>
+      <ul class="clean"><li>وصول لقاعدة عملاء درب (<b>50K+</b>).</li><li>عملاء عائدون (الاستبدال يرجّعهم).</li><li>بيانات وتسويق داخل التطبيق.</li></ul>
+      <div style="margin-top:16px; padding:14px; border-radius:12px; background:var(--chip);">
+        <div class="lbl">نقطة التعادل</div>
+        <p style="margin:4px 0 0; font-weight:800;">يكفي نمو مبيعات <span style="color:var(--brand);">+5%</span> ليتعادل — والولاء يعطي 15–30%.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <p class="eyebrow">المحفظة والباقات</p>
+  <h2 style="font-size:clamp(24px,4vw,34px);">محفظة مغلقة + متجر باقات مرن</h2>
+  <div class="grid g2" style="margin-top:22px;">
+    <div class="card"><h3 style="font-size:17px;">👛 محفظة درب</h3><p class="muted" style="margin:8px 0 0;">شحن مسبق يُصرف على منتجات درب فقط (بنزين + باقات) بلا سحب نقدي — سيولة لدرب ورسوم بطاقات أقل.</p></div>
+    <div class="card"><h3 style="font-size:17px;">🏪 متجر الباقات</h3><p class="muted" style="margin:8px 0 0;">تُشترى بالمحفظة أو البطاقة أو <b class="strong">تقسيط (تابي/تمارا)</b> أو استبدالاً بالنقاط — بلا حاجة لشحن المحفظة.</p></div>
+  </div>
+</section>
+
+<section class="wrap">
+  <p class="eyebrow">الخطوة التالية</p>
+  <h2 style="font-size:clamp(24px,4vw,34px);">ماذا يعني لك كشريك؟</h2>
+  <div class="grid g3" style="margin-top:22px;">
+    <div class="card"><h3 style="font-size:17px;">عملاء جدد وعائدون</h3><p class="muted" style="margin:8px 0 0;">تصلك قاعدة عملاء درب، والاستبدال يرجّعهم إليك مراراً.</p></div>
+    <div class="card"><h3 style="font-size:17px;">تدفع على النمو</h3><p class="muted" style="margin:8px 0 0;">النسبة على مبيعات البرنامج، ويكفي نمو +5% لتتعادل — والولاء يعطي 15–30%.</p></div>
+    <div class="card" style="border-color:var(--brand);"><h3 style="font-size:17px; color:var(--brand);">تجربة بلا مخاطرة</h3><p class="muted" style="margin:8px 0 0;">ابدأ بـ Pilot 3 شهور — لو ما تحقق النمو، تنسحب بلا رسوم.</p></div>
+  </div>
+</section>
+
+<p class="foot">درب · إدارة الشراكات · برنامج تانكي للولاء · 2026</p>
+
+</body>
+</html>
