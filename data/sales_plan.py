@@ -12,7 +12,8 @@ from collections import defaultdict
 
 SALES = "outlets/data/network-sales.csv"
 HOURS = "outlets/data/network-hours.csv"
-STAFF = "outlets/data/station-staff.csv"
+SHIFTS = "outlets/data/worker-shifts.csv"    # ملخص المحطات — تقرير العمّال والورديات
+WORKERS = "outlets/data/workers.csv"         # ٣٧٢ عاملاً × محطة
 NET = "outlets/data/network-sales.json"
 FIVE = "data/five.json"
 UNITS = "outlets/data/units-registry.csv"
@@ -28,7 +29,7 @@ COMM_PETROL = 0.03       # العمولة المعيارية — ريال لكل
 COMM_DIESEL = 0.015      # ريال لكل لتر ديزل
 CLOSE = 0.40             # نغلق ٤٠٪ من الفجوة خلال ٦ أشهر
 VAT = 1.15
-BOX = 0.45               # كلفة علبة المناديل — مؤكَّدة من الإدارة التجارية
+BOX = 0.65               # كلفة علبة المناديل — مؤكَّدة من الإدارة التجارية
 THRESHOLD = 50.0         # عتبة الهدية — ريال
 
 # أسعار المضخة الفعلية من مبيعاتنا (شاملة الضريبة)
@@ -68,8 +69,12 @@ EVENTS = [
      "ضبط نقاط البيع · تدريب الوردية · مؤشر في حافز العامل", "بيانات", "hi"),
     ("تغطية خزان دون ٤ أيام", "تأمين الإمداد قبل رفع الطلب",
      "حد أدنى تعاقدي · ناقل بديل · دراسة خزان", "إمداد", "hi"),
+    ("نقدي المحطة فوق ٧٠٪ · الوسيط ٤٠٪", "فحص نقاط البيع أولاً",
+     "اختبار قارئ البطاقة · مطابقة تسليم النقد · المحفظة تُطلق هنا", "رقابة", "hi"),
     ("فاقد في ساعات الذروة", "تغطية لا حملة",
      "طاقم الذروة · فحص المضخات · تدرّج التسليم", "معاملات", "md"),
+    ("عبء المسائية يفوق الصباحية", "نقل طاقم لا توظيف",
+     "إعادة جدولة المناوبات · مستهدف وردية لا محطة", "عمالة", "md"),
     ("تعبئة دون ما يفسّره مزيجها", "رفع السلة",
      "علبة المناديل عند العتبة · نص موحّد · لوحة عند المضخة", "سلة", "md"),
     ("حصة الديزل ٣٠٪ فأكثر", "تعاقد أساطيل",
@@ -257,29 +262,61 @@ def contracts(rows):
 
 
 def shift_gap(rows):
-    """توزيع الطاقم مقابل منحنى الطلب — الآن على كل محطة لها عمالة"""
-    staff = {}
-    for r in csv.DictReader(open(Q2, encoding="utf-8")):
-        v = _f(r["q2_staff"], None)
-        if v: staff[r["code"]] = int(v)
+    """توزيع الطاقم مقابل منحنى الطلب — مقيس من تقرير العمّال على مستوى الوردية
+
+       تعريف الورديتين من التقرير نفسه لا من افتراضنا:
+         صباحية ٠٠:٠٠–١١:٥٩ · مسائية ١٢:٠٠–٢٣:٥٩ · متوسط يوم العمل ١١٫٨ ساعة
+       والطاقم يُقاس بأيام العمل لا بالرؤوس: عاملٌ ستة أيامٍ ليس كعاملٍ مئتين.
+       ولأن حصة العامل الصباحية محسوبة من معاملاته، يميل المقياس لتضخيم
+       عرض العمل المسائي — فالفجوة الناتجة حدٌّ أدنى لا تقدير."""
+    SEGOF = {r["code"]: r["seg"] for r in rows}
+    LPD = {r["code"]: r["lpd"] for r in rows}
+
+    # ① عرض العمل: أيام كل عامل موزَّعة على ورديتيه بحصته المقيسة
+    sup = defaultdict(lambda: [0.0, 0.0, 0])          # صباحي · مسائي · رؤوس
+    for w in csv.DictReader(open(WORKERS, encoding="utf-8")):
+        c, d = w["الرمز"], _f(w["أيام العمل"], 0.0)
+        m = _f(w["نسبة الصباحية"], 0.5)
+        sup[c][0] += d * m; sup[c][1] += d * (1 - m); sup[c][2] += 1
+
     out = []
-    for r in rows:
-        n = staff.get(r["code"])
-        if not n:
+    for r in csv.DictReader(open(SHIFTS, encoding="utf-8")):
+        c = r["الرمز"]
+        n = int(_f(r["عدد العمّال"], 0.0))
+        tm, te = _f(r["عمليات صباحية"], 0.0), _f(r["عمليات مسائية"], 0.0)
+        if not n or tm + te == 0 or c not in sup:
+            continue                                  # ١٥ محطة ناتج بلا عمود عامل
+        dm, de = sup[c][0], sup[c][1]
+        if dm + de == 0:
             continue
-        eve = r["night"]                       # حصة ١٨:٠٠–٠٦:٠٠ من المعاملات
-        half = n / 2
-        want_e = n * eve                        # الطاقم المسائي المطابق للطلب
-        out.append(dict(code=r["code"], name=r["name"], seg=r["seg"], staff=n,
-                        vpd=r["vpd"], eve=eve, half=half, want_e=want_e,
-                        move=want_e - half,
-                        load_d=r["vpd"] * (1 - eve) / half,
-                        load_e=r["vpd"] * eve / half,
-                        imb=(r["vpd"] * eve / half) / (r["vpd"] * (1 - eve) / half) - 1))
+        days = _f(r["أيام التشغيل"], 0.0) or 1
+        eve_d = te / (tm + te)                        # حصة المساء من الطلب
+        eve_s = de / (dm + de)                        # حصة المساء من العمل
+        out.append(dict(
+            code=c, name=r["المحطة"], region=r["المنطقة"], sys=r["النظام"],
+            seg=SEGOF.get(c, "—"), staff=n, days=days,
+            vpd=(tm + te) / days, cov=_f(r["تغطية العامل"], 0.0),
+            eve=eve_d, eve_rev=_f(r["حصة الوردية المسائية"], 0.0), eve_staff=eve_s,
+            gap=eve_d - eve_s, move=n * (eve_d - eve_s),
+            load_m=(tm / days) / (n * (1 - eve_s)) if eve_s < 1 else 0,
+            load_e=(te / days) / (n * eve_s) if eve_s > 0 else 0,
+            lpd=LPD.get(c, 0.0)))
+    for x in out:
+        x["imb"] = x["load_e"] / x["load_m"] - 1 if x["load_m"] else 0
     out.sort(key=lambda x: -x["move"])
+    TM = sum(_f(r["عمليات صباحية"], 0.0) for r in csv.DictReader(open(SHIFTS, encoding="utf-8")))
+    TE = sum(_f(r["عمليات مسائية"], 0.0) for r in csv.DictReader(open(SHIFTS, encoding="utf-8")))
+    RM = sum(_f(r["إيراد صباحي (ر.س)"], 0.0) for r in csv.DictReader(open(SHIFTS, encoding="utf-8")))
+    RE = sum(_f(r["إيراد مسائي (ر.س)"], 0.0) for r in csv.DictReader(open(SHIFTS, encoding="utf-8")))
     return dict(rows=out, n=len(out),
                 total_staff=sum(x["staff"] for x in out),
-                movable=sum(x["move"] for x in out if x["move"] >= 0.5))
+                no_worker=sum(1 for r in csv.DictReader(open(SHIFTS, encoding="utf-8"))
+                              if not int(_f(r["عدد العمّال"], 0.0))),
+                movable=sum(x["move"] for x in out if x["move"] >= 0.5),
+                eve_txn=TE / (TM + TE), eve_rev=RE / (RM + RE),
+                txn_m=TM, txn_e=TE, rev_m=RM, rev_e=RE,
+                inv_m=RM / TM, inv_e=RE / TE,
+                shift_m="٠٠:٠٠–١١:٥٩", shift_e="١٢:٠٠–٢٣:٥٩")
 
 
 def fleet_plan(rows, units):
@@ -340,8 +377,6 @@ def build():
     conditions(rows, recon, units, access)
     net = json.load(open(NET, encoding="utf-8"))
     five = json.load(open(FIVE, encoding="utf-8"))
-    staff = {r["code"]: (int(r["day_workers"]), int(r["eve_workers"]))
-             for r in csv.DictReader(open(STAFF, encoding="utf-8"))}
 
     segsum = []
     for s in SEGS:
@@ -360,21 +395,10 @@ def build():
             net_txn=(vol / vis) * (MARGIN - OPEX_NET),
             driver=PLAY[s][0], action=PLAY[s][1]))
 
+    # ملاحظة: تعريف الوردية صار من تقرير العمّال (٠٠:٠٠–١١:٥٩ / ١٢:٠٠–٢٣:٥٩)
+    # فتُحسب الورديات كلها في shift_gap() على ٤٠ محطة بدل خمس، وسقط جدول
+    # station-staff.csv القديم بحدّه ٠٦:٠٠–١٨:٠٠ المفترَض لا المقيس.
     shifts = []
-    for c, (dw, ew) in staff.items():
-        r = next(x for x in rows if x["code"] == c)
-        top = set(sorted(range(24), key=lambda h: -r["hours"][h])[:8])
-        pd_ = sum(-(r["hours"][h] - r["ref_hours"][h]) for h in top
-                  if 6 <= h < 18 and r["hours"][h] < r["ref_hours"][h]) * r["vpd"]
-        pe_ = sum(-(r["hours"][h] - r["ref_hours"][h]) for h in top
-                  if (h >= 18 or h < 6) and r["hours"][h] < r["ref_hours"][h]) * r["vpd"]
-        day = sum(r["hours"][h] for h in range(6, 18))
-        shifts.append(dict(code=c, name=r["name"], vpd=r["vpd"], dw=dw, ew=ew,
-                           day=r["vpd"] * day, eve=r["vpd"] * (1 - day),
-                           load_d=r["vpd"] * day / dw, load_e=r["vpd"] * (1 - day) / ew,
-                           tgt_d=pd_, tgt_e=pe_, peak=r["peak"]))
-    shifts.sort(key=lambda x: -x["vpd"])
-
     T = dict(n=len(rows), mlpa=sum(r["mlpa"] for r in rows), lpd=sum(r["lpd"] for r in rows),
              upl_fill=sum(r["upl_fill"] for r in rows),
              gap_peak=sum(r["gap_peak"] for r in rows),
