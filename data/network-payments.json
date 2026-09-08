@@ -1,0 +1,2044 @@
+{
+ "generated": "2026-08-12",
+ "network": {
+  "Not Specified": {
+   "rev": 226312178.07,
+   "vis": 4072181
+  },
+  "Cash": {
+   "rev": 184558615.42,
+   "vis": 3554445
+  },
+  "Card": {
+   "rev": 179236303.33,
+   "vis": 2805314
+  },
+  "External Device": {
+   "rev": 24405655.16,
+   "vis": 447764
+  },
+  "Syarah App": {
+   "rev": 7751172.89,
+   "vis": 51926
+  },
+  "Petro App": {
+   "rev": 4205482.65,
+   "vis": 24473
+  },
+  "Smart Card": {
+   "rev": 8008.66,
+   "vis": 166
+  },
+  "CASHIN Wallet": {
+   "rev": 318.0,
+   "vis": 8
+  }
+ },
+ "stations": [
+  {
+   "code": "AS153",
+   "name": "مدخل محايل",
+   "region": "عسير",
+   "revenue": 5024619.78,
+   "visits": 99800,
+   "vol_partial": false,
+   "diesel_rev": 553771.84,
+   "diesel_vol": 301967.76,
+   "pays": [
+    {
+     "pay": "Cash",
+     "rev": 2605105.73,
+     "vis": 56795
+    },
+    {
+     "pay": "Card",
+     "rev": 2350584.29,
+     "vis": 42017
+    },
+    {
+     "pay": "External Device",
+     "rev": 36369.77,
+     "vis": 598
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 28893.95,
+     "vis": 335
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 3467.04,
+     "vis": 51
+    },
+    {
+     "pay": "Petro App",
+     "rev": 100.0,
+     "vis": 3
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 99.0,
+     "vis": 1
+    }
+   ]
+  },
+  {
+   "code": "EP051",
+   "name": "كورنيش الخبر",
+   "region": "الشرقية",
+   "revenue": 7286815.45,
+   "visits": 128201,
+   "vol_partial": false,
+   "diesel_rev": 531423.82,
+   "diesel_vol": 296886.66,
+   "pays": [
+    {
+     "pay": "External Device",
+     "rev": 3668176.38,
+     "vis": 63070
+    },
+    {
+     "pay": "Card",
+     "rev": 1920361.38,
+     "vis": 29453
+    },
+    {
+     "pay": "Cash",
+     "rev": 1627599.66,
+     "vis": 34837
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 36812.99,
+     "vis": 449
+    },
+    {
+     "pay": "Petro App",
+     "rev": 31256.7,
+     "vis": 340
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 1545.47,
+     "vis": 36
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 1062.87,
+     "vis": 16
+    }
+   ]
+  },
+  {
+   "code": "HA043",
+   "name": "العريفي",
+   "region": "حائل",
+   "revenue": 3444063.0,
+   "visits": 64190,
+   "vol_partial": false,
+   "diesel_rev": 264110.84,
+   "diesel_vol": 145120.78,
+   "pays": [
+    {
+     "pay": "Not Specified",
+     "rev": 3444063.0,
+     "vis": 64190
+    }
+   ]
+  },
+  {
+   "code": "JA041",
+   "name": "القسوم - أحد المسارحة",
+   "region": "جازان",
+   "revenue": 3909219.29,
+   "visits": 84777,
+   "vol_partial": false,
+   "diesel_rev": 233397.47,
+   "diesel_vol": 130390.16,
+   "pays": [
+    {
+     "pay": "Card",
+     "rev": 2142548.2,
+     "vis": 41018
+    },
+    {
+     "pay": "Cash",
+     "rev": 1599018.09,
+     "vis": 40137
+    },
+    {
+     "pay": "External Device",
+     "rev": 162083.23,
+     "vis": 3558
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 5569.64,
+     "vis": 63
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 0.13,
+     "vis": 1
+    }
+   ]
+  },
+  {
+   "code": "JA053",
+   "name": "خبت نخلان",
+   "region": "جازان",
+   "revenue": 6813042.63,
+   "visits": 138423,
+   "vol_partial": false,
+   "diesel_rev": 1319465.57,
+   "diesel_vol": 737137.55,
+   "pays": [
+    {
+     "pay": "Cash",
+     "rev": 3180561.37,
+     "vis": 72040
+    },
+    {
+     "pay": "Card",
+     "rev": 2950636.15,
+     "vis": 55717
+    },
+    {
+     "pay": "External Device",
+     "rev": 408982.67,
+     "vis": 9105
+    },
+    {
+     "pay": "Petro App",
+     "rev": 143989.6,
+     "vis": 786
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 128366.91,
+     "vis": 757
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 434.0,
+     "vis": 9
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 71.93,
+     "vis": 9
+    }
+   ]
+  },
+  {
+   "code": "JA056",
+   "name": "الروابي - المودة",
+   "region": "جازان",
+   "revenue": 3226032.37,
+   "visits": 60561,
+   "vol_partial": false,
+   "diesel_rev": 581993.21,
+   "diesel_vol": 328687.98,
+   "pays": [
+    {
+     "pay": "Card",
+     "rev": 1712340.91,
+     "vis": 30657
+    },
+    {
+     "pay": "Cash",
+     "rev": 1203131.97,
+     "vis": 24525
+    },
+    {
+     "pay": "External Device",
+     "rev": 223490.03,
+     "vis": 4828
+    },
+    {
+     "pay": "Petro App",
+     "rev": 43977.9,
+     "vis": 231
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 41669.55,
+     "vis": 264
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 1322.01,
+     "vis": 53
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 100.0,
+     "vis": 3
+    }
+   ]
+  },
+  {
+   "code": "JA060",
+   "name": "صناعية صامطة",
+   "region": "جازان",
+   "revenue": 2819666.08,
+   "visits": 80728,
+   "vol_partial": false,
+   "diesel_rev": 545798.06,
+   "diesel_vol": 304919.51,
+   "pays": [
+    {
+     "pay": "Not Specified",
+     "rev": 2819666.08,
+     "vis": 80728
+    }
+   ]
+  },
+  {
+   "code": "JA061",
+   "name": "طريق صبيا",
+   "region": "جازان",
+   "revenue": 7336072.51,
+   "visits": 106051,
+   "vol_partial": false,
+   "diesel_rev": 2702806.07,
+   "diesel_vol": 1561325.93,
+   "pays": [
+    {
+     "pay": "Not Specified",
+     "rev": 7336072.51,
+     "vis": 106051
+    }
+   ]
+  },
+  {
+   "code": "JA069",
+   "name": "كورنيش جيزان",
+   "region": "جازان",
+   "revenue": 9844948.5,
+   "visits": 192862,
+   "vol_partial": false,
+   "diesel_rev": 226582.51,
+   "diesel_vol": 126582.73,
+   "pays": [
+    {
+     "pay": "Card",
+     "rev": 7175362.09,
+     "vis": 128330
+    },
+    {
+     "pay": "Cash",
+     "rev": 2005932.47,
+     "vis": 48523
+    },
+    {
+     "pay": "External Device",
+     "rev": 649154.08,
+     "vis": 15812
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 8264.13,
+     "vis": 89
+    },
+    {
+     "pay": "Petro App",
+     "rev": 3870.24,
+     "vis": 56
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 2081.49,
+     "vis": 47
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 284.0,
+     "vis": 5
+    }
+   ]
+  },
+  {
+   "code": "JA092",
+   "name": "الصفا - أحد المسارحة",
+   "region": "جازان",
+   "revenue": 12646770.3,
+   "visits": 298909,
+   "vol_partial": false,
+   "diesel_rev": 634609.36,
+   "diesel_vol": 354553.91,
+   "pays": [
+    {
+     "pay": "Card",
+     "rev": 7211934.77,
+     "vis": 147226
+    },
+    {
+     "pay": "Cash",
+     "rev": 5043239.59,
+     "vis": 142845
+    },
+    {
+     "pay": "External Device",
+     "rev": 382260.25,
+     "vis": 8596
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 4336.79,
+     "vis": 101
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 3071.83,
+     "vis": 86
+    },
+    {
+     "pay": "Petro App",
+     "rev": 1368.14,
+     "vis": 38
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 558.93,
+     "vis": 17
+    }
+   ]
+  },
+  {
+   "code": "JA348",
+   "name": "جنوب صبيا",
+   "region": "جازان",
+   "revenue": 2767864.97,
+   "visits": 81843,
+   "vol_partial": false,
+   "diesel_rev": 286656.63,
+   "diesel_vol": 160144.61,
+   "pays": [
+    {
+     "pay": "Cash",
+     "rev": 1458099.45,
+     "vis": 48466
+    },
+    {
+     "pay": "Card",
+     "rev": 1208428.27,
+     "vis": 30877
+    },
+    {
+     "pay": "External Device",
+     "rev": 99231.71,
+     "vis": 2431
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 1255.14,
+     "vis": 37
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 850.4,
+     "vis": 32
+    }
+   ]
+  },
+  {
+   "code": "MD009",
+   "name": "طريق السلام",
+   "region": "المدينة المنورة",
+   "revenue": 937221.68,
+   "visits": 16299,
+   "vol_partial": false,
+   "diesel_rev": 257208.37,
+   "diesel_vol": 143692.47,
+   "pays": [
+    {
+     "pay": "Card",
+     "rev": 584229.58,
+     "vis": 9703
+    },
+    {
+     "pay": "Cash",
+     "rev": 350997.52,
+     "vis": 6559
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 949.02,
+     "vis": 12
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 855.8,
+     "vis": 21
+    },
+    {
+     "pay": "External Device",
+     "rev": 189.76,
+     "vis": 4
+    }
+   ]
+  },
+  {
+   "code": "MK001",
+   "name": "جبل النور",
+   "region": "مكة",
+   "revenue": 16778524.72,
+   "visits": 385509,
+   "vol_partial": false,
+   "diesel_rev": 0.0,
+   "diesel_vol": 0.0,
+   "pays": [
+    {
+     "pay": "Not Specified",
+     "rev": 16778524.72,
+     "vis": 385509
+    }
+   ]
+  },
+  {
+   "code": "MK002",
+   "name": "المعيصم",
+   "region": "مكة",
+   "revenue": 8668260.06,
+   "visits": 183284,
+   "vol_partial": false,
+   "diesel_rev": 0.0,
+   "diesel_vol": 0.0,
+   "pays": [
+    {
+     "pay": "Not Specified",
+     "rev": 8530290.24,
+     "vis": 180426
+    },
+    {
+     "pay": "Card",
+     "rev": 78197.48,
+     "vis": 1343
+    },
+    {
+     "pay": "Cash",
+     "rev": 56541.34,
+     "vis": 1434
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 3131.0,
+     "vis": 79
+    },
+    {
+     "pay": "External Device",
+     "rev": 50.0,
+     "vis": 1
+    },
+    {
+     "pay": "Petro App",
+     "rev": 50.0,
+     "vis": 1
+    }
+   ]
+  },
+  {
+   "code": "MK003",
+   "name": "العوالي",
+   "region": "مكة",
+   "revenue": 45452187.58,
+   "visits": 740200,
+   "vol_partial": false,
+   "diesel_rev": 0.0,
+   "diesel_vol": 0.0,
+   "pays": [
+    {
+     "pay": "Not Specified",
+     "rev": 18306520.57,
+     "vis": 303194
+    },
+    {
+     "pay": "Card",
+     "rev": 17409136.09,
+     "vis": 250024
+    },
+    {
+     "pay": "Cash",
+     "rev": 8400297.9,
+     "vis": 163653
+    },
+    {
+     "pay": "External Device",
+     "rev": 1184711.88,
+     "vis": 20877
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 149863.72,
+     "vis": 2420
+    },
+    {
+     "pay": "Petro App",
+     "rev": 1161.42,
+     "vis": 22
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 496.0,
+     "vis": 10
+    }
+   ]
+  },
+  {
+   "code": "MK004",
+   "name": "عاصفة الصحراء",
+   "region": "الطائف",
+   "revenue": 21858587.87,
+   "visits": 269614,
+   "vol_partial": false,
+   "diesel_rev": 7541303.25,
+   "diesel_vol": 4161910.21,
+   "pays": [
+    {
+     "pay": "Card",
+     "rev": 10146714.09,
+     "vis": 126491
+    },
+    {
+     "pay": "Cash",
+     "rev": 9413235.84,
+     "vis": 115757
+    },
+    {
+     "pay": "External Device",
+     "rev": 1358594.39,
+     "vis": 24082
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 933871.73,
+     "vis": 3139
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 5623.82,
+     "vis": 140
+    },
+    {
+     "pay": "Petro App",
+     "rev": 548.0,
+     "vis": 5
+    }
+   ]
+  },
+  {
+   "code": "MK005",
+   "name": "الشيباني",
+   "region": "الطائف",
+   "revenue": 9753536.53,
+   "visits": 163034,
+   "vol_partial": false,
+   "diesel_rev": 37721.45,
+   "diesel_vol": 16038.95,
+   "pays": [
+    {
+     "pay": "Card",
+     "rev": 6931566.07,
+     "vis": 103951
+    },
+    {
+     "pay": "Cash",
+     "rev": 2400034.37,
+     "vis": 51143
+    },
+    {
+     "pay": "External Device",
+     "rev": 386383.97,
+     "vis": 7254
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 31413.36,
+     "vis": 604
+    },
+    {
+     "pay": "Petro App",
+     "rev": 2135.0,
+     "vis": 38
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 2003.76,
+     "vis": 44
+    }
+   ]
+  },
+  {
+   "code": "MK006",
+   "name": "جنوب الطائف",
+   "region": "الطائف",
+   "revenue": 8283038.89,
+   "visits": 145545,
+   "vol_partial": false,
+   "diesel_rev": 0.0,
+   "diesel_vol": 0.0,
+   "pays": [
+    {
+     "pay": "Card",
+     "rev": 4931881.67,
+     "vis": 73868
+    },
+    {
+     "pay": "Cash",
+     "rev": 2781141.53,
+     "vis": 61059
+    },
+    {
+     "pay": "External Device",
+     "rev": 548485.88,
+     "vis": 10114
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 16944.75,
+     "vis": 395
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 4340.06,
+     "vis": 104
+    },
+    {
+     "pay": "Petro App",
+     "rev": 245.0,
+     "vis": 5
+    }
+   ]
+  },
+  {
+   "code": "MK007",
+   "name": "العمرة الجديدة",
+   "region": "مكة",
+   "revenue": 58264209.09,
+   "visits": 903255,
+   "vol_partial": false,
+   "diesel_rev": 16363454.57,
+   "diesel_vol": 9090428.73,
+   "pays": [
+    {
+     "pay": "Cash",
+     "rev": 28955737.28,
+     "vis": 470283
+    },
+    {
+     "pay": "Card",
+     "rev": 26246359.2,
+     "vis": 398021
+    },
+    {
+     "pay": "External Device",
+     "rev": 1439958.12,
+     "vis": 25269
+    },
+    {
+     "pay": "Petro App",
+     "rev": 1019930.65,
+     "vis": 4566
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 599303.02,
+     "vis": 5049
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 1627.92,
+     "vis": 42
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 1292.9,
+     "vis": 25
+    }
+   ]
+  },
+  {
+   "code": "MK008",
+   "name": "الحسينية",
+   "region": "مكة",
+   "revenue": 7363845.41,
+   "visits": 171470,
+   "vol_partial": false,
+   "diesel_rev": 0.0,
+   "diesel_vol": 0.0,
+   "pays": [
+    {
+     "pay": "Cash",
+     "rev": 4600781.38,
+     "vis": 118523
+    },
+    {
+     "pay": "Card",
+     "rev": 2421719.1,
+     "vis": 45455
+    },
+    {
+     "pay": "External Device",
+     "rev": 312380.67,
+     "vis": 6803
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 25918.41,
+     "vis": 618
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 2915.85,
+     "vis": 66
+    },
+    {
+     "pay": "Petro App",
+     "rev": 130.0,
+     "vis": 5
+    }
+   ]
+  },
+  {
+   "code": "MK014",
+   "name": "خليص",
+   "region": "مكة",
+   "revenue": 9944883.17,
+   "visits": 88401,
+   "vol_partial": false,
+   "diesel_rev": 5721842.05,
+   "diesel_vol": 3178830.1,
+   "pays": [
+    {
+     "pay": "Card",
+     "rev": 3897884.76,
+     "vis": 47815
+    },
+    {
+     "pay": "Cash",
+     "rev": 3206773.55,
+     "vis": 31011
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 2194086.81,
+     "vis": 5416
+    },
+    {
+     "pay": "Petro App",
+     "rev": 435236.86,
+     "vis": 1167
+    },
+    {
+     "pay": "External Device",
+     "rev": 206458.7,
+     "vis": 2877
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 4422.49,
+     "vis": 114
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 20.0,
+     "vis": 1
+    }
+   ]
+  },
+  {
+   "code": "MK015",
+   "name": "النسيم",
+   "region": "جدة",
+   "revenue": 9504303.64,
+   "visits": 191813,
+   "vol_partial": false,
+   "diesel_rev": 0.0,
+   "diesel_vol": 0.0,
+   "pays": [
+    {
+     "pay": "Card",
+     "rev": 6046030.78,
+     "vis": 103370
+    },
+    {
+     "pay": "Cash",
+     "rev": 3273219.24,
+     "vis": 84054
+    },
+    {
+     "pay": "External Device",
+     "rev": 139106.24,
+     "vis": 3109
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 39125.74,
+     "vis": 1141
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 6449.91,
+     "vis": 129
+    },
+    {
+     "pay": "Petro App",
+     "rev": 293.73,
+     "vis": 9
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 78.0,
+     "vis": 1
+    }
+   ]
+  },
+  {
+   "code": "MK016",
+   "name": "الرصيفة",
+   "region": "مكة",
+   "revenue": 13274969.34,
+   "visits": 305345,
+   "vol_partial": false,
+   "diesel_rev": 0.0,
+   "diesel_vol": 0.0,
+   "pays": [
+    {
+     "pay": "Not Specified",
+     "rev": 13274969.34,
+     "vis": 305345
+    }
+   ]
+  },
+  {
+   "code": "MK017",
+   "name": "عرفات الشوقية",
+   "region": "مكة",
+   "revenue": 12811088.71,
+   "visits": 269065,
+   "vol_partial": false,
+   "diesel_rev": 0.0,
+   "diesel_vol": 0.0,
+   "pays": [
+    {
+     "pay": "Not Specified",
+     "rev": 12811088.71,
+     "vis": 269065
+    }
+   ]
+  },
+  {
+   "code": "MK018",
+   "name": "الرصيفة المسار",
+   "region": "مكة",
+   "revenue": 6226942.09,
+   "visits": 130746,
+   "vol_partial": false,
+   "diesel_rev": 1091752.8,
+   "diesel_vol": 606554.23,
+   "pays": [
+    {
+     "pay": "Cash",
+     "rev": 3863482.05,
+     "vis": 90051
+    },
+    {
+     "pay": "Card",
+     "rev": 1532537.43,
+     "vis": 26755
+    },
+    {
+     "pay": "External Device",
+     "rev": 649049.7,
+     "vis": 11433
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 179678.29,
+     "vis": 2452
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 1924.62,
+     "vis": 48
+    },
+    {
+     "pay": "Petro App",
+     "rev": 250.0,
+     "vis": 6
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 20.0,
+     "vis": 1
+    }
+   ]
+  },
+  {
+   "code": "MK019",
+   "name": "الشرايع",
+   "region": "مكة",
+   "revenue": 4899104.01,
+   "visits": 93434,
+   "vol_partial": false,
+   "diesel_rev": 0.0,
+   "diesel_vol": 0.0,
+   "pays": [
+    {
+     "pay": "Not Specified",
+     "rev": 4899104.01,
+     "vis": 93434
+    }
+   ]
+  },
+  {
+   "code": "MK020",
+   "name": "ممشى الشوقية",
+   "region": "مكة",
+   "revenue": 12532864.6,
+   "visits": 288692,
+   "vol_partial": false,
+   "diesel_rev": 0.0,
+   "diesel_vol": 0.0,
+   "pays": [
+    {
+     "pay": "Not Specified",
+     "rev": 12532864.6,
+     "vis": 288692
+    }
+   ]
+  },
+  {
+   "code": "MK022",
+   "name": "بطحاء قريش 1",
+   "region": "مكة",
+   "revenue": 10976756.31,
+   "visits": 171994,
+   "vol_partial": false,
+   "diesel_rev": 3446739.29,
+   "diesel_vol": 1915461.94,
+   "pays": [
+    {
+     "pay": "Not Specified",
+     "rev": 10976756.31,
+     "vis": 171994
+    }
+   ]
+  },
+  {
+   "code": "MK023",
+   "name": "بن درويش",
+   "region": "مكة",
+   "revenue": 7567441.05,
+   "visits": 167582,
+   "vol_partial": false,
+   "diesel_rev": 0.0,
+   "diesel_vol": 0.0,
+   "pays": [
+    {
+     "pay": "Not Specified",
+     "rev": 7502839.75,
+     "vis": 166178
+    },
+    {
+     "pay": "Card",
+     "rev": 38011.07,
+     "vis": 722
+    },
+    {
+     "pay": "Cash",
+     "rev": 20181.29,
+     "vis": 532
+    },
+    {
+     "pay": "External Device",
+     "rev": 4156.94,
+     "vis": 86
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 2252.0,
+     "vis": 64
+    }
+   ]
+  },
+  {
+   "code": "MK028",
+   "name": "أحلى مساء",
+   "region": "الطائف",
+   "revenue": 19217443.34,
+   "visits": 283926,
+   "vol_partial": false,
+   "diesel_rev": 1578936.92,
+   "diesel_vol": 871409.89,
+   "pays": [
+    {
+     "pay": "Not Specified",
+     "rev": 19217443.34,
+     "vis": 283926
+    }
+   ]
+  },
+  {
+   "code": "MK029",
+   "name": "الدائري الثالث - الذكرى",
+   "region": "مكة",
+   "revenue": 19533987.64,
+   "visits": 333174,
+   "vol_partial": true,
+   "diesel_rev": 4280596.67,
+   "diesel_vol": 854300.53,
+   "pays": [
+    {
+     "pay": "Card",
+     "rev": 9195821.28,
+     "vis": 147245
+    },
+    {
+     "pay": "Cash",
+     "rev": 7078967.79,
+     "vis": 162786
+    },
+    {
+     "pay": "Petro App",
+     "rev": 1936503.15,
+     "vis": 10652
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 1043832.02,
+     "vis": 7302
+    },
+    {
+     "pay": "External Device",
+     "rev": 275412.41,
+     "vis": 5103
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 3290.99,
+     "vis": 81
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 160.0,
+     "vis": 5
+    }
+   ]
+  },
+  {
+   "code": "MK031",
+   "name": "بطحاء قريش 2",
+   "region": "مكة",
+   "revenue": 6134127.33,
+   "visits": 113878,
+   "vol_partial": false,
+   "diesel_rev": 1441815.94,
+   "diesel_vol": 801034.08,
+   "pays": [
+    {
+     "pay": "Not Specified",
+     "rev": 6134127.33,
+     "vis": 113878
+    }
+   ]
+  },
+  {
+   "code": "MK033",
+   "name": "أبو وافي العمرة",
+   "region": "مكة",
+   "revenue": 18678267.68,
+   "visits": 299155,
+   "vol_partial": false,
+   "diesel_rev": 8456473.01,
+   "diesel_vol": 4691428.89,
+   "pays": [
+    {
+     "pay": "Cash",
+     "rev": 15871852.47,
+     "vis": 264398
+    },
+    {
+     "pay": "Card",
+     "rev": 1323842.44,
+     "vis": 23731
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 1046240.71,
+     "vis": 4847
+    },
+    {
+     "pay": "External Device",
+     "rev": 425452.87,
+     "vis": 5919
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 7187.18,
+     "vis": 185
+    },
+    {
+     "pay": "Petro App",
+     "rev": 3468.01,
+     "vis": 67
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 224.0,
+     "vis": 8
+    }
+   ]
+  },
+  {
+   "code": "MK035",
+   "name": "الجمعية الوسام",
+   "region": "الطائف",
+   "revenue": 10693687.63,
+   "visits": 159896,
+   "vol_partial": false,
+   "diesel_rev": 2935797.87,
+   "diesel_vol": 1622124.12,
+   "pays": [
+    {
+     "pay": "Not Specified",
+     "rev": 10693687.63,
+     "vis": 159896
+    }
+   ]
+  },
+  {
+   "code": "MK046",
+   "name": "الحليس - طريق الجنوب",
+   "region": "الطائف",
+   "revenue": 10734609.73,
+   "visits": 157865,
+   "vol_partial": false,
+   "diesel_rev": 3042918.39,
+   "diesel_vol": 1679339.23,
+   "pays": [
+    {
+     "pay": "Card",
+     "rev": 5377339.77,
+     "vis": 71253
+    },
+    {
+     "pay": "Cash",
+     "rev": 4711419.78,
+     "vis": 77023
+    },
+    {
+     "pay": "External Device",
+     "rev": 504674.93,
+     "vis": 8259
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 138143.55,
+     "vis": 1260
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 2532.44,
+     "vis": 59
+    },
+    {
+     "pay": "Petro App",
+     "rev": 499.26,
+     "vis": 11
+    }
+   ]
+  },
+  {
+   "code": "MK047",
+   "name": "القادسية",
+   "region": "مكة",
+   "revenue": 19752239.36,
+   "visits": 332733,
+   "vol_partial": false,
+   "diesel_rev": 5448658.57,
+   "diesel_vol": 3056002.09,
+   "pays": [
+    {
+     "pay": "Not Specified",
+     "rev": 19752239.36,
+     "vis": 332733
+    }
+   ]
+  },
+  {
+   "code": "MK054",
+   "name": "طريق السيل",
+   "region": "مكة",
+   "revenue": 8627816.46,
+   "visits": 104632,
+   "vol_partial": false,
+   "diesel_rev": 3363473.45,
+   "diesel_vol": 1868643.45,
+   "pays": [
+    {
+     "pay": "Cash",
+     "rev": 4375300.29,
+     "vis": 50718
+    },
+    {
+     "pay": "Card",
+     "rev": 3293539.36,
+     "vis": 42886
+    },
+    {
+     "pay": "External Device",
+     "rev": 788563.98,
+     "vis": 10120
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 140142.27,
+     "vis": 395
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 28297.52,
+     "vis": 494
+    },
+    {
+     "pay": "Petro App",
+     "rev": 1923.04,
+     "vis": 18
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 50.0,
+     "vis": 1
+    }
+   ]
+  },
+  {
+   "code": "MK063",
+   "name": "السواط - شهار",
+   "region": "الطائف",
+   "revenue": 12102486.91,
+   "visits": 233642,
+   "vol_partial": false,
+   "diesel_rev": 702164.81,
+   "diesel_vol": 387517.67,
+   "pays": [
+    {
+     "pay": "Not Specified",
+     "rev": 12102486.91,
+     "vis": 233642
+    }
+   ]
+  },
+  {
+   "code": "MK064",
+   "name": "الجعرانة",
+   "region": "مكة",
+   "revenue": 12280255.01,
+   "visits": 238071,
+   "vol_partial": false,
+   "diesel_rev": 3453045.64,
+   "diesel_vol": 1918390.87,
+   "pays": [
+    {
+     "pay": "Cash",
+     "rev": 7356595.27,
+     "vis": 148964
+    },
+    {
+     "pay": "Card",
+     "rev": 3780959.86,
+     "vis": 65847
+    },
+    {
+     "pay": "External Device",
+     "rev": 1065112.09,
+     "vis": 22439
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 71136.63,
+     "vis": 668
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 4851.57,
+     "vis": 117
+    },
+    {
+     "pay": "Petro App",
+     "rev": 1336.0,
+     "vis": 30
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 263.59,
+     "vis": 6
+    }
+   ]
+  },
+  {
+   "code": "MK068",
+   "name": "الجموم - الكنيدري",
+   "region": "مكة",
+   "revenue": 9014842.11,
+   "visits": 196103,
+   "vol_partial": false,
+   "diesel_rev": 1034290.05,
+   "diesel_vol": 574624.21,
+   "pays": [
+    {
+     "pay": "Card",
+     "rev": 4312248.01,
+     "vis": 81614
+    },
+    {
+     "pay": "Cash",
+     "rev": 3986520.6,
+     "vis": 99671
+    },
+    {
+     "pay": "External Device",
+     "rev": 642114.71,
+     "vis": 14227
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 67910.98,
+     "vis": 447
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 3850.69,
+     "vis": 94
+    },
+    {
+     "pay": "Petro App",
+     "rev": 1716.12,
+     "vis": 34
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 481.0,
+     "vis": 16
+    }
+   ]
+  },
+  {
+   "code": "MK071",
+   "name": "الأجاويد",
+   "region": "جدة",
+   "revenue": 8619599.05,
+   "visits": 200709,
+   "vol_partial": false,
+   "diesel_rev": 1416053.85,
+   "diesel_vol": 791155.51,
+   "pays": [
+    {
+     "pay": "Card",
+     "rev": 4333866.4,
+     "vis": 87649
+    },
+    {
+     "pay": "Cash",
+     "rev": 3465552.4,
+     "vis": 91884
+    },
+    {
+     "pay": "External Device",
+     "rev": 597921.43,
+     "vis": 14702
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 132711.57,
+     "vis": 3838
+    },
+    {
+     "pay": "Petro App",
+     "rev": 87631.23,
+     "vis": 2593
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 1776.02,
+     "vis": 40
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 140.0,
+     "vis": 3
+    }
+   ]
+  },
+  {
+   "code": "MK072",
+   "name": "العزيزية",
+   "region": "مكة",
+   "revenue": 24068678.6,
+   "visits": 505197,
+   "vol_partial": true,
+   "diesel_rev": 3123975.26,
+   "diesel_vol": 676906.5,
+   "pays": [
+    {
+     "pay": "Cash",
+     "rev": 21590243.93,
+     "vis": 464906
+    },
+    {
+     "pay": "External Device",
+     "rev": 1905992.26,
+     "vis": 32362
+    },
+    {
+     "pay": "Card",
+     "rev": 465549.53,
+     "vis": 5814
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 94059.52,
+     "vis": 1824
+    },
+    {
+     "pay": "Petro App",
+     "rev": 8605.99,
+     "vis": 187
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 3291.37,
+     "vis": 86
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 936.0,
+     "vis": 18
+    }
+   ]
+  },
+  {
+   "code": "MK084",
+   "name": "الكر النازل",
+   "region": "مكة",
+   "revenue": 8447420.51,
+   "visits": 121506,
+   "vol_partial": false,
+   "diesel_rev": 884177.51,
+   "diesel_vol": 491227.37,
+   "pays": [
+    {
+     "pay": "Card",
+     "rev": 4144454.83,
+     "vis": 53534
+    },
+    {
+     "pay": "Cash",
+     "rev": 3525672.67,
+     "vis": 56681
+    },
+    {
+     "pay": "External Device",
+     "rev": 753964.42,
+     "vis": 10942
+    },
+    {
+     "pay": "Petro App",
+     "rev": 11504.07,
+     "vis": 156
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 8565.55,
+     "vis": 122
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 2610.6,
+     "vis": 63
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 648.37,
+     "vis": 8
+    }
+   ]
+  },
+  {
+   "code": "MK093",
+   "name": "الملك خالد",
+   "region": "الطائف",
+   "revenue": 6303626.0,
+   "visits": 123946,
+   "vol_partial": false,
+   "diesel_rev": 488333.04,
+   "diesel_vol": 269503.51,
+   "pays": [
+    {
+     "pay": "Card",
+     "rev": 3362285.86,
+     "vis": 57199
+    },
+    {
+     "pay": "Cash",
+     "rev": 1605492.54,
+     "vis": 38024
+    },
+    {
+     "pay": "External Device",
+     "rev": 1236883.61,
+     "vis": 26864
+    },
+    {
+     "pay": "Petro App",
+     "rev": 51435.91,
+     "vis": 866
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 46050.47,
+     "vis": 958
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 1477.61,
+     "vis": 35
+    }
+   ]
+  },
+  {
+   "code": "MK099",
+   "name": "البيعة",
+   "region": "الطائف",
+   "revenue": 4492250.07,
+   "visits": 96663,
+   "vol_partial": false,
+   "diesel_rev": 80391.76,
+   "diesel_vol": 44367.43,
+   "pays": [
+    {
+     "pay": "Card",
+     "rev": 2135178.03,
+     "vis": 37780
+    },
+    {
+     "pay": "Cash",
+     "rev": 1195710.45,
+     "vis": 32478
+    },
+    {
+     "pay": "External Device",
+     "rev": 1108493.96,
+     "vis": 24494
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 31653.3,
+     "vis": 1211
+    },
+    {
+     "pay": "Petro App",
+     "rev": 19891.59,
+     "vis": 666
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 1192.74,
+     "vis": 31
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 130.0,
+     "vis": 3
+    }
+   ]
+  },
+  {
+   "code": "MK100",
+   "name": "الكوثر",
+   "region": "جدة",
+   "revenue": 3917479.75,
+   "visits": 70784,
+   "vol_partial": false,
+   "diesel_rev": 1141974.86,
+   "diesel_vol": 638014.64,
+   "pays": [
+    {
+     "pay": "Card",
+     "rev": 1786434.51,
+     "vis": 33034
+    },
+    {
+     "pay": "Cash",
+     "rev": 1412721.4,
+     "vis": 26692
+    },
+    {
+     "pay": "External Device",
+     "rev": 579745.82,
+     "vis": 9718
+    },
+    {
+     "pay": "Petro App",
+     "rev": 82864.65,
+     "vis": 878
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 54440.77,
+     "vis": 432
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 1272.6,
+     "vis": 30
+    }
+   ]
+  },
+  {
+   "code": "MK210",
+   "name": "الفلاح - فلسطين",
+   "region": "جدة",
+   "revenue": 11893577.19,
+   "visits": 238689,
+   "vol_partial": false,
+   "diesel_rev": 3963260.29,
+   "diesel_vol": 2213959.92,
+   "pays": [
+    {
+     "pay": "Cash",
+     "rev": 7757893.89,
+     "vis": 159584
+    },
+    {
+     "pay": "Card",
+     "rev": 4132404.27,
+     "vis": 79028
+    },
+    {
+     "pay": "External Device",
+     "rev": 1534.01,
+     "vis": 36
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 1080.0,
+     "vis": 24
+    },
+    {
+     "pay": "Petro App",
+     "rev": 615.02,
+     "vis": 15
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 50.0,
+     "vis": 2
+    }
+   ]
+  },
+  {
+   "code": "MK289",
+   "name": "طريق الليث - الفضيلة",
+   "region": "جدة",
+   "revenue": 34048973.63,
+   "visits": 388807,
+   "vol_partial": false,
+   "diesel_rev": 22167476.84,
+   "diesel_vol": 12383944.59,
+   "pays": [
+    {
+     "pay": "Not Specified",
+     "rev": 24727185.74,
+     "vis": 272578
+    },
+    {
+     "pay": "Cash",
+     "rev": 6478143.11,
+     "vis": 75628
+    },
+    {
+     "pay": "Card",
+     "rev": 2112133.62,
+     "vis": 33230
+    },
+    {
+     "pay": "External Device",
+     "rev": 418800.37,
+     "vis": 6411
+    },
+    {
+     "pay": "Petro App",
+     "rev": 274108.14,
+     "vis": 832
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 38572.65,
+     "vis": 127
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 30.0,
+     "vis": 1
+    }
+   ]
+  },
+  {
+   "code": "MK323",
+   "name": "جبل ثور - جوهرة النسيم",
+   "region": "مكة",
+   "revenue": 1918370.53,
+   "visits": 38468,
+   "vol_partial": false,
+   "diesel_rev": 0.0,
+   "diesel_vol": 0.0,
+   "pays": [
+    {
+     "pay": "Card",
+     "rev": 1292873.31,
+     "vis": 22923
+    },
+    {
+     "pay": "Cash",
+     "rev": 585878.08,
+     "vis": 14627
+    },
+    {
+     "pay": "External Device",
+     "rev": 39478.7,
+     "vis": 912
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 123.27,
+     "vis": 3
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 17.17,
+     "vis": 3
+    }
+   ]
+  },
+  {
+   "code": "NJ219",
+   "name": "المركب",
+   "region": "نجران",
+   "revenue": 492335.82,
+   "visits": 10157,
+   "vol_partial": false,
+   "diesel_rev": 73269.74,
+   "diesel_vol": 40932.64,
+   "pays": [
+    {
+     "pay": "Cash",
+     "rev": 241747.25,
+     "vis": 5673
+    },
+    {
+     "pay": "Card",
+     "rev": 204172.26,
+     "vis": 3662
+    },
+    {
+     "pay": "External Device",
+     "rev": 44764.71,
+     "vis": 784
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 1351.6,
+     "vis": 31
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 300.0,
+     "vis": 7
+    }
+   ]
+  },
+  {
+   "code": "QS055",
+   "name": "الدائري الشرقي",
+   "region": "القصيم",
+   "revenue": 7054473.42,
+   "visits": 93238,
+   "vol_partial": false,
+   "diesel_rev": 2817016.64,
+   "diesel_vol": 1588512.46,
+   "pays": [
+    {
+     "pay": "Card",
+     "rev": 3849592.85,
+     "vis": 52883
+    },
+    {
+     "pay": "Cash",
+     "rev": 2396635.23,
+     "vis": 31103
+    },
+    {
+     "pay": "External Device",
+     "rev": 596075.27,
+     "vis": 8520
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 173028.74,
+     "vis": 534
+    },
+    {
+     "pay": "Petro App",
+     "rev": 37518.85,
+     "vis": 168
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 1372.48,
+     "vis": 27
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 250.0,
+     "vis": 3
+    }
+   ]
+  },
+  {
+   "code": "RY024",
+   "name": "غرناطة - طريق الملك عبدالله",
+   "region": "الخرج",
+   "revenue": 5146143.89,
+   "visits": 89966,
+   "vol_partial": false,
+   "diesel_rev": 0.0,
+   "diesel_vol": 0.0,
+   "pays": [
+    {
+     "pay": "Not Specified",
+     "rev": 5146143.89,
+     "vis": 89966
+    }
+   ]
+  },
+  {
+   "code": "RY025",
+   "name": "الحمرا - طريق الملك عبدالله",
+   "region": "الخرج",
+   "revenue": 9202045.74,
+   "visits": 167966,
+   "vol_partial": false,
+   "diesel_rev": 754328.8,
+   "diesel_vol": 421424.21,
+   "pays": [
+    {
+     "pay": "Not Specified",
+     "rev": 9202045.74,
+     "vis": 167966
+    }
+   ]
+  },
+  {
+   "code": "RY042",
+   "name": "الناصفة",
+   "region": "الخرج",
+   "revenue": 5491452.11,
+   "visits": 87436,
+   "vol_partial": false,
+   "diesel_rev": 1128729.7,
+   "diesel_vol": 630579.86,
+   "pays": [
+    {
+     "pay": "Card",
+     "rev": 3179744.05,
+     "vis": 46031
+    },
+    {
+     "pay": "Cash",
+     "rev": 1650007.48,
+     "vis": 30729
+    },
+    {
+     "pay": "External Device",
+     "rev": 584766.39,
+     "vis": 10042
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 73964.62,
+     "vis": 571
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 2345.0,
+     "vis": 53
+    },
+    {
+     "pay": "Petro App",
+     "rev": 524.57,
+     "vis": 9
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 100.0,
+     "vis": 1
+    }
+   ]
+  },
+  {
+   "code": "RY075",
+   "name": "الدائري الشمالي",
+   "region": "الرياض",
+   "revenue": 18394665.04,
+   "visits": 248043,
+   "vol_partial": true,
+   "diesel_rev": 1395140.46,
+   "diesel_vol": 557819.65,
+   "pays": [
+    {
+     "pay": "Card",
+     "rev": 14017399.71,
+     "vis": 167158
+    },
+    {
+     "pay": "Cash",
+     "rev": 3227149.17,
+     "vis": 60649
+    },
+    {
+     "pay": "External Device",
+     "rev": 976628.85,
+     "vis": 16003
+    },
+    {
+     "pay": "Syarah App",
+     "rev": 159179.02,
+     "vis": 3892
+    },
+    {
+     "pay": "Not Specified",
+     "rev": 13096.48,
+     "vis": 318
+    },
+    {
+     "pay": "Petro App",
+     "rev": 793.81,
+     "vis": 13
+    },
+    {
+     "pay": "CASHIN Wallet",
+     "rev": 318.0,
+     "vis": 8
+    },
+    {
+     "pay": "Smart Card",
+     "rev": 100.0,
+     "vis": 2
+    }
+   ]
+  }
+ ]
+}

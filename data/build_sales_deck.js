@@ -141,6 +141,7 @@ function foot(s, t) {
 }
 
 const N = D.network, T = D.totals, SEG = D.segments, ST = D.stations, L = D.litre;
+const X = JSON.parse(fs.readFileSync("data/competitors.json", "utf8"));
 const BOXN = N.visits / 7 * 0.10;   // علب شهرياً عند ١٠٪ من المعاملات · الفترة سبعة أشهر
 
 /* ═══ ١ · الغلاف ═══ */
@@ -162,7 +163,7 @@ cover("الإدارة التجارية · أغسطس ٢٠٢٦", "تحليل ال
                 "المعاملات ثم السلة — لا نطلب من العميل أن يعبّي أكثر مما يحتاج",
                 ar(Math.round(T.sar / 1000)) + " ألف ر"],
                ["إقفال ثغرة البيانات قبل الإنفاق", "١٨ محطة لا تسجّل وسيلة الدفع", "١٨٣ مليون ر"],
-               ["مسح المنافسين في ثلاثة منتجات", "العقار والإكسسوارات والإعلان", "٣ من ٥"]];
+               ["تسعير المنتجات الثلاثة", "جدول إيجارات · مسح أسعار · جرد أسطح", "٣ من ٥"]];
   dec.forEach((v, i) => {
     const y = 3.6 + i * 0.88;
     s.addShape(p.ShapeType.roundRect, { x: M, y, w: CW, h: 0.78, rectRadius: 0.04,
@@ -441,7 +442,7 @@ divider("القسم الأول", "أين نقف", "الشبكة · الاتجا�
   table(s, M, 2.38, CW * 0.56, [
     { t: "المحطة", w: 26, a: "right" }, { t: "الكود", w: 11 },
     { t: "ديزل لتر/يوم", w: 15 }, { t: "حصته", w: 10 },
-    { t: "الدفع المؤسسي", w: 13 }, { t: "وحدات خدمة", w: 12 },
+    { t: "تطبيقات الأسطول", w: 13 }, { t: "وحدات خدمة", w: 12 },
     { t: "العملة الممكنة", w: 17 }], rows, { rh: 0.335, fs: 10, hfs: 9.5 });
 
   const x2 = M + CW * 0.59, w2 = CW * 0.41;
@@ -490,7 +491,7 @@ divider("القسم الثاني", "المنافسون", "خمسة منتجات 
 {
   const s = page("المنافسون حسب المنتج", "من يسيطر على كل منتج — وأين لا نعرف");
   const rows = D.products.map((r, i) => {
-    const gap = r[5] === "مفقود";
+    const gap = r[5].startsWith("بنيوي");
     return { c: [{ t: r[0], a: "right", b: true, c: BGRAY }, { t: r[1], b: true },
                  r[2], { t: r[3], b: true, c: gap ? D_BAD : BLUE },
                  { t: r[4], a: "right" }, { t: r[5], b: true, c: gap ? D_BAD : D_GOOD }],
@@ -502,8 +503,8 @@ divider("القسم الثاني", "المنافسون", "خمسة منتجات 
     { t: "حالة المسح", w: 14 }], rows, { rh: 0.56, fs: 11, hfs: 10.5 });
   const cw = (CW - 2 * 0.2) / 3;
   const cards = [["٢ من ٥", "منتجات تعمل", "الوقود بشقّيه — والباقي لم يبدأ", ORANGE],
-                 ["١ من ٥", "مسح منافسين مكتمل", "وقود الأفراد على خمسة مواقع", GOLD],
-                 ["٣ من ٥", "بلا معرفة تنافسية", "العقار والإكسسوارات والإعلان", BAD]];
+                 ["٥ من ٥", "عُرِف مُسيطرها", "لكلٍّ منافس مختلف ومقياس مختلف", GOLD],
+                 ["٣ من ٥", "بلا سعر سوق", "نعرف من هو — ولا نعرف بكم يبيع", BAD]];
   cards.forEach((c, i) => {
     const x = rtlx(i, cw, 0.2);
     s.addShape(p.ShapeType.roundRect, { x, y: 4.72, w: cw, h: 1.32, rectRadius: 0.05,
@@ -515,7 +516,7 @@ divider("القسم الثاني", "المنافسون", "خمسة منتجات 
     s.addText(c[2], { x: x + 0.1, y: 5.62, w: cw - 0.2, h: 0.34, fontFace: F,
       fontSize: 10, color: INK2, align: "center", margin: 0 });
   });
-  foot(s, "لم تُذكر أسماء منافسين في المنتجات الثلاثة لأننا لا نملك مسحاً — والفراغ مقصود لا سهو");
+  foot(s, "المسيطر في المنتجات الثلاثة استُنتج من بياناتنا لا من مسحٍ خارجي — والناقص سعره لا هويّته");
 }
 
 /* ═══ ١٠ · منافسة الوقود ═══ */
@@ -547,6 +548,213 @@ divider("القسم الثاني", "المنافسون", "خمسة منتجات 
       fontSize: 11.5, color: INK, ...rtl });
   });
   band(s, 5.55, "الخدمة أفضل أصلاً — فالخطة اعتراضية: لافتة ومدخل وسرعة وإبراز التقييم قبل نقطة القرار بخمسمئة متر");
+}
+
+/* ═══ عمق ① · وقود الأفراد ═══ */
+{
+  const R = X.retail;
+  const s = page("وقود الأفراد — من حولنا، وهل يفسّر نتيجتنا",
+                 ar(R.n_sample) + " منافساً مرصوداً من " + ar(R.n_total) + " داخل ٥ كم · خرائط جوجل يوليو ٢٠٢٦");
+  s.addText("① من يحيط بنا فعلاً", { x: M, y: 1.3, w: CW * 0.52, h: 0.3, fontFace: F,
+    fontSize: 13.5, bold: true, color: ORANGE, ...rtl });
+  const brows = R.brands.map((b, i) => ({
+    c: [{ t: b.brand, a: "right", b: true }, ar(b.n), pc0(b.share),
+        arn(b.near.toLocaleString("en-US")) + " م", arn(b.med.toLocaleString("en-US")) + " م",
+        { t: b.rating ? ar2(b.rating) + "★" : "—",
+          b: true, c: b.rating && b.rating < 3.6 ? D_BAD : INK },
+        ar(b.reviews)],
+    fill: i % 2 ? T_NEU : W }));
+  table(s, M, 1.62, CW * 0.52, [
+    { t: "العلامة", w: 22, a: "right" }, { t: "مرات", w: 11 }, { t: "الحصة", w: 12 },
+    { t: "أقرب", w: 14 }, { t: "وسيط المسافة", w: 15 },
+    { t: "تقييمها", w: 13 }, { t: "وسيط المراجعات", w: 13 }],
+    brows, { rh: 0.34, fs: 10.5, hfs: 9.5 });
+
+  const x2 = M + CW * 0.55, w2 = CW * 0.45;
+  s.addText("② وميزتنا ثابتة — والنتيجة ليست", { x: x2, y: 1.3, w: w2, h: 0.3,
+    fontFace: F, fontSize: 13.5, bold: true, color: ORANGE, ...rtl });
+  const srows = R.sites.map((f, i) => ({
+    c: [{ t: f.name.slice(0, 14), a: "right", b: true },
+        { t: ar1(f.rating) + "★", b: true, c: D_GOOD }, ar1(f.comp_avg) + "★",
+        { t: "+" + ar2(f.gap), c: D_GOOD }, ar(f.n),
+        { t: (f.growth > 0 ? "+" : "−") + ar(Math.abs(f.growth)) + "٪",
+          b: true, c: f.growth > 0 ? D_GOOD : D_BAD }],
+    fill: i % 2 ? T_NEU : W }));
+  table(s, x2, 1.62, w2, [
+    { t: "الموقع", w: 26, a: "right" }, { t: "نحن", w: 13 }, { t: "هم", w: 12 },
+    { t: "الفارق", w: 14 }, { t: "عددهم", w: 13 }, { t: "نمونا", w: 22 }],
+    srows, { rh: 0.34, fs: 10.5, hfs: 9.5 });
+  s.addShape(p.ShapeType.roundRect, { x: x2, y: 3.72, w: w2, h: 1.16, rectRadius: 0.05,
+    fill: { color: T_BAD }, line: { color: BAD, width: 1.2 } });
+  s.addText("ميزتنا " + ar2(R.gap_mean) + " نجمة على المواقع الخمسة جميعاً، والنمو يمتد من "
+    + ar(R.growth_hi) + "٪ إلى −" + ar(Math.abs(R.growth_lo))
+    + "٪. الثابت لا يفسّر المتغيّر — فالمنافس ليس ما يحرّك أرقامنا.",
+    { x: x2 + 0.16, y: 3.84, w: w2 - 0.32, h: 0.94, fontFace: F, fontSize: 11.5,
+      color: INK, ...rtl });
+
+  head(s, 5.0, "③ وحين يكون السعر منظَّماً تُحسم المنافسة بالخدمة — وشكاوانا تقول أين نقف");
+  const svc = R.complaints.filter(c => c[0] !== "أخرى").slice(0, 5);
+  const other = (R.complaints.find(c => c[0] === "أخرى") || ["أخرى", 0])[1];
+  const cw = (CW - 4 * 0.16) / 5;
+  svc.forEach((c, i) => {
+    const x = rtlx(i, cw, 0.16);
+    s.addShape(p.ShapeType.roundRect, { x, y: 5.36, w: cw, h: 0.94, rectRadius: 0.04,
+      fill: { color: T_BAD }, line: { color: BAD, width: 1 } });
+    s.addText(ar(c[1]), { x: x + 0.08, y: 5.44, w: cw - 0.16, h: 0.4, fontFace: F,
+      fontSize: 19, bold: true, color: D_BAD, align: "center", margin: 0 });
+    s.addText(c[0], { x: x + 0.08, y: 5.86, w: cw - 0.16, h: 0.3, fontFace: F,
+      fontSize: 11, color: INK, align: "center", margin: 0 });
+  });
+  foot(s, "من " + ar(R.n_complaints) + " شكوى — " + pc0(R.svc_share)
+    + " منها خدمة لا سعر (و" + ar(other) + " بلا تصنيف) · فالخطة اعتراضية: "
+    + "مدخل ولافتة وسرعة، لا مطاردة سعر لا نملكه");
+}
+
+/* ═══ عمق ② · وقود الشركات ═══ */
+{
+  const C = X.corporate;
+  const s = page("وقود الشركات — المنافس منصّة لا محطة",
+                 "من يملك حساب الأسطول يملك تعبئته · تصنيف بحجم السلة لا بالاسم");
+  head(s, 1.3, "① قنوات الدفع — والسلة هي التي تفضح القناة");
+  const rows = C.pays.filter(x => x.rev > 1000).map((x, i) => ({
+    c: [{ t: x.ar, a: "right", b: true }, ar(x.rev), pc(x.share), ar(x.vis),
+        { t: ar2(x.inv), b: true, c: x.fleet_basket ? D_BAD : INK },
+        { t: x.fleet_basket ? "سلة أسطول" : "سلة أفراد",
+          b: true, c: x.fleet_basket ? D_BAD : INK2 },
+        { t: x.plat ? "منصّة خارجية" : x.pos ? "جهاز نقاط بيع" : x.pay === "Not Specified" ? "مجهولة" : "قناتنا", a: "right" }],
+    fill: x.plat ? T_BAD : (i % 2 ? T_NEU : W) }));
+  table(s, M, 1.62, CW, [
+    { t: "القناة", w: 14, a: "right" }, { t: "الإيراد", w: 13 }, { t: "الحصة", w: 9 },
+    { t: "المعاملات", w: 12 }, { t: "الفاتورة", w: 10 }, { t: "التصنيف", w: 12 },
+    { t: "من يملكها", w: 15, a: "right" }], rows, { rh: 0.33, fs: 10.5, hfs: 9.5 });
+
+  const cw = (CW - 2 * 0.2) / 3;
+  const cards = [[ar2(C.plat_inv) + " ريالاً", "فاتورة المنصّة",
+                  "ثلاثة أضعاف النقدي " + ar2(C.cash_inv) + " — هذه تعبئة أسطول", BAD],
+                 [pc(C.plat_share), "حصة المنصّات من المسجَّل",
+                  ar(C.plat_rev) + " ريالاً عبر سيارة وبترو", GOLD],
+                 [ar(C.our_vis) + " معاملات", "محفظة كاش إن",
+                  ar(C.our_rev) + " ريالاً — لا موقع لنا في القناة", BAD]];
+  cards.forEach((c, i) => {
+    const x = rtlx(i, cw, 0.2);
+    s.addShape(p.ShapeType.roundRect, { x, y: 4.36, w: cw, h: 1.16, rectRadius: 0.05,
+      fill: { color: c[3] === BAD ? T_BAD : BG }, line: { color: c[3], width: 1.2 } });
+    s.addText(c[0], { x: x + 0.1, y: 4.45, w: cw - 0.2, h: 0.4, fontFace: F,
+      fontSize: 19, bold: true, color: c[3], align: "center", margin: 0 });
+    s.addText(c[1], { x: x + 0.1, y: 4.86, w: cw - 0.2, h: 0.28, fontFace: F,
+      fontSize: 11.5, bold: true, color: BGRAY, align: "center", margin: 0 });
+    s.addText(c[2], { x: x + 0.1, y: 5.14, w: cw - 0.2, h: 0.34, fontFace: F,
+      fontSize: 10, color: INK2, align: "center", margin: 0 });
+  });
+  s.addText("② قائمة الصيد — ديزل ثقيل بلا أي علاقة رقمية: "
+    + ar(C.gap.length) + " محطات · " + ar(C.gap_diesel) + " ريالاً · "
+    + ar(C.gap_vol) + " لتراً",
+    { x: M, y: 5.60, w: CW, h: 0.3, fontFace: F, fontSize: 12.5, bold: true,
+      color: ORANGE, ...rtl });
+  const gw = (CW - 6 * 0.12) / 7;
+  C.gap.slice(0, 7).forEach((g, i) => {
+    const x = rtlx(i, gw, 0.12);
+    s.addShape(p.ShapeType.roundRect, { x, y: 5.94, w: gw, h: 0.82, rectRadius: 0.04,
+      fill: { color: BG }, line: { color: ORANGE, width: 1 } });
+    s.addText(g.name.slice(0, 13), { x: x + 0.06, y: 5.99, w: gw - 0.12, h: 0.26,
+      fontFace: F, fontSize: 9.5, bold: true, color: BGRAY, align: "center", margin: 0 });
+    s.addText(ar1(g.diesel / 1e6) + " م ريال", { x: x + 0.06, y: 6.25, w: gw - 0.12, h: 0.28,
+      fontFace: F, fontSize: 12.5, bold: true, color: ORANGE, align: "center", margin: 0 });
+    s.addText(g.code, { x: x + 0.06, y: 6.52, w: gw - 0.12, h: 0.24, fontFace: F,
+      fontSize: 9, color: INK3, align: "center", margin: 0 });
+  });
+}
+
+/* ═══ عمق ③ · العقار ═══ */
+{
+  const P = X.property;
+  const s = page("العقار والتأجير — بديل المستأجر هو المنافس",
+                 ar(P.n) + " وحدة في " + ar(P.stations) + " محطة · إشغال " + pc(P.occ));
+  head(s, 1.3, "① لكل نوع وحدة بديلٌ مختلف — والإشغال يقيس قوّته");
+  const rows = P.types.map((t, i) => ({
+    c: [{ t: t.ar, a: "right", b: true }, ar(t.n), ar(t.leased), ar(t.vacant),
+        { t: pc(t.occ), b: true, c: t.occ >= 0.44 ? D_GOOD : D_BAD },
+        { t: t.rival, a: "right", fs: 10.5 }],
+    fill: t.occ < 0.30 ? T_BAD : (i % 2 ? T_NEU : W) }));
+  table(s, M, 1.62, CW, [
+    { t: "نوع الوحدة", w: 12, a: "right" }, { t: "العدد", w: 9 }, { t: "مؤجَّر", w: 9 },
+    { t: "شاغر", w: 9 }, { t: "الإشغال", w: 11 },
+    { t: "بديل المستأجر خارج المحطة", w: 50, a: "right" }],
+    rows, { rh: 0.38, fs: 11, hfs: 10 });
+
+  const cw2 = (CW - 0.24) / 2;
+  const bx = [rtlx(0, cw2, 0.24), rtlx(1, cw2, 0.24)];
+  s.addShape(p.ShapeType.roundRect, { x: bx[0], y: 4.42, w: cw2, h: 1.34, rectRadius: 0.05,
+    fill: { color: T_BAD }, line: { color: BAD, width: 1.2 } });
+  s.addText("المحل وحده يخسر أمام بديله", { x: bx[0] + 0.16, y: 4.53, w: cw2 - 0.32, h: 0.3,
+    fontFace: F, fontSize: 13.5, bold: true, color: D_BAD, ...rtl });
+  s.addText("المحل " + pc(P.shops.occ) + " إشغالاً و" + ar(P.shops.vacant)
+    + " شاغراً — لأن جاره في الحي أرخص وأقرب للسكن. أمّا " + P.best.ar + " والسيّاقة والمغسلة فبلا بديل داخل الساحة، وإشغالها "
+    + pc(P.best.occ) + " فأعلى. البيع يبدأ من هنا لا من المحل.",
+    { x: bx[0] + 0.16, y: 4.88, w: cw2 - 0.32, h: 0.8, fontFace: F, fontSize: 11.5,
+      color: INK, ...rtl });
+
+  s.addText("② والمنافس الحقيقي داخلي — لا أحد يبيع", { x: bx[1], y: 4.42, w: cw2, h: 0.3,
+    fontFace: F, fontSize: 13.5, bold: true, color: ORANGE, ...rtl });
+  P.cats.forEach((c, i) => {
+    const y = 4.78 + i * 0.4;
+    const ok = c.occ >= 0.5;
+    s.addShape(p.ShapeType.roundRect, { x: bx[1], y, w: cw2, h: 0.34, rectRadius: 0.03,
+      fill: { color: ok ? T_GOOD : T_BAD } });
+    s.addText(c.cat, { x: bx[1] + 0.14, y, w: cw2 * 0.34, h: 0.34, fontFace: F,
+      fontSize: 11.5, bold: true, color: ok ? D_GOOD : D_BAD, valign: "middle", ...rtl });
+    s.addText(ar(c.n) + " وحدة · " + ar(c.vacant) + " شاغرة",
+      { x: bx[1] + cw2 * 0.36, y, w: cw2 * 0.42, h: 0.34, fontFace: F, fontSize: 10.5,
+        color: INK, valign: "middle", align: "center", margin: 0 });
+    s.addText(pc(c.occ), { x: bx[1] + cw2 - 1.0, y, w: 0.86, h: 0.34, fontFace: F,
+      fontSize: 12, bold: true, color: ok ? D_GOOD : D_BAD, valign: "middle",
+      align: "left", margin: 0 });
+  });
+  band(s, 6.08, "المشغّلة " + pc(P.cats[0].occ) + " إشغالاً والامتياز " + pc(P.cats[2].occ)
+    + " — الفارق ليس سوقاً بل غياب مالكٍ للبيع · وهذا ما تعالجه الباقات لا خفض الإيجار", BAD);
+}
+
+/* ═══ عمق ④⑤ · منتجان لم يبدآ ═══ */
+{
+  const s = page("الإكسسوارات والمساحات — منتجان بلا خط أساس",
+                 "لا يُدَّعى مسحٌ لم يُجرَ · وهذا ما نعرفه اليوم بالقياس");
+  const cw = (CW - 0.24) / 2;
+  X.newcomers.forEach((n, i) => {
+    const x = rtlx(i, cw, 0.24);
+    s.addShape(p.ShapeType.roundRect, { x, y: 1.3, w: cw, h: 3.9, rectRadius: 0.06,
+      fill: { color: BG }, line: { color: ORANGE, width: 1.3 } });
+    s.addShape(p.ShapeType.rect, { x, y: 1.3, w: cw, h: 0.06, fill: { color: ORANGE } });
+    s.addText(n.product, { x: x + 0.18, y: 1.44, w: cw - 0.36, h: 0.36, fontFace: F,
+      fontSize: 16, bold: true, color: BGRAY, ...rtl });
+    const blocks = [["من يشغل مكاننا اليوم", n.holder, D_BAD],
+                    ["الدليل من بياناتنا", arn(n.evidence), INK],
+                    ["ما نملكه ولا نبيعه", arn(n.asset), BLUE],
+                    ["ما يلزم لإقرار خطة", n.need, D_GOOD]];
+    blocks.forEach((b, k) => {
+      const y = 1.9 + k * 0.83;
+      s.addShape(p.ShapeType.rect, { x: x + cw - 0.2, y: y + 0.04, w: 0.04, h: 0.24,
+        fill: { color: b[2] } });
+      s.addText(b[0], { x: x + 0.18, y, w: cw - 0.44, h: 0.28, fontFace: F,
+        fontSize: 11, bold: true, color: b[2], ...rtl });
+      s.addText(b[1], { x: x + 0.18, y: y + 0.29, w: cw - 0.36, h: 0.52, fontFace: F,
+        fontSize: 11, color: INK, ...rtl });
+    });
+  });
+  head(s, 5.36, "المسح المطلوب — أسبوعان لكلٍّ منهما، ويُقفل ثلاثة أخماس الجهل التنافسي");
+  const need = [["ثلاثة أحياء", "عيّنة المسح لكل منتج"],
+                ["سلة وأسعار", "ما يبيعه المنافس وبكم"],
+                ["جرد الأسطح", "كم وجهاً إعلانياً نملك"],
+                ["سعر الوجه", "شهرياً — ليُسعَّر المخزون"]];
+  const cw3 = (CW - 3 * 0.18) / 4;
+  need.forEach((k, i) => {
+    const x = rtlx(i, cw3, 0.18);
+    s.addShape(p.ShapeType.roundRect, { x, y: 5.72, w: cw3, h: 0.92, rectRadius: 0.04,
+      fill: { color: T_OR }, line: { color: ORANGE, width: 1 } });
+    s.addText(k[0], { x: x + 0.1, y: 5.84, w: cw3 - 0.2, h: 0.3, fontFace: F,
+      fontSize: 13, bold: true, color: ORANGE, align: "center", margin: 0 });
+    s.addText(k[1], { x: x + 0.1, y: 6.16, w: cw3 - 0.2, h: 0.4, fontFace: F,
+      fontSize: 10.5, color: INK, align: "center", margin: 0 });
+  });
 }
 
 /* ═══ ١١ · المعيصم ═══ */
@@ -598,7 +806,7 @@ divider("القسم الثالث", "تقسيم المحطات", "نوع المو
 
 /* ═══ ١٣ · الشرائح ═══ */
 {
-  const s = page("خمس شرائح", "التصنيف من سلوك العميل: حصة الديزل ثم الدفع المؤسسي ثم الإنتاجية");
+  const s = page("خمس شرائح", "التصنيف من سلوك العميل: حصة الديزل ثم تطبيقات الأسطول ثم الإنتاجية");
   const rows = SEG.map((g, i) => ({
     c: [{ t: g.seg, b: true, a: "right", c: BGRAY }, { t: g.en, fs: 9.5, c: INK3 },
         g.rule, ar(g.n), ar1(g.mlpa), pc0(g.mlpa / T.mlpa), ar1(g.lpv),
@@ -1147,7 +1355,7 @@ divider("القسم السادس", "التنفيذ", "ثلاث موجات وبو
                 ["فجوة المشتريات والمبيعات", "±١٪ لكل محطة", "بوابة"],
                 ["الحافز ÷ الهامش الإضافي", "١٥٪ فأقل", "ضابط"],
                 ["إشغال الوحدات بالفئة", "مشغّلة · تحت تنفيذ · امتياز", "نمو"],
-                ["حصة الأساطيل الرقمية", "من ١٫٩٪ صعوداً", "نمو"],
+                ["حصة تطبيقات الأسطول", "من ٣٫٠٪ صعوداً", "نمو"],
                 ["تغطية الخزان", "أيام — تنبيه دون ٤", "مخاطر"]];
   const cw = (CW - 3 * 0.18) / 4;
   kpis.forEach((k, i) => {
@@ -1184,7 +1392,7 @@ divider("القسم السادس", "التنفيذ", "ثلاث موجات وبو
 
 /* ═══ ٢٩ · الختام ═══ */
 cover("الإدارة التجارية · درب", "القرار المطلوب",
-  "اعتماد المستهدف برافعتين · إقفال ثغرة البيانات قبل الإنفاق · مسح المنافسين في المنتجات الثلاثة المجهولة",
+  "اعتماد المستهدف برافعتين · إقفال ثغرة البيانات قبل الإنفاق · تسعير المنتجات الثلاثة غير المسعَّرة",
   "الفرصة المؤكَّدة " + ar(Math.round(T.sar)) + " ريال سنوياً — " +
   ar(Math.round(T.gap_peak)) + " معاملة و" + ar(Math.round(T.upl_fill)) + " لتراً يومياً");
 
