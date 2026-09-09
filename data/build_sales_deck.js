@@ -714,6 +714,63 @@ divider("القسم الثاني", "المنافسون", "خمسة منتجات 
     + " — الفارق ليس سوقاً بل غياب مالكٍ للبيع · وهذا ما تعالجه الباقات لا خفض الإيجار", BAD);
 }
 
+/* ═══ اكتتاب الوحدة ═══ */
+{
+  const UW = X.underwrite;
+  const s = page("ورقة اكتتاب الوحدة — الإيجار من دفتر المستأجر",
+                 "الوحدة وصولٌ إلى تيّار حركة · وقيمتها ما يحوّله المستأجر منه");
+  head(s, 1.3, "① أربعة مُدخَلات لدفتره — واثنان عندنا");
+  const iw = (CW - 3 * 0.16) / 4;
+  UW.inputs.forEach((k, i) => {
+    const x = rtlx(i, iw, 0.16), have = k[2];
+    s.addShape(p.ShapeType.roundRect, { x, y: 1.64, w: iw, h: 1.06, rectRadius: 0.05,
+      fill: { color: have ? T_GOOD : T_BAD }, line: { color: have ? GOOD : BAD, width: 1.2 } });
+    s.addText(have ? "✓ عندنا" : "✕ ينقصنا", { x: x + 0.1, y: 1.72, w: iw - 0.2, h: 0.24,
+      fontFace: F, fontSize: 9.5, bold: true, color: have ? D_GOOD : D_BAD,
+      align: "center", margin: 0 });
+    s.addText(k[0], { x: x + 0.1, y: 1.98, w: iw - 0.2, h: 0.3, fontFace: F,
+      fontSize: 12, bold: true, color: BGRAY, align: "center", margin: 0 });
+    s.addText(k[1], { x: x + 0.1, y: 2.3, w: iw - 0.2, h: 0.34, fontFace: F,
+      fontSize: 9.5, color: INK2, align: "center", margin: 0 });
+  });
+  s.addText("② والمُدخَل الأول وحده يفرز الشغور — " + ar(UW.n) + " محطة · المدى "
+    + ar(Math.round(UW.spread)) + " ضعفاً",
+    { x: M, y: 2.84, w: CW, h: 0.3, fontFace: F, fontSize: 13.5, bold: true,
+      color: ORANGE, ...rtl });
+  const mk = r => ({ c: [{ t: r.name.slice(0, 18), a: "right", b: true }, r.code, r.cat,
+                         ar(r.units), ar(r.vacant), ar(Math.round(r.vpd)),
+                         { t: ar(Math.round(r.per)), b: true,
+                           c: r.per >= UW.median ? D_GOOD : D_BAD },
+                         { t: r.per >= UW.median ? "الحركة موجودة — سعّرها منها"
+                                                 : "لا يُصلحها خفض إيجار", a: "right",
+                           c: r.per >= UW.median ? D_GOOD : D_BAD }] });
+  const rows = UW.top.slice(0, 4).map((r, i) => ({ ...mk(r), fill: T_GOOD }))
+    .concat(UW.bottom.map(r => ({ ...mk(r), fill: T_BAD })));
+  table(s, M, 3.18, CW, [
+    { t: "المحطة", w: 18, a: "right" }, { t: "الكود", w: 8 }, { t: "الفئة", w: 11 },
+    { t: "وحداتها", w: 9 }, { t: "الشاغرة", w: 9 }, { t: "زيارة/يوم", w: 10 },
+    { t: "لكل وحدة شاغرة", w: 12 }, { t: "القراءة", w: 23, a: "right" }],
+    rows, { rh: 0.32, fs: 10.5, hfs: 9.5 });
+
+  const cw2 = (CW - 0.24) / 2;
+  const bx = [rtlx(0, cw2, 0.24), rtlx(1, cw2, 0.24)];
+  s.addShape(p.ShapeType.roundRect, { x: bx[0], y: 6.12, w: cw2, h: 0.76, rectRadius: 0.05,
+    fill: { color: T_BAD }, line: { color: BAD, width: 1.2 } });
+  s.addText("طريق السيل ١٤ وحدة على " + ar(Math.round(UW.bottom.find(r => r.code === "MK054")
+      ? UW.bottom.find(r => r.code === "MK054").vpd : 0))
+    + " زيارة — عرضٌ يفوق حركته. هذه ليست مشكلة تأجير بل مشكلة تحجيم.",
+    { x: bx[0] + 0.16, y: 6.2, w: cw2 - 0.32, h: 0.62, fontFace: F, fontSize: 10.5,
+      color: INK, ...rtl });
+  s.addShape(p.ShapeType.roundRect, { x: bx[1], y: 6.12, w: cw2, h: 0.76, rectRadius: 0.05,
+    fill: { color: T_OR }, line: { color: ORANGE, width: 1.2 } });
+  s.addText("والتغطية " + pc0(UW.measured_share) + " فقط: " + ar(UW.measured) + " من "
+    + ar(UW.total_vacant) + " وحدة شاغرة نملك مُدخَلها الأول · "
+    + ar(UW.coverage[1].vacant) + " تحت التنفيذ تُكتتب بمحطة نظيرة، و"
+    + ar(UW.coverage[2].vacant) + " امتياز تحتاج طلب بيانات.",
+    { x: bx[1] + 0.16, y: 6.2, w: cw2 - 0.32, h: 0.62, fontFace: F, fontSize: 10.5,
+      color: INK, ...rtl });
+}
+
 /* ═══ عمق ④⑤ · منتجان لم يبدآ ═══ */
 {
   const s = page("الإكسسوارات والمساحات — منتجان بلا خط أساس",

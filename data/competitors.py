@@ -14,6 +14,7 @@ import csv, json, re, math, collections, statistics as stx
 
 FIVE = "data/five.json"
 UNITS = "outlets/data/units-registry.csv"
+SALES = "outlets/data/network-sales.csv"
 COMPLAINTS = "outlets/data/complaints.csv"
 DASH = "data/network-payments.json"
 OUT = "data/competitors.json"
@@ -209,6 +210,56 @@ def property_():
                 best=types[0])
 
 
+def underwrite():
+    """ورقة اكتتاب الوحدة: الإيجار يُسعَّر من دفتر المستأجر لا من متر المربّع
+
+       الوحدة على الساحة وصولٌ إلى تيّار حركة، وقيمتها ما يحوّله المستأجر منه.
+       أول مُدخَل في دفتره هو الحركة المارّة بوحدته — وهو المُدخَل الوحيد الذي
+       نملكه اليوم. البقية (التحويل · السلة · الهامش) يأتي بها المستأجر أو
+       مسحٌ لم يُجرَ بعد، فلا تُقدَّر هنا."""
+    U = list(csv.DictReader(open(UNITS, encoding="utf-8")))
+    S = {r["code"]: r for r in csv.DictReader(open(SALES, encoding="utf-8"))
+         if r["vol_ok"] == "1"}
+    rows = []
+    for r in U:
+        c, vac = r["code"], _i(r, "total_vacant")
+        if not vac or c not in S:
+            continue
+        s = S[c]
+        vpd = float(s["visits"]) / float(s["days"] or 1)
+        rows.append(dict(code=c, name=r["name"], cat=r["category"], vacant=vac,
+                         units=_i(r, "total_n"), vpd=vpd, per=vpd / vac,
+                         shop=_i(r, "shop_vacant"), wash=_i(r, "carwash_vacant"),
+                         kiosk=_i(r, "kiosk_vacant")))
+    rows.sort(key=lambda x: -x["per"])
+    med = stx.median([x["per"] for x in rows]) if rows else 0
+
+    # التغطية: أي شغور نملك مُدخَله الأول أصلاً؟
+    cov = []
+    for cat in ("مشغّلة", "تحت التنفيذ", "امتياز"):
+        g = [r for r in U if r["category"] == cat]
+        v = sum(_i(r, "total_vacant") for r in g)
+        vm = sum(_i(r, "total_vacant") for r in g if r["code"] in S)
+        cov.append(dict(cat=cat, vacant=v, measured=vm, share=vm / v if v else 0,
+                        why=("الحركة مقيسة — تُكتتب اليوم" if cat == "مشغّلة" else
+                             "المحطة لم تُفتح — تُكتتب بمحطة نظيرة" if cat == "تحت التنفيذ" else
+                             "المحطة تعمل ولا تصلنا معاملاتها — طلب بيانات")))
+    total_v = sum(c["vacant"] for c in cov)
+    return dict(rows=rows, n=len(rows), median=med,
+                ready=[x for x in rows if x["per"] >= med],
+                thin=[x for x in rows if x["per"] < med],
+                top=rows[:6], bottom=rows[-4:],
+                spread=rows[0]["per"] / rows[-1]["per"] if len(rows) > 1 else 0,
+                coverage=cov, total_vacant=total_v,
+                measured=sum(c["measured"] for c in cov),
+                measured_share=sum(c["measured"] for c in cov) / total_v if total_v else 0,
+                # المُدخَلات الأربعة لدفتر المستأجر — وأيّها عندنا
+                inputs=[("الحركة المارّة بالوحدة", "زيارة/يوم لكل محطة", True),
+                        ("ساعات الذروة", "منحنى ٢٤ ساعة لكل محطة", True),
+                        ("تحويل الشكل من التيّار", "لكل صيغة — مطعم · مقهى · مغسلة", False),
+                        ("سلة المستأجر وهامشه", "مبيعات المستأجرين شهرياً", False)])
+
+
 def newcomers(P, visits_month):
     """④ الإكسسوارات و⑤ المساحات: منتجان لم يبدآ — فالسؤال من يشغل مكانهما اليوم
 
@@ -237,7 +288,7 @@ def build():
     visits = sum(v["vis"] for v in D["network"].values())
     P = property_()
     out = dict(retail=retail(), corporate=corporate(), property=P,
-               newcomers=newcomers(P, visits / 7),
+               underwrite=underwrite(), newcomers=newcomers(P, visits / 7),
                months=7, visits=visits, visits_month=visits / 7)
     json.dump(out, open(OUT, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     return out
@@ -245,7 +296,7 @@ def build():
 
 if __name__ == "__main__":
     d = build()
-    R, C, P = d["retail"], d["corporate"], d["property"]
+    R, C, P, U = d["retail"], d["corporate"], d["property"], d["underwrite"]
     print(f"① الأفراد: {R['n_sample']} منافساً في العيّنة من {R['n_total']} داخل ٥ كم · "
           f"تقييمهم {R['rate_mean']:.2f}★ ونحن {R['ours_mean']:.2f}★ (فارق {R['gap_mean']:+.2f})")
     for b in R["brands"]:
@@ -265,3 +316,13 @@ if __name__ == "__main__":
         print(f"   {t['ar']:<8}{t['n']:>6,}  إشغال {t['occ']:>6.1%}  شاغر {t['vacant']:>5,}")
     for c in P["cats"]:
         print(f"   {c['cat']:<14}{c['n']:>6,}  إشغال {c['occ']:>6.1%}  شاغر {c['vacant']:>5,}")
+    print(f"\n④ اكتتاب الوحدات: {U['n']} محطة قابلة للحساب · وسيط {U['median']:,.0f} زيارة/يوم لكل وحدة شاغرة")
+    print(f"   المدى {U['spread']:.0f}× — من {U['top'][0]['per']:,.0f} إلى {U['bottom'][-1]['per']:,.0f}")
+    for x in U["top"][:4]:
+        print(f"   {x['code']:<7}{x['name'][:20]:<22}شاغرة {x['vacant']:>3} · {x['per']:>6,.0f} زيارة/يوم لكل وحدة")
+    print("   ...")
+    for x in U["bottom"]:
+        print(f"   {x['code']:<7}{x['name'][:20]:<22}شاغرة {x['vacant']:>3} · {x['per']:>6,.0f} زيارة/يوم لكل وحدة")
+    print(f"   التغطية: {U['measured']:,} من {U['total_vacant']:,} وحدة شاغرة نملك مُدخَلها الأول ({U['measured_share']:.0%})")
+    for c in U["coverage"]:
+        print(f"     {c['cat']:<14}{c['measured']:>4} من {c['vacant']:>5} — {c['why']}")
