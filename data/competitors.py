@@ -18,7 +18,15 @@ SALES = "outlets/data/network-sales.csv"
 COMPLAINTS = "outlets/data/complaints.csv"
 DASH = "data/network-payments.json"
 OUT = "data/competitors.json"
+PLAN = "data/sales-plan.json"              # مخرجات نموذج الخطة
 DIESEL_PRICE = 1.796      # سعر مضخة الديزل — لاشتقاق اللترات حين تكون الكمية ناقصة
+
+# من يخدمه كل تصنيف — بلغة الشركة نفسها
+SGWHO = {"حيوية": "أفراد المدينة · تردد عالٍ وسلة صغيرة",
+         "خط سفر": "شاحنات ومسافرون · تعبئة كاملة وسلة كبيرة",
+         "حي": "سكّان الحي · النمو بالتردد لا بالسلة",
+         "مختلط": "سكّان وعابرون — طلبان في موقع واحد",
+         "نائية": "طلب محدود · الأولوية ضبط التكلفة"}
 
 # تصنيف بالدليل لا بالاسم: ما فاتورته بحجم النقدي ليس أسطولاً مهما سُمّي.
 #   سيارة ١٤٩ وبترو ١٧٢ ريالاً — ثلاثة أضعاف فاتورة الشبكة، فهي تعبئة أسطول.
@@ -283,12 +291,58 @@ def newcomers(P, visits_month):
     ]
 
 
+# ═══════════════════════════════════════════════ استهداف كل منفذ
+def targeting():
+    """من يستهدفه كل منفذ — مقيس من مزيج الوقود والسلة والذروة وحصة المساء
+
+       والمسح التنافسي الميداني يغطّي خمسة منافذ فقط؛ لا يُملأ الباقي بتقدير."""
+    P = json.load(open(PLAN, encoding="utf-8"))
+    F = {f["code"]: f for f in P.get("five", [])}
+    SG = {g["seg"]: g for g in P["segments"]}
+    ST = sorted(P["stations"], key=lambda x: -x["sar_total"])
+
+    def who(x):
+        w = ["شاحنات وأساطيل" if x["diesel"] >= 0.30 else
+             "سكّان وعابرون" if x["diesel"] >= 0.10 else "أفراد المدينة"]
+        if x["fleet"] >= 0.02: w.append("حسابات أسطول رقمية")
+        if x["night"] >= 0.55: w.append("طلب مسائي غالب")
+        return " · ".join(w)
+
+    profiles = []
+    for seg in SG:
+        g = [x for x in ST if x["seg"] == seg]
+        if not g:
+            continue
+        profiles.append(dict(
+            cls=seg, n=len(g), mlpa=sum(x["mlpa"] for x in g),
+            diesel=stx.median([x["diesel"] for x in g]),
+            lpv=stx.median([x["lpv"] for x in g]),
+            vpd=stx.median([x["vpd"] for x in g]),
+            peak=int(stx.median([x["peak"] for x in g])),
+            night=stx.median([x["night"] for x in g]),
+            who=SGWHO.get(seg, "")))
+    profiles.sort(key=lambda g: -g["mlpa"])
+
+    top = [dict(code=x["code"], name=x["name"], cls=x["seg"], who=who(x),
+                peak=x["peak"], sar=round(x["sar_total"]),
+                scanned=x["code"] in F,
+                comp_n=F[x["code"]]["n"] if x["code"] in F else 0)
+           for x in ST[:5]]
+    mism = [x for x in ST if (x["diesel"] >= 0.30 and x["seg"] != "خط سفر")
+            or (x["diesel"] < 0.10 and x["seg"] == "خط سفر")]
+    return dict(n=len(ST), profiles=profiles, top=top,
+                scanned=len(F), mismatch=len(mism),
+                mismatches=[dict(code=x["code"], name=x["name"], cls=x["seg"],
+                                 diesel=x["diesel"], lpv=x["lpv"]) for x in mism])
+
+
 def build():
     D = json.load(open(DASH, encoding="utf-8"))
     visits = sum(v["vis"] for v in D["network"].values())
     P = property_()
     out = dict(retail=retail(), corporate=corporate(), property=P,
-               underwrite=underwrite(), newcomers=newcomers(P, visits / 7),
+               underwrite=underwrite(), targeting=targeting(),
+               newcomers=newcomers(P, visits / 7),
                months=7, visits=visits, visits_month=visits / 7)
     json.dump(out, open(OUT, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     return out
