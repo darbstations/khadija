@@ -1,74 +1,66 @@
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 
-wb = openpyxl.Workbook(); ws = wb.active; ws.title = "توقعات المدفوعات"
-ws.sheet_view.rightToLeft = True; ws.sheet_view.showGridLines = False
-
-ORANGE="E07C16"; ORANGE_L="FCE9D2"; INK="26262A"; GREY="6D6E70"; YELLOW="FFF4CC"; GREENL="E4F2E7"; HEAD="F3EFEA"; WHITE="FFFFFF"
-thin=Side(style="thin",color="D9D7D3"); border=Border(left=thin,right=thin,top=thin,bottom=thin)
-def c(r,col,v=None,bold=False,size=11,color=INK,fill=None,align="right",fmt=None,bd=True,wrap=False):
-    cc=ws.cell(row=r,column=col,value=v); cc.font=Font(name="Arial",bold=bold,size=size,color=color)
-    cc.alignment=Alignment(horizontal=align,vertical="center",wrap_text=wrap)
-    if fill: cc.fill=PatternFill("solid",fgColor=fill)
-    if fmt: cc.number_format=fmt
-    if bd: cc.border=border
+wb=openpyxl.Workbook(); ws=wb.active; ws.title="توقعات المدفوعات"
+ws.sheet_view.rightToLeft=True; ws.sheet_view.showGridLines=False
+ORANGE="E07C16";ORANGE_L="FCE9D2";INK="26262A";GREY="6D6E70";YELLOW="FFF4CC";GREENL="E4F2E7";HEAD="F3EFEA";WHITE="FFFFFF";BLUEL="E7F0FA"
+thin=Side(style="thin",color="D9D7D3");border=Border(left=thin,right=thin,top=thin,bottom=thin)
+def c(r,col,v=None,bold=False,size=11,color=INK,fill=None,align="right",fmt=None,bd=True):
+    cc=ws.cell(row=r,column=col,value=v);cc.font=Font(name="Arial",bold=bold,size=size,color=color)
+    cc.alignment=Alignment(horizontal=align,vertical="center")
+    if fill:cc.fill=PatternFill("solid",fgColor=fill)
+    if fmt:cc.number_format=fmt
+    if bd:cc.border=border
     return cc
-for col,w in {"A":3,"B":34,"C":18,"D":16,"E":3}.items(): ws.column_dimensions[col].width=w
-SAR='#,##0 "﷼"'; NUM='#,##0'; PCT='0%'
+for col,w in {"A":3,"B":34,"C":16,"D":16,"E":16,"F":16}.items(): ws.column_dimensions[col].width=w
+SAR='#,##0 "﷼"';NUM='#,##0';PCT='0%'
 
-ws.merge_cells("B2:D2"); c(2,2,"درب — توقعات المبيعات وعدد العمليات (لبوابة الدفع)",bold=True,size=15,color=ORANGE,align="right",bd=False)
-ws.merge_cells("B3:D3"); c(3,2,"أرقام توقعية · عدّل الأصفر فقط",size=10,color=GREY,align="right",bd=False)
+ws.merge_cells("B2:F2");c(2,2,"درب — توقعات مبيعات التطبيق على كل المحطات (لبوابة الدفع)",bold=True,size=15,color=ORANGE,align="right",bd=False)
+ws.merge_cells("B3:F3");c(3,2,"أرقام توقعية · عدّل الأصفر فقط",size=10,color=GREY,align="right",bd=False)
 
-# INPUTS
-c(5,2,"① المدخلات (توقعاتك)",bold=True,size=12,color=WHITE,fill=ORANGE,bd=False); ws.merge_cells("B5:D5")
-rows=[("عدد العملاء النشطين المتوقع (السنة 1)",60000,NUM),
-      ("عدد عمليات الشحن للعميل / شهر",2,NUM),
-      ("متوسط مبلغ الشحنة الواحدة (﷼)",200,SAR),
-      ("حصة مدى من إجمالي القيمة",0.75,PCT),
-      ("متوسط قيمة عملية مدى (﷼)",180,SAR),
-      ("متوسط قيمة عملية فيزا (﷼)",260,SAR)]
+# ① ثوابت
+c(5,2,"① الثوابت",bold=True,size=12,color=WHITE,fill=ORANGE,bd=False);ws.merge_cells("B5:F5")
+rows=[("متوسط مبيعات المحطة / شهر (وقود+خدمات) ﷼",200000,SAR),
+      ("حصة مدى من القيمة",0.75,PCT),
+      ("متوسط قيمة عملية مدى (﷼)",120,SAR),
+      ("متوسط قيمة عملية فيزا (﷼)",180,SAR)]
 r0=6
 for i,(lab,val,fmt) in enumerate(rows):
-    r=r0+i
-    c(r,2,lab,size=11); c(r,3,val,fill=YELLOW,align="center",fmt=fmt); ws.merge_cells(start_row=r,start_column=3,end_row=r,end_column=4)
-USERS=f"C{r0}"; TPM=f"C{r0+1}"; AVG=f"C{r0+2}"; MADA=f"C{r0+3}"; TKM=f"C{r0+4}"; TKV=f"C{r0+5}"
-c(r0+6,2,"حصة فيزا (تُحسب تلقائياً)",size=10,color=GREY); c(r0+6,3,f"=1-{MADA}",align="center",fmt=PCT,fill=WHITE); ws.merge_cells(start_row=r0+6,start_column=3,end_row=r0+6,end_column=4)
+    r=r0+i;c(r,2,lab,size=11);c(r,3,val,fill=YELLOW,align="center",fmt=fmt);ws.merge_cells(start_row=r,start_column=3,end_row=r,end_column=6)
+MON=f"C{r0}";MADA=f"C{r0+1}";TKM=f"C{r0+2}";TKV=f"C{r0+3}"
 
-# TOTAL SALES
-rt=r0+8
-c(rt,2,"② إجمالي المبيعات السنوية المتوقعة",bold=True,size=12,color=WHITE,fill=ORANGE,bd=False); ws.merge_cells(start_row=rt,start_column=2,end_row=rt,end_column=4)
-TOTAL=f"C{rt+1}"
-c(rt+1,2,"إجمالي الشحن السنوي (﷼)",bold=True,fill=ORANGE_L)
-c(rt+1,3,f"={USERS}*{TPM}*12*{AVG}",bold=True,align="center",fmt=SAR,fill=ORANGE_L); ws.merge_cells(start_row=rt+1,start_column=3,end_row=rt+1,end_column=4)
+# ② سيناريوهات النمو
+gt=r0+5
+c(gt,2,"② سيناريوهات النمو (3 سنوات)",bold=True,size=12,color=WHITE,fill=ORANGE,bd=False);ws.merge_cells(start_row=gt,start_column=2,end_row=gt,end_column=6)
+c(gt+1,2,"البند",bold=True,fill=HEAD,align="center")
+c(gt+1,4,"السنة 1",bold=True,fill=HEAD,align="center");c(gt+1,5,"السنة 2",bold=True,fill=HEAD,align="center");c(gt+1,6,"السنة 3",bold=True,fill=HEAD,align="center")
+ws.merge_cells(start_row=gt+1,start_column=2,end_row=gt+1,end_column=3)
+# editable rows: stations, penetration
+def yrow(r,label,vals,fmt,fill=YELLOW,bold=False,bd=True):
+    c(r,2,label,size=11,bold=bold);ws.merge_cells(start_row=r,start_column=2,end_row=r,end_column=3)
+    for j,v in enumerate(vals): c(r,4+j,v,fill=fill,align="center",fmt=fmt,bold=bold,bd=bd)
+yrow(gt+2,"عدد المحطات",[173,200,230],NUM)
+yrow(gt+3,"نسبة المبيعات عبر التطبيق",[0.40,0.55,0.70],PCT)
+ST=gt+2; PEN=gt+3
+# computed
+def crow(r,label,f_by_col,fmt,fill):
+    c(r,2,label,size=11,bold=True,fill=fill);ws.merge_cells(start_row=r,start_column=2,end_row=r,end_column=3)
+    for j,col in enumerate(("D","E","F")): c(r,4+j,f_by_col(col),align="center",fmt=fmt,fill=fill,bold=True)
+crow(gt+4,"مبيعات المحطات السنوية (﷼)", lambda col:f"={col}{ST}*{MON}*12", SAR, HEAD)
+APPr=gt+5
+crow(APPr,"مبيعات التطبيق السنوية (﷼)", lambda col:f"={col}{ST}*{MON}*12*{col}{PEN}", SAR, ORANGE_L)
+crow(gt+6,"— منها مدى (﷼)", lambda col:f"={col}{APPr}*{MADA}", SAR, GREENL)
+crow(gt+7,"— منها فيزا (﷼)", lambda col:f"={col}{APPr}*(1-{MADA})", SAR, GREENL)
+crow(gt+8,"عدد عمليات مدى", lambda col:f"=({col}{APPr}*{MADA})/{TKM}", NUM, BLUEL)
+crow(gt+9,"عدد عمليات فيزا", lambda col:f"=({col}{APPr}*(1-{MADA}))/{TKV}", NUM, BLUEL)
+crow(gt+10,"إجمالي العمليات", lambda col:f"={col}{gt+8}+{col}{gt+9}", NUM, BLUEL)
 
-# OUTPUTS the bank asked
-ro=rt+3
-c(ro,2,"③ الأرقام المطلوبة للبنك",bold=True,size=12,color=WHITE,fill=ORANGE,bd=False); ws.merge_cells(start_row=ro,start_column=2,end_row=ro,end_column=4)
-c(ro+1,2,"البند",bold=True,fill=HEAD,align="center"); c(ro+1,3,"مدى",bold=True,fill=HEAD,align="center"); c(ro+1,4,"فيزا",bold=True,fill=HEAD,align="center")
-# sales
-c(ro+2,2,"المبيعات السنوية (﷼)",bold=True,fill=GREENL)
-c(ro+2,3,f"={TOTAL}*{MADA}",align="center",fmt=SAR,fill=GREENL,bold=True)
-c(ro+2,4,f"={TOTAL}*(1-{MADA})",align="center",fmt=SAR,fill=GREENL,bold=True)
-# transactions
-c(ro+3,2,"عدد العمليات السنوية",bold=True,fill=GREENL)
-c(ro+3,3,f"=({TOTAL}*{MADA})/{TKM}",align="center",fmt=NUM,fill=GREENL,bold=True)
-c(ro+3,4,f"=({TOTAL}*(1-{MADA}))/{TKV}",align="center",fmt=NUM,fill=GREENL,bold=True)
-# totals col
-c(ro+1,5,"",bd=False)
-cE=5
-ws.column_dimensions["E"].width=16
-c(ro+1,5,"الإجمالي",bold=True,fill=HEAD,align="center")
-c(ro+2,5,f"={TOTAL}",align="center",fmt=SAR,fill=GREENL,bold=True)
-c(ro+3,5,f"=C{ro+3}+D{ro+3}",align="center",fmt=NUM,fill=GREENL,bold=True)
-
-c(ro+5,2,"ملاحظة: مدى أرخص رسوماً (شحن المحفظة ~1.5 ﷼ ثابت)؛ وجّه الشحن لمدى. الأرقام توقعية تُضبط بحجمك الفعلي.",size=9,color=GREY,align="right",bd=False)
-ws.merge_cells(start_row=ro+5,start_column=2,end_row=ro+5,end_column=5)
+c(gt+12,2,"الأصفر = مُدخلات تعدّلينها (محطات + نسبة اعتماد لكل سنة). الباقي يُحسب تلقائياً. مدى أرخص رسوماً — وجّه الدفع لمدى.",size=9,color=GREY,align="right",bd=False)
+ws.merge_cells(start_row=gt+12,start_column=2,end_row=gt+12,end_column=6)
 
 path="/tmp/claude-0/-home-user-khadija/05ed6524-f029-51fd-96d9-884d1c665dcf/scratchpad/payments_forecast.xlsx"
 wb.save(path)
-# echo computed example
-users=100000; tpm=2; avg=200; mada=0.75; tkm=180; tkv=260
-total=users*tpm*12*avg
-print("example: total", f"{total:,.0f}", "| mada sales", f"{total*mada:,.0f}", "visa sales", f"{total*(1-mada):,.0f}")
-print("mada txns", f"{total*mada/tkm:,.0f}", "visa txns", f"{total*(1-mada)/tkv:,.0f}", "total txns", f"{total*mada/tkm+total*(1-mada)/tkv:,.0f}")
-print("saved", path)
+for y,(st,pen) in enumerate([(173,.40),(200,.55),(230,.70)],1):
+    tot=st*200000*12;app=tot*pen
+    print(f"Y{y}: app {app:,.0f} | mada {app*.75:,.0f} visa {app*.25:,.0f} | txns {app*.75/120+app*.25/180:,.0f}")
+print("saved",path)
