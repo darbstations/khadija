@@ -39,7 +39,7 @@ ws.merge_cells(start_row=gt+1,start_column=2,end_row=gt+1,end_column=3)
 def yrow(r,label,vals,fmt,fill=YELLOW,bold=False,bd=True):
     c(r,2,label,size=11,bold=bold);ws.merge_cells(start_row=r,start_column=2,end_row=r,end_column=3)
     for j,v in enumerate(vals): c(r,4+j,v,fill=fill,align="center",fmt=fmt,bold=bold,bd=bd)
-yrow(gt+2,"عدد المحطات",[173,200,230],NUM)
+yrow(gt+2,"عدد المحطات",[200,350,500],NUM)
 yrow(gt+3,"نسبة المبيعات عبر التطبيق",[0.40,0.55,0.70],PCT)
 ST=gt+2; PEN=gt+3
 # computed
@@ -60,7 +60,7 @@ ws.merge_cells(start_row=gt+12,start_column=2,end_row=gt+12,end_column=6)
 
 path="/tmp/claude-0/-home-user-khadija/05ed6524-f029-51fd-96d9-884d1c665dcf/scratchpad/payments_forecast.xlsx"
 wb.save(path)
-for y,(st,pen) in enumerate([(173,.40),(200,.55),(230,.70)],1):
+for y,(st,pen) in enumerate([(200,.40),(350,.55),(500,.70)],1):
     tot=st*200000*12;app=tot*pen
     print(f"Y{y}: app {app:,.0f} | mada {app*.75:,.0f} visa {app*.25:,.0f} | txns {app*.75/120+app*.25/180:,.0f}")
 print("saved",path)
