@@ -31,7 +31,13 @@ OUT = "data/sales-plan.json"
 #    الأجر ٣٬٥٠٠ ريالاً «للربع» (١٬١٦٧ شهرياً للعامل) وهو أجرٌ شهري طُبِّق مرة
 #    بدل ثلاث. فالقائمة المالية هي المرجع، والتقرير يبقى صالحاً للمقارنة
 #    النسبية بين المحطات لا لمستوى الكلفة المطلق.
-MARGIN = 0.1144          # هامش مساهمة الوقود — ريال لكل لتر
+MARGIN = 0.1144          # هامش مساهمة الوقود — ريال لكل لتر · مرجَّحاً بمزيج الشبكة
+# ── والهامش ليس واحداً على المنتجات: انحدار هامش ١٩ محطة (من تقرير المالية)
+#    على حصة ديزلها يعطي ١٢٫٦٦ هللة عند ديزل صفر و٤٫٤٧ عند ديزل كامل · R²=٠٫٥٦
+#    ويسنده هيكل عمولتنا نفسه: ٣ هللات للتر البنزين و١٫٥ للديزل — نسبة ٢:١
+#    تحذير: أقصى حصة ديزل مرصودة ٤٣٪، فرقم الديزل استقراءٌ خارج المدى لا قياس.
+MARGIN_PETROL = 0.1266   # هامش لتر البنزين
+MARGIN_DIESEL = 0.0447   # هامش لتر الديزل — ثلث البنزين تقريباً
 OPEX_NET = 0.0915        # مصاريف تشغيل المحطات — ريال لكل لتر
 OPEX_OP = 0.0915         # الأساس نفسه: محطاتنا دون الامتياز
 LOADED = 0.0441          # محمّلات المركز — بيع وتسويق وإدارية وفوائد
@@ -179,6 +185,11 @@ def load():
     return rows
 
 
+def blend(diesel):
+    """هامش اللتر بمزيج المحطة نفسها — لا بمزيج الشبكة"""
+    return MARGIN_PETROL * (1 - diesel) + MARGIN_DIESEL * diesel
+
+
 def segment(r):
     """تصنيف الشركة أولاً؛ وما لم تصنّفه يُشتقّ بالقاعدة التي تُعيد إنتاج تصنيفها
 
@@ -216,7 +227,7 @@ def lever_fill(G):
             r["gap_fill"] = max(ref - r["resid"], 0)
             r["tgt_lpv"] = r["lpv"] + r["gap_fill"] * CLOSE
             r["upl_fill"] = r["gap_fill"] * CLOSE * r["vpd"]
-            r["sar_fill"] = r["upl_fill"] * 365 * MARGIN
+            r["sar_fill"] = r["upl_fill"] * 365 * blend(r["diesel"])
 
 
 def lever_txn(G):
@@ -235,7 +246,7 @@ def lever_txn(G):
             r["ref_hours"] = ref
             r["gap_peak"] = peak * r["vpd"]        # معاملة/يوم — قابل للدفاع
             r["gap_quiet"] = quiet * r["vpd"]      # معاملة/يوم — يحتاج إثباتاً
-            r["sar_txn"] = r["gap_peak"] * r["lpv"] * 365 * MARGIN
+            r["sar_txn"] = r["gap_peak"] * r["lpv"] * 365 * blend(r["diesel"])
             r["sar_total"] = r["sar_fill"] + r["sar_txn"]
 
 
@@ -399,10 +410,11 @@ def litre_economics():
     out = []
     for k, pr in PRICE.items():
         L = THRESHOLD / pr
-        out.append(dict(fuel=k, price=pr, net_price=pr / VAT, litres=L,
-                        margin=L * MARGIN, opex=L * OPEX_NET,
-                        net=L * MARGIN, after=L * MARGIN - BOX, box=BOX,
-                        net_station=L * (MARGIN - OPEX_NET), w=MIX[k]))
+        m = MARGIN_DIESEL if k == "ديزل" else MARGIN_PETROL
+        out.append(dict(fuel=k, price=pr, net_price=pr / VAT, litres=L, cpl=m * 100,
+                        margin=L * m, opex=L * OPEX_NET,
+                        net=L * m, after=L * m - BOX, box=BOX,
+                        net_station=L * (m - OPEX_NET), w=MIX[k]))
     wl = sum(o["litres"] * o["w"] for o in out) / sum(o["w"] for o in out)
     wn = sum(o["net"] * o["w"] for o in out) / sum(o["w"] for o in out)
     ws_ = sum(o["net_station"] * o["w"] for o in out) / sum(o["w"] for o in out)
@@ -410,8 +422,10 @@ def litre_economics():
                 cpl_opex_op=OPEX_OP * 100, cpl_net=(MARGIN - OPEX_NET) * 100,
                 cpl_loaded=LOADED * 100, cpl_company=(MARGIN - OPEX_NET - LOADED + RENT_CM) * 100,
                 box=BOX, threshold=THRESHOLD, w_litres=wl, w_net=wn, w_net_station=ws_,
-                breakeven_extra=BOX / MARGIN,
-                breakeven_sar=BOX / (MARGIN / 2.200))
+                cpl_petrol=MARGIN_PETROL * 100, cpl_diesel=MARGIN_DIESEL * 100,
+                breakeven_extra=BOX / MARGIN_PETROL,
+                breakeven_sar=BOX / (MARGIN_PETROL / 2.200),
+                breakeven_diesel=BOX / MARGIN_DIESEL)
 
 
 def build():
@@ -441,7 +455,7 @@ def build():
             below=sum(1 for x in g if x["gap_fill"] > 0.5),
             upl_fill=sum(x["upl_fill"] for x in g), gap_peak=sum(x["gap_peak"] for x in g),
             sar_fill=sum(x["sar_fill"] for x in g), sar_txn=sum(x["sar_txn"] for x in g),
-            net_txn=(vol / vis) * MARGIN,        # مساهمة المعاملة الإضافية
+            net_txn=(vol / vis) * blend(sum(x["vol"] * x["diesel"] for x in g) / vol),
             driver=PLAY[s][0], action=PLAY[s][1]))
 
     # ملاحظة: تعريف الوردية صار من تقرير العمّال (٠٠:٠٠–١١:٥٩ / ١٢:٠٠–٢٣:٥٩)
