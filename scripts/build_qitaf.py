@@ -21,7 +21,7 @@ ws.merge_cells("B3:F3");c(3,2,"التكلفة = مبيعات التطبيق × �
 # inputs (single)
 c(5,2,"① المدخلات القابلة للتعديل",bold=True,size=12,color=WHITE,fill=ORANGE,bd=False);ws.merge_cells("B5:F5")
 c(6,2,"نسبة الدفع بنقاط قطاف من المبيعات",size=11);c(6,3,0.05,fill=YELLOW,align="center",fmt=PCT0);ws.merge_cells("C6:F6")
-c(7,2,"نسبة خصم قطاف (2% العنوان / 5% المثال)",size=11);c(7,3,0.05,fill=YELLOW,align="center",fmt=PCT0);ws.merge_cells("C7:F7")
+c(7,2,"نسبة خصم قطاف (مؤكّدة 2%)",size=11);c(7,3,0.02,fill=YELLOW,align="center",fmt=PCT0);ws.merge_cells("C7:F7")
 REDMP="C6"; DISC="C7"
 
 # growth table
