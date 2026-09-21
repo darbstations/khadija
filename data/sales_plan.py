@@ -22,11 +22,21 @@ Q2 = "outlets/data/q2-stations.csv"
 PAYMENTS = "data/network-payments.json"    # قنوات الدفع من لوحة كاش إن
 OUT = "data/sales-plan.json"
 
-# ── ثوابت مقيسة من تقرير ربحية محطات التشغيل — الربع الثاني ٢٠٢٦ (٢١ محطة)
-#    مجمل الربح ٥٬٤٤٢٬٢٢٥ ÷ ٤٩٬٠٧٩٬٦٨٦ لتر · المصاريف التشغيلية ٢٬٣٨٥٬٩٩١
-MARGIN = 0.1109          # مجمل الربح — ريال لكل لتر (كان ٠٫١١٤٤ من تقرير يوليو)
-OPEX_NET = 0.0486        # المصاريف التشغيلية — ريال لكل لتر (مقيسة لا موزَّعة)
-OPEX_OP = 0.0486         # الأساس نفسه: محطات مشغّلة حصراً
+# ── ثوابت من قائمة الدخل يناير–يوليو ٢٠٢٦ · محطاتنا الـ٤٩ (استثماري وإيجاري
+#    وتشغيلي، دون الامتياز) · ٣١٠٫٧ مليون لتر
+#    هامش المساهمة ٣٥٬٥٣٦ ألف ريال · مصاريف تشغيل المحطات ٢٨٬٤٤١ ألفاً
+#
+#    ولماذا لا تقرير ربحية الربع الثاني: مصاريفه التشغيلية ٤٫٨٦ هللة/لتر بينما
+#    قائمة الدخل تقول ٩٫١٥ للمحطات نفسها — فارق ٢٫٠٢×. وسببه أن التقرير يسعّر
+#    الأجر ٣٬٥٠٠ ريالاً «للربع» (١٬١٦٧ شهرياً للعامل) وهو أجرٌ شهري طُبِّق مرة
+#    بدل ثلاث. فالقائمة المالية هي المرجع، والتقرير يبقى صالحاً للمقارنة
+#    النسبية بين المحطات لا لمستوى الكلفة المطلق.
+MARGIN = 0.1144          # هامش مساهمة الوقود — ريال لكل لتر
+OPEX_NET = 0.0915        # مصاريف تشغيل المحطات — ريال لكل لتر
+OPEX_OP = 0.0915         # الأساس نفسه: محطاتنا دون الامتياز
+LOADED = 0.0441          # محمّلات المركز — بيع وتسويق وإدارية وفوائد
+RENT_CM = 0.0017         # مساهمة الإيجار
+#    صافي اللتر بعد التشغيل ٢٫٢٨ هللة · وبعد المحمّلات −١٫٩٩ هللة
 COMM_PETROL = 0.03       # العمولة المعيارية — ريال لكل لتر بنزين
 COMM_DIESEL = 0.015      # ريال لكل لتر ديزل
 CLOSE = 0.40             # نغلق ٤٠٪ من الفجوة خلال ٦ أشهر
@@ -361,7 +371,7 @@ def fleet_plan(rows, units):
                        svc=n(r["code"], "carwash_n"), svc_v=n(r["code"], "carwash_vacant"),
                        lpv=r["lpv"]))
     tg.sort(key=lambda x: -x["dl"])
-    net = MARGIN - OPEX_NET
+    net = MARGIN            # حدّي: العقد الإضافي لا يزيد تكلفة المحطة الثابتة
     V = 16000                     # أسطول نموذجي: ٢٠ شاحنة × ٢٠٠ لتر × ٤ تعبئات
     return dict(
         targets=tg[:10],
@@ -376,21 +386,32 @@ def fleet_plan(rows, units):
 
 
 def litre_economics():
-    """تفكيك اللتر الواحد وتعبئة الخمسين ريالاً"""
+    """تفكيك اللتر الواحد — بثلاثة أسس، ولكل قرارٍ أساسه
+
+       ① هامش المساهمة ١١٫٤٤ هللة — أساس كل قرار حدّي: لترٌ إضافي في محطة
+          قائمة لا يزيد أجراً ولا كهرباء ولا إيجاراً، فكلفته الحدّية شراؤه
+          وحده وهو مطروحٌ أصلاً. وبه تُقوَّم الفرصة ويُسقَّف الحافز.
+       ② الصافي بعد تشغيل المحطة ٢٫٢٨ هللة — أساس الحكم على المحطة نفسها.
+       ③ الصافي بعد محمّلات المركز −١٫٩٩ هللة — أساس الحكم على الشركة.
+
+       وخلطها خطأ: من يسقّف مكافأةً بالأساس الثاني يرفض حملةً مربحة،
+       ومن يحكم على محطة بالأول يُبقي خاسرة."""
     out = []
     for k, pr in PRICE.items():
         L = THRESHOLD / pr
         out.append(dict(fuel=k, price=pr, net_price=pr / VAT, litres=L,
                         margin=L * MARGIN, opex=L * OPEX_NET,
-                        net=L * (MARGIN - OPEX_NET), box=BOX,
-                        after=L * (MARGIN - OPEX_NET) - BOX, w=MIX[k]))
+                        net=L * MARGIN, after=L * MARGIN - BOX, box=BOX,
+                        net_station=L * (MARGIN - OPEX_NET), w=MIX[k]))
     wl = sum(o["litres"] * o["w"] for o in out) / sum(o["w"] for o in out)
     wn = sum(o["net"] * o["w"] for o in out) / sum(o["w"] for o in out)
+    ws_ = sum(o["net_station"] * o["w"] for o in out) / sum(o["w"] for o in out)
     return dict(rows=out, cpl_margin=MARGIN * 100, cpl_opex=OPEX_NET * 100,
                 cpl_opex_op=OPEX_OP * 100, cpl_net=(MARGIN - OPEX_NET) * 100,
-                box=BOX, threshold=THRESHOLD, w_litres=wl, w_net=wn,
-                breakeven_extra=BOX / (MARGIN - OPEX_NET),
-                breakeven_sar=BOX / ((MARGIN - OPEX_NET) / 2.200))
+                cpl_loaded=LOADED * 100, cpl_company=(MARGIN - OPEX_NET - LOADED + RENT_CM) * 100,
+                box=BOX, threshold=THRESHOLD, w_litres=wl, w_net=wn, w_net_station=ws_,
+                breakeven_extra=BOX / MARGIN,
+                breakeven_sar=BOX / (MARGIN / 2.200))
 
 
 def build():
@@ -420,7 +441,7 @@ def build():
             below=sum(1 for x in g if x["gap_fill"] > 0.5),
             upl_fill=sum(x["upl_fill"] for x in g), gap_peak=sum(x["gap_peak"] for x in g),
             sar_fill=sum(x["sar_fill"] for x in g), sar_txn=sum(x["sar_txn"] for x in g),
-            net_txn=(vol / vis) * (MARGIN - OPEX_NET),
+            net_txn=(vol / vis) * MARGIN,        # مساهمة المعاملة الإضافية
             driver=PLAY[s][0], action=PLAY[s][1]))
 
     # ملاحظة: تعريف الوردية صار من تقرير العمّال (٠٠:٠٠–١١:٥٩ / ١٢:٠٠–٢٣:٥٩)
