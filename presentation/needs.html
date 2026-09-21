@@ -1,0 +1,135 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تانكي — احتياجات ملف الشراكات</title>
+<style>
+  :root{
+    --orange:#F18A2B; --orange-d:#E07C16; --grey:#6D6E70;
+    --bg:#F7F7F5; --card:#FFFFFF; --ink:#26262A; --mut:#6D6E70;
+    --line:#E7E5E1; --head:#F3EFEA; --why-bg:#FEF9F3;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#141416; --card:#1E1E22; --ink:#F2F1EE; --mut:#A5A4A0;
+      --line:#33333A; --head:#26262B; --why-bg:#241a0e; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Tahoma,"Noto Sans Arabic",sans-serif;
+    direction:rtl;line-height:1.65;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:28px 20px 64px}
+  header{display:flex;align-items:center;gap:14px}
+  .logo{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--orange),var(--orange-d));
+    display:grid;place-items:center;color:#fff;font-weight:900;font-size:23px;flex:none;box-shadow:0 4px 14px rgba(241,138,43,.35)}
+  h1{font-size:24px;margin:0;font-weight:900;letter-spacing:-.3px}
+  .sub{color:var(--mut);font-size:13px;margin:3px 0 0}
+  .rule{height:3px;background:linear-gradient(90deg,var(--orange),transparent);border-radius:2px;margin:14px 0 4px}
+  .kick{display:inline-block;background:var(--orange);color:#fff;font-size:11px;font-weight:800;
+    padding:3px 10px;border-radius:999px;margin:14px 0 6px}
+  .intro{font-size:14px;color:var(--ink);margin:6px 0 8px}
+  h2{font-size:17px;margin:30px 0 12px;font-weight:900;display:flex;align-items:center;gap:9px}
+  h2 .n{width:28px;height:28px;border-radius:8px;background:var(--orange);color:#fff;display:grid;place-items:center;font-size:14px;font-weight:900;flex:none}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{padding:12px 14px;text-align:right;vertical-align:top;border-bottom:1px solid var(--line)}
+  thead th{font-size:12.5px;font-weight:800;background:var(--head);color:var(--ink)}
+  .c-need{width:34%;font-weight:800;color:var(--ink)}
+  .c-why{background:var(--why-bg);color:var(--ink)}
+  .c-why::before{content:"↳ ";color:var(--orange-d);font-weight:900}
+  tbody tr:last-child td{border-bottom:none}
+  .flag{display:inline-block;font-size:10px;font-weight:800;padding:1px 7px;border-radius:6px;margin-inline-start:6px;
+    background:var(--orange);color:#fff;vertical-align:middle}
+  .flag.ok{background:#1E7E45}
+  .note{background:var(--why-bg);border:1px solid var(--line);border-inline-start:4px solid var(--orange);
+    border-radius:12px;padding:14px 16px;margin-top:26px;font-size:13.5px}
+  .note b{color:var(--orange-d)}
+  .foot{color:var(--mut);font-size:11.5px;margin-top:24px;text-align:center;border-top:1px solid var(--line);padding-top:14px}
+  @media(max-width:600px){.c-need{width:42%}th,td{padding:10px 10px;font-size:12.5px}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="logo">د</div>
+    <div>
+      <h1>احتياجات ملف الشراكات</h1>
+      <p class="sub">برنامج تانكي للولاء — درب لخدمات المحطات</p>
+    </div>
+  </header>
+  <div class="rule"></div>
+  <span class="kick">وثيقة رسمية · للإدارة التنفيذية</span>
+  <p class="intro">تعرض هذه الوثيقة الاحتياجات اللازمة لإنجاح ملف الشراكات في برنامج «تانكي»، موزّعة على أربع ركائز، مع بيان <b>سبب</b> كل احتياج. لا تتضمن هذه النسخة التكاليف؛ تُعرض الميزانيات في وثيقة منفصلة.</p>
+
+  <!-- 1. HR -->
+  <h2><span class="n">١</span> الموارد البشرية</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th class="c-need">الاحتياج</th><th>السبب</th></tr></thead>
+      <tbody>
+        <tr><td class="c-need">مدير الشراكات</td><td class="c-why">يملك الملف كاملاً ويقود الاستراتيجية والتفاوض الكبير؛ بدون قائد تتشتت الجهود ولا تُسنَد المسؤولية.</td></tr>
+        <tr><td class="c-need">مديرو تطوير الأعمال (BD)</td><td class="c-why">يوقّعون التجار ويبنون قاعدة الشركاء؛ بدونهم لا شركاء، ويبقى البرنامج وقوداً بلا قنوات استبدال.</td></tr>
+        <tr><td class="c-need">محلل تجاري</td><td class="c-why">يحسب ربحية كل صفقة قبل توقيعها ويحمي هامش البرنامج؛ صمّام الأمان الذي يمنع الصفقات الخاسرة.</td></tr>
+        <tr><td class="c-need">مديرو حسابات التجار</td><td class="c-why">يتابعون التاجر بعد التوقيع (تفعيل وأداء وتجديد)؛ بدونهم يوقّع التاجر ثم يُهمَل فيتسرّب.</td></tr>
+        <tr><td class="c-need">أخصائي تسويق الشراكات</td><td class="c-why">يصمّم العروض والحملات المشتركة؛ بدونه يوجد التجار دون أن يعرف عنهم العميل فينخفض الاستبدال.</td></tr>
+        <tr><td class="c-need">منسّق عمليات التفعيل (Onboarding)</td><td class="c-why">يفعّل التاجر تقنياً وتشغيلياً ويحل عوائقه اليومية؛ بدونه فجوة بين «وقّعنا» و«اشتغل فعلاً».</td></tr>
+        <tr><td class="c-need">مختص التسويات المالية</td><td class="c-why">يسوّي مستحقات التجار ويدير الرصيد المقدّم (Float)؛ بدونه فوضى مالية وخلافات على المستحقات.</td></tr>
+        <tr><td class="c-need">دعم التكامل التقني</td><td class="c-why">يربط أنظمة التجار (POS/QR) بالبرنامج؛ بدونه لا يستطيع العميل الكسب أو الاستبدال لدى التاجر.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 2. Departments -->
+  <h2><span class="n">٢</span> الأقسام والوظائف الداعمة</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th class="c-need">الاحتياج</th><th>السبب</th></tr></thead>
+      <tbody>
+        <tr><td class="c-need">قسم الشراكات وتطوير الأعمال</td><td class="c-why">القسم المالك للملف؛ بدونه لا جهة مسؤولة عن نجاح الشراكات.</td></tr>
+        <tr><td class="c-need">القانوني والعقود</td><td class="c-why">يصوغ ويحمي كل اتفاقية؛ بدونه تتعرّض درب لالتزامات ونزاعات غير محسوبة.</td></tr>
+        <tr><td class="c-need">المالية</td><td class="c-why">تدير التسويات والرصيد المقدّم والفوترة والضريبة؛ بدونها يتحرّك المال دون ضبط.</td></tr>
+        <tr><td class="c-need">التقنية والتكامل</td><td class="c-why">يبني الواجهات البرمجية ويربط المحفظة والمضخات؛ بدونه لا منتج قابل للتشغيل.</td></tr>
+        <tr><td class="c-need">التسويق والاتصال</td><td class="c-why">يطلق البرنامج ويوصّل العروض للعميل والتاجر؛ بدونه يبقى أفضل برنامج مجهولاً.</td></tr>
+        <tr><td class="c-need">الامتثال والمخاطر <span class="flag">حرج</span></td><td class="c-why">يضمن ترخيص ساما وحماية البيانات (PDPL) والالتزام الشرعي؛ بدونه لا ينطلق البرنامج قانونياً.</td></tr>
+        <tr><td class="c-need">خدمة العملاء</td><td class="c-why">ترد على استفسارات النقاط والاستبدال؛ بدونها يقتل إحباط العميل الثقة بالبرنامج.</td></tr>
+        <tr><td class="c-need">البيانات والتحليلات</td><td class="c-why">يقيس أداء الشركاء ومعدلات الكسب والحرق والاسترداد؛ بدونه تُقاد البرنامج دون مؤشرات.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. Contracts -->
+  <h2><span class="n">٣</span> التعاقدات والاتفاقيات</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th class="c-need">الاحتياج</th><th>السبب</th></tr></thead>
+      <tbody>
+        <tr><td class="c-need">اتفاقية التاجر الرئيسية</td><td class="c-why">تحدّد نسب الكسب والحرق والرسوم والتسويات والالتزامات؛ بدونها كل تاجر بلا مرجع ملزم.</td></tr>
+        <tr><td class="c-need">اتفاقية شبكة الاستبدال (Gift Card API)</td><td class="c-why">تؤمّن كتالوج الاستبدال مع بقاء البيانات لدى درب؛ بدونها لا قناة استبدال جاهزة.</td></tr>
+        <tr><td class="c-need">اتفاقية شريك المحفظة المرخّص</td><td class="c-why">تتيح تشغيل المحفظة قانونياً دون ترخيص ساما من الصفر؛ بدونها لا محفظة نقدية نظامية.</td></tr>
+        <tr><td class="c-need">اتفاقية بوابة/معالج الدفع</td><td class="c-why">تمكّن شحن المحفظة عبر مدى/فيزا؛ بدونها لا يستطيع العميل شحن رصيده.</td></tr>
+        <tr><td class="c-need">اتفاقية مستوى الخدمة (SLA)</td><td class="c-why">تضمن توفّر واستجابة الشركاء التقنيين؛ بدونها تبقى الأعطال دون التزام بالإصلاح.</td></tr>
+        <tr><td class="c-need">اتفاقية معالجة البيانات (DPA)</td><td class="c-why">تحمي بيانات العملاء وفق نظام PDPL مع كل شريك؛ بدونها مخالفة نظامية ومخاطر تسريب.</td></tr>
+        <tr><td class="c-need">اتفاقية عدم الإفصاح (NDA)</td><td class="c-why">تحمي أسرار درب التجارية أثناء التفاوض؛ بدونها تنكشف المعلومات الحساسة.</td></tr>
+        <tr><td class="c-need">اتفاقية التمويل المشترك (Co-funding)</td><td class="c-why">تنظّم تقاسم تكلفة العروض مع التاجر؛ بدونها خلاف على من يتحمّل تكلفة كل حملة.</td></tr>
+        <tr><td class="c-need">الموافقة التنظيمية + الفتوى الشرعية</td><td class="c-why">ترخّص المحفظة وتجيز النموذج شرعياً؛ بدونها يتعطّل البرنامج قانونياً وشرعياً.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. Systems -->
+  <h2><span class="n">٤</span> الأنظمة والممكّنات</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th class="c-need">الاحتياج</th><th>السبب</th></tr></thead>
+      <tbody>
+        <tr><td class="c-need">نظام إدارة التجار + حاسبة الكسب/الحرق <span class="flag ok">جاهز في تانكي</span></td><td class="c-why">لتوثيق كل تاجر وحساب ربحيته؛ بدونه يجري التفاوض دون أداة. (مبنيّ بالفعل في التطبيق.)</td></tr>
+        <tr><td class="c-need">آلية الرصيد المقدّم / الضمان (Escrow)</td><td class="c-why">لتغطية قيمة القسائم وضمان مبدأ «النظام لا يخسر»؛ بدونها مخاطرة مالية مباشرة.</td></tr>
+        <tr><td class="c-need">لوحة مؤشرات الأداء (KPIs)</td><td class="c-why">لمتابعة عدد التجار والتفعيل والاسترداد وتكلفة الاكتساب؛ بدونها لا يُعرف مسار النجاح.</td></tr>
+        <tr><td class="c-need">قناة تواصل مع التجار</td><td class="c-why">لإدارة العلاقة والعروض والتحديثات؛ بدونها يشعر الشركاء بالإهمال.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <b>الخلاصة:</b> ينجح ملف الشراكات باكتمال أربع ركائز متوازية — <b>فريق متخصّص</b> يقوده مدير الشراكات ومحلل تجاري، <b>أقسام داعمة</b> أحرجها الامتثال والمخاطر، <b>حزمة عقود</b> أهمها اتفاقية التاجر وشريك المحفظة المرخّص، و<b>أنظمة تشغيل</b> جوهرها جاهز في تطبيق تانكي. غياب أي ركيزة يُضعف الملف بأكمله.
+  </div>
+
+  <p class="foot">درب · برنامج تانكي للولاء — وثيقة داخلية للمناقشة التنفيذية · تُعرض الميزانيات والجداول الزمنية في وثائق منفصلة</p>
+</div>

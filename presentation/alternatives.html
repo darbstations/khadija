@@ -1,0 +1,198 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>بدائل شبكة ديسكوير — تانكي</title>
+<style>
+  :root{
+    --orange:#F18A2B; --orange-d:#E07C16; --grey:#6D6E70;
+    --bg:#F7F7F5; --card:#FFFFFF; --ink:#26262A; --mut:#6D6E70;
+    --line:#E7E5E1; --good:#1E9E5A; --warn:#C8871B; --bad:#C6413B;
+    --good-bg:#E8F6EE; --warn-bg:#FBF1DD; --bad-bg:#FBE9E8;
+    --pick-bg:#FEF3E6; --neu-bg:#F0F0F2;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#141416; --card:#1E1E22; --ink:#F2F1EE; --mut:#A5A4A0;
+      --line:#33333A; --good-bg:#123322; --warn-bg:#33280F; --bad-bg:#331715;
+      --pick-bg:#2A1E10; --neu-bg:#26262B; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Tahoma,"Noto Sans Arabic",sans-serif;
+    direction:rtl;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
+  header{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+  .logo{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--orange),var(--orange-d));
+    display:grid;place-items:center;color:#fff;font-weight:900;font-size:22px;flex:none;box-shadow:0 4px 14px rgba(241,138,43,.35)}
+  h1{font-size:23px;margin:0;font-weight:900;letter-spacing:-.3px}
+  .sub{color:var(--mut);font-size:13px;margin:2px 0 0}
+  .kick{display:inline-block;background:var(--orange);color:#fff;font-size:11px;font-weight:800;
+    padding:3px 10px;border-radius:999px;margin-bottom:18px}
+  h2{font-size:16px;margin:30px 0 12px;font-weight:800;display:flex;align-items:center;gap:8px}
+  p.lead{font-size:14px;color:var(--ink);margin:0 0 6px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  /* unbundle */
+  .unb{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+  .ub{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--card)}
+  .ub h4{margin:0 0 4px;font-size:14px;font-weight:900}
+  .ub .em{font-size:26px}
+  .ub .v{font-size:12px;font-weight:800;padding:2px 8px;border-radius:6px;display:inline-block;margin-top:8px}
+  .ub p{font-size:12.5px;color:var(--mut);margin:8px 0 0}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{padding:11px 12px;text-align:right;vertical-align:top;border-bottom:1px solid var(--line)}
+  thead th{font-size:12px;font-weight:800}
+  .col-dim{width:120px;font-weight:800;background:var(--bg)}
+  .h-ds{color:var(--grey)}
+  .h-pick{color:var(--orange-d)}
+  .h-full{color:var(--grey)}
+  td.pick{background:var(--pick-bg)}
+  td.neu{background:var(--neu-bg)}
+  thead th.pick{background:var(--pick-bg)}
+  tbody tr:last-child td{border-bottom:none}
+  .dot{font-weight:800}
+  .g{color:var(--good)} .w{color:var(--warn)} .r{color:var(--bad)}
+  .steps{list-style:none;margin:0;padding:0;counter-reset:s}
+  .steps li{counter-increment:s;position:relative;padding:12px 46px 12px 14px;border-bottom:1px solid var(--line)}
+  .steps li:last-child{border-bottom:none}
+  .steps li::before{content:counter(s);position:absolute;right:12px;top:12px;width:26px;height:26px;border-radius:8px;
+    background:var(--orange);color:#fff;font-weight:900;display:grid;place-items:center;font-size:13px}
+  .steps b{font-weight:900}
+  .steps small{color:var(--mut);display:block;font-size:12px;margin-top:2px}
+  .honest{background:var(--warn-bg);border:1px solid var(--warn);border-radius:14px;padding:16px 18px;margin-top:14px}
+  .honest h4{margin:0 0 6px;font-size:14px;font-weight:900;color:var(--warn)}
+  .honest ul{margin:0;padding-inline-start:18px;font-size:13px}
+  .verdict{background:linear-gradient(135deg,var(--orange),var(--orange-d));color:#fff;border-radius:18px;
+    padding:22px;margin-top:26px;box-shadow:0 8px 26px rgba(241,138,43,.32)}
+  .verdict h3{margin:0 0 8px;font-size:17px;font-weight:900}
+  .verdict p{margin:6px 0;font-size:14px;opacity:.97}
+  .foot{color:var(--mut);font-size:11.5px;margin-top:22px;text-align:center}
+  @media(max-width:620px){.unb{grid-template-columns:1fr}.col-dim{width:72px}th,td{padding:9px 8px;font-size:12px}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="logo">د</div>
+    <div>
+      <h1>بدائل شبكة ديسكوير</h1>
+      <p class="sub">كيف تستبدلينها بأسهل تقنياً — مع احتفاظ درب بالملكية الكاملة</p>
+    </div>
+  </header>
+  <span class="kick">مذكرة قرار · للإدارة التنفيذية</span>
+
+  <!-- Idea -->
+  <h2>💡 الفكرة: فُكّي الحزمة</h2>
+  <p class="lead">ديسكوير يبيع شيئين مدموجين. حين تفصلينهما، يتضح أن أحدهما يُستبدل بسهولة، والآخر لا تريدينه منهم أصلاً.</p>
+  <div class="unb">
+    <div class="ub">
+      <div class="em">🎟️</div>
+      <h4>أ) شبكة الاستبدال</h4>
+      <div class="mut" style="font-size:12.5px;color:var(--mut)">بطاقات هدايا: أمازون · جرير · نون · إكسترا…</div>
+      <span class="v" style="background:var(--good-bg);color:var(--good)">🟢 سهل جداً استبدالها</span>
+      <p>مجرد API مورّد — تشترين قسيمة، يرجع كود، توصلينه للعميل. لا منصة، لا تسليم داتا.</p>
+    </div>
+    <div class="ub">
+      <div class="em">🤝</div>
+      <h4>ب) شركاء الكسب</h4>
+      <div class="mut" style="font-size:12.5px;color:var(--mut)">مطاعم ومتاجر محلية تموّل النقاط</div>
+      <span class="v" style="background:var(--pick-bg);color:var(--orange-d)">🟠 لا تريدينها منهم</span>
+      <p>هذي مصدر هامشك وعلاقتك بالعميل — قيمتك الأساسية. تبنينها بنفسك (والأداة جاهزة).</p>
+    </div>
+  </div>
+
+  <!-- Paths comparison -->
+  <h2>📊 مقارنة المسارات الثلاثة</h2>
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-dim">المعيار</th>
+          <th class="h-ds">⚪ ديسكوير<br><span style="font-weight:600;font-size:11px;color:var(--mut)">مشغّل كامل</span></th>
+          <th class="h-pick pick">🟠 البديل الموصى<br><span style="font-weight:600;font-size:11px">Gift Card API + كسب ذاتي</span></th>
+          <th class="h-full">⚪ بناء كامل<br><span style="font-weight:600;font-size:11px;color:var(--mut)">من الصفر</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="col-dim">سرعة الإطلاق</td>
+          <td class="neu"><span class="dot g">●</span> سريعة — شبكة جاهزة</td>
+          <td class="pick"><span class="dot g">●</span> سريعة — الاستبدال عبر API فوري</td>
+          <td class="neu"><span class="dot r">●</span> بطيئة — كل شيء يُبنى</td>
+        </tr>
+        <tr>
+          <td class="col-dim">التكلفة</td>
+          <td class="neu"><span class="dot w">●</span> Setup + رسوم شهرية + لكل معاملة</td>
+          <td class="pick"><span class="dot g">●</span> رسوم لكل قسيمة فقط — بلا التزام منصة</td>
+          <td class="neu"><span class="dot r">●</span> Capex عالٍ + صيانة دائمة</td>
+        </tr>
+        <tr>
+          <td class="col-dim">الجهد التقني</td>
+          <td class="neu"><span class="dot g">●</span> منخفض على درب</td>
+          <td class="pick"><span class="dot w">●</span> متوسط — تكامل API + كسب ذاتي</td>
+          <td class="neu"><span class="dot r">●</span> مرتفع جداً</td>
+        </tr>
+        <tr>
+          <td class="col-dim">الملكية والداتا</td>
+          <td class="neu"><span class="dot r">●</span> عندهم — درب واجهة</td>
+          <td class="pick"><span class="dot g">●</span> كاملة لدرب</td>
+          <td class="neu"><span class="dot g">●</span> كاملة لدرب</td>
+        </tr>
+        <tr>
+          <td class="col-dim">المرونة</td>
+          <td class="neu"><span class="dot r">●</span> تخضع لأولوياتهم</td>
+          <td class="pick"><span class="dot g">●</span> عالية — بدّلي المورّد متى شئت</td>
+          <td class="neu"><span class="dot g">●</span> كاملة</td>
+        </tr>
+        <tr>
+          <td class="col-dim">الارتهان (Lock-in)</td>
+          <td class="neu"><span class="dot r">●</span> مرتفع — خروج مكلف</td>
+          <td class="pick"><span class="dot g">●</span> شبه معدوم</td>
+          <td class="neu"><span class="dot g">●</span> لا يوجد</td>
+        </tr>
+        <tr>
+          <td class="col-dim">ملاءمة عميل المحطات</td>
+          <td class="neu"><span class="dot w">●</span> قائمة عامة غير مخصّصة</td>
+          <td class="pick"><span class="dot g">●</span> تختارين الكتالوج والتجار بنفسك</td>
+          <td class="neu"><span class="dot g">●</span> مخصّصة بالكامل</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- The alternative in detail -->
+  <h2>🛠️ البديل الموصى — ثلاث قطع تركّبها بنفسك</h2>
+  <div class="card">
+    <ol class="steps">
+      <li>
+        <b>الاستبدال → Gift Card API (مورّد نقي)</b>
+        <small>مزوّدون مثل YouGotaGift أو Tillo — كتالوج بطاقات هدايا سعودي (أمازون، جرير، نون…) عبر تكامل واحد. الداتا وحساب النقاط يبقيان لدى درب. المورّد يعطي الأكواد فقط. * تُثبَّت الأسماء والأسعار عند التعاقد.</small>
+      </li>
+      <li>
+        <b>الكسب → بناء ذاتي (الأداة جاهزة)</b>
+        <small>توقّعين التجار المحليين مباشرة عبر فريق تطوير أعمال — مصدر هامشك وعلاقتك بالعميل. قاعدة بيانات التجار + نموذج Earn/Burn + صفحة العرض مبنية عندك بالفعل في تطبيق تانكي.</small>
+      </li>
+      <li>
+        <b>المحفظة والدفع → شريك مرخّص</b>
+        <small>ركّبي فوق محفظة/تمويل مرخّص من ساما (كما فعلت ساسكو مع «إمكان») بدل ترخيص من الصفر. يختصر أثقل بند تنظيمي، وتبقى الملكية لدرب.</small>
+      </li>
+    </ol>
+  </div>
+
+  <!-- Honesty -->
+  <div class="honest">
+    <h4>⚠️ بصراحة — ماذا تخسرين مقابل الاستبدال؟</h4>
+    <ul>
+      <li><b>الخدمة الكاملة:</b> ديسكوير يجمّع التجار كخدمة جاهزة — أنتِ توظّفين فريق تطوير أعمال يوقّعهم.</li>
+      <li><b>سرعة كتالوج الكسب:</b> شبكتهم جاهزة اليوم، بناء علاقاتك يأخذ أسابيع (لكن Gift Card API يغطّي الاستبدال فوراً).</li>
+      <li><b>تنسيق عدة مورّدين</b> بدل عقد واحد — لكن كلٌّ منها مورّد بسيط قابل للاستبدال.</li>
+    </ul>
+    <p style="margin:8px 0 0;font-size:13px">الخلاصة: ما تخسرينه = <b>راحة وسرعة</b>، لا <b>قدرة</b> — وكلها تُشترى بأرخص من ثمن التنازل عن الداتا وملكية العميل.</p>
+  </div>
+
+  <!-- Verdict -->
+  <div class="verdict">
+    <h3>🎯 التوصية</h3>
+    <p>استبدلي شبكة ديسكوير بـ <b>Gift Card API</b> للاستبدال، وابني الكسب بنفسك، وركّبي المحفظة على شريك مرخّص.</p>
+    <p>تحصلين على نفس فائدة الشبكة — <b>بأسهل تقنياً، وأرخص، ومع احتفاظ درب بالداتا وملكية العميل بالكامل، وبلا ارتهان.</b></p>
+  </div>
+
+  <p class="foot">درب · برنامج تانكي للولاء — وثيقة داخلية للمناقشة التنفيذية · أسماء المورّدين وبنودهم التجارية تُثبَّت عند التعاقد النهائي</p>
+</div>
