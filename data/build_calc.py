@@ -44,6 +44,7 @@ TXN = '#,##0" معاملة"'
 RIYAL4 = '0.0000" ريال"'
 
 S_ST = "المحطات"
+S_HR = "شكل الساعات"
 S_CALC = "حاسبة المبيعات"
 S_MK = "العمرة — بيان يومي"
 S_H = "الساعة والوردية"
@@ -61,8 +62,27 @@ ST = sorted(P["stations"], key=lambda s: -s["sar_total"])
 SEGS = P["segments"]; NET = P["network"]; TOT = P["totals"]
 CONTR = P["contracts"]; SG = P["shiftgap"]; LIT = P["litre"]
 
-TBL = ""          # مرجع جدول البحث — يُملأ عند بناء ورقة المحطات
+TBL = ""            # مرجع جدول البحث — يُملأ عند بناء ورقة المحطات
+S_ST_RANGE = ""     # مدى أسماء المحطات للقائمة المنسدلة
+HRS, HREF = {}, {}  # أسطر ورقة شكل الساعات · ووسيط كل تصنيف
 DEFAULT_ST = "العمرة الجديدة"
+
+# أسعار المضخة الفعلية من مبيعاتنا — شاملة الضريبة · للسياق لا للاشتقاق
+PRICE_ = {"بنزين ٩١": 2.191, "بنزين ٩٥": 2.340, "ديزل": 1.796}
+
+# شكل ساعات كل محطة من ملف الشبكة — معاملات كل ساعة عبر النافذة المقيسة
+HOURS_RAW = {}
+for _r in csv.DictReader(open("outlets/data/network-hours.csv", encoding="utf-8")):
+    HOURS_RAW[_r["code"]] = [float(_r["h%02d" % _h] or 0) for _h in range(24)]
+
+# عدد العمّال وحصة الوردية المسائية — تقرير العمّال والورديات
+WORKERS = {}
+for _r in csv.DictReader(open("outlets/data/worker-shifts.csv", encoding="utf-8")):
+    try:
+        WORKERS[_r["الرمز"]] = (float(_r["عدد العمّال"] or 0),
+                                float(_r["حصة الوردية المسائية"] or 0))
+    except ValueError:
+        pass
 
 
 # ═══════════════════════════════════════════════ أدوات الورقة
@@ -283,9 +303,10 @@ def summary(wb):
 
 # ═══════════════════════════════════════════════ ② المحطات — جدول البحث
 def stations(wb):
-    global TBL
-    NC = 18
-    ws = sheet(wb, S_ST, [3, 26, 8, 9, 9, 10, 11, 9, 10, 8, 8, 7, 10, 10, 12, 12, 13, 26],
+    global TBL, S_ST_RANGE
+    NC = 20
+    ws = sheet(wb, S_ST, [3, 26, 8, 9, 9, 10, 11, 9, 10, 8, 8, 7, 10, 10, 12, 12,
+                          13, 26, 8, 10],
                "المحطات — جدول واحد تقرأ منه الحاسبة وكل الأوراق",
                f"{TOT['n']} محطة مقيسة من كاش إن · {NET['days']:,} يوم-محطة · "
                "مرتَّبة بقيمة الفرصة · والبوابة في آخر عمود", NC, freeze="D5")
@@ -293,7 +314,8 @@ def stations(wb):
     W.header(ws, r, ["", "المحطة", "الرمز", "المنطقة", "التصنيف", "زيارة/يوم",
                      "لتر/يوم", "لتر/زيارة", "الفاتورة", "ديزل٪", "ليلي٪",
                      "ذروة", "فجوة الذروة", "فجوة السلة", "قيمة المعاملات",
-                     "قيمة السلة", "الإجمالي ر/سنة", "البوابات والحالات"])
+                     "قيمة السلة", "الإجمالي ر/سنة", "البوابات والحالات",
+                     "عمّال", "حصة المسائية"])
     ws.row_dimensions[r].height = 34
     r += 1
     first = r
@@ -320,6 +342,9 @@ def stations(wb):
         txt(ws, r, 18, ("⛔ " if gate else "") + " · ".join(s["conds"]), align=W.WRAP,
             fill=fill, font=Font(name=B.FONT, size=8,
                                  color=B.D_GOLD if gate else B.INK3))
+        wk, evs = WORKERS.get(s["code"], (0, 0))
+        txt(ws, r, 19, wk or "—", fmt=NUM if wk else None, fill=fill or W.CALC)
+        txt(ws, r, 20, evs or "—", fmt=PCT if evs else None, fill=fill or W.CALC)
         r += 1
     last = r - 1
     txt(ws, r, 2, "الإجمالي", align=W.RGT, font=W.BOLD, fill=W.FS)
@@ -332,13 +357,15 @@ def stations(wb):
     for c_ in (15, 16, 17): txt(ws, r, c_, f"=SUM({get_column_letter(c_)}{first}:{get_column_letter(c_)}{last})",
                                 fmt=MONEY, fill=W.FS, font=W.BOLD)
     txt(ws, r, 18, "", fill=W.FS)
+    txt(ws, r, 19, f"=SUM(S{first}:S{last})", fmt=NUM, fill=W.FS, font=W.BOLD)
+    txt(ws, r, 20, SG["eve_txn"], fmt=PCT, fill=W.FS, font=W.BOLD)
     r += 1
     for c_, col in (("M", 13), ("Q", 17), ("F", 6)):
         ws.conditional_formatting.add(f"{c_}{first}:{c_}{last}",
                                       DataBarRule(start_type="num", start_value=0,
                                                   end_type="max", color=B.ORANGE,
                                                   showValue=True))
-    ws.auto_filter.ref = f"B{first-1}:R{last}"
+    ws.auto_filter.ref = f"B{first-1}:T{last}"
     r = note(ws, r, NC,
              "⛔ الصفّ الذهبي = بوابة مفتوحة (فجوة مطابقة · تغيير مسار · بيانات دفع "
              "مفقودة). «فجوة الذروة» معاملة/يوم مقارنةً بشكل ساعات تصنيف المحطة، "
@@ -346,129 +373,246 @@ def stations(wb):
              "والقيمة تُحتسب بهامش مرجَّح بمزيج كل محطة لا بمتوسط الشبكة.",
              fill=PatternFill("solid", fgColor=B.T_GOLD),
              font=Font(name=B.FONT, size=9, bold=True, color=B.D_GOLD), h=36)
-    TBL = f"'{S_ST}'!$B${first}:$R${last}"
+    TBL = f"'{S_ST}'!$B${first}:$T${last}"
+    S_ST_RANGE = f"'{S_ST}'!$B${first}:$B${last}"
     return ws
 
 
-# ═══════════════════════════════════════════════ ③ حاسبة المبيعات
+# ═══════════════════════════════════════════════ ③ شكل الساعات — بيانات البحث
+def hourshapes(wb):
+    """حصة كل ساعة من معاملات اليوم — لكل محطة، ثم وسيط كل تصنيف.
+       منها تُشتقّ فجوة الزيارات في الحاسبة أمام القارئ لا خلف ستار."""
+    global HRS, HREF
+    NC = 29
+    ws = sheet(wb, S_HR, [3, 24, 8, 9] + [6.2] * 24 + [26],
+               "شكل الساعات — حصة كل ساعة من معاملات اليوم",
+               f"{len(ST)} محطة من ملف ساعات الشبكة · ثم وسيط كل تصنيف في آخر الورقة "
+               "· وهذه الورقة مرجعٌ تقرأ منه الحاسبة، لا ورقة عرض", NC, freeze="E5")
+    r = 4
+    W.header(ws, r, ["", "المحطة", "الرمز", "التصنيف"]
+             + [f"{h:02d}" for h in range(24)] + ["المجموع"])
+    r += 1
+    first = r
+    prof = {}
+    for s in ST:
+        v = HOURS_RAW.get(s["code"])
+        t = sum(v) if v else 0
+        sh = [x / t for x in v] if t else [0.0] * 24
+        prof.setdefault(s["seg"], []).append(sh)
+        txt(ws, r, 2, s["name"], align=W.RGT, font=W.BOLD)
+        txt(ws, r, 3, s["code"], font=Font(name=B.FONT, size=8, color=B.INK2))
+        txt(ws, r, 4, s["seg"], font=Font(name=B.FONT, size=8, color=B.INK2))
+        for h in range(24):
+            txt(ws, r, 5 + h, sh[h], fmt=PCT2, fill=W.CALC,
+                font=Font(name=B.FONT, size=8, color=B.INK))
+        txt(ws, r, 29, f"=SUM(E{r}:AB{r})", fmt=PCT, fill=W.FS, font=W.BOLD)
+        r += 1
+    last = r - 1
+    ws.conditional_formatting.add(f"E{first}:AB{last}",
+                                  DataBarRule(start_type="num", start_value=0,
+                                              end_type="max", color=B.GOLD,
+                                              showValue=True))
+    r += 1
+    r = W.band(ws, r, NC, "وسيط كل تصنيف — وهو الشكل الذي تُقاس عليه الفجوة")
+    W.header(ws, r, ["", "التصنيف", "محطات", ""]
+             + [f"{h:02d}" for h in range(24)] + ["المجموع"])
+    r += 1
+    rfirst = r
+    import statistics as stx
+    for seg in [s["seg"] for s in SEGS]:
+        rows = prof.get(seg, [])
+        med = [stx.median([p[h] for p in rows]) for h in range(24)] if rows else [0] * 24
+        HREF[seg] = med
+        txt(ws, r, 2, seg, align=W.RGT, font=W.BOLD,
+            fill=PatternFill("solid", fgColor=B.T_ORANGE))
+        txt(ws, r, 3, len(rows), fmt=NUM, fill=PatternFill("solid", fgColor=B.T_ORANGE))
+        txt(ws, r, 4, "وسيط", fill=PatternFill("solid", fgColor=B.T_ORANGE),
+            font=Font(name=B.FONT, size=8, color=B.INK2))
+        for h in range(24):
+            txt(ws, r, 5 + h, med[h], fmt=PCT2,
+                fill=PatternFill("solid", fgColor=B.T_ORANGE),
+                font=Font(name=B.FONT, size=8, color=B.INK))
+        txt(ws, r, 29, f"=SUM(E{r}:AB{r})", fmt=PCT, fill=W.FS, font=W.BOLD)
+        r += 1
+    rlast = r - 1
+    r = note(ws, r, NC,
+             "الوسيط لا يجمع ١٠٠٪ بالضبط — لأنه وسيطُ كل ساعةٍ على حدة لا توزيعُ "
+             "محطةٍ واحدة. وهذا مقصود: نقارن كل ساعة بنظيرتها، ولا نفترض أن محطةً "
+             "بعينها هي المعيار. ونصف محطات كل تصنيف فوق وسيطه بالتعريف.",
+             fill=PatternFill("solid", fgColor=B.T_GOLD),
+             font=Font(name=B.FONT, size=9, bold=True, color=B.D_GOLD))
+    HRS = dict(first=first, last=last, rfirst=rfirst, rlast=rlast)
+    return ws
+
+
+# ═══════════════════════════════════════════════ ④ حاسبة المبيعات
 def calculator(wb):
-    NC = 9
-    ws = sheet(wb, S_CALC, [3, 30, 16, 16, 4, 30, 16, 18, 4],
-               "حاسبة المبيعات — اختر المحطة وغيّر الأصفر وحده",
-               "كل خلية بيضاء صيغةٌ حيّة · الذهبية مُدخَلات · "
-               "وبيانات المحطة تُسحب تلقائياً من ورقة المحطات", NC)
+    NC = 12
+    ws = sheet(wb, S_CALC,
+               [3, 30, 14, 14, 14, 4, 13, 13, 4, 15, 15, 40],
+               "حاسبة المبيعات — سلسلةٌ واحدة من خمس خطوات",
+               "اختر المحطة، ثم اقرأ من أعلى إلى أسفل: قيمة اللتر ← الزيادة في "
+               "الزيارات ← مستهدف العامل ← القيمة والكلفة ← بطاقة التسليم · "
+               "الذهبيّ مُدخَلات وما عداه صيغٌ حيّة", NC)
+    H_ = f"'{S_HR}'"
+    SREF = f"{H_}!$E${HRS['rfirst']}:$AB${HRS['rlast']}"
+    SNAM = f"{H_}!$B${HRS['rfirst']}:$B${HRS['rlast']}"
+    SSTA = f"{H_}!$E${HRS['first']}:$AB${HRS['last']}"
+    SCOD = f"{H_}!$B${HRS['first']}:$B${HRS['last']}"
     r = 4
     r = note(ws, r, NC,
-             "الحاسبة تجيب سؤالاً واحداً: كم يساوي أن نضيف معاملةً في اليوم في هذه "
-             "المحطة — وكم يكلّف. فالمعاملة تُطلَب، وحجم التعبئة يُفسَّر بمزيج الوقود "
-             "ولا يُطالَب به.",
+             "كل رقم في هذه الورقة مشتقٌّ أمامك: لا رقم مُدخَل إلا ما كان بخلفية "
+             "ذهبية، وكل ما عداه يقول من أين جاء في عمود «من أين». "
+             "وإن غيّرت المحطة تغيّرت السلسلة كلها.",
              fill=PatternFill("solid", fgColor=B.T_ORANGE),
              font=Font(name=B.FONT, size=10, bold=True, color=B.ORANGE))
     r += 1
 
-    # ── اختيار المحطة
-    r = W.band(ws, r, NC, "① المحطة — اخترها من القائمة وكل ما تحتها يتغيّر")
-    pick = r
+    # ── ⓪ المحطة
+    r = W.band(ws, r, NC, "⓪ المحطة")
     txt(ws, r, 2, "المحطة", align=W.RGT,
         font=Font(name=B.FONT, size=12, bold=True, color=B.ORANGE))
-    merge(ws, r, 3, 4, DEFAULT_ST, fill=W.FI,
+    merge(ws, r, 3, 5, DEFAULT_ST, fill=W.FI,
           font=Font(name=B.FONT, size=12, bold=True, color=B.BLUE))
-    txt(ws, r, 5, "", box=False)
-    txt(ws, r, 6, "◀ اضغط الخلية ثم اختر من السهم", align=W.RGT,
-        font=Font(name=B.FONT, size=9, color=B.INK3))
-    merge(ws, r, 7, 9, f"من {TOT['n']} محطة مقيسة",
+    txt(ws, r, 6, "", box=False)
+    merge(ws, r, 7, 12, "◀ اضغط الخلية ثم اختر من السهم — "
+          f"{TOT['n']} محطة مقيسة من كاش إن", align=W.RGT,
           font=Font(name=B.FONT, size=9, color=B.INK3))
     ws.row_dimensions[r].height = 24
     PICK = f"$C${r}"
-    dv = DataValidation(type="list", formula1=TBL.split(":")[0] + ":"
-                        + "$B$" + TBL.split("$")[-1], allow_blank=False)
+    dv = DataValidation(type="list", formula1=f"{S_ST_RANGE}", allow_blank=False)
     ws.add_data_validation(dv); dv.add(ws.cell(r, 3))
     r += 1
-
     W.header(ws, r, ["", "من بيانات المحطة", "القيمة", "", "",
-                     "من بيانات المحطة", "القيمة", "", ""])
+                     "", "من بيانات المحطة", "القيمة", "", "", "", "المصدر"])
     r += 1
-    auto = [
-        [("الرمز", 2, None), ("المنطقة", 3, None), ("التصنيف", 4, None)],
-        [("زيارة/يوم", 5, NUM), ("لتر/يوم", 6, NUM), ("لتر لكل زيارة", 7, NUM2)],
-        [("متوسط الفاتورة", 8, MONEY2), ("حصة الديزل", 9, PCT), ("حصة الليل", 10, PCT)],
-        [("فجوة الذروة معاملة/يوم", 12, NUM2), ("فجوة السلة لتر/زيارة", 13, NUM2),
-         ("البوابات والحالات", 17, None)],
-    ]
     A = {}
-    # عمودان: يسار (B/C) ويمين (F/G)
-    flat = [x for g in auto for x in g]
-    half = (len(flat) + 1) // 2
+    pairs = [("الرمز", 2, None, "كاش إن"), ("المنطقة", 3, None, "كاش إن"),
+             ("التصنيف", 4, None, "ملف التحليلات — تصنيف الشركة"),
+             ("زيارة/يوم", 5, NUM, "كاش إن — معدّل النافذة المقيسة"),
+             ("لتر لكل زيارة", 7, NUM2, "كاش إن"),
+             ("حصة الديزل من اللترات", 9, PCT, "كاش إن"),
+             ("عدد العمّال", None, NUM, "تقرير العمّال والورديات"),
+             ("حصة الوردية المسائية من المعاملات", None, PCT,
+              "تقرير العمّال والورديات")]
+    half = 4
     for i in range(half):
-        for side, idx in ((0, i), (1, i + half)):
-            if idx >= len(flat): continue
-            lab, col, fm = flat[idx]
-            bc, vc = (2, 3) if side == 0 else (6, 7)
+        for side in (0, 1):
+            idx = i + side * half
+            lab, col, fm, src = pairs[idx]
+            bc, vc, sc = (2, 3, 5) if side == 0 else (7, 8, 12)
             txt(ws, r + i, bc, lab, align=W.RGT, font=W.BOLD)
+            if col is None:                 # العمّال وحصة المسائية في آخر عمودين
+                col = 18 if lab == "عدد العمّال" else 19
             f = f'=VLOOKUP({PICK},{TBL},{col},FALSE)'
-            cell = txt(ws, r + i, vc, f, fmt=fm, fill=W.CALC,
-                       font=Font(name=B.FONT, size=10, color=B.GOOD))
+            txt(ws, r + i, vc, f, fmt=fm, fill=W.CALC,
+                font=Font(name=B.FONT, size=10, color=B.GOOD))
             A[lab] = f"${get_column_letter(vc)}${r+i}"
-            if side == 0: txt(ws, r + i, 4, "", box=False); txt(ws, r + i, 5, "", box=False)
-            else: txt(ws, r + i, 8, "", box=False); txt(ws, r + i, 9, "", box=False)
+            if side == 0:
+                merge(ws, r + i, 4, 5, src, align=W.RGT,
+                      font=Font(name=B.FONT, size=8, color=B.INK3))
+                txt(ws, r + i, 6, "", box=False)
+            else:
+                merge(ws, r + i, 9, 12, src, align=W.RGT,
+                      font=Font(name=B.FONT, size=8, color=B.INK3))
     r += half
-    VPD, LPV, DSL = A["زيارة/يوم"], A["لتر لكل زيارة"], A["حصة الديزل"]
-    GAP = A["فجوة الذروة معاملة/يوم"]
+    VPD, LPV, DSL = A["زيارة/يوم"], A["لتر لكل زيارة"], A["حصة الديزل من اللترات"]
+    SEG, WK = A["التصنيف"], A["عدد العمّال"]
+    EVS = A["حصة الوردية المسائية من المعاملات"]
     r += 1
 
-    # ── المُدخَلات
-    r = W.band(ws, r, NC, "② المُدخَلات — الذهبيّ وحده قابل للتغيير")
-    W.header(ws, r, ["", "المُدخَل", "القيمة", "الوحدة", "", "المُدخَل", "القيمة",
-                     "الوحدة", ""])
+    # ── ① قيمة اللتر
+    r = W.band(ws, r, NC, "① قيمة اللتر في هذه المحطة — بالضبط كما حسبناها")
+    W.header(ws, r, ["", "الخطوة", "القيمة", "الوحدة", "", "", "", "", "",
+                     "", "", "من أين جاءت"])
     r += 1
-    IN = r
-    left = [
-        ("نسبة إغلاق الفجوة", K["close"], PCT, "٪ خلال ستة أشهر"),
-        ("معاملات إضافية في اليوم", f"={GAP}*$C${IN}", NUM2, "اكتب فوقها رقمك إن شئت"),
-        ("هامش لتر البنزين", K["margin_petrol"], RIYAL4, "ريال/لتر = ١٢٫٦٦ هللة"),
-        ("هامش لتر الديزل", K["margin_diesel"], RIYAL4, "ريال/لتر = ٤٫٤٧ هللة"),
-        ("أيام التطبيق", 365, NUM, "يوم"),
+    L0 = r
+    steps = [
+        ("سعر المضخة — بنزين ٩١", PRICE_["بنزين ٩١"], MONEY2, "ريال/لتر", "inp",
+         "سعرٌ فعلي من مبيعاتنا · شامل الضريبة"),
+        ("سعر المضخة — ديزل", PRICE_["ديزل"], MONEY2, "ريال/لتر", "inp",
+         "سعرٌ فعلي من مبيعاتنا · شامل الضريبة"),
+        ("هامش لتر البنزين", K["margin_petrol"], RIYAL4, "ريال/لتر", "inp",
+         "⛔ انحدار هامش ١٩ محطة على حصة ديزلها · R²=٠٫٥٦ — لا جدول معتمد"),
+        ("هامش لتر الديزل", K["margin_diesel"], RIYAL4, "ريال/لتر", "inp",
+         "⛔ الطرف الآخر للانحدار · أقصى حصة ديزل مرصودة ٤٣٪ فهو استقراء"),
+        ("حصة الديزل في هذه المحطة", f"={DSL}", PCT, "٪ من اللترات", "calc",
+         "من لترات المحطة نفسها — لا من متوسط الشبكة"),
+        ("الهامش المرجَّح لهذه المحطة", None, RIYAL4, "ريال/لتر", "key",
+         "الصيغة: هامش البنزين × (١−حصة الديزل) + هامش الديزل × حصة الديزل"),
+        ("وبالهللة", None, HAL, "هللة/لتر", "key", "الرقم نفسه بالهللة"),
+        ("كلفة التشغيل بالأساس المختار", None, HAL, "هللة/لتر", "calc",
+         "من جدول الأسُس أدناه — والافتراضي «تشغيل المحطة»"),
+        ("صافي اللتر", None, HAL, "هللة/لتر", "key",
+         "الصيغة: الهامش المرجَّح − كلفة التشغيل · وهو ما يبقى من كل لتر إضافي"),
     ]
-    right = [
-        ("أساس الكلفة", "تشغيل المحطة — محمَّل بالكامل", None, "اختر"),
-        ("هدية على كل فاتورة مؤهَّلة؟", "لا", None, "نعم / لا"),
-        ("كلفة العلبة", K["box"], MONEY2, "ريال"),
-        ("حصة الفواتير المؤهَّلة", C["elig_pct"], PCT, "٪ — مقيسة في العمرة"),
-        ("سعر البيع للتر", Q["3"]["price"], MONEY2, "ريال/لتر"),
-    ]
-    for i in range(5):
-        lab, v, f, u = left[i]
-        txt(ws, r + i, 2, lab, align=W.RGT, font=W.BOLD)
-        W.inp(ws, r + i, 3, f or NUM, v)
-        txt(ws, r + i, 4, u, font=Font(name=B.FONT, size=9, color=B.INK3))
-        txt(ws, r + i, 5, "", box=False)
-        lab, v, f, u = right[i]
-        txt(ws, r + i, 6, lab, align=W.RGT, font=W.BOLD)
-        W.inp(ws, r + i, 7, f or "General", v)
-        txt(ws, r + i, 8, u, font=Font(name=B.FONT, size=9, color=B.INK3))
-        txt(ws, r + i, 9, "", box=False)
-    CLOSE, TXN_, MP, MD, DAYS = (f"$C${IN+i}" for i in range(5))
-    BASIS, GIFT, BOX_, ELIG, PRICE = (f"$G${IN+i}" for i in range(5))
-    r += 5
+    for i, (lab, v, fm, u, kind, src) in enumerate(steps):
+        rr = r + i
+        bold = kind == "key"
+        fill = (W.FI if kind == "inp" else
+                PatternFill("solid", fgColor=B.T_GOOD) if bold else W.CALC)
+        txt(ws, rr, 2, lab, align=W.RGT,
+            font=Font(name=B.FONT, size=11 if bold else 10, bold=True,
+                      color=B.INK))
+        if kind == "inp":
+            W.inp(ws, rr, 3, fm, v)
+        else:
+            f = v if isinstance(v, str) else {
+                5: f"=$C${L0+2}*(1-$C${L0+4})+$C${L0+3}*$C${L0+4}",
+                6: f"=$C${L0+5}*100",
+                7: 0,                       # تُربط بجدول الأسُس بعد تعريفه
+                8: f"=$C${L0+6}-$C${L0+7}",
+            }[i]
+            txt(ws, rr, 3, f, fmt=fm, fill=fill,
+                font=Font(name=B.FONT, size=12 if bold else 10, bold=bold,
+                          color=B.D_GOOD if bold else B.INK))
+        txt(ws, rr, 4, u, font=Font(name=B.FONT, size=9, color=B.INK3))
+        txt(ws, rr, 5, ""); txt(ws, rr, 6, "", box=False)
+        gate = src.startswith("⛔")
+        merge(ws, rr, 7, 12, src, align=W.RGT,
+              fill=PatternFill("solid", fgColor=B.T_GOLD) if gate else None,
+              font=Font(name=B.FONT, size=8, bold=gate,
+                        color=B.D_GOLD if gate else B.INK3))
+    BLEND = f"$C${L0+5}"
+    NETL = f"$C${L0+8}"
+    PRICEW = f"($C${L0}*(1-{DSL})+$C${L0+1}*{DSL})"
+    r += len(steps)
+    r = note(ws, r, NC,
+             "وهذا هو «قيمة اللتر» بعينها: هامش المساهمة — الإيراد ناقص شراء الوقود، "
+             "قبل أي مصروف تشغيل. وهو وحده ما يتحرّك باللتر الإضافي. "
+             "وسعر المضخة معروضٌ للسياق لا للحساب: الهامش لا يُشتقّ منه بل من "
+             "قائمة الدخل.")
+    r += 1
 
-    r = W.band(ws, r, NC, "أسُس الكلفة الثلاثة — ولكلٍّ قرارٌ يخصّه")
-    W.header(ws, r, ["", "الأساس", "هللة/لتر", "", "", "يصلح لقرار", "", "", ""])
+    r = W.band(ws, r, NC, "أسُس الكلفة الثلاثة — اختر الأساس الذي يخصّ قرارك")
+    W.header(ws, r, ["", "الأساس", "هللة/لتر", "", "", "", "", "",
+                     "", "", "", "يصلح لقرار"])
     r += 1
-    lut = r
+    LUT = r
     for b in C["bases"]:
         txt(ws, r, 2, b["base"], align=W.RGT)
         txt(ws, r, 3, b["cpl"] * 100, fmt=HAL, fill=W.CALC)
-        txt(ws, r, 4, ""); txt(ws, r, 5, "", box=False)
-        merge(ws, r, 6, 9, b["use"], align=W.RGT,
+        for c_ in (4, 5): txt(ws, r, c_, "")
+        txt(ws, r, 6, "", box=False)
+        merge(ws, r, 7, 12, b["use"], align=W.RGT,
               font=Font(name=B.FONT, size=9, color=B.INK2))
         r += 1
-    lut_end = r - 1
+    LUTE = r - 1
+    txt(ws, r, 2, "الأساس المختار", align=W.RGT,
+        font=Font(name=B.FONT, size=11, bold=True, color=B.ORANGE))
+    merge(ws, r, 3, 5, "تشغيل المحطة — محمَّل بالكامل", fill=W.FI,
+          font=Font(name=B.FONT, size=10, bold=True, color=B.BLUE))
+    BASIS = f"$C${r}"
+    txt(ws, r, 6, "", box=False)
+    merge(ws, r, 7, 12, "◀ غيّره ليتغيّر «صافي اللتر» أعلاه وكل ما بُني عليه",
+          align=W.RGT, font=Font(name=B.FONT, size=9, color=B.INK3))
     dv1 = DataValidation(type="list",
                          formula1=f'"{",".join(b["base"] for b in C["bases"])}"',
                          allow_blank=False)
-    ws.add_data_validation(dv1); dv1.add(ws[BASIS.replace("$", "")])
-    dv2 = DataValidation(type="list", formula1='"نعم,لا"', allow_blank=False)
-    ws.add_data_validation(dv2); dv2.add(ws[GIFT.replace("$", "")])
+    ws.add_data_validation(dv1); dv1.add(ws.cell(r, 3))
+    r += 1
+    # اربط صيغة كلفة التشغيل بجدول الأسُس بعد أن عُرفت أسطره
+    ws.cell(L0 + 7, 3).value = (f"=VLOOKUP({BASIS},$B${LUT}:$C${LUTE},2,FALSE)")
     r = note(ws, r, NC,
              "الأساس الحدّي صفرٌ لأن النقص في ساعات الذروة طاقةُ خدمةٍ لا طاقة ضخّ: "
              "المضخّات والمرافق والأجور مدفوعة أصلاً، فاللتر الإضافي على الطاقم "
@@ -476,121 +620,252 @@ def calculator(wb):
              "الأساس الثاني، ومن يقرّر رأس مال جديداً يستعمل الثالث.")
     r += 1
 
-    # ── النتيجة
-    r = W.band(ws, r, NC, "③ النتيجة — محسوبة من المُدخَلات أعلاه")
-    W.header(ws, r, ["", "السطر", "في اليوم", "في السنة", "", "السطر", "القيمة", "", ""])
-    r += 1
-    R = r
-    BLEND = f"$G${R}"
-    rowsL = [
-        ("لترات إضافية", f"={TXN_}*{LPV}", f"=C{R}*{DAYS}", LTR, NUM, None),
-        ("مبيعات إضافية", f"=C{R}*{PRICE}", f"=C{R+1}*{DAYS}", MONEY, MONEY, None),
-        ("هامش مساهمة المستهدف", f"=C{R}*{BLEND}", f"=C{R+2}*{DAYS}", MONEY2, MONEY, "good"),
-        ("كلفة لترات المستهدف",
-         f"=-C{R}*VLOOKUP({BASIS},$B${lut}:$C${lut_end},2,FALSE)/100",
-         f"=C{R+3}*{DAYS}", MONEY2, MONEY, "bad"),
-        ("صافي المستهدف", f"=C{R+2}+C{R+3}", f"=C{R+4}*{DAYS}", MONEY2, MONEY, "net"),
-        ("كلفة الهدية — على المحطة كلها",
-         f'=-IF({GIFT}="نعم",({VPD}+{TXN_})*{ELIG}*{BOX_},0)',
-         f"=C{R+5}*{DAYS}", MONEY2, MONEY, "bad"),
-        ("الصافي بعد الهدية", f"=C{R+4}+C{R+5}", f"=C{R+6}*{DAYS}", MONEY2, MONEY, "net"),
-    ]
-    rowsR = [
-        ("الهامش المرجَّح للتر — ريالاً", f"={MP}*(1-{DSL})+{MD}*{DSL}", RIYAL4, None),
-        ("قيمة معاملةٍ واحدة إضافية في اليوم", f"={LPV}*{BLEND}*{DAYS}", MONEY, "good"),
-        ("الزيادة على حركة المحطة", f"={TXN_}/{VPD}", PCT, None),
-        ("قيمة إغلاق الفجوة كاملةً", f"={GAP}*{LPV}*{BLEND}*{DAYS}", MONEY, "good"),
-        ("الفواتير المؤهَّلة للهدية اليوم", f"=({VPD}+{TXN_})*{ELIG}", NUM, None),
-        ("لترات/يوم تدفع كلفة الهدية", f"=-C{R+5}/{BLEND}", NUM, "bad"),
-        ("وهي من حجم المحطة", f"=-C{R+5}/{BLEND}/({VPD}*{LPV})", PCT, "bad"),
-    ]
-    tf = {"good": B.T_GOOD, "bad": B.T_BAD, "net": B.T_BAND}
-    tc = {"good": B.D_GOOD, "bad": B.D_BAD, "net": B.INK}
-    for i in range(7):
-        lab, f1, f2, fm1, fm2, tone = rowsL[i]
-        fill = PatternFill("solid", fgColor=tf.get(tone, B.T_NEUTRAL))
-        fnt = Font(name=B.FONT, size=11 if tone == "net" else 10,
-                   bold=(tone == "net"), color=tc.get(tone, B.INK))
-        txt(ws, r + i, 2, lab, align=W.RGT,
-            font=Font(name=B.FONT, size=11, bold=True, color=B.INK) if tone == "net" else W.BOLD)
-        txt(ws, r + i, 3, f1, fmt=fm1, fill=fill, font=fnt)
-        txt(ws, r + i, 4, f2, fmt=fm2, fill=fill, font=fnt)
-        txt(ws, r + i, 5, "", box=False)
-        lab, f1, fm1, tone = rowsR[i]
-        fill = PatternFill("solid", fgColor=tf.get(tone, B.T_NEUTRAL))
-        txt(ws, r + i, 6, lab, align=W.RGT, font=W.BOLD)
-        txt(ws, r + i, 7, f1, fmt=fm1, fill=fill,
-            font=Font(name=B.FONT, size=10, color=tc.get(tone, B.INK)))
-        txt(ws, r + i, 8, "", box=False); txt(ws, r + i, 9, "", box=False)
-    for c_ in ("C", "D", "G"):
-        ws.conditional_formatting.add(f"{c_}{R}:{c_}{R+6}", CellIsRule(
-            operator="lessThan", formula=["0"],
-            font=Font(name=B.FONT, size=10, color=B.BAD)))
-    r += 7
+    # ── ② الزيادة في الزيارات
+    r = W.band(ws, r, NC,
+               "② الزيادة في الزيارات لهذه المحطة — ساعةً ساعة، لا رقماً مُنزَلاً")
     r = note(ws, r, NC,
-             "السطران الأخيران يخلطان أساسين عمداً ليُرى الخلط: الهدية تُدفع على كل "
-             "فاتورةٍ مؤهَّلة — القائمة والإضافية معاً — بينما العائد يأتي من الإضافية "
-             "وحدها. فلذلك تُقارَن كلفتها بحجم المحطة لا بحجم الزيادة، "
-             "والسطر «وهي من حجم المحطة» يقول النسبة مباشرة.",
+             "القاعدة: نقارن حصة كل ساعة عندنا بحصتها عند وسيط تصنيفنا. وما نحن "
+             "دونه في ساعات ذروتنا الثماني وحدها هو الفجوة المؤكَّدة — أمّا النقص "
+             "في ساعات الهدوء فاختلاف طلبٍ لا فاقد، فلا يُطالَب به أحد.",
+             fill=PatternFill("solid", fgColor=B.T_NEUTRAL))
+    W.header(ws, r, ["", "الساعة", "حصتنا", "فعلي/يوم", "شكل التصنيف",
+                     "المتوقَّع/يوم", "", "الفجوة", "", "ذروة؟", "الوردية",
+                     "القراءة"])
+    r += 1
+    H0 = r
+    for h in range(24):
+        rr = r + h
+        txt(ws, rr, 2, f"{h:02d}:٠٠", font=W.BOLD)
+        txt(ws, rr, 3,
+            f"=INDEX({SSTA},MATCH({PICK},{SCOD},0),{h+1})", fmt=PCT2, fill=W.CALC)
+        txt(ws, rr, 4, f"=C{rr}*{VPD}", fmt=NUM, fill=W.CALC)
+        txt(ws, rr, 5,
+            f"=INDEX({SREF},MATCH({SEG},{SNAM},0),{h+1})", fmt=PCT2, fill=W.CALC)
+        txt(ws, rr, 6, f"=E{rr}*{VPD}", fmt=NUM, fill=W.CALC)
+        txt(ws, rr, 7, "", box=False)
+        txt(ws, rr, 8, f'=IF(J{rr}="★",MAX(0,F{rr}-D{rr}),0)', fmt=NUM2,
+            fill=W.CALC, font=W.BOLD)
+        txt(ws, rr, 9, "", box=False)
+        txt(ws, rr, 10, f'=IF(C{rr}>=LARGE($C${H0}:$C${H0+23},8),"★","")',
+            font=Font(name=B.FONT, size=10, color=B.ORANGE))
+        txt(ws, rr, 11, "صباحية" if h < 12 else "مسائية",
+            font=Font(name=B.FONT, size=9, color=B.INK2))
+        txt(ws, rr, 12, "", align=W.WRAP,
+            font=Font(name=B.FONT, size=8, color=B.D_BAD))
+    H1 = H0 + 23
+    for rr in range(H0, H1 + 1):
+        ws.cell(rr, 12).value = (f'=IF(H{rr}>0,"فجوة تُحتسب — ساعة ذروة ونحن '
+                                 f'دون الشكل","")')
+    ws.conditional_formatting.add(f"H{H0}:H{H1}", CellIsRule(
+        operator="greaterThan", formula=["0"],
+        fill=PatternFill("solid", fgColor=B.T_BAD),
+        font=Font(name=B.FONT, size=10, bold=True, color=B.D_BAD)))
+    ws.conditional_formatting.add(f"D{H0}:D{H1}",
+                                  DataBarRule(start_type="num", start_value=0,
+                                              end_type="max", color=B.GOLD,
+                                              showValue=True))
+    r = H1 + 1
+    rows2 = [
+        ("فجوة ساعات الذروة — الرقم المؤكَّد", f"=SUM(H{H0}:H{H1})", NUM2,
+         "معاملة/يوم", "key",
+         "مجموع الفجوة في ساعات ذروتنا الثماني وحدها"),
+        ("منها في الوردية الصباحية ٠٠–١١", f"=SUM(H{H0}:H{H0+11})", NUM2,
+         "معاملة/يوم", "calc", "الساعات ٠٠ إلى ١١"),
+        ("ومنها في الوردية المسائية ١٢–٢٣", f"=SUM(H{H0+12}:H{H1})", NUM2,
+         "معاملة/يوم", "calc", "الساعات ١٢ إلى ٢٣"),
+        ("نسبة الإغلاق خلال ستة أشهر", K["close"], PCT, "٪", "inp",
+         "سياسة الخطة — ٤٠٪ في كل محطات الشبكة"),
+        ("المطلوب في اليوم", None, NUM2, "معاملة/يوم", "key",
+         "الصيغة: فجوة الذروة × نسبة الإغلاق"),
+    ]
+    G0 = r
+    for i, (lab, v, fm, u, kind, src) in enumerate(rows2):
+        rr = r + i
+        bold = kind == "key"
+        fill = (W.FI if kind == "inp" else
+                PatternFill("solid", fgColor=B.T_GOOD) if bold else W.FS)
+        txt(ws, rr, 2, lab, align=W.RGT,
+            font=Font(name=B.FONT, size=11 if bold else 10, bold=True))
+        if kind == "inp":
+            W.inp(ws, rr, 3, fm, v)
+        else:
+            f = v if v is not None else f"=$C${G0}*$C${G0+3}"
+            txt(ws, rr, 3, f, fmt=fm, fill=fill,
+                font=Font(name=B.FONT, size=12 if bold else 10, bold=bold,
+                          color=B.D_GOOD if bold else B.INK))
+        txt(ws, rr, 4, u, font=Font(name=B.FONT, size=9, color=B.INK3))
+        txt(ws, rr, 5, ""); txt(ws, rr, 6, "", box=False)
+        merge(ws, rr, 7, 12, src, align=W.RGT,
+              font=Font(name=B.FONT, size=8, color=B.INK3))
+    GAPP = f"$C${G0}"; GAPM = f"$C${G0+1}"; GAPE = f"$C${G0+2}"
+    CLOSE = f"$C${G0+3}"; NEED = f"$C${G0+4}"
+    r += len(rows2)
+    r = note(ws, r, NC,
+             "«ذروة؟» تُحدَّد بشكل المحطة نفسها: ساعاتها الثماني الأعلى حصةً. "
+             "ولهذا قد تسقط ساعةٌ فجوتُها كبيرة لأنها ليست من ساعاتنا الأعلى — "
+             "وهو تحفّظٌ مقصود يجعل الرقم أصغر مما قد يكون، لا أكبر. "
+             "وإن تساوت ساعتان عند الحدّ الثامن دخلتا معاً.")
+    r += 1
+
+    # ── ③ مستهدف الوردية والعامل
+    r = W.band(ws, r, NC, "③ مستهدف الوردية والعامل — الرقم الذي يُسلَّم فعلاً")
+    W.header(ws, r, ["", "الخطوة", "القيمة", "الوحدة", "", "", "", "", "",
+                     "", "", "من أين جاءت"])
+    r += 1
+    T0 = r
+    trows = [
+        ("عدد عمّال المحطة", f"={WK}", NUM, "عامل", "calc",
+         "تقرير العمّال والورديات — إجمالي المحطة"),
+        ("حصة الوردية المسائية من المعاملات", f"={EVS}", PCT, "٪", "calc",
+         "معاملات المساء ÷ معاملات اليوم — مقيسة"),
+        ("⛔ عدد عمّال الوردية المسائية", None, NUM, "عامل", "inp",
+         "الافتراضي هو التوزيع المتوازن مع الطلب — اكتب العدد المعتمد من "
+         "العمليات فوقه، فهذا هو المُدخَل الملزم الوحيد هنا"),
+        ("المطلوب من الوردية المسائية", None, NUM2, "معاملة/يوم", "calc",
+         "الصيغة: المطلوب في اليوم × حصة المسائية من الفجوة"),
+        ("المستهدف لكل عامل مسائي", None, NUM2, "معاملة/يوم", "key",
+         "الصيغة: المطلوب من الوردية ÷ عدد عمّالها"),
+        ("وبالساعة", None, NUM2, "معاملة/ساعة", "key",
+         "على وردية اثنتي عشرة ساعة"),
+        ("حِمله اليوم", None, NUM, "معاملة/يوم", "calc",
+         "الصيغة: معاملات المساء ÷ عمّال المساء — للسياق"),
+        ("الزيادة المطلوبة على حِمله", None, PCT, "٪", "key",
+         "وهذا هو حجم الطلب الحقيقي من العامل"),
+    ]
+    for i, (lab, v, fm, u, kind, src) in enumerate(trows):
+        rr = r + i
+        bold = kind == "key"
+        gate = lab.startswith("⛔")
+        fill = (W.FI if kind == "inp" else
+                PatternFill("solid", fgColor=B.T_GOOD) if bold else W.CALC)
+        txt(ws, rr, 2, lab, align=W.RGT,
+            font=Font(name=B.FONT, size=11 if bold else 10, bold=True,
+                      color=B.D_GOLD if gate else B.INK))
+        if kind == "inp":
+            W.inp(ws, rr, 3, fm, None)
+            ws.cell(rr, 3).value = f"=ROUND($C${T0}*$C${T0+1},0)"
+        else:
+            f = v if v is not None else {
+                3: f"={NEED}*IF({GAPP}=0,0,{GAPE}/{GAPP})",
+                4: f"=IF($C${T0+2}=0,0,$C${T0+3}/$C${T0+2})",
+                5: f"=$C${T0+4}/12",
+                6: f"=IF($C${T0+2}=0,0,{VPD}*$C${T0+1}/$C${T0+2})",
+                7: f"=IF($C${T0+6}=0,0,$C${T0+4}/$C${T0+6})",
+            }[i]
+            txt(ws, rr, 3, f, fmt=fm, fill=fill,
+                font=Font(name=B.FONT, size=12 if bold else 10, bold=bold,
+                          color=B.D_GOOD if bold else B.INK))
+        txt(ws, rr, 4, u, font=Font(name=B.FONT, size=9, color=B.INK3))
+        txt(ws, rr, 5, ""); txt(ws, rr, 6, "", box=False)
+        merge(ws, rr, 7, 12, src, align=W.RGT,
+              fill=PatternFill("solid", fgColor=B.T_GOLD) if gate else None,
+              font=Font(name=B.FONT, size=8, bold=gate,
+                        color=B.D_GOLD if gate else B.INK3))
+        if gate: ws.row_dimensions[rr].height = 26
+    PERW = f"$C${T0+4}"; PERH = f"$C${T0+5}"; LOADE = f"$C${T0+6}"
+    UPW = f"$C${T0+7}"; EVW = f"$C${T0+2}"
+    r += len(trows)
+    r = note(ws, r, NC,
+             "⛔ بوابة: عدد عمّال الوردية هو المُدخَل الوحيد الذي لا نملكه مقيساً "
+             "لكل محطة — وثلاثة ملفات تعطي للعمرة وحدها ٢٠ و٢٦ و٣٢. "
+             "فالافتراضي هنا توزيعٌ متوازن مع الطلب، ولا يُحمَّل مستهدفٌ على وردية "
+             "قبل أن تكتب العمليات العدد المعتمد في الخلية الذهبية.",
              fill=PatternFill("solid", fgColor=B.T_GOLD),
              font=Font(name=B.FONT, size=9, bold=True, color=B.D_GOLD), h=36)
     r += 1
 
-    # ── حجم التعبئة: يُعرض ولا يُطالَب به
-    r = W.band(ws, r, NC, "④ حجم التعبئة — يُعرض ولا يُطالَب به")
-    W.header(ws, r, ["", "السطر", "القيمة", "في السنة", "", "لماذا لا يُطالَب به",
-                     "", "", ""])
+    # ── ④ القيمة والكلفة
+    r = W.band(ws, r, NC, "④ القيمة والكلفة — الخطوتان ① و② مضروبتان ببعضهما")
+    W.header(ws, r, ["", "السطر", "في اليوم", "في السنة", "الوحدة", "",
+                     "", "", "", "", "", "الصيغة بالكلمات"])
     r += 1
-    FB = r
-    fb = [("فجوة السلة لكل زيارة", f"={A['فجوة السلة لتر/زيارة']}", NUM2, None),
-          ("لترات/يوم لو أُغلقت كاملةً", f"=C{FB}*{VPD}", NUM, f"=C{FB+1}*{DAYS}"),
-          ("قيمتها هامشَ مساهمة", f"=C{FB+1}*{BLEND}", MONEY2, f"=C{FB+2}*{DAYS}")]
-    why = ["الفرق بين لتر زيارتنا وما يفسّره مزيج تصنيفنا",
-           "ثلثا تباين حجم التعبئة مزيج وقود لا سلوك — R²=٠٫٦٦",
-           "فتُفسَّر بالمزيج وتُتابَع، ولا تُحمَّل على وردية"]
-    for i, (lab, f1, fm, f2) in enumerate(fb):
-        fill = PatternFill("solid", fgColor=B.T_NEUTRAL)
-        txt(ws, r + i, 2, lab, align=W.RGT, font=W.BOLD)
-        txt(ws, r + i, 3, f1, fmt=fm, fill=fill)
-        txt(ws, r + i, 4, f2 if f2 else "—", fmt=MONEY if i == 2 else NUM, fill=fill)
-        txt(ws, r + i, 5, "", box=False)
-        merge(ws, r + i, 6, 9, why[i], align=W.RGT,
-              font=Font(name=B.FONT, size=9, color=B.INK2))
-    r += 3
+    V0 = r
+    vrows = [
+        ("لترات إضافية", f"={NEED}*{LPV}", "لتر", NUM2, NUM, "calc",
+         "الصيغة: المطلوب في اليوم × لتر لكل زيارة"),
+        ("مبيعات إضافية", f"=C{V0}*{PRICEW}", "ريال", MONEY2, MONEY, "calc",
+         "الصيغة: اللترات × سعر البيع المرجَّح"),
+        ("هامش مساهمة", f"=C{V0}*{BLEND}", "ريال", MONEY2, MONEY, "good",
+         "الصيغة: اللترات × الهامش المرجَّح من الخطوة ①"),
+        ("ناقص كلفة التشغيل", f"=-C{V0}*$C${L0+7}/100", "ريال", MONEY2, MONEY, "bad",
+         "الصيغة: اللترات × كلفة التشغيل بالأساس المختار"),
+        ("صافي المستهدف", f"=C{V0+2}+C{V0+3}", "ريال", MONEY2, MONEY, "key",
+         "الصيغة: اللترات × صافي اللتر"),
+        ("قيمة إغلاق الفجوة كاملةً", f"={GAPP}*{LPV}*{NETL}/100", "ريال",
+         MONEY2, MONEY, "calc", "بلا نسبة إغلاق — الفجوة كلها"),
+        ("قيمة معاملةٍ واحدة إضافية في اليوم", f"={LPV}*{NETL}/100", "ريال",
+         MONEY2, MONEY, "good", "الصيغة: لتر لكل زيارة × صافي اللتر"),
+    ]
+    tf = {"good": B.T_GOOD, "bad": B.T_BAD, "key": B.T_BAND}
+    tc = {"good": B.D_GOOD, "bad": B.D_BAD, "key": B.INK}
+    for i, (lab, f1, u, fm1, fm2, tone, why) in enumerate(vrows):
+        rr = r + i
+        bold = tone == "key"
+        fill = PatternFill("solid", fgColor=tf.get(tone, B.T_NEUTRAL))
+        txt(ws, rr, 2, lab, align=W.RGT,
+            font=Font(name=B.FONT, size=11 if bold else 10, bold=True))
+        txt(ws, rr, 3, f1, fmt=fm1, fill=fill,
+            font=Font(name=B.FONT, size=12 if bold else 10, bold=bold,
+                      color=tc.get(tone, B.INK)))
+        txt(ws, rr, 4, f"=C{rr}*365", fmt=fm2, fill=fill,
+            font=Font(name=B.FONT, size=12 if bold else 10, bold=bold,
+                      color=tc.get(tone, B.INK)))
+        txt(ws, rr, 5, u, font=Font(name=B.FONT, size=9, color=B.INK3))
+        txt(ws, rr, 6, "", box=False)
+        merge(ws, rr, 7, 12, why, align=W.RGT,
+              font=Font(name=B.FONT, size=8, color=B.INK3))
+    NETD = f"$C${V0+4}"
+    r += len(vrows)
     r = note(ws, r, NC,
-             "هذه الكتلة معروضةٌ للعلم لا للمطالبة. وإن خرجت صفراً فالمحطة تعبئتها "
-             "عند ما يفسّره مزيجها — وهذا وضعٌ سليم لا نقص.")
+             "ولاحظ أن «صافي المستهدف» يتبع الأساس الذي اخترته في الخطوة ①: "
+             "بالأساس الحدّي هو الهامش كاملاً، وبالمحمَّل الكامل قد يخرج سالباً "
+             "في محطاتٍ هامشها دون كلفتها محمَّلةً. وذلك ليس سبباً لرفض اللتر "
+             "الإضافي، بل سببٌ لئلّا يُبنى عليه قرار رأس مال.")
     r += 1
 
-    # ── الحساسية
-    r = W.band(ws, r, NC, "⑤ الحساسية — الصافي السنوي قبل أي حافز")
-    W.header(ws, r, ["", "معاملات إضافية/يوم", "لترات/يوم", "هامش مساهمة/سنة",
-                     "", "حدّية — الكلفة صفر فيساوي الهامش", "بعد تشغيل المحطة",
-                     "بعد المحمَّل الكامل", "الزيادة على الحركة"])
+    # ── ⑤ بطاقة التسليم
+    r = W.band(ws, r, NC, "⑤ بطاقة التسليم — ما يُكتب في ورقة الوردية")
+    W.header(ws, r, ["", "البند", "القيمة", "", "", "", "البند", "القيمة",
+                     "", "", "", "ملاحظة"])
     r += 1
-    s0 = r
-    for i in range(7):
-        base = f"={GAP}*{(i+1)/7:.4f}" if i < 6 else f"={GAP}"
-        fill = PatternFill("solid", fgColor=B.T_GOLD if i == 6 else B.T_NEUTRAL)
-        txt(ws, r, 2, base, fmt=NUM2, fill=fill,
-            font=Font(name=B.FONT, size=10, bold=(i == 6),
-                      color=B.D_GOLD if i == 6 else B.INK))
-        txt(ws, r, 3, f"=B{r}*{LPV}", fmt=NUM, fill=fill)
-        txt(ws, r, 4, f"=C{r}*{BLEND}*{DAYS}", fmt=MONEY, fill=fill)
-        txt(ws, r, 5, "", box=False)
-        for j, b in enumerate(C["bases"]):
-            txt(ws, r, 6 + j, f"=$D{r}-$C{r}*{b['cpl']*100:.4f}/100*{DAYS}",
-                fmt=MONEY, fill=fill)
-        txt(ws, r, 9, f"=B{r}/{VPD}", fmt=PCT, fill=fill)
-        r += 1
-    for c_ in ("F", "G", "H"): sign_cf(ws, f"{c_}{s0}:{c_}{r-1}")
+    K0 = r
+    card = [
+        ("المحطة", f"={PICK}", None, "الوردية المستهدَفة", '="المسائية ١٢:٠٠–٢٣:٥٩"',
+         None),
+        ("عدد العمّال في الوردية", f"={EVW}", NUM,
+         "المستهدف لكل عامل في اليوم", f"={PERW}", NUM2),
+        ("وبالساعة", f"={PERH}", NUM2,
+         "الزيادة على حِمله الحالي", f"={UPW}", PCT),
+        ("الرقم الذي يُقاس",
+         '="معاملات ساعات الذروة المسائية وحدها"', None,
+         "خط الأساس", '="الأسابيع الأربعة السابقة في المحطة نفسها"', None),
+        ("متى يُحكَم", '="بعد ستة أسابيع ثم كل شهر"', None,
+         "حدّ الأثر المقبول",
+         f'="أكثر من {D["campaigns"]["noise"]*100:.1f}٪ — تشتّت خط الأساس"', None),
+        ("مالك التنفيذ", '="مدير المحطة"', None,
+         "مالك القياس", '="التجاري · والعمليات للطاقم"', None),
+    ]
+    for i, (l1, f1, m1, l2, f2, m2) in enumerate(card):
+        rr = r + i
+        txt(ws, rr, 2, l1, align=W.RGT, font=W.BOLD)
+        merge(ws, rr, 3, 5, f1, fmt=m1,
+              fill=PatternFill("solid", fgColor=B.T_ORANGE),
+              font=Font(name=B.FONT, size=11, bold=True, color=B.ORANGE))
+        txt(ws, rr, 6, "", box=False)
+        txt(ws, rr, 7, l2, align=W.RGT, font=W.BOLD)
+        merge(ws, rr, 8, 11, f2, fmt=m2,
+              fill=PatternFill("solid", fgColor=B.T_ORANGE),
+              font=Font(name=B.FONT, size=11, bold=True, color=B.ORANGE))
+        txt(ws, rr, 12, "", box=False)
+        ws.row_dimensions[rr].height = 22
+    r += len(card)
     r = note(ws, r, NC,
-             "الصفّ الأخير هو الفجوة كاملةً. ولاحظ عمود «المحمَّل الكامل»: في محطاتٍ "
-             "كثيرة يخرج سالباً — لأن هامش اللتر أقلّ من كلفته محمَّلةً بمصاريف "
-             "المركز. وهذا ليس سبباً لرفض اللتر الإضافي، بل سببٌ لئلّا يُبنى عليه "
-             "قرار رأس مال.")
+             "وما لا يُطالَب به في هذه البطاقة عمداً: لترات الفاتورة الواحدة. "
+             "ثلثا تباينها مزيج وقود لا سلوك، فلا يملكها العامل ولا يُحاسَب عليها. "
+             "والمستهدف معاملاتٌ يخدمها، وهو ما يملكه فعلاً.",
+             fill=PatternFill("solid", fgColor=B.T_ORANGE),
+             font=Font(name=B.FONT, size=9, bold=True, color=B.ORANGE))
     return ws
-
 
 # ═══════════════════════════════════════════════ ④ الربع الأول والثاني
 def _q2rows():
@@ -1841,6 +2116,7 @@ def build():
     wb.remove(wb.active)
     summary(wb)
     stations(wb)          # يجب أن تسبق الحاسبة — منها يُبنى مرجع البحث
+    hourshapes(wb)        # وكذلك شكل الساعات — منه تُشتقّ الفجوة أمام القارئ
     calculator(wb)
     quarters_net(wb)
     mk007(wb)
