@@ -280,19 +280,20 @@ divider("القسم الأول", "أين نقف", "الشبكة · الاتجا�
   head(s, 2.1, "تعبئة بخمسين ريالاً — العتبة المعتمدة");
   const rows = L.rows.map((r, i) => ({
     c: [{ t: r.fuel, a: "right", b: true }, ar2(r.price), ar2(r.net_price),
-        { t: ar2(r.litres), b: true }, ar2(r.margin), ar2(r.opex),
-        { t: ar2(r.net), b: true, c: D_GOOD }, ar2(r.box),
-        { t: ar2(r.after), b: true, c: D_GOLD }, pc0(r.box / r.net)],
+        { t: ar2(r.litres), b: true },
+        { t: ar2(r.net), b: true, c: D_GOOD }, ar2(r.net_station),
+        ar2(r.box), { t: ar2(r.after), b: true, c: D_GOLD }, pc0(r.box / r.net)],
     fill: i % 2 ? T_NEU : W }));
   rows.push({ c: [{ t: "المرجّح", b: true }, ar2(50 / L.w_litres), ar2(50 / L.w_litres / 1.15),
-                  ar2(L.w_litres), ar2(L.w_litres * D.margin), ar2(L.w_litres * D.opex),
-                  ar2(L.w_net), ar2(L.box), ar2(L.w_net - L.box), pc0(L.box / L.w_net)],
+                  ar2(L.w_litres), ar2(L.w_net), ar2(L.w_net_station),
+                  ar2(L.box), ar2(L.w_net - L.box), pc0(L.box / L.w_net)],
               fill: T_BAND, b: true });
   table(s, M, 2.42, CW, [
-    { t: "المنتج", w: 12, a: "right" }, { t: "سعر المضخة", w: 10 }, { t: "صافي الضريبة", w: 10 },
-    { t: "لتر بـ٥٠ ريالاً", w: 11 }, { t: "هامش المساهمة", w: 11 }, { t: "خصم التشغيل", w: 10 },
-    { t: "الصافي", w: 9 }, { t: "علبة المناديل", w: 10 }, { t: "بعد الهدية", w: 9 },
-    { t: "الهدية من الصافي", w: 12 }], rows, { rh: 0.4, fs: 11, hfs: 9.5 });
+    { t: "المنتج", w: 12, a: "right" }, { t: "سعر المضخة", w: 11 },
+    { t: "صافي الضريبة", w: 11 }, { t: "لتر بـ٥٠ ريالاً", w: 12 },
+    { t: "مساهمة التعبئة", w: 12 }, { t: "بعد تشغيل المحطة", w: 12 },
+    { t: "علبة المناديل", w: 10 }, { t: "المساهمة بعد الهدية", w: 11 },
+    { t: "الهدية من المساهمة", w: 12 }], rows, { rh: 0.4, fs: 11, hfs: 9 });
   const cw = (CW - 2 * 0.2) / 3;
   const cards = [[ar(Math.round(L.box * 100)) + " هللة", "كلفة العلبة", "مؤكَّدة من الإدارة", ORANGE],
                  [ar1(L.breakeven_extra) + " لتر", "تعادل الهدية",
@@ -310,7 +311,7 @@ divider("القسم الأول", "أين نقف", "الشبكة · الاتجا�
     s.addText(c[2], { x: x + 0.1, y: 5.63, w: cw - 0.2, h: 0.34, fontFace: F,
       fontSize: 10, color: INK2, align: "center", margin: 0 });
   });
-  foot(s, "الهامش والتشغيل مقيسان من دفاتر ٢٦ محطة مشغّلة في الربع الثاني ٢٠٢٦ — لا موزَّعين من قائمة الدخل");
+  foot(s, "من قائمة الدخل يناير–يوليو ٢٠٢٦ · محطاتنا الـ٤٩ دون الامتياز · ٣١٠٫٧ مليون لتر — وعمود «بعد تشغيل المحطة» للحكم على المحطة لا لتسقيف مكافأة");
 }
 
 /* ═══ تكلفة اللتر ═══ */
