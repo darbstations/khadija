@@ -142,6 +142,7 @@ function foot(s, t) {
 
 const N = D.network, T = D.totals, SEG = D.segments, ST = D.stations, L = D.litre;
 const X = JSON.parse(fs.readFileSync("data/competitors.json", "utf8"));
+const LC = JSON.parse(fs.readFileSync("data/litre-cost.json", "utf8"));
 const BOXN = N.visits / 7 * 0.10;   // علب شهرياً عند ١٠٪ من المعاملات · الفترة سبعة أشهر
 
 /* ═══ ١ · الغلاف ═══ */
@@ -310,6 +311,74 @@ divider("القسم الأول", "أين نقف", "الشبكة · الاتجا�
       fontSize: 10, color: INK2, align: "center", margin: 0 });
   });
   foot(s, "الهامش والتشغيل مقيسان من دفاتر ٢٦ محطة مشغّلة في الربع الثاني ٢٠٢٦ — لا موزَّعين من قائمة الدخل");
+}
+
+/* ═══ تكلفة اللتر ═══ */
+{
+  const P = LC.pl, O = LC.op;
+  const s = page("تكلفة اللتر الواحد — لا قيمته",
+                 "ما نُخرجه من جيبنا لنبيع لتراً · قائمة الدخل يناير–يوليو ٢٠٢٦ · "
+                 + ar(P.total_stations) + " محطة و" + ar1(P.total_litres / 1e6) + " مليون لتر");
+  head(s, 1.3, "① أربع طبقات — وواحدة فقط بيدنا");
+  const rows = P.stack.map((k, i) => ({
+    c: [{ t: k.layer, a: "right", b: true }, ar(k.total), ar2(k.cpl),
+        pc0(k.cpl / P.cost_cpl), { t: k.note, a: "right", fs: 10 }],
+    fill: k.key === "opex" ? T_GOOD : (i % 2 ? T_NEU : W) }));
+  rows.push({ c: [{ t: "إجمالي التكلفة", b: true }, "", { t: ar2(P.cost_cpl), b: true },
+                  "١٠٠٪", { t: "مقابل سعر بيع محقَّق " + ar2(P.rev_cpl) + " هللة", a: "right" }],
+              fill: T_BAND, b: true });
+  table(s, M, 1.62, CW, [
+    { t: "الطبقة", w: 15, a: "right" }, { t: "ألف ريال", w: 11 },
+    { t: "هللة/لتر", w: 10 }, { t: "من التكلفة", w: 10 },
+    { t: "من يملك قرارها", w: 44, a: "right" }], rows, { rh: 0.31, fs: 10, hfs: 9.5 });
+
+  const cw = (CW - 2 * 0.2) / 3;
+  const cards = [[ar2(P.stack[0].cpl) + " هللة", "شراء اللتر",
+                  pc0(P.stack[0].cpl / P.cost_cpl) + " من التكلفة — بلا قرار لنا", BGRAY],
+                 [ar2(P.stack[1].cpl) + " هللة", "تشغيل المحطة",
+                  "الطبقة الوحيدة التي تُضبط — والأجور " + pc0(O.wage_share) + " منها", GOOD],
+                 [ar2(P.net_cpl) + " هللة", "صافي اللتر — خسارة",
+                  "التكلفة " + ar2(P.cost_cpl) + " والبيع " + ar2(P.rev_cpl), BAD]];
+  cards.forEach((c, i) => {
+    const x = rtlx(i, cw, 0.2);
+    s.addShape(p.ShapeType.roundRect, { x, y: 3.84, w: cw, h: 1.12, rectRadius: 0.05,
+      fill: { color: c[3] === BAD ? T_BAD : c[3] === GOOD ? T_GOOD : BG },
+      line: { color: c[3], width: 1.2 } });
+    s.addText(c[0], { x: x + 0.1, y: 3.92, w: cw - 0.2, h: 0.38, fontFace: F,
+      fontSize: 19, bold: true, color: c[3], align: "center", margin: 0 });
+    s.addText(c[1], { x: x + 0.1, y: 4.31, w: cw - 0.2, h: 0.27, fontFace: F,
+      fontSize: 11, bold: true, color: BGRAY, align: "center", margin: 0 });
+    s.addText(c[2], { x: x + 0.1, y: 4.58, w: cw - 0.2, h: 0.34, fontFace: F,
+      fontSize: 9.5, color: INK2, align: "center", margin: 0 });
+  });
+
+  s.addText("② والخسارة ليست موزَّعة — نموذج واحد يحملها", { x: M, y: 5.04, w: CW * 0.52,
+    h: 0.3, fontFace: F, fontSize: 12.5, bold: true, color: ORANGE, ...rtl });
+  const mrows = P.by_model.map(m => ({
+    c: [{ t: m.model, a: "right", b: true }, ar(m.stations), ar1(m.litres_m),
+        ar2(m.cm), ar2(m.opex), ar2(m.loaded),
+        { t: (m.net >= 0 ? "+" : "−") + ar2(Math.abs(m.net)), b: true,
+          c: m.net >= 0 ? D_GOOD : D_BAD }],
+    fill: m.net < -5 ? T_BAD : (m.net >= 0 ? T_GOOD : W) }));
+  table(s, M, 5.34, CW * 0.52, [
+    { t: "النموذج", w: 20, a: "right" }, { t: "محطات", w: 11 }, { t: "م لتر", w: 12 },
+    { t: "الهامش", w: 13 }, { t: "التشغيل", w: 14 }, { t: "المحمّل", w: 13 },
+    { t: "الصافي", w: 17 }], mrows, { rh: 0.26, fs: 9.5, hfs: 8.5 });
+
+  const x2 = M + CW * 0.55, w2 = CW * 0.45;
+  s.addText("③ وداخل التشغيل: العمالة — ومداها ٣٫٤ أضعاف", { x: x2, y: 5.04, w: w2, h: 0.3,
+    fontFace: F, fontSize: 12.5, bold: true, color: ORANGE, ...rtl });
+  const top = O.rows.slice(0, 2).concat(O.rows.slice(-2));
+  const wrows = top.map((r, i) => ({
+    c: [{ t: r.name.slice(0, 14), a: "right", b: true },
+        { t: ar2(r.wage_cpl), b: true, c: i < 2 ? D_BAD : D_GOOD },
+        ar(r.staff), ar(Math.round(r.litres_per_worker))],
+    fill: i < 2 ? T_BAD : T_GOOD }));
+  table(s, x2, 5.34, w2, [
+    { t: "المحطة", w: 34, a: "right" }, { t: "هللة/لتر", w: 20 },
+    { t: "عمّال", w: 16 }, { t: "لتر للعامل", w: 30 }],
+    wrows, { rh: 0.26, fs: 9.5, hfs: 8.5 });
+  foot(s, "⚠ " + O.caveat);
 }
 
 /* ═══ ربحية محطات التشغيل ═══ */
