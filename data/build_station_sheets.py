@@ -472,8 +472,95 @@ def station(wb, s):
              "التفصيل في ورقة «كيف حُسبت»", tone="gold", h=18)
     r += 1
 
-    # ── ③ المستهدف الشهري
-    r = band(ws, r, "③ المستهدف الشهري — اثنا عشر شهراً")
+    # ── ③ مستهدف الربح — الوجهة قبل الطريق
+    r = band(ws, r, "③ مستهدف الربح — كم لتراً حتى تربح")
+    W.header(ws, r, ["", "البند", "القيمة", "الوحدة", "من أين جاءت",
+                     "", "", "", ""])
+    _mh(ws, r, 5, 9)
+    r += 1
+    B0 = r
+    lpv = s["plan"]["lpv"] if s["plan"] else 0
+    peak = s["plan"]["gap_peak"] if s["plan"] else 0
+    com_m = (s["contract"]["std"] - s["contract"]["act"]) / 3 \
+        if s["contract"] else 0
+    prows = [
+        ("صافي الشهر بالأساس المختار", f"={NETM}", MONEY, "ريال", "calc",
+         "من كتلة الريال أعلاه"),
+        ("نقطة التعادل",
+         f'=IF({LMARG}<=0,"—",{LMON}*{LCOST}/{LMARG}/30.4)', NUM,
+         "لتر/يوم", "key",
+         "المصاريف الثابتة ÷ هامش اللتر"),
+        ("لترها اليوم", f"={LMON}/30.4", NUM, "لتر/يوم", "calc",
+         "لترات الشهر ÷ ٣٠٫٤"),
+        ("الفرق إلى التعادل",
+         f'=IF({LMARG}<=0,"—",C{B0+1}-C{B0+2})', NUM, "لتر/يوم", "key",
+         "سالبٌ يعني أنها فوق التعادل"),
+        ("وبالمعاملات",
+         f'=IF({LMARG}<=0,"—",C{B0+3}/{lpv})' if lpv else "—", NUM,
+         "معاملة/يوم", "key", "الفرق ÷ لتر لكل زيارة"),
+        ("فجوة ذروتها المقيسة", peak, NUM2, "معاملة/يوم", "calc",
+         "أقصى ما يحتمله البيع في ساعات ذروتها"),
+    ]
+    for i, (lab, v, fm, u, kind, src) in enumerate(prows):
+        rr = r + i
+        key = kind == "key"
+        txt(ws, rr, 2, lab, align=W.RGT,
+            font=Font(name=B.FONT, size=11 if key else 10, bold=True))
+        txt(ws, rr, 3, v, fmt=fm if not isinstance(v, str) or
+            str(v).startswith("=") else None,
+            fill=PatternFill("solid", fgColor=B.T_GOOD) if key else W.CALC,
+            font=Font(name=B.FONT, size=12 if key else 10, bold=key,
+                      color=B.D_GOOD if key else B.INK))
+        txt(ws, rr, 4, u, font=Font(name=B.FONT, size=9, color=B.INK3))
+        merge(ws, rr, 5, 9, src, align=W.RGT,
+              font=Font(name=B.FONT, size=8, color=B.INK3))
+    r += len(prows)
+    # الحكم — ثلاث حالات لا رابعة لها
+    verdict = (f'=IF({LMARG}<=0,"لا هامش مقيس — لا يُحكم",'
+               f'IF(C{B0+3}<=0,"✓ فوق التعادل — والمستهدف أدناه زيادةٌ فوق '
+               f'أرضيتها",IF(C{B0+4}<={peak},"✓ تكفيها فجوة ذروتها — فالبيع '
+               f'يبلغ التعادل","✗ البيع وحده لا يبلغ التعادل")))'
+               if lpv else '="لا لتر لكل زيارة مقيس — لا يُحكم"')
+    txt(ws, r, 2, "الحكم", align=W.RGT,
+        font=Font(name=B.FONT, size=11, bold=True))
+    merge(ws, r, 3, 9, verdict,
+          fill=PatternFill("solid", fgColor=B.T_ORANGE),
+          font=Font(name=B.FONT, size=11, bold=True, color=B.ORANGE))
+    ws.row_dimensions[r].height = 22
+    r += 1
+    W.header(ws, r, ["", "وإن لم يكفِ البيع — طريقان آخران", "القيمة",
+                     "الوحدة", "ما يغطّيه من العجز", "", "", "", ""])
+    _mh(ws, r, 5, 9)
+    r += 1
+    R0 = r
+    txt(ws, r, 2, "② العقد — فجوة العمولة", align=W.RGT, font=W.BOLD)
+    txt(ws, r, 3, com_m if com_m else "—", fmt=MONEY if com_m else None,
+        fill=W.CALC)
+    txt(ws, r, 4, "ريال/شهر", font=Font(name=B.FONT, size=9, color=B.INK3))
+    merge(ws, r, 5, 9,
+          f'=IF(C{B0}>=0,"المحطة رابحة — لا عجز",IF(C{R0}<=0,"لا شيء يُسترد '
+          f'— حصّتنا فوق المعياري",TEXT(C{R0}/-C{B0}*100,"0")&"٪ من العجز"))'
+          if com_m else '="لا عقد تشغيل مسجَّل لها"',
+          align=W.RGT, fill=W.CALC,
+          font=Font(name=B.FONT, size=10, bold=True, color=B.INK))
+    r += 1
+    txt(ws, r, 2, "③ التكلفة — الخفض اللازم", align=W.RGT, font=W.BOLD)
+    txt(ws, r, 3, f"=MAX(0,{LCOST}-{LMARG})", fmt=HAL, fill=W.CALC)
+    txt(ws, r, 4, "هللة/لتر", font=Font(name=B.FONT, size=9, color=B.INK3))
+    merge(ws, r, 5, 9,
+          f'=IF({LCOST}<=0,"—",IF(C{r}=0,"لا خفض لازم",'
+          f'TEXT(C{r}/{LCOST}*100,"0")&"٪ من مصاريف اللتر"))',
+          align=W.RGT, fill=W.CALC,
+          font=Font(name=B.FONT, size=10, bold=True, color=B.INK))
+    r += 1
+    r = note(ws, r,
+             "الافتراض: المصاريف ثابتة لا تتحرّك مع اللتر الإضافي — فالطاقم "
+             "والمرافق مدفوعة أصلاً. ولهذا يُقسَّم الثابت على الهامش لا على الصافي.",
+             tone="gold", h=20)
+    r += 1
+
+    # ── ④ المستهدف الشهري
+    r = band(ws, r, "④ المستهدف الشهري — اثنا عشر شهراً")
     W.header(ws, r, ["", "الأساس", "القيمة", "الوحدة", "من أين جاءت",
                      "", "", "", ""])
     _mh(ws, r, 5, 9)
@@ -544,9 +631,10 @@ def station(wb, s):
 
 # ═══════════════════════════════════════════════ الفهرس
 def index(wb, rows):
-    N = 12
+    N = 14
     ws = wb.create_sheet("الفهرس", 0)
-    W.setup(ws, [3, 26, 8, 10, 11, 12, 13, 13, 12, 12, 13, 26], freeze="A5")
+    W.setup(ws, [3, 26, 8, 10, 11, 12, 13, 13, 11, 11, 12, 12, 30, 22],
+            freeze="A5")
     W.title(ws, "فهرس المحطات — شيتٌ لكل محطة",
             f"{len(rows)} محطة · لكلٍّ شيتٌ باسمها فيه أداؤها وحاسبة لترها "
             "ومستهدفها الشهري · والأرقام هنا ملخّصٌ منها", N)
@@ -554,7 +642,8 @@ def index(wb, rows):
     r = 4
     W.header(ws, r, ["", "المحطة", "الرمز", "المنطقة", "نموذج العمل",
                      "مبيعات ر٢", "حجم ر٢ لتر", "صافي ر٢", "هامش الوقود",
-                     "صافي اللتر بنموذجها", "مستهدف السنة لتراً", "الشيت"])
+                     "صافي اللتر بنموذجها", "مستهدف السنة لتراً",
+                     "إلى التعادل معاملة/يوم", "هل يكفي البيع؟", "الشيت"])
     ws.row_dimensions[r].height = 32
     r += 1
     first = r
@@ -580,13 +669,37 @@ def index(wb, rows):
                  * calendar.monthrange(y, m)[1]
                  for i, (nm, y, m) in enumerate(MONTHS, 1))
         txt(ws, r, 11, yr, fmt=NUM, fill=W.CALC)
-        c = ws.cell(r, 12, s["sheet"])
+        # الفرق إلى التعادل، وهل تحتمله فجوة ذروتها
+        marg = s["price_ex"] * s["fm"] * 100
+        lpv = s["plan"]["lpv"] if s["plan"] else 0
+        peak = s["plan"]["gap_peak"] if s["plan"] else 0
+        if marg > 0 and lpv and s["base_lpd"]:
+            need = (s["base_lpd"] * s["cpl_def"] / marg - s["base_lpd"]) / lpv
+            over = need <= 0
+            okv = over or need <= peak
+            txt(ws, r, 12, need, fmt=NUM2,
+                fill=PatternFill("solid",
+                                 fgColor=B.T_GOOD if okv else B.T_BAD),
+                font=Font(name=B.FONT, size=10, bold=True,
+                          color=B.D_GOOD if okv else B.D_BAD))
+            txt(ws, r, 13, "فوق التعادل أصلاً" if over else
+                ("نعم — تكفيها فجوتها" if okv else
+                 f"لا — فجوتها {peak:.0f} فقط"), align=W.RGT,
+                fill=PatternFill("solid",
+                                 fgColor=B.T_GOOD if okv else B.T_BAD),
+                font=Font(name=B.FONT, size=9, bold=True,
+                          color=B.D_GOOD if okv else B.D_BAD))
+        else:
+            txt(ws, r, 12, "—", fill=W.CALC)
+            txt(ws, r, 13, "لا هامش أو حجم مقيس", align=W.RGT,
+                font=Font(name=B.FONT, size=9, color=B.INK3))
+        c = ws.cell(r, 14, s["sheet"])
         c.hyperlink = f"#'{s['sheet']}'!A1"
         c.font = Font(name=B.FONT, size=9, color=B.BLUE, underline="single")
         c.alignment = W.RGT; c.border = W.BOX
         r += 1
     last = r - 1
-    ws.auto_filter.ref = f"B{first-1}:L{last}"
+    ws.auto_filter.ref = f"B{first-1}:N{last}"
     for col in ("G", "K"):
         ws.conditional_formatting.add(
             f"{col}{first}:{col}{last}",
@@ -594,8 +707,9 @@ def index(wb, rows):
                         color=B.ORANGE, showValue=True))
     r += 1
     r = note(ws, r,
-             "الشرطة تعني أن مصدر العمود لا يغطّي هذه المحطة، لا أن قيمتها صفر "
-             "· وكيف حُسب كل رقم في ورقة «كيف حُسبت»", tone="gold", nc=N, h=20)
+             "«إلى التعادل» سالبٌ يعني أنها فوق التعادل أصلاً · والشرطة تعني "
+             "أن مصدر العمود لا يغطّي هذه المحطة لا أن قيمتها صفر · "
+             "وكيف حُسب كل رقم في ورقة «كيف حُسبت»", tone="gold", nc=N, h=20)
     return ws
 
 
