@@ -147,6 +147,74 @@ def build():
     c.alignment = W.RGT
     r += 2
 
+    # ═════════════ ⓪ الملخّص — ثلاثة أبعادٍ في جدولٍ واحد
+    r = band(ws, r, "⓪  الملخّص · المحطات والوقود والوحدات")
+    r = head(ws, r, ["البند", "المخطط", "الفعلي", "الموازنة ٢٧",
+                     "الفعلي ÷ المخطط", "٢٧ ÷ الفعلي", "المصدر", ""])
+    D26 = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+    def lpd(lit, cnt, upto=12):
+        sd = sum(cnt[k] * D26[k] for k in range(upto))
+        return sum(lit[:upto]) / sd if sd else 0
+
+    def per(blk, k):
+        return d[blk][k] / d[blk + "_n"][k] if d[blk + "_n"][k] else 0
+
+    rows = [
+        ("محطةٌ قائمةٌ بنهاية السنة",
+         d["register_existing"] + d["register_opens_26"],
+         d["fuel_l26_n"][ra - 1], d["fuel_has_27"], NUM,
+         "السجل مقابل ما باع في سبتمبر"),
+        ("محطةٌ باعت في أي شهر", None, d["fuel_sold_actual"],
+         d["fuel_has_27"], NUM, "لترٌ > صفر"),
+        ("الوقود · مليون لتر", None, sum(d["fuel_l26"][:ra]) / 1e6,
+         sum(d["fuel_l27"]) / 1e6, NUM1, "فعليُّ تسعةِ أشهر"),
+        ("الوقود · مليون ريال", None, sum(d["fuel_v26"][:ra]) / 1e6,
+         sum(d["fuel_v27"]) / 1e6, NUM1, "قبل الضريبة"),
+        ("لتر / محطة / يوم", None, lpd(d["fuel_l26"], d["fuel_l26_n"], ra),
+         lpd(d["fuel_l27"], d["fuel_l27_n"]), NUM,
+         "إنتاجيةُ المحطة الواحدة"),
+        ("وحدةٌ تفوتر · مخطط «أ»", d["rent_p26a_n"][11],
+         d["rent_gross_n"][rr - 1], d["rent_b27_n"][11], NUM, "ديسمبر"),
+        ("وحدةٌ تفوتر · مخطط «ب»", d["rent_p26b_n"][11],
+         d["rent_gross_n"][rr - 1], d["rent_b27_n"][11], NUM, "ديسمبر"),
+        ("الإيجار · مليون ريال «أ»", sum(d["rent_p26a"]) / 1e6,
+         sum(d["rent_gross"]) / 1e6, sum(d["rent_b27"]) / 1e6, NUM1,
+         "السنة ▸ بالمنقول"),
+        ("الإيجار · مليون ريال «ب»", sum(d["rent_p26b"]) / 1e6,
+         sum(d["rent_gross"]) / 1e6, sum(d["rent_b27"]) / 1e6, NUM1,
+         "السنة ▸ بالمنقول"),
+        ("ريال / وحدة / شهر", per("rent_p26b", 11),
+         per("rent_gross", rr - 1), per("rent_b27", 11), NUM,
+         "المخطط «ب» · والفعلي أغسطس"),
+    ]
+    for lbl, p, a, b, fmt, src in rows:
+        txt(ws, r, 2, lbl, font=W.BOLD, align=W.RGT)
+        txt(ws, r, 3, p if p is not None else "—", fmt=fmt if p else None)
+        txt(ws, r, 4, a, fmt=fmt)
+        txt(ws, r, 5, b, fmt=fmt)
+        txt(ws, r, 6, f'=IF(C{r}="—","—",D{r}/C{r})' if p is not None else "—",
+            fmt=PCT, fill=CALCF)
+        txt(ws, r, 7, f'=IF(D{r}=0,"—",E{r}/D{r})', fmt=NUM1, fill=CALCF)
+        ws.merge_cells(start_row=r, start_column=8, end_row=r, end_column=NC)
+        c = ws.cell(r, 8, src)
+        c.font = W.SMALL
+        c.alignment = W.RGT
+        c.border = W.BOX
+        ws.cell(r, 9).border = W.BOX
+        r += 1
+    r += 1
+    r = note(ws, r, "ومن أين تأتي الموازنة؟  الوقود "
+                    f"{d['fuel_has_27']/d['fuel_l26_n'][ra-1]:.2f}× محطاتٍ × "
+                    f"{lpd(d['fuel_l27'],d['fuel_l27_n'])/lpd(d['fuel_l26'],d['fuel_l26_n'],ra)*100:.0f}٪ "
+                    "إنتاجيةً للمحطة. والإيجار "
+                    f"{d['rent_b27_n'][11]/d['rent_gross_n'][rr-1]:.2f}× وحداتٍ × "
+                    f"{per('rent_b27',11)/per('rent_gross',rr-1)*100:.0f}٪ "
+                    "إيجاراً للوحدة. فالوقود يَعِد توسّعاً وزيادةً يسيرةً في "
+                    "الإنتاجية، والإيجار يَعِد عدداً وحدَه — وإيرادُ الوحدة "
+                    "فيه ينزل إلى أقلَّ من النصف.", tone="gold", h=36)
+    r += 1
+
     # ═════════════ ① الإيجار · الإيراد
     r = band(ws, r, "①  الإيجار · الإيراد المفوتَر (ريال)")
     r = note(ws, r, "والمخطط نسختان في الملف نفسه: «أ» عمودُ "
