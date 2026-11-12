@@ -104,8 +104,12 @@ def build_html():
                       base64.b64encode(open(FONT, "rb").read()).decode())
     H = ['<meta charset="utf-8"><style>' + css + "</style>"]
     H.append("<h1>الأوصاف الوظيفية — الإدارة التجارية</h1>")
-    H.append('<div class="sub">ستة أدوار · لكل قرارٍ مالكٌ واحد · ولكل دورٍ '
-             "رقمٌ لا يُقاس به غيره · و«ما ليس من مهامه» مكتوبٌ بمالكه</div>")
+    H.append(f'<div class="sub">{len(J.ROLES)} أدوار · لكل قرارٍ مالكٌ واحد · '
+             "ولكل دورٍ رقمٌ لا يُقاس به غيره · و«ما ليس من مهامه» مكتوبٌ "
+             "بمالكه</div>")
+    H.append(f'<div class="num" style="font-size:8pt">الهيكل: {esc(J.HEAD)}'
+             " &nbsp;◂&nbsp; مدير مبيعات الوقود · مدير التسويق · مدير العقار"
+             " &nbsp;◂&nbsp; مشرفو الإدارات الثلاث</div>")
     H.append("<h2>خريطة المسؤولية</h2><table><tr><th>القرار أو الرقم</th>"
              "<th>المالك الوحيد</th><th>يُستشار</th><th>يُبلَّغ</th>"
              "<th>ليس له — والقاعدة</th></tr>")
