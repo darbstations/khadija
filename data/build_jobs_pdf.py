@@ -147,6 +147,36 @@ def build_html():
     return HTML
 
 
+def build_one(name):
+    """وصفٌ مفردٌ لدورٍ واحد — صفحةُ A4 قائمةٌ بذاتها"""
+    import base64 as b64
+    css = CSS.replace("__FONT__",
+                      b64.b64encode(open(FONT, "rb").read()).decode())
+    body = role_html(name).replace('<h1 class="brk">', "<h1>", 1)
+    html = f"docs/وصف-وظيفي-{name.replace(' ', '-')}.html"
+    pdf = f"docs/وصف-وظيفي-{name.replace(' ', '-')}.pdf"
+    with open(html, "w", encoding="utf-8") as f:
+        f.write('<meta charset="utf-8"><style>' + css + "</style>" + body)
+    return html, pdf
+
+
+def _print(html, pdf):
+    with open(JS, "w", encoding="utf-8") as f:
+        f.write("""const { chromium } = require('playwright');
+(async () => {
+  const b = await chromium.launch();
+  const p = await b.newPage();
+  await p.goto('file://' + process.argv[2], { waitUntil: 'networkidle' });
+  await p.pdf({ path: process.argv[3], format: 'A4', printBackground: true });
+  await b.close();
+})();""")
+    subprocess.run(["node", JS, os.path.abspath(html), os.path.abspath(pdf)],
+                   check=True)
+    os.remove(html)
+    os.remove(JS)
+    print(f"✓ {pdf}")
+
+
 def build():
     build_html()
     with open(JS, "w", encoding="utf-8") as f:
@@ -166,4 +196,11 @@ def build():
 
 
 if __name__ == "__main__":
-    build()
+    import sys
+    if len(sys.argv) > 1:
+        role = sys.argv[1]
+        if role not in J.JOBS:
+            sys.exit("الأدوار: " + " · ".join(J.ROLES))
+        _print(*build_one(role))
+    else:
+        build()
