@@ -126,7 +126,7 @@ def memo_html(role, ref, to, frm, note=""):
     if note:
         H.append(f'<div class="purpose" style="margin-bottom:2.5mm">{P.esc(note)}</div>')
     # الجسم — من المصدر نفسه
-    body = P.role_html(role).replace('<h1 class="brk">', "<h1>", 1)
+    body = P.role_html(role, weights=False).replace('<h1 class="brk">', "<h1>", 1)
     H.append(body)
     # التواقيع
     H.append(

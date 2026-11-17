@@ -54,7 +54,7 @@ def esc(s):
     return (str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
 
 
-def role_html(name):
+def role_html(name, weights=True):
     j = J.JOBS[name]
     h = [f'<h1 class="brk">{esc(name)}  <small>— الإدارة التجارية</small></h1>',
          f'<div class="sub">{esc(j["scope"])} · يرفع إلى '
@@ -84,14 +84,17 @@ def role_html(name):
                  f'<td class="c">{esc(a)}</td></tr>')
     h.append("</table>")
     mine = [k for k in J.KPI if k[0] == name]
+    wcol = "<th>الوزن</th>" if weights else ""
     h.append("<h2>⑥ مؤشراته</h2><table><tr><th>المؤشر</th><th>طريقة الحساب</th>"
-             "<th>المصدر</th><th>الاتجاه</th><th>الوزن</th></tr>")
+             f"<th>المصدر</th><th>الاتجاه</th>{wcol}</tr>")
     for own, nm, calc, src, direc, wt in mine:
+        w = f'<td class="c">{wt*100:.0f}٪</td>' if weights else ""
         h.append(f'<tr><td class="k">{esc(nm)}</td><td>{esc(calc)}</td>'
                  f'<td class="c">{esc(src)}</td><td class="c">{esc(direc)}</td>'
-                 f'<td class="c">{wt*100:.0f}٪</td></tr>')
-    h.append(f'<tr><td class="k">مجموع الأوزان</td><td colspan="3"></td>'
-             f'<td class="c"><b>{sum(k[5] for k in mine)*100:.0f}٪</b></td></tr>')
+                 f"{w}</tr>")
+    if weights:
+        h.append(f'<tr><td class="k">مجموع الأوزان</td><td colspan="3"></td>'
+                 f'<td class="c"><b>{sum(k[5] for k in mine)*100:.0f}٪</b></td></tr>')
     h.append("</table>")
     for title, pts, _ in j["rules"]:
         h.append(f'<div class="rule"><b>{esc(title)}</b>'
