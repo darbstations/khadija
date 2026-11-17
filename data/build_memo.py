@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""مذكّرة داخلية بهوية درب — تُغلّف أي وصفٍ وظيفيٍّ بصيغةِ مراسلةٍ رسمية
+"""خطابٌ رسميٌّ على ترويسة درب — يُغلّف أي وصفٍ وظيفيٍّ بصيغةِ مراسلة
 
    الترويسة أصلُها الرسميّ: استُخرجت طبقتاها من ملف الشركة
    (`التواصل الداخلي.docx`) وحُفظتا في `data/brand/`:
@@ -24,7 +24,7 @@ import build_jobs as J
 import build_jobs_pdf as P
 
 JS = "data/memo.js"
-FONT = "data/fonts/noto-sans-arabic.woff2"
+FONT = "data/fonts/din-next-lt-arabic-medium.ttf"   # خط درب الرسميّ من الترويسة
 LOGO = "data/brand/darb-letterhead-logo.png"
 LOGO_ONLY = "data/brand/darb-logo.png"   # الشعار مقصوصاً — لرأس الطباعة
 MARK = "data/brand/darb-letterhead-watermark.jpg"
@@ -36,73 +36,65 @@ HIJRI = {1: "محرّم", 2: "صفر", 3: "ربيع الأول", 4: "ربيع ا
          9: "رمضان", 10: "شوّال", 11: "ذو القعدة", 12: "ذو الحجّة"}
 
 CSS = """
-@font-face { font-family:"NSA"; src:url(data:font/woff2;base64,__FONT__) format("woff2");
+@font-face { font-family:"DIN"; src:url(data:font/ttf;base64,__FONT__) format("truetype");
              font-weight:100 900; font-style:normal; }
 @page { size: A4 portrait; }
 * { box-sizing: border-box; }
 html { background-image: url(__MARK__); background-repeat: no-repeat;
        background-position: left bottom; background-size: 100% 100%;
        background-attachment: fixed; }
-body { direction: rtl; margin: 0; color: #3D3D3D; font-family: "NSA", sans-serif; }
-
-/* ── طبقتا الترويسة الرسمية — تتكرّران على كل صفحة */
-/* الشعار وسطرُ الذيل يتكرّران عبر رأس/ذيل الطباعة في كروميوم.
-   والعلامة المائية خلفيةٌ على الصفحة نفسها. */
+body { direction: rtl; margin: 0; color: #3D3D3D; font-family: "DIN", sans-serif; }
 .page { position: relative; z-index: 1; }
 
-/* ── شريط العنوان تحت الشعار */
-.head { border-bottom: 1.2pt solid __ORANGE__; padding-bottom: 2.5mm;
-        margin: 0 0 3mm; display: flex; align-items: flex-end; }
-.org { flex: 1; }
-.org .n { font-size: 12pt; font-weight: 700; color: __GREY__; }
-.org .d { font-size: 7.5pt; color: #9B968E; margin-top: 0.6mm; }
-.kind { font-size: 8.5pt; color: __ORANGE__; font-weight: 700; white-space: nowrap; }
+/* ── شريط العنوان */
+.head { border-bottom: 1pt solid __ORANGE__; padding-bottom: 2.5mm;
+        margin: 0 0 3mm; }
+.head .n { font-size: 12pt; color: __GREY__; }
+.head .d { font-size: 8pt; color: #8E8A84; margin-top: 0.8mm; }
 
 /* ── حقول المراسلة */
-table.meta { width: 100%; border-collapse: collapse; font-size: 7.4pt;
+table.meta { width: 100%; border-collapse: collapse; font-size: 8pt;
              margin-bottom: 3mm; }
-table.meta td { border: 0.4pt solid #E3DCD1; padding: 1.1mm 2mm; }
-table.meta td.k { background: #F5F2ED; font-weight: 700; color: __GREY__;
-                  white-space: nowrap; width: 20mm; }
+table.meta td { border: 0.4pt solid #E6E2DB; padding: 1.3mm 2mm; }
+table.meta td.k { background: #F5F2ED; color: __GREY__; white-space: nowrap;
+                  width: 20mm; }
 
 /* ── الجسم */
-h1 { font-size: 12pt; margin: 0 0 1mm; color: __GREY__; }
-.sub { font-size: 7pt; color: #9B968E; margin: 0 0 2.5mm; }
-h2 { font-size: 8.5pt; color: __ORANGE__; background: #FBEEE0; margin: 2.2mm 0 0.9mm;
-     padding: 0.8mm 2mm; border-radius: 1mm; page-break-after: avoid; }
-table { border-collapse: collapse; width: 100%; font-size: 6.6pt;
+h1 { font-size: 12.5pt; margin: 0 0 1mm; color: __GREY__; }
+.sub { font-size: 7.5pt; color: #8E8A84; margin: 0 0 3mm; }
+h2 { font-size: 9pt; color: __GREY__; background: #F5F2ED; margin: 3mm 0 1mm;
+     padding: 1mm 2mm; page-break-after: avoid;
+     border-right: 1.6pt solid __ORANGE__; }
+table { border-collapse: collapse; width: 100%; font-size: 7.2pt;
         page-break-inside: avoid; }
-th { background: #55565A; color: #fff; font-weight: 600; padding: 0.8mm 1mm;
-     font-size: 6.3pt; text-align: center; }
-td { border: 0.35pt solid #E3DCD1; padding: 0.6mm 1mm; vertical-align: top;
+th { background: __GREY__; color: #fff; padding: 1mm 1mm; font-size: 6.8pt;
+     text-align: center; }
+td { border: 0.35pt solid #E6E2DB; padding: 0.9mm 1.2mm; vertical-align: top;
      text-align: right; }
 td.c { text-align: center; white-space: nowrap; }
-td.k { font-weight: 700; background: #FAF8F4; white-space: nowrap; }
-.num { background: #D6E9E1; color: #1F5E4A; font-weight: 700; font-size: 9pt;
-       text-align: center; padding: 1.4mm; border-radius: 1mm; }
-.purpose { font-size: 7.8pt; line-height: 1.6; }
-td.no { color: #9A3E2C; background: #F2DAD4; font-weight: 600; }
-td.own { color: #2E8B6F; font-weight: 700; white-space: nowrap; }
-.rule { background: #F2DAD4; color: #9A3E2C; font-size: 6.4pt; padding: 1mm 2mm;
-        margin-top: 1mm; border-radius: 1mm; }
-.rule b { display: block; margin-bottom: 0.6mm; }
-.rule div { margin: 0.4mm 0; }
+td.k { background: #FAF9F7; color: __GREY__; white-space: nowrap; }
+.num { background: #F5F2ED; color: __GREY__; font-size: 10pt;
+       text-align: center; padding: 2mm; border-right: 1.6pt solid __ORANGE__; }
+.purpose { font-size: 8.2pt; line-height: 1.75; }
+td.no { background: #FAF9F7; color: __GREY__; }
+td.own { color: __ORANGE__; white-space: nowrap; }
+.rule { background: #F5F2ED; color: #6E6A64; font-size: 7pt; padding: 1.4mm 2mm;
+        margin-top: 1.2mm; border-right: 1.6pt solid __ORANGE__; }
+.rule b { display: block; margin-bottom: 0.8mm; color: __GREY__; }
+.rule div { margin: 0.5mm 0; }
 
 /* ── التواقيع */
-.sig { width: 100%; border-collapse: collapse; font-size: 7pt; margin-top: 4mm;
+.sig { width: 100%; border-collapse: collapse; font-size: 7.4pt; margin-top: 5mm;
        page-break-inside: avoid; }
-.sig th { background: #F5F2ED; color: __GREY__; border: 0.4pt solid #E3DCD1;
-          padding: 1.2mm; font-size: 7pt; }
-.sig td { height: 15mm; border: 0.4pt solid #E3DCD1; vertical-align: bottom;
-          padding: 1.2mm; color: #B5AEA2; font-size: 6pt; }
-.ack { margin-top: 2.5mm; border: 0.5pt solid __ORANGE__; border-radius: 1mm;
-       padding: 2mm; font-size: 7pt; color: #55565A; }
+.sig th { background: #F5F2ED; color: __GREY__; border: 0.4pt solid #E6E2DB;
+          padding: 1.4mm; font-size: 7.4pt; }
+.sig td { height: 16mm; border: 0.4pt solid #E6E2DB; vertical-align: bottom;
+          padding: 1.4mm; color: #A8A49E; font-size: 6.4pt; }
+.ack { margin-top: 3mm; border: 0.5pt solid __ORANGE__; padding: 2.2mm;
+       font-size: 7.4pt; color: __GREY__; }
 .ack b { color: __ORANGE__; }
-.ack { color: __GREY__; }
-.ack .line { display: inline-block; border-bottom: 0.5pt dotted #9B968E;
+.ack .line { display: inline-block; border-bottom: 0.5pt dotted #A8A49E;
              min-width: 38mm; margin: 0 1mm; }
-.foot { margin-top: 3mm; padding-top: 1.5mm; text-align: center;
-        font-size: 5.8pt; color: #B5AEA2; border-top: 0.4pt solid #ECE6DD; }
 """
 
 
@@ -118,9 +110,8 @@ def memo_html(role, ref, to, frm, note=""):
     H.append('<div class="page">')
     H.append(
         '<div class="head">'
-        '<div class="org"><div class="n">شركة درب الوقود المحدودة</div>'
-        '<div class="d">القطاع التجاري · إدارة العقار</div></div>'
-        '<div class="kind">مذكّرة داخلية</div></div>')
+        '<div class="n">شركة درب الوقود المحدودة</div>'
+        '<div class="d">القطاع التجاري · إدارة العقار</div></div>')
     # الحقول
     H.append(
         '<table class="meta">'
@@ -174,7 +165,7 @@ const fs = require('fs');
       + '<img src="' + process.argv[4] + '" style="height:12mm">' + '</div>',
     footerTemplate: '<div style="width:100%;text-align:center;font-size:6pt;'
       + 'color:#B5AEA2;font-family:sans-serif;padding-bottom:6mm;">'
-      + 'وثيقة داخلية — تُحفظ في ملف الموظف ولا تُتداول خارج الشركة'
+      + 'تُحفظ في ملف الموظف'
       + ' &nbsp;·&nbsp; <span class="pageNumber"></span>/'
       + '<span class="totalPages"></span></div>',
   });
