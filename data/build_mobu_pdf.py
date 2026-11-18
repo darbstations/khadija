@@ -33,22 +33,22 @@ html { background-image: url(__MARK__); background-repeat: no-repeat;
        background-position: left bottom; background-size: 100% 100%;
        background-attachment: fixed; }
 body { direction: rtl; margin: 0; color: #3D3D3D; font-family: "DIN", sans-serif; }
-.head { border-bottom: 1pt solid __ORANGE__; padding-bottom: 2.5mm; margin: 0 0 4mm; }
+.head { border-bottom: 1pt solid __ORANGE__; padding-bottom: 2mm; margin: 0 0 2.5mm; }
 .head .n { font-size: 13pt; color: __GREY__; }
 .head .d { font-size: 8pt; color: #8E8A84; margin-top: 1mm; }
-h2 { font-size: 9.5pt; color: __GREY__; background: #F5F2ED; margin: 4mm 0 1.5mm;
-     padding: 1.2mm 2.5mm; border-right: 1.8pt solid __ORANGE__; }
-table { border-collapse: collapse; width: 100%; font-size: 8.4pt; }
-th { background: __GREY__; color: #fff; padding: 1.4mm 1mm; font-size: 7.6pt;
+h2 { font-size: 9pt; color: __GREY__; background: #F5F2ED; margin: 2.6mm 0 1.2mm;
+     padding: 1mm 2.5mm; border-right: 1.8pt solid __ORANGE__; }
+table { border-collapse: collapse; width: 100%; font-size: 8pt; }
+th { background: __GREY__; color: #fff; padding: 1mm 1mm; font-size: 7.2pt;
      text-align: center; font-weight: 600; }
-td { border: 0.4pt solid #E6E2DB; padding: 1.3mm 1.6mm; text-align: center; }
+td { border: 0.4pt solid #E6E2DB; padding: 0.9mm 1.4mm; text-align: center; }
 td.k { text-align: right; color: __GREY__; background: #FAF9F7; white-space: nowrap; }
-td.big { font-size: 11pt; font-weight: 700; color: #1F1F1F; }
+td.big { font-size: 10pt; font-weight: 700; color: #1F1F1F; }
 tr.tot td { background: #F5F2ED; font-weight: 700; }
-.mon { font-size: 6.8pt; }
-.mon td { padding: 1mm 0.4mm; }
-.note { font-size: 7.6pt; color: #6E6A64; background: #F5F2ED; padding: 2mm 2.5mm;
-        margin-top: 1.5mm; border-right: 1.8pt solid __ORANGE__; line-height: 1.6; }
+.mon { font-size: 6.4pt; }
+.mon td { padding: 0.7mm 0.3mm; }
+.note { font-size: 7.2pt; color: #6E6A64; background: #F5F2ED; padding: 1.4mm 2.2mm;
+        margin-top: 1mm; border-right: 1.8pt solid __ORANGE__; line-height: 1.5; }
 .note b { color: __GREY__; }
 .warn { border-right-color: #C0503A; }
 .warn b { color: #9A3E2C; }
@@ -89,10 +89,9 @@ def build_html(D):
                  f'<td style="font-size:7.4pt">{STAT[y]}</td>'
                  f'<td class="pos">{v["total"] - v["own"]:+,.0f} لتر</td></tr>')
     H.append("</table>")
-    H.append('<div class="note"><b>التحقّق</b> — جُمعت الشهورُ الاثنا عشرَ '
-             'وقُورنت بعمود <b>Total</b> الذي تكتبه الورقةُ بنفسها: الفرقُ '
-             '<b>صفرٌ في السنواتِ الثلاث</b>. وجمعُ المنتجاتِ منفردةً '
-             '(٩١ + ٩٥ + ديزل + ٩٨) يطابق صفَّ Total بفارقٍ دون ٠٫٠٥٪.</div>')
+    H.append('<div class="note"><b>التحقّق</b> — جمعُ الشهورِ الاثني عشرَ '
+             'يطابق عمودَ <b>Total</b> الذي تكتبه الورقةُ بنفسها: الفرقُ '
+             '<b>صفرٌ في السنواتِ الثلاث</b>.</div>')
 
     # ② شهراً بشهر
     H.append("<h2>② شهراً بشهر — مليون لتر</h2>"
@@ -159,6 +158,38 @@ def build_html(D):
              f'على خليص وهو بحرة، و<b>JA357</b> على الذكرى الخالدة وهو الريث. '
              f'فالمفتاحُ الصالحُ عمودُ <b>Station Name</b> أو عمودُ '
              f'<b>#</b> (١–{D["stations"]}) — لا الكود.</div>')
+
+    # ⑥ المحطات الجديدة
+    N = D.get("new")
+    if N:
+        qq = " · ".join(f"ر{k} {v}" for k, v in N["q"].items())
+        H.append("<h2>⑥ المحطاتُ الجديدةُ لـ٢٠٢٧ — خارجَ الستّين</h2><table>"
+                 "<tr><th>العدد</th><th>تفتح نوف–ديس ٢٦</th>"
+                 "<th>تفتح خلال ٢٧</th><th>موازنةُ الملف</th>"
+                 "<th>التوقّعُ المقيس</th><th>التوقّع ÷ الموازنة</th></tr>")
+        H.append(f'<tr class="tot"><td class="big">{N["n"]}</td>'
+                 f'<td>{N["n26"]}</td><td>{N["n27"]}</td>'
+                 f'<td class="big">{fmt(N["budget"])}</td>'
+                 f'<td class="big">{fmt(N["forecast"])}</td>'
+                 f'<td class="neg">'
+                 f'{N["forecast"] / N["budget"] * 100:.0f}٪</td></tr>')
+        H.append("</table>")
+        H.append(f'<div class="note">توزُّعُ افتتاحاتِ ٢٠٢٧: {qq}. '
+                 f'<b>ولا تقاطعَ مع الستّين</b> — فالرقمان يُجمعان ولا '
+                 f'يُكرَّران. والتوقّعُ مبنيٌّ على أربعةِ مُدخَلاتٍ مقيسةٍ '
+                 f'من بياناتنا: معدّلُ النظير '
+                 f'({N["rate_lo"]:,}–{N["rate_hi"]:,} ل/يوم) × منحنى التدرّج '
+                 f'المقيس من ٢٢ افتتاحاً في ٢٠٢٦ × كسرِ يومِ الافتتاح × '
+                 f'منحنى الموسم — وتفصيلُه في ملف '
+                 f'«توقّع المحطات الجديدة ٢٠٢٧».</div>')
+        H.append(f'<div class="note warn"><b>المجموعُ على هذه الورقة</b> — '
+                 f'الستّون {fmt(D["years"]["2027"]["total"])} مليون لترٍ '
+                 f'موازنةً، والجديدةُ {fmt(N["budget"])} موازنةً أو '
+                 f'{fmt(N["forecast"])} توقّعاً ⇒ '
+                 f'<b>{fmt(D["years"]["2027"]["total"] + N["budget"])}</b> '
+                 f'بموازنةِ الملف، أو '
+                 f'<b>{fmt(D["years"]["2027"]["total"] + N["forecast"])}</b> '
+                 f'بالتوقّعِ المقيس.</div>')
 
     H.append(f'<div class="src">{D["source"]}</div>')
     with open(HTML, "w", encoding="utf-8") as f:
