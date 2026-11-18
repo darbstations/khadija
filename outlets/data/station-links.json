@@ -1,0 +1,2294 @@
+{
+ "MK127": {
+  "url": "https://maps.app.goo.gl/cKhGikzMLtDYUERz7",
+  "name": "محطة بحرة",
+  "city": "Makkah",
+  "kind": "new"
+ },
+ "MD011": {
+  "url": "https://maps.app.goo.gl/b41M3K7juo8MQ6dPA",
+  "name": "ابيار الماشي",
+  "city": "Madinah",
+  "kind": "new"
+ },
+ "MK037": {
+  "url": "https://maps.app.goo.gl/FMCnQXFT9LhGmrrz8",
+  "name": "درب 37- الراشدية",
+  "city": "Makkah",
+  "kind": "new"
+ },
+ "JA059": {
+  "url": "https://maps.app.goo.gl/5gRHZgehnU6EYXcq7",
+  "name": "طريق الملك فهد",
+  "city": "Jazan",
+  "kind": "new"
+ },
+ "MD096": {
+  "url": "https://maps.app.goo.gl/r932iVMTx9b3yuNZ9",
+  "name": "درب 96",
+  "city": "Madinah",
+  "kind": "new"
+ },
+ "MK013": {
+  "url": "https://maps.app.goo.gl/dADvr1o78FkkucSt7",
+  "name": "سندى بن العباس",
+  "city": "Jeddah",
+  "kind": "new"
+ },
+ "MK044": {
+  "url": "https://maps.app.goo.gl/eV5rD8eyZw9oEUW76?g_st=iw",
+  "name": "مجمع القنفذة",
+  "city": "Al Qunfudhah",
+  "kind": "new"
+ },
+ "RY073": {
+  "url": "https://maps.app.goo.gl/ThZM3DTNzcUtw98q8",
+  "name": "درب 73 القدية",
+  "city": "Riyadh",
+  "kind": "new"
+ },
+ "MK045": {
+  "url": "https://maps.app.goo.gl/6nnqKqdEi2TuBXh28",
+  "name": "مدينة الملك عبدالله الاقتصادية",
+  "city": "Makkah",
+  "kind": "new"
+ },
+ "MK104": {
+  "url": "https://maps.app.goo.gl/wafLDdDYn5fJN1MSA",
+  "name": "الخمرة",
+  "city": "JEDDAH",
+  "kind": "new"
+ },
+ "JA188": {
+  "url": "https://maps.app.goo.gl/kFaCyVcBrNHtfJbP9",
+  "name": "محطة طريق الملك عبدالعزيز بيش",
+  "city": "بيشBaish",
+  "kind": "new"
+ },
+ "MK021": {
+  "url": "https://maps.app.goo.gl/eHVpMimcjpUBJkVJ8",
+  "name": "الوسام الطائف",
+  "city": "Taif",
+  "kind": "new"
+ },
+ "TB146": {
+  "url": "https://maps.app.goo.gl/7ZNAUu7L6vtQ2bX17",
+  "name": "القادسية",
+  "city": "TABOUK",
+  "kind": "new"
+ },
+ "MK091": {
+  "url": "https://maps.app.goo.gl/yerUfVj9bD4QEe8EA",
+  "name": "السر-الطائف",
+  "city": "TAIF",
+  "kind": "new"
+ },
+ "MK191": {
+  "url": "https://maps.app.goo.gl/iQqyGmzGnZoTPXJZ7",
+  "name": "الربوة جدة",
+  "city": "Jeddah",
+  "kind": "new"
+ },
+ "MK228": {
+  "url": "https://maps.google.com/maps?q=21.503795623779297%2C39.197845458984375&z=17&hl=ar",
+  "name": "الملك خالد جدة",
+  "city": "Jeddah",
+  "kind": "new"
+ },
+ "AS286": {
+  "url": "https://maps.app.goo.gl/ox7gqeLGx243bj1RA?g_st=iw",
+  "name": "صناعية محايل",
+  "city": "Muhayil Asir",
+  "kind": "new"
+ },
+ "MK318": {
+  "url": "https://maps.app.goo.gl/jRGzT2WTT9RLMtyW8?g_st=iw",
+  "name": "محطة الدغمية الخرمة",
+  "city": "Al Khurmah",
+  "kind": "new"
+ },
+ "MK288": {
+  "url": "https://maps.app.goo.gl/Q87z9kZ58JN1EMdUA",
+  "name": "محطة حلي",
+  "city": "Al Qunfudhah",
+  "kind": "new"
+ },
+ "AS287": {
+  "url": "https://maps.app.goo.gl/rwxPGN2JL4GaRX9K7?g_st=iwb",
+  "name": "عقبة شعار",
+  "city": "Asir",
+  "kind": "new"
+ },
+ "JA353": {
+  "url": "https://maps.app.goo.gl/iaHkd6FHWGTfFLRF7",
+  "name": "محطة الحنيني",
+  "city": "Samtah",
+  "kind": "new"
+ },
+ "MK317": {
+  "url": "https://maps.app.goo.gl/uvPENCwH85a8TepcA?g_st=iw",
+  "name": "وادي وج",
+  "city": "Taif",
+  "kind": "new"
+ },
+ "MK150": {
+  "url": "https://maps.app.goo.gl/5BBzj7ExUDDgYBNp9",
+  "name": "حداء",
+  "city": "بحرةBahra",
+  "kind": "new"
+ },
+ "AS254": {
+  "url": "https://maps.app.goo.gl/ow1jGXUN3T8R2bhb8?g_st=iw",
+  "name": "محطة الزهور (درة المحالة)",
+  "city": "Abha",
+  "kind": "new"
+ },
+ "JA365": {
+  "url": "https://maps.app.goo.gl/knzdaqpHG8r4ieLbA",
+  "name": "محطة خضيرة",
+  "city": "Jazan",
+  "kind": "new"
+ },
+ "RY366": {
+  "url": "https://maps.app.goo.gl/HFHehHv7LqvVV49e8",
+  "name": "العزيزية الرياض",
+  "city": "Riyadh",
+  "kind": "new"
+ },
+ "MK403": {
+  "url": "https://maps.app.goo.gl/Mr31tz7bBtqHrXJ36",
+  "name": "صناعية عسفان",
+  "city": "Jeddah",
+  "kind": "new"
+ },
+ "MK406": {
+  "url": "https://maps.app.goo.gl/ANt4eP3Q6pz5f2wP7",
+  "name": "محطة منارة الطائف",
+  "city": "Taif",
+  "kind": "new"
+ },
+ "MK334": {
+  "url": "https://maps.app.goo.gl/uXdQ7uhDWGQN4a7v5?g_st=iw",
+  "name": "صناعية الطائف",
+  "city": "Taif",
+  "kind": "new"
+ },
+ "MK190": {
+  "url": "https://maps.app.goo.gl/bUJoRzFuvE2aDurg6",
+  "name": "قديد",
+  "city": "مكة المكرمة Makkah",
+  "kind": "new"
+ },
+ "QS319": {
+  "url": "https://maps.app.goo.gl/uBy8D3pGmFDJbzhe7?g_st=iwb",
+  "name": "محطة قرطبة",
+  "city": "Buraydah",
+  "kind": "new"
+ },
+ "JA234": {
+  "url": "https://maps.app.goo.gl/uQTUEdvKbKTf1nA47?g_st=aw",
+  "name": "رحاب",
+  "city": "Jazan",
+  "kind": "new"
+ },
+ "AS376": {
+  "url": "https://maps.app.goo.gl/jWy8ikbRc64aGmU79",
+  "name": "محطة الواديين",
+  "city": "Al Wadiyain",
+  "kind": "new"
+ },
+ "MK333": {
+  "url": "https://maps.app.goo.gl/7dBhK1JDuEPXjpgt6?g_st=iw",
+  "name": "محطة الرويس",
+  "city": "Jeddah",
+  "kind": "new"
+ },
+ "RY312": {
+  "url": "https://maps.app.goo.gl/M8b8LzA46YH1jC2P6?g_st=iw",
+  "name": "الغروب",
+  "city": "Riyadh",
+  "kind": "new"
+ },
+ "JA357": {
+  "url": "https://maps.app.goo.gl/Rzuzjmr8cTPWAujz7?g_st=iw",
+  "name": "محطة الريث",
+  "city": "Jazan",
+  "kind": "new"
+ },
+ "AS363": {
+  "url": "https://maps.app.goo.gl/AmWWqg6SoF6d5omK9",
+  "name": "محطة باق",
+  "city": "Asir",
+  "kind": "new"
+ },
+ "MK003": {
+  "url": "https://maps.app.goo.gl/ArqPT2igifFFgaz37",
+  "name": "العوالي",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK007": {
+  "url": "https://maps.app.goo.gl/8Ghx6TaEP5Aqp8cd9",
+  "name": "العمرة",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK001": {
+  "url": "https://maps.app.goo.gl/vUBtRETgovmjfBC38",
+  "name": "جبل النور",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK005": {
+  "url": "https://maps.app.goo.gl/LTSVg5ZFbPHv8m7F7",
+  "name": "السباني",
+  "city": "Taif",
+  "kind": "existing"
+ },
+ "MK006": {
+  "url": "https://maps.app.goo.gl/nJoZDTSho92QFvvn7",
+  "name": "جنوب الطائف",
+  "city": "Taif",
+  "kind": "existing"
+ },
+ "MK004": {
+  "url": "https://maps.app.goo.gl/jWfbhVzHwZcZkb8j6",
+  "name": "عاصفة الصحراء",
+  "city": "Taif",
+  "kind": "existing"
+ },
+ "MK002": {
+  "url": "https://maps.app.goo.gl/miC9rEDf3EwSrMj68",
+  "name": "المعيصم",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "JA094": {
+  "url": "https://maps.app.goo.gl/9A6DhgdgX5JJP3Tc6",
+  "name": "الكربوس جيزان",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "MK008": {
+  "url": "https://maps.app.goo.gl/CQs4NUkkpoZCk4Yz7",
+  "name": "الحسينية",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK019": {
+  "url": "https://maps.app.goo.gl/vtMTbXZNJNtxoR2x9",
+  "name": "عرفات الشرائع",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK015": {
+  "url": "https://maps.app.goo.gl/47QXbqyg2NvvLfB38",
+  "name": "النسيم",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "RY024": {
+  "url": "https://maps.app.goo.gl/PAp58Ph7tmvr4oMy6",
+  "name": "غرناطة",
+  "city": "Al Kharj",
+  "kind": "existing"
+ },
+ "MK017": {
+  "url": "https://maps.app.goo.gl/cBQWsdxFt7qPzHRn6",
+  "name": "عرفات الشوقية",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "RY025": {
+  "url": "https://maps.app.goo.gl/jE4m2xr8EZUNk6cR6",
+  "name": "الحمراء",
+  "city": "Al Kharj",
+  "kind": "existing"
+ },
+ "MK022": {
+  "url": "https://maps.app.goo.gl/jqbNNERdDY6ZDnmP6",
+  "name": "بطحاء قريش 1",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "JA061": {
+  "url": "https://goo.gl/maps/2gZqYRiVWzxBzgLw6",
+  "name": "صبيا",
+  "city": "Sabya",
+  "kind": "existing"
+ },
+ "JA060": {
+  "url": "https://maps.app.goo.gl/Am7pk1fp5b8y9ABX7?g_st=iw",
+  "name": "صامطة",
+  "city": "Sabya",
+  "kind": "existing"
+ },
+ "MK031": {
+  "url": "https://maps.app.goo.gl/Mc4CBXyhyQtitJux9",
+  "name": "بطحاء قريش 2",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK027": {
+  "url": "https://maps.app.goo.gl/1aJMwEad9yQdhsjWA",
+  "name": "الأزوري الطائف",
+  "city": "Taif",
+  "kind": "existing"
+ },
+ "EP051": {
+  "url": "https://maps.app.goo.gl/XUbSkee2PYm1HFF77",
+  "name": "كورنيش الخبر",
+  "city": "Dammam",
+  "kind": "existing"
+ },
+ "MK018": {
+  "url": "https://maps.app.goo.gl/cnFwHYwL2vXht8y99",
+  "name": "الرصيفة مسار",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK040": {
+  "url": "https://maps.app.goo.gl/S1xc1MShiBU2uGUN9",
+  "name": "درب الروضة",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "QS055": {
+  "url": "https://maps.app.goo.gl/FdNfLMwCtWEubUNSA",
+  "name": "القصيم بريدة",
+  "city": "Al Qassim",
+  "kind": "existing"
+ },
+ "RY042": {
+  "url": "https://maps.app.goo.gl/QDCSULoWwu5yqa1T9",
+  "name": "الخرج العرجاني",
+  "city": "Riyadh",
+  "kind": "existing"
+ },
+ "MK039": {
+  "url": "https://maps.app.goo.gl/vQyFVVi4dCgogwkYA",
+  "name": "الجود-رابغ",
+  "city": "RABIGH",
+  "kind": "existing"
+ },
+ "MK063": {
+  "url": "https://maps.app.goo.gl/6K8UqqU65zXN7PS48",
+  "name": "السواط",
+  "city": "Taif",
+  "kind": "existing"
+ },
+ "AS197": {
+  "url": "https://maps.app.goo.gl/H3FXBLrscK7MuVMi8?g_st=iwb",
+  "name": "شرق الأسواق",
+  "city": "Asir",
+  "kind": "existing"
+ },
+ "AS226": {
+  "url": "https://goo.gl/maps/s1ykbLUWawUFx5NA7",
+  "name": "محطة المصيف",
+  "city": "Abhaابها",
+  "kind": "existing"
+ },
+ "JA187": {
+  "url": "https://maps.app.goo.gl/8bVhNexMQ4FZoXpKA",
+  "name": "محطة درب الناصرية ( أبو عريش )",
+  "city": "ابوعريشAbu Arish",
+  "kind": "existing"
+ },
+ "JA259": {
+  "url": "https://maps.app.goo.gl/hgHPTcUW7AzH14qi9",
+  "name": "الخالدية ضمد",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "AS192": {
+  "url": "https://maps.google.com/maps?q=18.377370834350586%2C42.71491622924805&z=17&hl=ar",
+  "name": "الرؤية خميس مشيط",
+  "city": "Asir",
+  "kind": "existing"
+ },
+ "AS225": {
+  "url": "https://maps.app.goo.gl/oYrzRZnB99YUSHHL8?g_st=ipc",
+  "name": "غير مستخدم",
+  "city": "Bisha",
+  "kind": "existing"
+ },
+ "MK020": {
+  "url": "https://maps.app.goo.gl/dRmCWS45ikzMJWyG6",
+  "name": "ممشى الشوقية",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK016": {
+  "url": "https://maps.app.goo.gl/AfXZdSVQxdXfjdCY6",
+  "name": "الرصيفة",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK046": {
+  "url": "https://goo.gl/maps/PnKQUfPZnwtSDM3W6",
+  "name": "الحليس",
+  "city": "Taif",
+  "kind": "existing"
+ },
+ "MK047": {
+  "url": "https://maps.app.goo.gl/3RYrgevaaBnoVq9N8",
+  "name": "القادسية",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK035": {
+  "url": "https://maps.app.goo.gl/HmSTED1EdzhqZdPC8",
+  "name": "الجامعة",
+  "city": "Taif",
+  "kind": "existing"
+ },
+ "JA053": {
+  "url": "https://maps.app.goo.gl/En76PVZ7iPdKL2Y37?g_st=ic",
+  "name": "جازان صبيح 2",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "JA056": {
+  "url": "https://maps.app.goo.gl/CFzXCRKe1is3R7Wu8?g_st=iw",
+  "name": "روابه",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "MK072": {
+  "url": "https://maps.app.goo.gl/B8kjxp3r1riMbVFY7",
+  "name": "بن دهيش",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "JA069": {
+  "url": "https://maps.app.goo.gl/2wcQMPRDhBcdZi6o6",
+  "name": "كورنيش جازان",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "MK014": {
+  "url": "https://maps.app.goo.gl/v1eBtxkwP8jffpy18",
+  "name": "خليص",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK029": {
+  "url": "https://maps.app.goo.gl/WPDEcYRHEngqmGRn7",
+  "name": "الذكرى الخالدة",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK033": {
+  "url": "https://maps.app.goo.gl/Dt9A5t6iGoBNnfyu9?g_st=iw",
+  "name": "أبو وافي",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK057": {
+  "url": "https://maps.app.goo.gl/NEXWXpEVVXTwornD9",
+  "name": "الريان-الجموم",
+  "city": "GOOMOM",
+  "kind": "existing"
+ },
+ "MK064": {
+  "url": "https://maps.app.goo.gl/g1gnS2So2ktSqjyVA",
+  "name": "الجعرانة",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK066": {
+  "url": "https://maps.app.goo.gl/KNaiKcKZnMf8BPza7",
+  "name": "الامير فواز جدة",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "MK068": {
+  "url": "https://maps.app.goo.gl/Y35McvMhqvwTnoyU8?g_st=iw",
+  "name": "الجموم الكنيدري",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK082": {
+  "url": "https://maps.app.goo.gl/v7uQwoRrsbcRdEiP7",
+  "name": "الامير فهدة جدة",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "MK084": {
+  "url": "https://maps.app.goo.gl/jUz7vrATmJfuZMRv5",
+  "name": "الكر",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK093": {
+  "url": "https://maps.app.goo.gl/RojkqknncNLZvbLbA",
+  "name": "طريق الملك خالد",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK098": {
+  "url": "https://maps.app.goo.gl/HidRQsVqZvJq5NXw8",
+  "name": "وادي جليل-الطائف",
+  "city": "TAIF",
+  "kind": "existing"
+ },
+ "MK099": {
+  "url": "https://maps.app.goo.gl/185ghMzKFHBXUvGb9",
+  "name": "البيعة",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK142": {
+  "url": "https://maps.app.goo.gl/qLxsVNwmPgPjbY3x5",
+  "name": "عين شمس",
+  "city": "MAKKAH",
+  "kind": "existing"
+ },
+ "JA058": {
+  "url": "https://goo.gl/maps/x5TgAWfRf4Bj3DAY8",
+  "name": "زيارة ام الغلف",
+  "city": "JIZAN",
+  "kind": "existing"
+ },
+ "MK100": {
+  "url": "https://maps.app.goo.gl/KxiDewCMDCVrcqDm7",
+  "name": "الكوثر",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "AS153": {
+  "url": "https://maps.app.goo.gl/ox7gqeLGx243bj1RA?g_st=iw",
+  "name": "مدخل محايل",
+  "city": "Khamis Mushait",
+  "kind": "existing"
+ },
+ "AS124": {
+  "url": "https://maps.app.goo.gl/qDPoud5UnRD2EBQv9",
+  "name": "الصقاء بشية",
+  "city": "Baish",
+  "kind": "existing"
+ },
+ "MK054": {
+  "url": "https://maps.app.goo.gl/NMdtUEqBDDcBuyey7",
+  "name": "سلطان المطرفي",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "JA041": {
+  "url": "https://maps.app.goo.gl/VK24vuauLpRMtzE59",
+  "name": "القسوم",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "RY075": {
+  "url": "https://maps.app.goo.gl/KTGM2JKZXcPDz9v29",
+  "name": "الدائري الشمالي",
+  "city": "Riyadh",
+  "kind": "existing"
+ },
+ "MK071": {
+  "url": "https://maps.app.goo.gl/xgwsiT7jii9gWeQVA",
+  "name": "الأجاويد",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK048": {
+  "url": "https://maps.app.goo.gl/2n8s66vt6gYdXaPf8",
+  "name": "عشيرة",
+  "city": "عشيرة Ashayrah",
+  "kind": "existing"
+ },
+ "MK143": {
+  "url": "https://maps.app.goo.gl/syRQo5bWzMMJ9XP8A",
+  "name": "مدينة الورود",
+  "city": "الطائف Al Taif",
+  "kind": "existing"
+ },
+ "NJ219": {
+  "url": "https://maps.app.goo.gl/TbwRSC3vitxu8LWV8?g_st=iw",
+  "name": "المركب",
+  "city": "Najran",
+  "kind": "existing"
+ },
+ "TB148": {
+  "url": "https://maps.app.goo.gl/qUSbLwFti2wfzk5f7",
+  "name": "بئر بن هرماس",
+  "city": "تبوك Tabuk",
+  "kind": "existing"
+ },
+ "MK023": {
+  "url": "https://maps.app.goo.gl/zbsqkVhnR8gCGnW47",
+  "name": "بن درويش",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK028": {
+  "url": "https://maps.app.goo.gl/dQZUvTJtkbdw5jxX6",
+  "name": "أهل مسا",
+  "city": "Taif",
+  "kind": "existing"
+ },
+ "HA043": {
+  "url": "https://goo.gl/maps/ci4mixf5LN7HY4q9A",
+  "name": "العريفي",
+  "city": "Hail",
+  "kind": "existing"
+ },
+ "HA052": {
+  "url": "https://goo.gl/maps/Q1iwfKJJMnK19Y75A",
+  "name": "الأمير سعود",
+  "city": "Hail",
+  "kind": "existing"
+ },
+ "AS141": {
+  "url": "https://goo.gl/maps/Q1iwfKJJMnK19Y75A",
+  "name": "الامير سلطان بن جباس",
+  "city": "Asir",
+  "kind": "existing"
+ },
+ "AS255": {
+  "url": "https://maps.app.goo.gl/Cz9jGvkrZcUeSSF36",
+  "name": "قرية المهدي",
+  "city": "Bisha",
+  "kind": "existing"
+ },
+ "MK103": {
+  "url": "https://maps.app.goo.gl/377XRc8ewYa7JKPz9?g_st=iwb",
+  "name": "يحي المعلمي",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "JA092": {
+  "url": "https://maps.app.goo.gl/HPKYLthLEUYuqSao9",
+  "name": "الصفاء",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "BH065": {
+  "url": "https://maps.app.goo.gl/ky16rYMSFc5wvK166",
+  "name": "الالاء الوطنيه- الباحة",
+  "city": "Al Baha",
+  "kind": "existing"
+ },
+ "BH111": {
+  "url": "https://maps.app.goo.gl/BYBYUN5eityfGbZa8",
+  "name": "الظفير",
+  "city": "Al Baha",
+  "kind": "existing"
+ },
+ "JA122": {
+  "url": "https://maps.app.goo.gl/LPAogZ3gWrJPQAD89",
+  "name": "المضايا",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "MK067": {
+  "url": "https://maps.app.goo.gl/12qPSjkZjCcMXnw76",
+  "name": "تربه",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "JA155": {
+  "url": "https://maps.app.goo.gl/6SoxhdNEQusm5Hty8",
+  "name": "محطة بترو بارك",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "MK154": {
+  "url": "https://maps.app.goo.gl/T7DxAWBAZYZaGZor6",
+  "name": "مؤسسة ثلاث نقاط نفط للوقود",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "MK049": {
+  "url": "https://maps.app.goo.gl/jKc2Zsqx8KTBXqHe7",
+  "name": "السلولي",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "RY076": {
+  "url": "https://maps.app.goo.gl/HrfFWthkCngyizuv5",
+  "name": "السحاب",
+  "city": "Al Kharj",
+  "kind": "existing"
+ },
+ "RY077": {
+  "url": "https://maps.app.goo.gl/23UjZ3bbbUE6WBsJ6",
+  "name": "السفير 1 ( طويق الزاهر )",
+  "city": "Al Kharj",
+  "kind": "existing"
+ },
+ "RY078": {
+  "url": "https://maps.app.goo.gl/Cxf4xXfG4dkh5ABQ9",
+  "name": "السفير 2 ( النهضه )",
+  "city": "Al Kharj",
+  "kind": "existing"
+ },
+ "RY095": {
+  "url": "https://maps.app.goo.gl/AjQbxwAVbqKpvVrBA",
+  "name": "السفير حي مشرف",
+  "city": "Al Kharj",
+  "kind": "existing"
+ },
+ "RY079": {
+  "url": "https://maps.app.goo.gl/Svuc92UVNZz3HuMD8",
+  "name": "السفير 3 ( اليرموك )",
+  "city": "Al Kharj",
+  "kind": "existing"
+ },
+ "MK088": {
+  "url": "https://maps.app.goo.gl/u2SHzWiGgUtobU646",
+  "name": "بترولكس ( ابحر )",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "MK089": {
+  "url": "https://maps.app.goo.gl/dYAM5U6ogWh9485D8",
+  "name": "بترولكس ( طريق المدينة",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "MK086": {
+  "url": "https://maps.app.goo.gl/A3a6ep6v6F17fq9F6",
+  "name": "بترولكس ( الوزيرية )",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "MK087": {
+  "url": "https://maps.app.goo.gl/vvyag1Sv28d5QQLr6",
+  "name": "بترولكس ( مشرفه )",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "AS081": {
+  "url": "https://maps.app.goo.gl/cAMoLcHkhqfSfzpU9",
+  "name": "العزيزية",
+  "city": "Khamis Mushait",
+  "kind": "existing"
+ },
+ "AS107": {
+  "url": "https://maps.app.goo.gl/Y8GF4rNMucyhF3wp8",
+  "name": "خميس مشيط ال راسي",
+  "city": "Khamis Mushait",
+  "kind": "existing"
+ },
+ "JA119": {
+  "url": "https://maps.app.goo.gl/5xaTvVP9jaStQ5AW7",
+  "name": "الطيري 2",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "EP102": {
+  "url": "https://maps.app.goo.gl/KduZfmeNqZWw6gN1A",
+  "name": "طريق احد",
+  "city": "Qatif",
+  "kind": "existing"
+ },
+ "HA050": {
+  "url": "https://maps.app.goo.gl/iVcrbNvVuzTo9t1Z6",
+  "name": "المطار",
+  "city": "Hail",
+  "kind": "existing"
+ },
+ "JA070": {
+  "url": "https://maps.app.goo.gl/54bMCAX7SupdKz1w5",
+  "name": "الظبية",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "MD009": {
+  "url": "https://maps.app.goo.gl/T6rKa4bKeKDvUK446",
+  "name": "طريق السلام",
+  "city": "Madinah",
+  "kind": "existing"
+ },
+ "AS085": {
+  "url": "https://maps.app.goo.gl/eyG5p4QfWZj4oZDf7",
+  "name": "الخيبر بيشة",
+  "city": "Khamis Mushait",
+  "kind": "existing"
+ },
+ "MD097": {
+  "url": "https://maps.app.goo.gl/4HfgXeGBMgEUbd6T9",
+  "name": "الامام مسلم",
+  "city": "Madinah",
+  "kind": "existing"
+ },
+ "MK012": {
+  "url": "https://goo.gl/maps/HWwUJpTaQARBbc8t7",
+  "name": "طيبه",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "RY105": {
+  "url": "https://maps.app.goo.gl/Afr6aHe3ZfcKXdAZA",
+  "name": "محطة افاق درب",
+  "city": "Riyadh",
+  "kind": "existing"
+ },
+ "RY106": {
+  "url": "https://maps.app.goo.gl/WseVaSZoPz7uBH9b9",
+  "name": "محطة افاق درب",
+  "city": "Riyadh",
+  "kind": "existing"
+ },
+ "TB010": {
+  "url": "https://maps.app.goo.gl/zDQp8QaYnHZnRWPJ9",
+  "name": "الاصيل",
+  "city": "Tabuk",
+  "kind": "existing"
+ },
+ "TB032": {
+  "url": "https://maps.app.goo.gl/8sfcdq3pnYPyyjP17",
+  "name": "الشفا",
+  "city": "Tabuk",
+  "kind": "existing"
+ },
+ "TB034": {
+  "url": "https://maps.app.goo.gl/Gw4gqMLLHhqcSJLz9",
+  "name": "الراقي",
+  "city": "Tabuk",
+  "kind": "existing"
+ },
+ "JA156": {
+  "url": "https://maps.app.goo.gl/EhpAbCZMRc2jMZkt5",
+  "name": "ركن جاز",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "JA157": {
+  "url": "https://maps.app.goo.gl/wEUGzJW9ZJTQABBN8",
+  "name": "ركن جاز",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "JA151": {
+  "url": "https://maps.app.goo.gl/6TDBXBqF1aE8izJW6",
+  "name": "اللؤلؤة البيضاء",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "JA152": {
+  "url": "https://maps.app.goo.gl/VvYiUXMtHmQnEAyRA",
+  "name": "ركن جاز",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "AS178": {
+  "url": "https://maps.app.goo.gl/Poy267vQmHMabSMF9",
+  "name": "محطة (أحد رفيدة)",
+  "city": "Ahad Rafidah",
+  "kind": "existing"
+ },
+ "MK183": {
+  "url": "https://maps.app.goo.gl/5Y3phTrEGUJ6teGm9",
+  "name": "محطة الاربعين (جده)",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "MK181": {
+  "url": "https://maps.app.goo.gl/JZmM4HkfGHeWN7Tn8?g_st=ic",
+  "name": "محطة الرفيدي (جده)",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "MK170": {
+  "url": "https://maps.app.goo.gl/YW1bNPDwWSAiXNfA9?g_st=iw",
+  "name": "محطة الريان (الطائف)",
+  "city": "Taif",
+  "kind": "existing"
+ },
+ "MK184": {
+  "url": "https://maps.app.goo.gl/kQS8E5ZTRdhkvV9d6",
+  "name": "محطة الزهراء (جده)",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "MK185": {
+  "url": "https://maps.app.goo.gl/ry9XxXuHef3soa416",
+  "name": "محطة السمو المجيرمة (طريق القنفذه)",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK165": {
+  "url": "https://maps.app.goo.gl/5ui9AfKoRSZqgaVz8",
+  "name": "محطة الشوقية (مكة المكرمة)",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "AS180": {
+  "url": "https://maps.app.goo.gl/2C2C4cniYvsLYZEs9",
+  "name": "محطة المركاض (وادي بن هشبل)",
+  "city": "Khamis Mushait",
+  "kind": "existing"
+ },
+ "MK169": {
+  "url": "https://maps.app.goo.gl/EnRtk9SyVH27wtp46?g_st=iw",
+  "name": "محطة النزهة (الطائف)",
+  "city": "Taif",
+  "kind": "existing"
+ },
+ "AS176": {
+  "url": "https://maps.app.goo.gl/WBLPx3Wesrj98LP19",
+  "name": "محطة الوادي الأخضر (قنا)",
+  "city": "Muhayil Asir",
+  "kind": "existing"
+ },
+ "MK182": {
+  "url": "https://maps.app.goo.gl/yK2seccUduJVxirs6",
+  "name": "محطة الوزايرية (جده)",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "AS175": {
+  "url": "https://maps.app.goo.gl/uGrcNWwrCXF1Nds2A",
+  "name": "محطة بارق",
+  "city": "Abha",
+  "kind": "existing"
+ },
+ "MK171": {
+  "url": "https://maps.app.goo.gl/yJovsc7CjvwPNuqn6",
+  "name": "محطة بهجه (الطائف)",
+  "city": "Taif",
+  "kind": "existing"
+ },
+ "MK172": {
+  "url": "https://maps.app.goo.gl/NKrqJv9rB37DDgDs5",
+  "name": "محطة جبره (الطائف)",
+  "city": "Taif",
+  "kind": "existing"
+ },
+ "MK173": {
+  "url": "https://maps.app.goo.gl/xkyj8K6RiakYu1KW8",
+  "name": "محطة سنجر (الطائف)",
+  "city": "Taif",
+  "kind": "existing"
+ },
+ "NJ174": {
+  "url": "https://maps.app.goo.gl/q5PQPnZvCkfLyxxt6",
+  "name": "محطة نجران",
+  "city": "Najran",
+  "kind": "existing"
+ },
+ "JA125": {
+  "url": "https://maps.app.goo.gl/jZjzfRDghFmmhmHL7",
+  "name": "النعامية",
+  "city": "Sabya",
+  "kind": "existing"
+ },
+ "MK159": {
+  "url": "https://maps.app.goo.gl/rbjbfRNg33goMrAo9",
+  "name": "محطة لتر الجزيرة",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MD166": {
+  "url": "https://maps.app.goo.gl/t4WoC9epb8PWoBN59",
+  "name": "الهيئة الملكيه (ينبع)",
+  "city": "Yanbu",
+  "kind": "existing"
+ },
+ "AS177": {
+  "url": "https://maps.app.goo.gl/n5VS7xFFHMxvhaF9A",
+  "name": "صفوان (عسير)",
+  "city": "Ahad Rafidah",
+  "kind": "existing"
+ },
+ "MK110": {
+  "url": "https://maps.app.goo.gl/r39KK89S3HVNkz6P7",
+  "name": "محطة نفط الحجاز العزيزية",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MD167": {
+  "url": "https://maps.app.goo.gl/WNS5Lm7RFFDo1Usc9",
+  "name": "محطة الكورنيش (ينبع)",
+  "city": "Yanbu",
+  "kind": "existing"
+ },
+ "NP140": {
+  "url": "https://maps.app.goo.gl/E8Dky63EEZW5V2Np7",
+  "name": "محطة الشارع الاصفر",
+  "city": "Arar",
+  "kind": "existing"
+ },
+ "NP162": {
+  "url": "https://maps.app.goo.gl/JdzCpSFHtx43P94m7",
+  "name": "ذيب الضاحية",
+  "city": "Arar",
+  "kind": "existing"
+ },
+ "NP163": {
+  "url": "https://maps.app.goo.gl/1HaFz4BvBsASg9jh6",
+  "name": "ذيب ام خنصر",
+  "city": "Arar",
+  "kind": "existing"
+ },
+ "MD194": {
+  "url": "https://maps.app.goo.gl/dcux79p4kbRCRQWU7",
+  "name": "محطة النواة",
+  "city": "Yanbu",
+  "kind": "existing"
+ },
+ "MD123": {
+  "url": "https://maps.app.goo.gl/uCGnK3kej7DwSvQU6",
+  "name": "محطة بترو بارك",
+  "city": "Madinah",
+  "kind": "existing"
+ },
+ "EP101": {
+  "url": "https://maps.app.goo.gl/Xt3CwopKdHjDxMY78",
+  "name": "الامام علي",
+  "city": "Dammam",
+  "kind": "existing"
+ },
+ "EB062": {
+  "url": "https://maps.app.goo.gl/nokWnMZzbb43P71o8?g_st=iw",
+  "name": "طريق الملك فيصل",
+  "city": "Dammam",
+  "kind": "existing"
+ },
+ "MK205": {
+  "url": "https://maps.app.goo.gl/PuAfiUVij9PDB2Vg6",
+  "name": "نقز",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "MK206": {
+  "url": "https://maps.app.goo.gl/CZdggqMWNigyBiXX7",
+  "name": "نقز",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "RY199": {
+  "url": "https://maps.app.goo.gl/9pHwSe7nvTvVuq6y9",
+  "name": "نبض",
+  "city": "Riyadh",
+  "kind": "existing"
+ },
+ "AS135": {
+  "url": "https://maps.app.goo.gl/ZXKwSrRMAAoBBBEE8",
+  "name": "بيكو الضيافة",
+  "city": "Khamis Mushait",
+  "kind": "existing"
+ },
+ "AS137": {
+  "url": "https://maps.app.goo.gl/EamH9Hut1JupdxJz8",
+  "name": "بيكو طريق الطائف",
+  "city": "Abha",
+  "kind": "existing"
+ },
+ "MK203": {
+  "url": "https://maps.app.goo.gl/wd6AqCeUKKDmiMUF9",
+  "name": "محطة الاستاد",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "MK202": {
+  "url": "https://maps.app.goo.gl/Sr6fYnvvYFzm1GDy6",
+  "name": "محطة الخير",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "RY204": {
+  "url": "https://maps.app.goo.gl/Ts33bBebWsanwkcn6",
+  "name": "شركة نبع للوقود",
+  "city": "Riyadh",
+  "kind": "existing"
+ },
+ "EP132": {
+  "url": "https://maps.app.goo.gl/Twmfx8vdDeDTtxHH9",
+  "name": "محطة الذيبة",
+  "city": "Hafar Al Batin",
+  "kind": "existing"
+ },
+ "MK161": {
+  "url": "https://maps.app.goo.gl/UaSNKGt5agQHrJ238",
+  "name": "الحمادي",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "JA026": {
+  "url": "https://maps.app.goo.gl/NrAoGHMb2oYKUagTA",
+  "name": "الكربوس",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "JA208": {
+  "url": "https://maps.app.goo.gl/fMQneqUJRiDxXJBR6",
+  "name": "محطة جوهرة الساحل",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "JA209": {
+  "url": "https://maps.app.goo.gl/u4JQsCJctwE7ED4d8?g_st=iw",
+  "name": "ضمد",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "MK160": {
+  "url": "https://maps.app.goo.gl/K3jVDWq8UBR8e6L98",
+  "name": "محطة الشامل",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "QS158": {
+  "url": "https://maps.app.goo.gl/jPicmTVZs2qSK2568",
+  "name": "محطة النهدي",
+  "city": "Al Qassim",
+  "kind": "existing"
+ },
+ "MK164": {
+  "url": "https://maps.app.goo.gl/k5skekwRoHPxkbUr6",
+  "name": "محطة ولي العهد (مكة المكرمة)",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK186": {
+  "url": "https://maps.app.goo.gl/W26wGtV8WwZAn6Mj7",
+  "name": "محطة الحرازات (جده)",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "AS128": {
+  "url": "https://maps.app.goo.gl/1HGJijuLRHpahP9p9",
+  "name": "الفرعاء",
+  "city": "Khamis Mushait",
+  "kind": "existing"
+ },
+ "AS129": {
+  "url": "https://maps.app.goo.gl/7U36TKPsBPTrM6dp6",
+  "name": "طريب الجنوب",
+  "city": "Khamis Mushait",
+  "kind": "existing"
+ },
+ "HA109": {
+  "url": "https://maps.app.goo.gl/qQigvrYoEFhp5kS1A",
+  "name": "المدائن",
+  "city": "Hail",
+  "kind": "existing"
+ },
+ "JA113": {
+  "url": "https://maps.app.goo.gl/XXV39Eyg8C8EBcuX6",
+  "name": "محطة الطيبات للمحروقات",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "JA114": {
+  "url": "https://maps.app.goo.gl/7LUCj5JczSUbDqb69",
+  "name": "الفيصلية",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "JA115": {
+  "url": "https://maps.app.goo.gl/omyiY7pGUqPaAz2N9",
+  "name": "اليزيد",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "JA116": {
+  "url": "https://maps.app.goo.gl/HG3RmZTieKBBWZK6A",
+  "name": "الإسكان سيتي",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "JA117": {
+  "url": "https://maps.app.goo.gl/AMa4p4S7mLiQexry5",
+  "name": "العزامة",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "JA118": {
+  "url": "https://maps.app.goo.gl/Hv82uV7biKdJeSXV9",
+  "name": "الطيري",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "JA120": {
+  "url": "https://maps.app.goo.gl/NHFo3upK48uuQsL39",
+  "name": "محطه رمز- الخير",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "JA121": {
+  "url": "https://maps.app.goo.gl/gGEdR9HEzPAK8Ndw6",
+  "name": "رمز الملك عبد الله",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "JA112": {
+  "url": "https://maps.app.goo.gl/zQfVw5P1GB3b2xSg8",
+  "name": "رمز النسيم",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "EP133": {
+  "url": "https://maps.app.goo.gl/PMYn8MAK9KiHQneJ8",
+  "name": "محطة البلدية",
+  "city": "Hafar Al Batin",
+  "kind": "existing"
+ },
+ "EP134": {
+  "url": "https://maps.app.goo.gl/xZK3rket6cpvBAng6",
+  "name": "محطة الواحة",
+  "city": "Hafar Al Batin",
+  "kind": "existing"
+ },
+ "AS136": {
+  "url": "https://maps.app.goo.gl/eUdYn1neHQ74SJFf7",
+  "name": "بيكو مربة",
+  "city": "Abha",
+  "kind": "existing"
+ },
+ "JA138": {
+  "url": "https://maps.app.goo.gl/VY1YfhY5cxHBgzpJ8",
+  "name": "بكيو بيش",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "MD195": {
+  "url": "https://maps.app.goo.gl/sNScbVA1MduGoLEo7",
+  "name": "محطة الصناعية",
+  "city": "Yanbu",
+  "kind": "existing"
+ },
+ "AS030": {
+  "url": "https://maps.app.goo.gl/R9vnXcRiovsBpPZY9",
+  "name": "ورثه بن حمد",
+  "city": "Bisha",
+  "kind": "existing"
+ },
+ "MD224": {
+  "url": "https://maps.app.goo.gl/CD3i777CLGrC4ux4A",
+  "name": "محطة الجمعية العربية",
+  "city": "Yanbu",
+  "kind": "existing"
+ },
+ "TB198": {
+  "url": "https://maps.app.goo.gl/1EKhoJL8ogTJM7eb6",
+  "name": "فور يو طريق الملك فيصل",
+  "city": "Tabuk",
+  "kind": "existing"
+ },
+ "RY201": {
+  "url": "https://maps.app.goo.gl/ghSaMibh5YDca7om8",
+  "name": "نبض- طنجة",
+  "city": "Riyadh",
+  "kind": "existing"
+ },
+ "AS211": {
+  "url": "https://maps.app.goo.gl/L5JQLynd7CyAq3Z6A",
+  "name": "المطار القديم",
+  "city": "Khamis Mushait",
+  "kind": "existing"
+ },
+ "AS212": {
+  "url": "https://maps.app.goo.gl/QoBjhUkvG1Rjfpk86",
+  "name": "محايل عسر الياسمين",
+  "city": "Muhayil Asir",
+  "kind": "existing"
+ },
+ "MD213": {
+  "url": "https://maps.app.goo.gl/qDapTNTfPwcrgXFw5",
+  "name": "بترولايز بداية",
+  "city": "Madinah",
+  "kind": "existing"
+ },
+ "MK214": {
+  "url": "https://maps.app.goo.gl/thcUoPC17PKQR9Lm6",
+  "name": "بترولايز",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK215": {
+  "url": "https://maps.app.goo.gl/CEEPGYMUVnVV5YudA",
+  "name": "بترولايز",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK216": {
+  "url": "https://maps.app.goo.gl/jizQGX9cUqMCPjEj9",
+  "name": "بترولايز -الواحة",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MD220": {
+  "url": "https://maps.app.goo.gl/kgRywx2hhcPxPkUDA",
+  "name": "بترو لايز الديوان",
+  "city": "Madinah",
+  "kind": "existing"
+ },
+ "MK221": {
+  "url": "https://maps.app.goo.gl/qo7qtghHGMPLmdou7",
+  "name": "بترولايز الرحيلي 1",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK222": {
+  "url": "https://maps.app.goo.gl/udBzdSrJkWjVyeYs5",
+  "name": "بترولايز الرحيلي 2",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK223": {
+  "url": "https://maps.app.goo.gl/NVMGSBJSSt41H2ir6",
+  "name": "بترو لايز المساعدية",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK217": {
+  "url": "https://maps.app.goo.gl/jEZTq5dEVNtC4oip7",
+  "name": "محطة المظليف",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "MK210": {
+  "url": "https://maps.app.goo.gl/zZ8N1VMGTZLB3VhM9?g_st=ac",
+  "name": "محطة الفلاح",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "RY229": {
+  "url": "https://maps.app.goo.gl/H82rfAPDvDCjFfqg6",
+  "name": "ظهرة لبن",
+  "city": "Riyadh",
+  "kind": "existing"
+ },
+ "RY230": {
+  "url": "https://maps.app.goo.gl/ubbTZ4LVnRTThSLa8",
+  "name": "الجزيرة",
+  "city": "Riyadh",
+  "kind": "existing"
+ },
+ "RY231": {
+  "url": "https://maps.app.goo.gl/kGjwAun1SjEsphBU7",
+  "name": "الابداع",
+  "city": "Riyadh",
+  "kind": "existing"
+ },
+ "RY232": {
+  "url": "https://maps.app.goo.gl/1L1GqNExRBsEaod49",
+  "name": "المصياد",
+  "city": "Riyadh",
+  "kind": "existing"
+ },
+ "RY233": {
+  "url": "https://maps.app.goo.gl/qzx6N4fyymqnYEf18",
+  "name": "العريجاء",
+  "city": "Riyadh",
+  "kind": "existing"
+ },
+ "BH218": {
+  "url": "https://maps.app.goo.gl/2R2JegAy1mZnfULSA",
+  "name": "بلجرشي",
+  "city": "الباحة Al baha",
+  "kind": "existing"
+ },
+ "JA 22": {
+  "url": "https://maps.app.goo.gl/piScKzjZDhz6UB7C8",
+  "name": "الحزام الجنوبي",
+  "city": "جيزان / العارضة",
+  "kind": "existing"
+ },
+ "JA207": {
+  "url": "https://maps.app.goo.gl/3qwFyiJs8HueiJjT9",
+  "name": "محطة الطالبي",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "AS179": {
+  "url": "https://maps.app.goo.gl/itgp1rQXc7o9MdVCA",
+  "name": "محطة السلامة (وادي بن هشبل)",
+  "city": "Khamis Mushait",
+  "kind": "existing"
+ },
+ "BH108": {
+  "url": "https://maps.app.goo.gl/3e5V47g7Ew7zHQs27",
+  "name": "بني عدوان",
+  "city": "Al Baha",
+  "kind": "existing"
+ },
+ "EB101": {
+  "url": "https://maps.app.goo.gl/Xt3CwopKdHjDxMY78",
+  "name": "الامام علي",
+  "city": "Dammam",
+  "kind": "existing"
+ },
+ "EB102": {
+  "url": "https://maps.app.goo.gl/SSanFSzA9gRSvBxP6",
+  "name": "طريق احد",
+  "city": "Qatif",
+  "kind": "existing"
+ },
+ "JA090": {
+  "url": "https://maps.app.goo.gl/N3uU6F1P5twLUCnQ8",
+  "name": "الدوار الفضي -أحد المسارحه",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "JO251": {
+  "url": "https://maps.app.goo.gl/rSbZF4Bnh2AfNLYZ8",
+  "name": "محطة الريان",
+  "city": "Al Qurayyat",
+  "kind": "existing"
+ },
+ "MD168": {
+  "url": "https://maps.app.goo.gl/H9gyMN8ENUMvCvJX8?g_st=ic",
+  "name": "محطة صفا (ينبع)",
+  "city": "Yanbu",
+  "kind": "existing"
+ },
+ "MD238": {
+  "url": "https://goo.gl/maps/hjy3GAvCupMvQRbc9",
+  "name": "بترولايز البدر",
+  "city": "Madinah",
+  "kind": "existing"
+ },
+ "MD239": {
+  "url": "https://goo.gl/maps/29FZyCBwTsbPLVVC9",
+  "name": "بترولايز بني الاشهل",
+  "city": "Madinah",
+  "kind": "existing"
+ },
+ "MD240": {
+  "url": "https://maps.app.goo.gl/intWFUCpuEBAgi2r8",
+  "name": "بترولايز وارد",
+  "city": "Madinah",
+  "kind": "existing"
+ },
+ "MK235": {
+  "url": "https://goo.gl/maps/898fLCtDRUW9s3aS8",
+  "name": "بترولايز جوهرة العروس",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "MK241": {
+  "url": "https://maps.app.goo.gl/SWxJnDyLb2spFo47A?g_st=iw",
+  "name": "بترولايز الياقوت",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "MK242": {
+  "url": "https://goo.gl/maps/dYNNpF5Y6KMr2U1YA",
+  "name": "بترولايز الصولي",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK243": {
+  "url": "https://goo.gl/maps/DqH1Jwde4LW9EPxs8",
+  "name": "بترولايز الخط الاصفر",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK244": {
+  "url": "https://goo.gl/maps/SWPU7su4gE3ncdwW7",
+  "name": "بترولايز العبور",
+  "city": "Taif",
+  "kind": "existing"
+ },
+ "MK248": {
+  "url": "https://goo.gl/maps/nQ4jphAYfsWwAKdU7",
+  "name": "بترولايز مزايا",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "MK249": {
+  "url": "https://maps.app.goo.gl/oSRFWptbaj3DsGzT6?g_st=iw",
+  "name": "بترولايز الستين",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "NB130": {
+  "url": "https://maps.app.goo.gl/2fVEztcVCj3b5C2x5",
+  "name": "طريق الامير سلطان",
+  "city": "Turaif",
+  "kind": "existing"
+ },
+ "NB131": {
+  "url": "https://maps.app.goo.gl/exbaa2gLobuWYuFs5",
+  "name": "طريق ابو بكر",
+  "city": "Turaif",
+  "kind": "existing"
+ },
+ "RY083": {
+  "url": "https://maps.app.goo.gl/2iNRZpWjhRHtJ8TEA",
+  "name": "الحوميات",
+  "city": "Riyadh",
+  "kind": "existing"
+ },
+ "RY200": {
+  "url": "https://maps.app.goo.gl/qJPQ3niNBth7xSy48",
+  "name": "نبض",
+  "city": "الرياض / ثادج",
+  "kind": "existing"
+ },
+ "RY236": {
+  "url": "https://maps.app.goo.gl/wpUZAtcnhgL4xNip9?g_st=iw",
+  "name": "بترولايز العزيزية",
+  "city": "Riyadh",
+  "kind": "existing"
+ },
+ "RY237": {
+  "url": "https://maps.app.goo.gl/FfduwQgZqS9HqS437",
+  "name": "بترولايز الشميسي",
+  "city": "Riyadh",
+  "kind": "existing"
+ },
+ "RY245": {
+  "url": "https://maps.app.goo.gl/F2skjFio714hAZKf8",
+  "name": "بترولايز ديراب",
+  "city": "Riyadh",
+  "kind": "existing"
+ },
+ "RY246": {
+  "url": "https://goo.gl/maps/Q1iwfKJJMnK19Y75A",
+  "name": "بترولايز بتروزيت الصغيرة",
+  "city": "Riyadh",
+  "kind": "existing"
+ },
+ "RY247": {
+  "url": "https://maps.app.goo.gl/ynPcpSPDPfeWauJR9",
+  "name": "بترو لايز السلي",
+  "city": "Riyadh",
+  "kind": "existing"
+ },
+ "MK264": {
+  "url": "https://maps.app.goo.gl/muUvgE6Ds21F9Ut8A",
+  "name": "بترولايز التمييز",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "MK263": {
+  "url": "https://maps.app.goo.gl/HnJ423Bxei1BTjqS9",
+  "name": "بترولايز بنزول",
+  "city": "Taif",
+  "kind": "existing"
+ },
+ "MK262": {
+  "url": "https://maps.app.goo.gl/x5gF3yLhkzbGDRbj8",
+  "name": "بترولايز الفضيلة",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "RY250": {
+  "url": "https://maps.app.goo.gl/uyUYahmTQiZtsFLd7",
+  "name": "محطة الدلم",
+  "city": "Riyadh",
+  "kind": "existing"
+ },
+ "JA227": {
+  "url": "https://maps.app.goo.gl/Ka5asoNeWKpdsnaN9?g_st=ipc",
+  "name": "الحزام الجنوبي",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "MK252": {
+  "url": "https://maps.app.goo.gl/r4VBsbiUy8Y4F8y57",
+  "name": "المحاميد",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "RY261": {
+  "url": "https://maps.app.goo.gl/RaL4sKgkYRXcJ8d2A",
+  "name": "بترولايز السلام",
+  "city": "Riyadh",
+  "kind": "existing"
+ },
+ "MD265": {
+  "url": "https://maps.app.goo.gl/dYqAPEnscXn9u6S8A",
+  "name": "بترولايز بيحان",
+  "city": "Madinah",
+  "kind": "existing"
+ },
+ "MK267": {
+  "url": "https://maps.app.goo.gl/o2X7AMA1tEgE8bcR7",
+  "name": "بترولايز جوهرة العروس 2",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "JA256": {
+  "url": "https://maps.app.goo.gl/x2BstDR6BoPmptei6",
+  "name": "ركن جاز الفطيحة",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "EP062": {
+  "url": "https://maps.app.goo.gl/nokWnMZzbb43P71o8?g_st=iw",
+  "name": "طريق الملك فيصل",
+  "city": "Dammam",
+  "kind": "existing"
+ },
+ "JA272": {
+  "url": "https://maps.app.goo.gl/1UKNnM8vmRyiqaSWA",
+  "name": "مسارات درب الزامل",
+  "city": "Baish",
+  "kind": "existing"
+ },
+ "AS271": {
+  "url": "https://maps.app.goo.gl/ewjKbPJNmDinsT4o6",
+  "name": "مسارات درب عقبة شعار",
+  "city": "Abha",
+  "kind": "existing"
+ },
+ "RY307": {
+  "url": "https://maps.app.goo.gl/ynPcpSPDPfeWauJR9",
+  "name": "الطلاسي",
+  "city": "Riyadh",
+  "kind": "existing"
+ },
+ "MK311": {
+  "url": "https://goo.gl/maps/Q1iwfKJJMnK19Y75A",
+  "name": "قويزة",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "EP380": {
+  "url": "https://goo.gl/maps/Q1iwfKJJMnK19Y75A",
+  "name": "العقير",
+  "city": "Al Ahsa",
+  "kind": "existing"
+ },
+ "EP382": {
+  "url": "https://goo.gl/maps/Q1iwfKJJMnK19Y75A",
+  "name": "محطة التشاليح",
+  "city": "Dammam",
+  "kind": "existing"
+ },
+ "MK313": {
+  "url": "https://goo.gl/maps/Q1iwfKJJMnK19Y75A",
+  "name": "محطة الصفا",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "RY381": {
+  "url": "https://goo.gl/maps/Q1iwfKJJMnK19Y75A",
+  "name": "طويق الزهراء",
+  "city": "Riyadh",
+  "kind": "existing"
+ },
+ "RY384": {
+  "url": "https://goo.gl/maps/Q1iwfKJJMnK19Y75A",
+  "name": "محطة النصر",
+  "city": "Riyadh",
+  "kind": "existing"
+ },
+ "NJ350": {
+  "url": "https://maps.app.goo.gl/DoWTAFDofn161kAB8",
+  "name": "زهرة الجنوب 1",
+  "city": "Najran",
+  "kind": "existing"
+ },
+ "EP349": {
+  "url": "https://maps.app.goo.gl/UZFGfLzcm1RybF9X8",
+  "name": "هال الاحساء",
+  "city": "Al Ahsa",
+  "kind": "existing"
+ },
+ "تحت ا": {
+  "url": "https://maps.app.goo.gl/P58L3VGKEWZYfd7a8?g_st=iw",
+  "name": "خميس مشيط طريق الرياض",
+  "city": "Khamis Mushait",
+  "kind": "existing"
+ },
+ "JO281": {
+  "url": "https://maps.app.goo.gl/V9KwM4ksGvsw5V2s6",
+  "name": "القريات",
+  "city": "Al Qurayyat",
+  "kind": "existing"
+ },
+ "JO298": {
+  "url": "https://maps.app.goo.gl/rYLzFeLEJAmZmDC4A",
+  "name": "القريات",
+  "city": "Al Qurayyat",
+  "kind": "existing"
+ },
+ "MD297": {
+  "url": "https://maps.app.goo.gl/zZZU42UcyCj5f4k68",
+  "name": "المدينة عين الخيف",
+  "city": "Madinah",
+  "kind": "existing"
+ },
+ "EP316": {
+  "url": "https://maps.app.goo.gl/b9F9fjwSft3Bfzvj9",
+  "name": "محطة القصيم",
+  "city": "Hafar Al Batin",
+  "kind": "existing"
+ },
+ "MK431": {
+  "url": "https://maps.app.goo.gl/fYw2Cv1rkw8aw8QN7?g_st=iw",
+  "name": "البشائر",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "MK322": {
+  "url": "https://maps.app.goo.gl/oerweTgfV6comML19?g_st=iw",
+  "name": "الموسع",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "NJ351": {
+  "url": "https://maps.app.goo.gl/WmKLsHGpA54vFx8y8",
+  "name": "زهرة الجنوب الواحة 2",
+  "city": "Najran",
+  "kind": "existing"
+ },
+ "HA280": {
+  "url": "https://maps.google.com/?q=27.500341,41.640793",
+  "name": "الفجر",
+  "city": "Hail",
+  "kind": "existing"
+ },
+ "JA379": {
+  "url": "https://maps.app.goo.gl/RWtCyp7zuzPnB5Dp6",
+  "name": "محطة السويس",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "MK385": {
+  "url": "https://maps.app.goo.gl/qTz6A6dVHfma52XK6",
+  "name": "محطة حي طيبة",
+  "city": "Jeddah",
+  "kind": "existing"
+ },
+ "JA387": {
+  "url": "https://maps.app.goo.gl/2xBqCeVKj94Pq75r7",
+  "name": "محطة واجهة صبيا",
+  "city": "Sabya",
+  "kind": "existing"
+ },
+ "JA388": {
+  "url": "https://maps.app.goo.gl/cbAeNHMwzkDyh7DVA",
+  "name": "محطة أطياف الخير",
+  "city": "Sabya",
+  "kind": "existing"
+ },
+ "MD392": {
+  "url": "https://maps.app.goo.gl/baErVPMS2WpouEDN7?g_st=ic",
+  "name": "الاديب",
+  "city": "Makkah",
+  "kind": "existing"
+ },
+ "HA413": {
+  "url": "https://maps.app.goo.gl/NnAxWzehZpvtCuW99",
+  "name": "البساتين",
+  "city": "Hail",
+  "kind": "existing"
+ },
+ "JA417": {
+  "url": "https://maps.app.goo.gl/u5RsvDJc51ehmknN9",
+  "name": "جازان الزهور",
+  "city": "Jazan",
+  "kind": "existing"
+ },
+ "AS269": {
+  "url": "https://maps.app.goo.gl/7NwQtmBUsUNQcmhHA",
+  "name": "بترولايز الثنية",
+  "city": "Bisha",
+  "kind": "existing"
+ },
+ "JA302": {
+  "url": "https://maps.app.goo.gl/NbhSTXpi6TCcUxNo6",
+  "name": "ركن جاز الفرسان",
+  "city": "",
+  "kind": "existing"
+ },
+ "JA348": {
+  "url": "https://maps.app.goo.gl/6zGnZoExbhnRshTFA",
+  "name": "محطة الجارة",
+  "city": "",
+  "kind": "existing"
+ },
+ "MK285": {
+  "url": "https://maps.app.goo.gl/7bpbvpfVViY5swX6A",
+  "name": "محطة بتروتن جده",
+  "city": "",
+  "kind": "existing"
+ },
+ "MK300": {
+  "url": "https://maps.app.goo.gl/MFqJFptSfnSSZjzc6",
+  "name": "بترولايز البغدادية",
+  "city": "",
+  "kind": "existing"
+ },
+ "MK323": {
+  "url": "https://maps.app.goo.gl/UiPpgARAcj6kiQ4s5",
+  "name": "محطة جوهرة النسيم",
+  "city": "",
+  "kind": "existing"
+ },
+ "NP130": {
+  "url": "https://maps.app.goo.gl/2fVEztcVCj3b5C2x5",
+  "name": "طريق الامير سلطان",
+  "city": "",
+  "kind": "existing"
+ },
+ "NP131": {
+  "url": "https://maps.app.goo.gl/exbaa2gLobuWYuFs5",
+  "name": "طريق ابو بكر",
+  "city": "",
+  "kind": "existing"
+ },
+ "AB254": {
+  "url": "https://maps.app.goo.gl/ow1jGXUN3T8R2bhb8?g_st=iw",
+  "name": "محطة الزهور",
+  "city": "ابها",
+  "kind": "existing"
+ },
+ "AS189": {
+  "url": "https://maps.app.goo.gl/DeXvxtcYfpn97mMGA",
+  "name": "محطة الخزامى بيشه",
+  "city": "بيشة",
+  "kind": "existing"
+ },
+ "AS193": {
+  "url": "https://maps.app.goo.gl/h7Syc4Q85xbjaoKY9?g_st=iw",
+  "name": "طريق المئة",
+  "city": "خميس مشيط",
+  "kind": "existing"
+ },
+ "AS354": {
+  "url": "https://maps.app.goo.gl/yrUqSdJMZJ38wnhy6?g_st=iw",
+  "name": "محطة الواحة",
+  "city": "خميس مشيط",
+  "kind": "existing"
+ },
+ "EP335": {
+  "url": "https://maps.app.goo.gl/1zcJjJu2kKzyVY5A9",
+  "name": "النزهة الاحساء",
+  "city": "الاحساء",
+  "kind": "existing"
+ },
+ "EP336": {
+  "url": "https://maps.app.goo.gl/HbNJ6ZSZkRh9emEQ7",
+  "name": "طيبة الدمام",
+  "city": "الدمام",
+  "kind": "existing"
+ },
+ "EP337": {
+  "url": "https://maps.app.goo.gl/otwR4QfnHxzNmupX8",
+  "name": "الحزام الذهبي الاحساء",
+  "city": "الاحساء",
+  "kind": "existing"
+ },
+ "JA141": {
+  "url": "https://maps.app.goo.gl/Bw2DJGQx6jg23Y6d9?g_st=aw",
+  "name": "الأمير سلطان",
+  "city": "بيشة",
+  "kind": "existing"
+ },
+ "MK036": {
+  "url": "https://maps.app.goo.gl/Q87z9kZ58JN1EMdUA",
+  "name": "محطة حلي",
+  "city": "حلي",
+  "kind": "existing"
+ },
+ "MK080": {
+  "url": "https://maps.app.goo.gl/wBSK8LDCyDdtChd86",
+  "name": "طريق السيل النازل",
+  "city": "مكة",
+  "kind": "existing"
+ },
+ "MK257": {
+  "url": "https://maps.app.goo.gl/Mji7fiQ8iX6WxWCF9?g_st=iw",
+  "name": "الربوة مكة",
+  "city": "مكة",
+  "kind": "existing"
+ },
+ "MK258": {
+  "url": "https://maps.app.goo.gl/ZghKvLVfusUTTt656?g_st=iw",
+  "name": "الستين مكة",
+  "city": "مكة",
+  "kind": "existing"
+ },
+ "MK260": {
+  "url": "https://maps.app.goo.gl/npjjbuwP13rnYMt28",
+  "name": "ابحر الشمالية",
+  "city": "جدة",
+  "kind": "existing"
+ },
+ "MK310": {
+  "url": "https://maps.app.goo.gl/URTjmdVZmF5G8r7z7",
+  "name": "طريق الملك",
+  "city": "جدة",
+  "kind": "existing"
+ },
+ "MK339": {
+  "url": "https://maps.app.goo.gl/oBAW4S4XTLcQUuFZ9?g_st=iw",
+  "name": "محطة الشاطئ",
+  "city": "جدة",
+  "kind": "existing"
+ },
+ "NA190": {
+  "url": "https://maps.app.goo.gl/36VxhrTjhdymRsbH8?g_st=iw",
+  "name": "الحصينية",
+  "city": "نجران",
+  "kind": "existing"
+ },
+ "NJ145": {
+  "url": "https://maps.app.goo.gl/M191MVsHVfjdruWT9",
+  "name": "المندفق",
+  "city": "نجران",
+  "kind": "existing"
+ },
+ "RY147": {
+  "url": "https://maps.app.goo.gl/7ZEMAE6D1TAecuhWA",
+  "name": "حوطة بني تميم",
+  "city": "حوطة بني تميم",
+  "kind": "existing"
+ },
+ "RY149": {
+  "url": "https://maps.app.goo.gl/nS7Ujb35EqQivfcRA",
+  "name": "طريق الحاير",
+  "city": "الدلم",
+  "kind": "existing"
+ },
+ "RY338": {
+  "url": "https://maps.app.goo.gl/1zPP73Je2JX63L7D7",
+  "name": "محطة التعاون",
+  "city": "الرياض",
+  "kind": "existing"
+ },
+ "RY355": {
+  "url": "https://maps.app.goo.gl/WUviPFVrgT7f9omx9?g_st=iw",
+  "name": "محطة العريجاء",
+  "city": "الرياض",
+  "kind": "existing"
+ },
+ "RY356": {
+  "url": "https://maps.app.goo.gl/WUviPFVrgT7f9omx9?g_st=iw",
+  "name": "محطة المونسية",
+  "city": "الرياض",
+  "kind": "existing"
+ },
+ "AS328": {
+  "url": "https://maps.app.goo.gl/SNa6GqCdjzbRKh386",
+  "name": "خميس البحر",
+  "city": "محايل عسير",
+  "kind": "existing"
+ },
+ "BH253": {
+  "url": "https://maps.app.goo.gl/wJBoXRVdbjaBY5hEA",
+  "name": "مثلث الأطاولة العقيق",
+  "city": "الباحة",
+  "kind": "existing"
+ },
+ "EP299": {
+  "url": "https://maps.app.goo.gl/DDVGtRLmmKmtDmbW8",
+  "name": "طريق قبه",
+  "city": "حفر الباطن",
+  "kind": "existing"
+ },
+ "EP301": {
+  "url": "https://maps.app.goo.gl/zitgCWWv7i49hGfE6",
+  "name": "بترولايز الصفا",
+  "city": "الدمام",
+  "kind": "existing"
+ },
+ "EP315": {
+  "url": "https://maps.app.goo.gl/vVrcwxh2n51oNXxX8",
+  "name": "وهل طريق الخليج",
+  "city": "الهفوف",
+  "kind": "existing"
+ },
+ "EP324": {
+  "url": "https://maps.app.goo.gl/DoG1TRwUnfwRCAiA8",
+  "name": "رمكو الصفوي",
+  "city": "القطيف",
+  "kind": "existing"
+ },
+ "EP329": {
+  "url": "https://maps.app.goo.gl/5CdfZdUp26V1hYEHA",
+  "name": "محطة الورود",
+  "city": "حفر الباطن",
+  "kind": "existing"
+ },
+ "MK070": {
+  "url": "https://maps.app.goo.gl/f9BSH1i1zNsa6huPA",
+  "name": "محطة الظبية",
+  "city": "الظبية",
+  "kind": "existing"
+ },
+ "MK284": {
+  "url": "https://maps.app.goo.gl/uEx98XyhDp7bGTYDA",
+  "name": "محطة بتروتن مكة",
+  "city": "مكة ولي العهد",
+  "kind": "existing"
+ },
+ "MK304": {
+  "url": "https://maps.app.goo.gl/v7fdHhdEkQGXjJN27",
+  "name": "حي الرياض",
+  "city": "جدة",
+  "kind": "existing"
+ },
+ "MK314": {
+  "url": "https://maps.app.goo.gl/vZKhCykEp7s7pxQX8",
+  "name": "قوس النصر",
+  "city": "مكة",
+  "kind": "existing"
+ },
+ "QS330": {
+  "url": "https://maps.app.goo.gl/Ywy97T2jvgG6EB4w8",
+  "name": "محطة القويع",
+  "city": "بريدة",
+  "kind": "existing"
+ },
+ "QS331": {
+  "url": "https://maps.app.goo.gl/3Wfka8KZnutEo3UA6",
+  "name": "محطة البصر",
+  "city": "بريدة",
+  "kind": "existing"
+ },
+ "QS332": {
+  "url": "https://maps.app.goo.gl/rgtwiZQ8XAj1ffoy6",
+  "name": "محطة البدائع",
+  "city": "بريدة",
+  "kind": "existing"
+ },
+ "AS295": {
+  "url": "https://maps.app.goo.gl/fv3CjzyGG2p76nxR8",
+  "name": "نقطة ايفاء المجاردة",
+  "city": "",
+  "kind": "existing"
+ },
+ "EP309": {
+  "url": "https://maps.app.goo.gl/bME4EPuia3nF4F1n8",
+  "name": "الطلاسي - الضاحية",
+  "city": "",
+  "kind": "existing"
+ },
+ "EP325": {
+  "url": "https://maps.app.goo.gl/sXwvdskpQsPfkHCC6",
+  "name": "رمكو البطحاء",
+  "city": "",
+  "kind": "existing"
+ },
+ "EP327": {
+  "url": "https://maps.app.goo.gl/Wn4FBGT5kMCtwjKKA",
+  "name": "ميدواي الرفيعة",
+  "city": "",
+  "kind": "existing"
+ },
+ "EP352": {
+  "url": "https://maps.app.goo.gl/KBkWA8KTNnarA8kf8",
+  "name": "محطة الدوحة",
+  "city": "",
+  "kind": "existing"
+ },
+ "JA305": {
+  "url": "https://maps.app.goo.gl/nzbJQKQQ9DFt6BxG6",
+  "name": "محطة ركن الساحل",
+  "city": "",
+  "kind": "existing"
+ },
+ "JA306": {
+  "url": "https://maps.app.goo.gl/x4MvzCLTcRiZ4heM8",
+  "name": "محطة عمود",
+  "city": "",
+  "kind": "existing"
+ },
+ "JA358": {
+  "url": "https://maps.app.goo.gl/H1y6C36Srm18i6NE7",
+  "name": "محطة الحديقة",
+  "city": "",
+  "kind": "existing"
+ },
+ "JA360": {
+  "url": "https://maps.app.goo.gl/2NAgai4sjSay4YsH7",
+  "name": "محطة الزاوية",
+  "city": "",
+  "kind": "existing"
+ },
+ "JO303": {
+  "url": "https://maps.app.goo.gl/YAnW8nKskvJQ6d4k9",
+  "name": "سام سكاكا",
+  "city": "",
+  "kind": "existing"
+ },
+ "JO347": {
+  "url": "https://maps.app.goo.gl/9VDZxpCHKixfYzpe7",
+  "name": "سكاكا اللقايط",
+  "city": "",
+  "kind": "existing"
+ },
+ "MD294": {
+  "url": "https://maps.app.goo.gl/9fwjwbwk3HpgMKBn7",
+  "name": "نقطة ايفاء العلا",
+  "city": "",
+  "kind": "existing"
+ },
+ "MD296": {
+  "url": "https://maps.app.goo.gl/mT5teYjCqSj4TL1y6",
+  "name": "نقطة ايفاء طيبة",
+  "city": "",
+  "kind": "existing"
+ },
+ "MD344": {
+  "url": "https://maps.app.goo.gl/929mjRjw2DBDxrZJ7",
+  "name": "الحجاز",
+  "city": "",
+  "kind": "existing"
+ },
+ "MD346": {
+  "url": "https://maps.app.goo.gl/z4GCVCtfMN8JCJcd9",
+  "name": "الضيافة",
+  "city": "",
+  "kind": "existing"
+ },
+ "MK144": {
+  "url": "https://maps.app.goo.gl/E6BehqoqfLDjobwR8",
+  "name": "بترولكس ايفينت مول",
+  "city": "",
+  "kind": "existing"
+ },
+ "MK196": {
+  "url": "https://maps.app.goo.gl/BEpaNufxGVUL8hLTA",
+  "name": "الياقوت",
+  "city": "",
+  "kind": "existing"
+ },
+ "MK266": {
+  "url": "https://maps.app.goo.gl/3bjQvVqJgNEJVwCTA",
+  "name": "بترولايز الفلاح",
+  "city": "",
+  "kind": "existing"
+ },
+ "MK273": {
+  "url": "https://maps.app.goo.gl/55EdkmVi5uFrZkHX9",
+  "name": "محطة النسيم 1 الشوقية",
+  "city": "",
+  "kind": "existing"
+ },
+ "MK274": {
+  "url": "https://maps.app.goo.gl/HrgmZ6J7pj8HAbaE7",
+  "name": "محطة النسيم 3 الجزائر",
+  "city": "",
+  "kind": "existing"
+ },
+ "MK275": {
+  "url": "https://maps.app.goo.gl/x2PqsNu2mAxQ4f8N9",
+  "name": "محطة النسيم 4 الشوقية",
+  "city": "",
+  "kind": "existing"
+ },
+ "MK276": {
+  "url": "https://maps.app.goo.gl/6whxnKcpy3qPacXQ8",
+  "name": "محطة النسيم 5  الفيحاء",
+  "city": "",
+  "kind": "existing"
+ },
+ "MK277": {
+  "url": "https://maps.app.goo.gl/ZXEkSJh3yvvJu3Qj9",
+  "name": "محطة النسيم 6 البحيرات",
+  "city": "",
+  "kind": "existing"
+ },
+ "MK278": {
+  "url": "https://maps.app.goo.gl/enEhxvhSmHnpdeKa8",
+  "name": "محطة النسيم 7 رابغ",
+  "city": "",
+  "kind": "existing"
+ },
+ "MK279": {
+  "url": "https://maps.app.goo.gl/CAkZgavGs9PSpbmR9",
+  "name": "محطة النسيم 8 أبو مراغ",
+  "city": "",
+  "kind": "existing"
+ },
+ "MK282": {
+  "url": "https://maps.app.goo.gl/HfQo7YKufSwXYij26",
+  "name": "الشرائع مخطط 5",
+  "city": "",
+  "kind": "existing"
+ },
+ "MK290": {
+  "url": "https://maps.app.goo.gl/cUHKvhD5je4t9iji8",
+  "name": "امداد الكعكية",
+  "city": "",
+  "kind": "existing"
+ },
+ "MK291": {
+  "url": "https://maps.app.goo.gl/SS3cMFRn3znLxLbcA",
+  "name": "امداد المنصور",
+  "city": "",
+  "kind": "existing"
+ },
+ "MK292": {
+  "url": "https://maps.app.goo.gl/LhQo9BkmVfJSm3Ax5",
+  "name": "امداد الشرائع",
+  "city": "",
+  "kind": "existing"
+ },
+ "MK293": {
+  "url": "https://maps.app.goo.gl/NRmYqReYQ2cEqpXS7",
+  "name": "امداد السبهاني",
+  "city": "",
+  "kind": "existing"
+ },
+ "QS200": {
+  "url": "https://maps.app.goo.gl/qJPQ3niNBth7xSy48",
+  "name": "نبض - ثادج",
+  "city": "",
+  "kind": "existing"
+ },
+ "QS270": {
+  "url": "https://maps.app.goo.gl/PqBoBmWdXnx7ziGb8",
+  "name": "بترولايز المذنب",
+  "city": "",
+  "kind": "existing"
+ },
+ "QS308": {
+  "url": "https://maps.app.goo.gl/i33AYbBPGJDftXao6",
+  "name": "الطلاسي - البدائع",
+  "city": "",
+  "kind": "existing"
+ },
+ "QS361": {
+  "url": "https://maps.app.goo.gl/J4Yj8UsP4cn36qkN9",
+  "name": "محطة سلطانه",
+  "city": "",
+  "kind": "existing"
+ },
+ "RY268": {
+  "url": "https://maps.app.goo.gl/moxni1zomBdj45mc7",
+  "name": "بترولايز الخرج",
+  "city": "",
+  "kind": "existing"
+ },
+ "RY283": {
+  "url": "https://maps.app.goo.gl/SSx6GR93nsCP51Ra6",
+  "name": "كواكب الجزيرة  - الجنادرية",
+  "city": "",
+  "kind": "existing"
+ },
+ "RY340": {
+  "url": "https://maps.app.goo.gl/SKqoD1ya1nt2Nhg58",
+  "name": "محطة الدار البيضاء",
+  "city": "",
+  "kind": "existing"
+ },
+ "RY341": {
+  "url": "https://maps.app.goo.gl/ecnPXqRhCijFK1zc9",
+  "name": "نجد النسيم",
+  "city": "",
+  "kind": "existing"
+ },
+ "RY342": {
+  "url": "https://maps.app.goo.gl/JMUvJY7Tiexko3Qi6",
+  "name": "نجد رماح",
+  "city": "",
+  "kind": "existing"
+ },
+ "RY343": {
+  "url": "https://maps.app.goo.gl/zR2vq7SmxFBM3BED8",
+  "name": "نجد الثمامة",
+  "city": "",
+  "kind": "existing"
+ },
+ "TB345": {
+  "url": "https://maps.app.goo.gl/GkwSzPeqhVkR5TFXA",
+  "name": "الوجه",
+  "city": "",
+  "kind": "existing"
+ }
+}
