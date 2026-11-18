@@ -71,11 +71,18 @@ FRAC_SAMPLE = 0.50
 CLASSES = [("ممرُّ شاحنات", 0.40, 0.55),
            ("ديزلٌ غالب", 0.55, 1.01)]
 
+# تصحيحُ منطقةٍ خاطئةٍ في الشيت — تُقاس بما تقوله جاراتُنا في المدينة نفسِها
+REGION_FIX = {"AS286": ("Northern", "Southern")}   # محايل عسير جنوبيّةٌ لا شمالية
+
 # ما تعرفه الإدارةُ عن الموقعِ ولا يَظهر في الملف — مُدخَلٌ إداريٌّ مُعلَن
 OVERRIDE = {
     "MK044": dict(cls="ممرُّ شاحنات", basis="من عددِ الوحدات",
                   why="مساحةٌ فوق ١٠٠ ألف م² · مسارُ ديزلٍ مخصَّصٌ للشاحنات · "
                       "وتجارةٌ كثيفةٌ بعلاماتٍ كبرى تجرّ حركةً للموقع "
+                      "— الإدارة التجارية"),
+    "RY073": dict(prof="صيفيٌّ مقيس",
+                  why="مدينةُ القدية الترفيهيّةُ بعدها فموسمُها موسمُ "
+                      "إجازاتٍ · ومحطتان قبلها تقتسمان الحركة "
                       "— الإدارة التجارية"),
     "MK045": dict(cls="ممرُّ شاحنات", prof="صيفيٌّ مقيس",
                   basis="من عددِ الوحدات",
@@ -109,10 +116,14 @@ def read(path):
         if not r[8] or not isinstance(r[7], (dt.date, dt.datetime)):
             continue
         d = r[7].date() if isinstance(r[7], dt.datetime) else r[7]
-        new[str(r[8]).strip()] = dict(
+        code = str(r[8]).strip()
+        rg = str(r[2]).strip().replace(" Region", "")
+        if code in REGION_FIX and rg == REGION_FIX[code][0]:
+            rg = REGION_FIX[code][1]
+        new[code] = dict(
             name=str(r[6]).split(" - ")[0].strip(),
             model=str(r[1]).strip().title(),
-            reg=str(r[2]).strip().replace(" Region", ""),
+            reg=rg,
             city=str(r[3]).strip().title(),
             open=d.isoformat())
 
@@ -350,6 +361,92 @@ def measure_anchor(vol, new, attr, U, Lz):
                  for p in sorted(pts, key=lambda x: -x["brands"])[:6]])
 
 
+def measure_neighbours(vol, new, attr):
+    """جوارُ كلِّ محطةٍ جديدةٍ — بالمدينة، إذ لا إحداثيّاتَ تُفكُّ في هذه الجلسة
+
+       والمدينةُ وحدةُ قياسٍ خشنة: جارةٌ على عشرين كيلومتراً في مكّةَ ليست
+       «قبلها على الطريق». فما يُقاس هنا حضورٌ لا مسافة.
+    """
+    DAY = DAYS
+    rt = {}
+    for c, v in vol.items():
+        if c in new or c not in attr:
+            continue
+        t = totals(v, 2026)
+        if all(x > 0 for x in t[:NACT]):
+            rt[c] = st.mean([t[i] / DAY[i] for i in range(NACT)])
+    bycity = collections.defaultdict(list)
+    cityreg = collections.defaultdict(collections.Counter)
+    for c, a in attr.items():
+        if c in new:
+            continue
+        k = a["city"].strip().lower()
+        bycity[k].append(c)
+        cityreg[k][a["reg"]] += 1
+    out = {}
+    for c, s0 in new.items():
+        k = s0["city"].strip().lower()
+        nb = bycity.get(k, [])
+        mn = [x for x in nb if x in rt]
+        out[c] = dict(
+            n_ours=len(nb), n_mature=len(mn),
+            med=round(st.median([rt[x] for x in mn])) if mn else 0,
+            top=[[attr[x]["name"], round(rt[x])]
+                 for x in sorted(mn, key=lambda y: -rt[y])[:3]],
+            reg_conflict=(cityreg[k].most_common(1)[0][0]
+                          if cityreg.get(k) and s0["reg"] not in cityreg[k] else ""))
+    return out
+
+
+def measure_cannibal(vol, new, attr):
+    """هل الافتتاحُ يأكل من جاراتنا؟ — فرقُ الفروقِ على افتتاحاتِ ٢٠٢٦
+
+       لكلِّ افتتاحٍ في ٢٠٢٦: تغيُّرُ جاراتِه في المدينةِ شهرَين قبلَه مقابل
+       شهرَين بعدَه، مطروحاً منه تغيُّرُ بقيّةِ الشبكةِ في الشهورِ نفسِها.
+       ثم يُجمَع الحدثُ الواحدُ مرّةً واحدةً ولو فُتحت فيه ثلاثُ محطات.
+    """
+    rate = lambda c, i: totals(vol[c], 2026)[i] / DAYS[i]
+    mature = [c for c in vol if c not in new and c in attr
+              and all(x > 0 for x in totals(vol[c], 2026)[:NACT])]
+    ev = collections.defaultdict(list)
+    for c, v in vol.items():
+        if c in new or c not in attr:
+            continue
+        a = totals(v, 2026)[:NACT]
+        nz = [i for i, x in enumerate(a) if x > 0]
+        if not nz or nz[0] == 0 or len(nz) != NACT - nz[0]:
+            continue
+        o = nz[0]
+        if not 2 <= o <= 5:
+            continue
+        city = attr[c]["city"].strip().lower()
+        nb = [x for x in mature if attr[x]["city"].strip().lower() == city
+              and x != c]
+        if not nb:
+            continue
+        ctrl = [x for x in mature if attr[x]["city"].strip().lower() != city]
+        f = lambda g, ms: sum(rate(x, i) for x in g for i in ms) / len(ms)
+        nbp, nbq = f(nb, [o - 2, o - 1]), f(nb, [o + 1, o + 2])
+        cp, cq = f(ctrl, [o - 2, o - 1]), f(ctrl, [o + 1, o + 2])
+        if nbp <= 0 or cp <= 0:
+            continue
+        ev[(attr[c]["city"], o)].append(
+            dict(name=attr[c]["name"], dd=(nbq / nbp) - (cq / cp), nb=len(nb)))
+    E = [dict(city=k[0], month=k[1] + 1, k=len(g), nb=g[0]["nb"], dd=g[0]["dd"],
+              names=[x["name"] for x in g]) for k, g in ev.items()]
+    if len(E) < 4:
+        return None
+    dd = [e["dd"] for e in E]
+    se = st.stdev(dd) / len(dd) ** 0.5
+    return dict(n=len(E), median=round(st.median(dd), 4),
+                mean=round(st.mean(dd), 4), se=round(se, 4),
+                significant=abs(st.mean(dd)) > 2 * se,
+                neg=sum(1 for x in dd if x < 0),
+                events=sorted([[e["city"], e["month"], e["nb"], round(e["dd"], 4),
+                                " · ".join(e["names"])] for e in E],
+                              key=lambda x: x[3]))
+
+
 def measure_mix(vol, new, attr):
     """حصصُ المنتجاتِ الفعليّةُ بالمنطقة — ينا–سبت ٢٠٢٦"""
     reg = collections.defaultdict(collections.Counter)
@@ -382,6 +479,8 @@ def build(path):
     prof = measure_profiles(vol, new, attr)
     U, Lz = read_units()
     anc = measure_anchor(vol, new, attr, U, Lz)
+    nbr = measure_neighbours(vol, new, attr)
+    can = measure_cannibal(vol, new, attr)
     net = st.median(list(rate.values()))
     top_mature = round(max(rate.values()))
     top_name = attr[max(rate, key=rate.get)]["name"]
@@ -435,6 +534,8 @@ def build(path):
             units_leased=U.get(c, {}).get("leased", 0),
             brands=len(Lz.get(c, [])),
             peer_units=(anc or {}).get("peer_units", {}).get(src, 0),
+            share=1.0,                 # حصّةٌ مُقتسَمة — محايدةٌ حتى تُقاس
+            nbr=nbr.get(c, {}),
             why=ov.get("why", ""), mix=m, bu=bu, a26=a26,
             has26=any(sum(a26[p]) for p in PRODS),
             # معدّلُ الموازنةِ الضمنيّ، وهل هي رقمٌ واحدٌ مكرَّرٌ في كلِّ شهر
@@ -447,7 +548,8 @@ def build(path):
              peer_reg={k: [round(st.median(v)), len(v)] for k, v in reg.items()},
              peer_net=round(net), n_mature=len(rate), n_ramp=nramp,
              mix_reg=mix, mix_net=mnet, classes=cls, profiles=prof,
-             anchor=anc, top_mature=top_mature, top_name=top_name)
+             anchor=anc, cannibal=can,
+             top_mature=top_mature, top_name=top_name)
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(D, f, ensure_ascii=False, indent=1)
 
@@ -470,6 +572,16 @@ def build(path):
     for c, o in OVERRIDE.items():
         print(f"  OVERRIDE {c}: {o.get('cls', '')} "
               f"{'· ' + o['prof'] if 'prof' in o else ''}")
+    if can:
+        print(f"  اقتسامُ الحصّة (فرقُ الفروق، ن={can['n']}): وسيط "
+              f"{can['median'] * 100:+.1f}٪ · متوسّط {can['mean'] * 100:+.1f}٪ "
+              f"· خطأٌ معياريّ {can['se'] * 100:.1f}٪ ⇒ "
+              f"{'دالّ' if can['significant'] else 'غيرُ دالٍّ إحصائياً'}"
+              f" ({can['neg']} من {can['n']} سالبة)")
+    rc = [s for s in out if s.get("nbr", {}).get("reg_conflict")]
+    if rc:
+        print("  تعارضُ منطقةٍ في الشيت: "
+              + " · ".join(f"{s['code']} {s['name']}" for s in rc))
     if anc:
         print(f"  رافعةُ المستأجرين (ن={anc['n']}): وحداتٌ مؤجَّرة r="
               f"{anc['r_leased']:+.3f} R²={anc['r2']:.2f} · "

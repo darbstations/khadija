@@ -63,9 +63,10 @@ SEAS_WEST = [1.049, 1.003, 1.013, 1.012, 0.939, 0.926,
 # أعمدةُ جدول المحطات في ورقة المُدخَلات
 IC = dict(no=1, code=2, name=3, reg=4, city=5, open=6, off=7, day=8,
           basis=9, peer=10, clsr=11, built=12, uexp=13, urate=14, rate=15,
-          src=16, n=17, cls=18, prof=19, m91=20, m95=21, mdsl=22)
+          share=16, src=17, n=18, nbr=19, cls=20, prof=21,
+          m91=22, m95=23, mdsl=24)
 MIXC = {"91": "m91", "95": "m95", "diesel": "mdsl"}
-NIC = 22
+NIC = 24
 
 GOOD = PatternFill("solid", fgColor=B.T_GOOD)
 BAD = PatternFill("solid", fgColor=B.T_BAD)
@@ -128,8 +129,9 @@ def fc_formula(ir, m, prod):
     off = f"'{IN}'!$G${ir}"
     opm = f"{m}-{off}"
     rate = f"'{IN}'!${L(IC['rate'])}${ir}"
+    share = f"'{IN}'!${L(IC['share'])}${ir}"
     mix = f"'{IN}'!${L(IC[MIXC[prod]])}${ir}"
-    return (f"=IF({opm}<1,0,{rate}*{ramp_factor(ir, m)}"
+    return (f"=IF({opm}<1,0,{rate}*{share}*{ramp_factor(ir, m)}"
             f"*{days_ref(m)}*{mix}*{seas_ref(ir, m)})")
 
 
@@ -137,7 +139,7 @@ def fc_formula(ir, m, prod):
 def sheet_inputs(wb, D):
     ws = wb.create_sheet(IN)
     W.setup(ws, [5, 9, 24, 11, 13, 12, 6, 6, 15, 10, 10, 8, 8, 11, 11,
-                 17, 5, 13, 13, 8, 8, 8], freeze="A23")
+                 8, 17, 5, 9, 13, 13, 8, 8, 8], freeze="A23")
     W.title(ws, "المُدخَلات — ستّةُ مُدخَلاتٍ تُحرّك التوقّعَ كلَّه",
             "الأزرقُ يُغيَّر · والتوقّعُ في ورقة «FC 2027» معادلةٌ تقرأ من هنا، "
             "فما غيّرتَه هنا تحرّك هناك",
@@ -245,7 +247,8 @@ def sheet_inputs(wb, D):
                             "أساسُ المعدّل", "① نظيرُ\nالجوار",
                             "② فئةٌ\nمقيسة", "وحداتٌ\nمبنيّة",
                             "وحداتٌ\nمتوقَّعة", "③ من عددِ\nالوحدات",
-                            "المعدّلُ\nالمختار", "مصدرُ النظير", "ن",
+                            "المعدّلُ\nالمختار", "حصّةٌ\nمُقتسَمة",
+                            "مصدرُ النظير", "ن", "جاراتُنا\nبالمدينة",
                             "الفئة", "الموسم", "٩١", "٩٥", "ديزل"], h=34)
     for i, s in enumerate(D["stations"], 1):
         rr = R_ST + i - 1
@@ -278,10 +281,17 @@ def sheet_inputs(wb, D):
                f'IF(AND({L(IC["basis"])}{rr}="{BASES[2]}",'
                f'{L(IC["built"])}{rr}>0),{L(IC["urate"])}{rr},'
                f'{L(IC["peer"])}{rr}))', NUM)
+        cc = W.inp(ws, rr, IC["share"], "0%", s.get("share", 1.0))
+        if s.get("share", 1.0) != 1.0:
+            cc.font = Font(name=B.FONT, size=9, bold=True, color=B.D_GOLD)
         cc = ws.cell(rr, IC["src"], s["src"]); cc.font = Font(name=B.FONT, size=8.5,
                                                               color=B.INK2)
         cc.border = W.BOX; cc.alignment = W.RGT; cc.fill = NEU
         W.calc(ws, rr, IC["n"], s["n"], "0")
+        nb = s.get("nbr") or {}
+        cc = W.calc(ws, rr, IC["nbr"], nb.get("n_ours", 0), "0")
+        if nb.get("n_ours", 0) >= 15:
+            cc.font = Font(name=B.FONT, size=9, bold=True, color=B.D_BAD)
         cc = W.inp(ws, rr, IC["cls"], "@", s.get("cls") or "—")
         if s.get("cls"):
             cc.font = Font(name=B.FONT, size=9, bold=True, color=B.D_GOLD)
@@ -715,6 +725,100 @@ def sheet_gap(wb, D, FCROW):
 
 
 # ══════════════════════════════════════════════════════════════════
+def sheet_nbr(wb, D):
+    """الجوار — ومن قبلها · وما قيس من الاقتسامِ وما لم يُقَس"""
+    ws = wb.create_sheet("الجوار")
+    W.setup(ws, [4, 26, 11, 16, 10, 11, 12, 13, 36], freeze="A5")
+    W.title(ws, "الجوار — هل قبلها محطةٌ لنا؟",
+            "القياسُ هنا بالمدينةِ لا بالمسافة، إذ لا إحداثيّاتَ تُفكُّ — "
+            "فما يُقاس حضورٌ لا «قبلها على الطريق»",
+            9)
+    W.rule(ws, 3, 9)
+    W.header(ws, 4, ["#", "المحطة", "الكود", "المدينة", "منطقةُ\nالشيت",
+                     "محطاتُنا\nبالمدينة", "ناضجةٌ\nمنها",
+                     "وسيطُها\nل/يوم", "أكبرُ ثلاثٍ لنا هناك · والتدقيق"], h=34)
+    r = 5
+    for i, s0 in enumerate(sorted(D["stations"],
+                                  key=lambda x: -(x.get("nbr") or {})
+                                  .get("n_ours", 0)), 1):
+        nb = s0.get("nbr") or {}
+        W.calc(ws, r, 1, i, "0")
+        cc = ws.cell(r, 2, s0["name"]); cc.font = Font(name=B.FONT, size=10,
+                                                       color=B.INK)
+        cc.border = W.BOX; cc.alignment = W.RGT; cc.fill = NEU
+        W.calc(ws, r, 3, s0["code"], "@")
+        W.calc(ws, r, 4, s0["city"], "@")
+        W.calc(ws, r, 5, s0["reg"], "@")
+        cc = W.calc(ws, r, 6, nb.get("n_ours", 0), "0")
+        if nb.get("n_ours", 0) >= 15:
+            cc.font = Font(name=B.FONT, size=10, bold=True, color=B.D_BAD)
+        W.calc(ws, r, 7, nb.get("n_mature", 0), "0")
+        W.calc(ws, r, 8, nb.get("med", 0) or None, NUM)
+        txt = " · ".join(f"{n} {v:,}" for n, v in nb.get("top", []))
+        if nb.get("reg_conflict"):
+            txt = f"⚠ الشيت «{s0['reg']}» وجاراتُها «{nb['reg_conflict']}»"
+        elif not nb.get("n_ours"):
+            txt = "لا محطةَ لنا في هذه المدينة — ولا نظيرَ قريبٌ يُقاس به"
+        cc = ws.cell(r, 9, txt)
+        cc.font = Font(name=B.FONT, size=8.5,
+                       color=B.D_BAD if nb.get("reg_conflict") else B.INK2)
+        cc.border = W.BOX; cc.alignment = W.RGT
+        r += 1
+
+    # اختبارُ الاقتسام — بنتيجته أيّاً كانت
+    can = D.get("cannibal")
+    if can:
+        r += 1
+        verdict = "دالٌّ إحصائياً" if can["significant"] else "غيرُ دالٍّ إحصائياً"
+        r = W.band(ws, r, 9,
+                   f"اختبارُ الاقتسام — فرقُ الفروقِ على {can['n']} افتتاحاً "
+                   f"في ٢٠٢٦ · النتيجة: {verdict}")
+        W.header(ws, r, ["المدينة", "شهرُ الافتتاح", "جاراتٌ ناضجة",
+                         "فرقُ الفروق", "المحطةُ المفتوحة"], h=22)
+        r += 1
+        for city, mon, nbn, dd, names in can["events"]:
+            W.calc(ws, r, 1, city, "@")
+            W.calc(ws, r, 2, MONAR[mon - 1], "@")
+            W.calc(ws, r, 3, nbn, "0")
+            cc = W.calc(ws, r, 4, dd, "+0.0%;-0.0%")
+            cc.font = Font(name=B.FONT, size=9, bold=True,
+                           color=B.D_BAD if dd < 0 else B.D_GOOD)
+            cc = ws.cell(r, 5, names)
+            cc.font = Font(name=B.FONT, size=8.5, color=B.INK2)
+            cc.border = W.BOX; cc.alignment = W.RGT
+            r += 1
+        for ttl, items, col in (
+                ("ما قيس", [
+                    f"وسيطُ فرقِ الفروق {can['median'] * 100:+.1f}٪ · "
+                    f"متوسّطُه {can['mean'] * 100:+.1f}٪ · خطأٌ معياريّ "
+                    f"{can['se'] * 100:.1f}٪ ⇒ {verdict}",
+                    f"و{can['neg']} حدثاً من {can['n']} جاراتُه تراجعت أكثرَ "
+                    f"من بقيّةِ الشبكة — أي أقلُّ من نصفها"], B.BGRAY),
+                ("ولماذا لا يُحتجُّ به", [
+                    "المدينةُ وحدةُ قياسٍ خشنة: جارةٌ على عشرين كيلومتراً في "
+                    "مكّةَ ليست «قبلها على الطريق»، ومكّةُ وحدَها ٦٥ محطةً لنا",
+                    "فهذا الاختبارُ ينفي الاقتسامَ على مستوى المدينة، ولا "
+                    "ينفيه على مستوى الطريق — وهما سؤالان مختلفان",
+                    "والسؤالُ الصحيحُ يحتاج إحداثيّاتِ المحطات، وهي ليست في "
+                    "أيِّ ملفٍ عندنا: روابطُ خرائطَ مختصرةٌ فقط",
+                    "ولذلك عمودُ «حصّةٌ مُقتسَمة» في ورقة المُدخَلات محايدٌ "
+                    "على ١٠٠٪ — موصولٌ بالمعادلة ومتروكٌ لمن يعرف الطريق"],
+                 B.D_BAD)):
+            cc = ws.cell(r, 1, ttl)
+            cc.font = Font(name=B.FONT, size=9, bold=True, color=col)
+            cc.alignment = W.RGT
+            r += 1
+            for it in items:
+                ws.merge_cells(start_row=r, start_column=2, end_row=r,
+                               end_column=9)
+                cc = ws.cell(r, 2, "•  " + it)
+                cc.font = Font(name=B.FONT, size=8.5, color=B.INK2)
+                cc.alignment = W.RGT
+                r += 1
+    return ws
+
+
+# ══════════════════════════════════════════════════════════════════
 def sheet_gaps_known(wb, D):
     ws = wb.create_sheet("ما ينقص")
     W.setup(ws, [4, 34, 30, 26, 22], freeze="A5")
@@ -726,6 +830,19 @@ def sheet_gaps_known(wb, D):
     W.header(ws, 4, ["#", "المُدخَل الناقص", "لماذا يَحسم", "من يملك سدَّه",
                      "أثرُه على هذه الورقة"], h=32)
     ROWS = [
+        ("إحداثيّاتُ المحطات — خطًّا وعرضاً",
+         "«هل قبلها محطةٌ لنا؟» سؤالُ مسافةٍ لا سؤالُ مدينة. ولا إحداثيَّ في "
+         "أيِّ ملفٍ عندنا، بل روابطُ خرائطَ مختصرةٌ لا تُفكُّ في هذه الجلسة. "
+         "واختبارُ الاقتسامِ بالمدينةِ خرج غيرَ دالٍّ — وهذا نفيٌ على مستوى "
+         "المدينةِ لا على مستوى الطريق",
+         "إدارةُ المشاريع / هندسةُ الشبكة",
+         "يُفعِّل عمودَ «حصّةٌ مُقتسَمة» بقياسٍ بدل أن يبقى محايداً ١٠٠٪"),
+        ("المحطتان اللتان قبل القدية — أيُّهما وعلى أيِّ مسافة",
+         "القديةُ الترفيهيّةُ بعدها، ومحطتان قبلها تقتسمان الحركة. ولنا ٣٤ "
+         "محطةً في الرياضَ أربعٌ منها ناضجةٌ في ٢٠٢٦، وسجلُّ المحطات لا يحمل "
+         "لهما تمييزاً",
+         "الإدارة التجارية",
+         "يُسمّي الحصّةَ المُقتسَمةَ لـRY073 رقماً بدل ١٠٠٪"),
         ("خطّةُ مستأجري القنفذة ومدينة الملك عبدالله — عدداً وعلامةً وموعداً",
          "٦٥ وحدةً مبنيّةً في القنفذة و٤١ في مدينة الملك، ومعدّلُهما محسوبٌ "
          "بإشغالِ ٧٧٫٥٪ (إشغالُ الناضجة مجموعاً). والمحلاتُ وحدَها في الشبكة "
@@ -828,8 +945,10 @@ def build():
     sheet_inputs(wb, D)
     _, gbu, gfc, FCROW = sheet_fc(wb, D)
     sheet_gap(wb, D, FCROW)
+    sheet_nbr(wb, D)
     sheet_gaps_known(wb, D)
-    wb._sheets = [wb["FC 2027"], wb["الفجوة"], wb[IN], wb["ما ينقص"]]
+    wb._sheets = [wb["FC 2027"], wb["الفجوة"], wb["الجوار"], wb[IN],
+                  wb["ما ينقص"]]
     wb.save(OUT)
     print(f"✓ {OUT}")
     print(f"  محطات {len(D['stations'])} · منحنى التدرّج "
