@@ -51,17 +51,21 @@ R_DAYS = 8                # C8:N8   — أيام أشهر ٢٠٢٧
 R_PROF = 11               # B11:O14 — أربعةُ منحنياتِ موسمٍ · O المتوسّط
 N_PROF = 4
 C_PAVG = 15               # O       — متوسّطُ المنحنى (للتطبيع)
-R_ST = 21                 # أول صفٍّ في جدول المحطات
+R_ANC = 18                # C18:G18 — رافعةُ المستأجرين: ميلٌ وثابتٌ وإشغالٌ وسقف
+C_SLOPE, C_INTER, C_OCC, C_CAP = 3, 4, 5, 6
+R_ST = 23                 # أول صفٍّ في جدول المحطات
+BASES = ["نظيرُ الجوار", "فئةٌ مقيسة", "من عددِ الوحدات"]
 
 # المؤشّرُ الموسميُّ الغربيُّ المقيس — ٨ محطاتٍ لها سنتان فعليّتان كاملتان
 # (وسيطُ ٢٠٢٥ و٢٠٢٦ لينا–سبت · وأكت–ديس من ٢٠٢٥ وحدها إذ لا فعليَّ لها في ٢٦)
 SEAS_WEST = [1.049, 1.003, 1.013, 1.012, 0.939, 0.926,
              1.022, 1.053, 0.982, 0.952, 0.920, 0.882]
 # أعمدةُ جدول المحطات في ورقة المُدخَلات
-IC = dict(no=1, code=2, name=3, reg=4, city=5, open=6, off=7, day=8, rate=9,
-          src=10, n=11, cls=12, prof=13, m91=14, m95=15, mdsl=16)
+IC = dict(no=1, code=2, name=3, reg=4, city=5, open=6, off=7, day=8,
+          basis=9, peer=10, clsr=11, built=12, uexp=13, urate=14, rate=15,
+          src=16, n=17, cls=18, prof=19, m91=20, m95=21, mdsl=22)
 MIXC = {"91": "m91", "95": "m95", "diesel": "mdsl"}
-NIC = 16
+NIC = 22
 
 GOOD = PatternFill("solid", fgColor=B.T_GOOD)
 BAD = PatternFill("solid", fgColor=B.T_BAD)
@@ -132,9 +136,9 @@ def fc_formula(ir, m, prod):
 # ══════════════════════════════════════════════════════════════════
 def sheet_inputs(wb, D):
     ws = wb.create_sheet(IN)
-    W.setup(ws, [5, 9, 24, 11, 13, 12, 6, 6, 11, 17, 5, 13, 13, 8, 8, 8],
-            freeze="A21")
-    W.title(ws, "المُدخَلات — خمسةُ مُدخَلاتٍ تُحرّك التوقّعَ كلَّه",
+    W.setup(ws, [5, 9, 24, 11, 13, 12, 6, 6, 15, 10, 10, 8, 8, 11, 11,
+                 17, 5, 13, 13, 8, 8, 8], freeze="A23")
+    W.title(ws, "المُدخَلات — ستّةُ مُدخَلاتٍ تُحرّك التوقّعَ كلَّه",
             "الأزرقُ يُغيَّر · والتوقّعُ في ورقة «FC 2027» معادلةٌ تقرأ من هنا، "
             "فما غيّرتَه هنا تحرّك هناك",
             NIC)
@@ -155,7 +159,7 @@ def sheet_inputs(wb, D):
     hc.font = Font(name=B.FONT, size=8, bold=True, color="FFFFFF")
     hc.fill = PatternFill("solid", fgColor=B.D_GOLD); hc.alignment = W.CTR
     W.inp(ws, R_RAMP, C_FRAC, "0.00", D.get("frac_sample", 0.5))
-    ws.cell(R_RAMP, C_FRAC + 1,
+    ws.cell(R_RAMP, C_FRAC + 2,
             "شهرُ الافتتاح يُحسب بكسرِ أيامِه: ٠٫٢٩ ÷ كسرِ العيّنة = أساسُ "
             "شهرٍ كامل، ثم × (أيامُ الشهر − يومُ الافتتاح + ١) ÷ أيامِ الشهر"
             ).font = Font(name=B.FONT, size=8.5, italic=True, color=B.D_GOLD)
@@ -206,14 +210,43 @@ def sheet_inputs(wb, D):
         cc.font = Font(name=B.FONT, size=8.5, italic=True, color=B.INK2)
         cc.alignment = W.RGT
 
-    # ④ جدول المحطات
-    r = R_PROF + N_PROF + 1
-    ws.cell(r, 1, "④ لكل محطة: معدّلُ نظيرها وفئتُها وموسمُها ومزيجُها")
+    # ④ رافعةُ المستأجرين — مقيسةٌ على ٦٧ محطةً ناضجةً لها سجلُّ وحدات
+    a = D.get("anchor") or {}
+    ws.cell(R_ANC - 2, 1,
+            f"④ رافعةُ المستأجرين — عددُ الوحداتِ المؤجَّرة يفسّر "
+            f"{a.get('r2', 0) * 100:.0f}٪ من تباينِ اللتر (ن={a.get('n', 0)})، "
+            f"والعلامةُ الكبرى {a.get('r2_brands', 0) * 100:.0f}٪ فقط")
+    ws.cell(R_ANC - 2, 1).font = Font(name=B.FONT, size=10, bold=True,
+                                      color=B.BGRAY)
+    for j, t in enumerate(("الميل\nلتر/وحدة", "الثابت\nلتر/يوم",
+                           "إشغالٌ\nمفترض", "السقف\nل/يوم",
+                           "وسيطُ وحداتِ\nالشبكة")):
+        hc = ws.cell(R_ANC - 1, 3 + j, t)
+        hc.font = Font(name=B.FONT, size=8, bold=True, color="FFFFFF")
+        hc.fill = PatternFill("solid", fgColor=B.D_GOLD); hc.alignment = W.CTR
+    W.inp(ws, R_ANC, C_SLOPE, NUM, a.get("slope", 0))
+    W.inp(ws, R_ANC, C_INTER, NUM, a.get("intercept", 0))
+    W.inp(ws, R_ANC, C_OCC, "0.0%", a.get("occ", 0))
+    W.inp(ws, R_ANC, C_CAP, NUM, a.get("cap_rate", 0))
+    W.calc(ws, R_ANC, 7, a.get("net_units", 0), "0.0")
+    ws.cell(R_ANC, 8,
+            f"السقفُ = أعلى محطةٍ قائمة ({a.get('cap_name', '')}) — فلا يُوازَن "
+            f"موقعٌ فوق ما لم نشغّله قطّ · والإشغالُ مجموعُ المؤجَّرِ ÷ المبنيِّ "
+            f"في الناضجة").font = Font(name=B.FONT, size=8.5, italic=True,
+                                        color=B.INK2)
+
+    # ⑤ جدول المحطات
+    r = R_ANC + 2
+    ws.cell(r, 1, "⑤ لكل محطة: أساسُ معدّلها — ثلاثةُ أسُسٍ مقيسةٍ تُقلَّب "
+                  "من القائمةِ المنسدلة، والمعدّلُ يُحسب من المختار")
     ws.cell(r, 1).font = Font(name=B.FONT, size=10, bold=True, color=B.BGRAY)
-    W.header(ws, R_ST - 1, ["#", "الكود", "المحطة", "المنطقة", "المدينة", "الافتتاح",
-                            "شهرُه*", "يومُه", "معدّل النظير\nل/يوم",
-                            "أساسُ المعدّل", "ن", "الفئة", "الموسم",
-                            "٩١", "٩٥", "ديزل"], h=32)
+    W.header(ws, R_ST - 1, ["#", "الكود", "المحطة", "المنطقة", "المدينة",
+                            "الافتتاح", "شهرُه*", "يومُه",
+                            "أساسُ المعدّل", "① نظيرُ\nالجوار",
+                            "② فئةٌ\nمقيسة", "وحداتٌ\nمبنيّة",
+                            "وحداتٌ\nمتوقَّعة", "③ من عددِ\nالوحدات",
+                            "المعدّلُ\nالمختار", "مصدرُ النظير", "ن",
+                            "الفئة", "الموسم", "٩١", "٩٥", "ديزل"], h=34)
     for i, s in enumerate(D["stations"], 1):
         rr = R_ST + i - 1
         W.calc(ws, rr, IC["no"], i, "0")
@@ -225,7 +258,26 @@ def sheet_inputs(wb, D):
         W.calc(ws, rr, IC["open"], s["open"], "@")
         W.calc(ws, rr, IC["off"], s["off"], "0")
         W.inp(ws, rr, IC["day"], "0", s["day"])
-        W.inp(ws, rr, IC["rate"], NUM, s["rate"])
+        cc = W.inp(ws, rr, IC["basis"], "@", s.get("basis") or BASES[0])
+        if (s.get("basis") or BASES[0]) != BASES[0]:
+            cc.font = Font(name=B.FONT, size=9, bold=True, color=B.D_GOLD)
+        W.inp(ws, rr, IC["peer"], NUM, s.get("peer_rate", s["rate"]))
+        cr = s.get("cls_rate", 0)
+        cc = W.inp(ws, rr, IC["clsr"], NUM, cr or None)
+        if not cr:
+            cc.value = None
+        W.inp(ws, rr, IC["built"], "0", s.get("units_built", 0))
+        W.calc(ws, rr, IC["uexp"],
+               f"=ROUND({L(IC['built'])}{rr}*'{IN}'!${L(C_OCC)}${R_ANC},0)", "0")
+        W.calc(ws, rr, IC["urate"],
+               f"=IF({L(IC['built'])}{rr}=0,\"\",MIN("
+               f"'{IN}'!${L(C_INTER)}${R_ANC}+'{IN}'!${L(C_SLOPE)}${R_ANC}"
+               f"*{L(IC['uexp'])}{rr},'{IN}'!${L(C_CAP)}${R_ANC}))", NUM)
+        W.calc(ws, rr, IC["rate"],
+               f'=IF({L(IC["basis"])}{rr}="{BASES[1]}",{L(IC["clsr"])}{rr},'
+               f'IF(AND({L(IC["basis"])}{rr}="{BASES[2]}",'
+               f'{L(IC["built"])}{rr}>0),{L(IC["urate"])}{rr},'
+               f'{L(IC["peer"])}{rr}))', NUM)
         cc = ws.cell(rr, IC["src"], s["src"]); cc.font = Font(name=B.FONT, size=8.5,
                                                               color=B.INK2)
         cc.border = W.BOX; cc.alignment = W.RGT; cc.fill = NEU
@@ -239,11 +291,20 @@ def sheet_inputs(wb, D):
         for p in ("91", "95", "diesel"):
             W.inp(ws, rr, IC[MIXC[p]], "0.0%", s["mix"][p])
     last = R_ST + len(D["stations"]) - 1
-    dv = DataValidation(type="list",
-                        formula1='"' + ",".join(p[0] for p in PROFS) + '"',
-                        allow_blank=False)
-    ws.add_data_validation(dv)
-    dv.add(f"{L(IC['prof'])}{R_ST}:{L(IC['prof'])}{last}")
+    for col, opts in ((IC["prof"], [p[0] for p in PROFS]),
+                      (IC["basis"], BASES),
+                      (IC["cls"], ["—"] + list(D.get("classes", {})))):
+        dv = DataValidation(type="list",
+                            formula1='"' + ",".join(opts) + '"',
+                            allow_blank=False)
+        ws.add_data_validation(dv)
+        dv.add(f"{L(col)}{R_ST}:{L(col)}{last}")
+    # المعدّلُ المختارُ فوق سقفِ الشبكة — تحذيرٌ بصريّ
+    ws.conditional_formatting.add(
+        f"{L(IC['rate'])}{R_ST}:{L(IC['rate'])}{last}",
+        CellIsRule(operator="greaterThan",
+                   formula=[f"'{IN}'!${L(C_CAP)}${R_ANC}"], fill=BAD,
+                   font=Font(name=B.FONT, size=10, bold=True, color=B.D_BAD)))
     # نظيرٌ رقيقُ الأساس — تحذيرٌ بصريّ
     ws.conditional_formatting.add(
         f"{L(IC['n'])}{R_ST}:{L(IC['n'])}{last}",
@@ -338,6 +399,57 @@ def sheet_inputs(wb, D):
         cc.border = W.BOX; cc.alignment = W.RGT
         r += 1
     r += 1
+    # رافعةُ المستأجرين — الدليلُ والنقيضُ معاً
+    a = D.get("anchor")
+    if a:
+        r += 1
+        r = W.band(ws, r, NIC,
+                   f"رافعةُ المستأجرين كما قيست — {a['n']} محطةً ناضجةً لها "
+                   f"سجلُّ وحدات · والنقيضُ مكتوبٌ معها لأنّ السببيّةَ "
+                   f"غيرُ مُثبَتة")
+        W.header(ws, r, ["وحداتٌ مؤجَّرة", "ن", "وسيطُ اللتر", "معامل"], h=20)
+        r += 1
+        for lbl, n, med, fac in a["buckets"]:
+            W.calc(ws, r, 1, lbl, "@"); W.calc(ws, r, 2, n, "0")
+            W.calc(ws, r, 3, med, NUM)
+            W.calc(ws, r, 4, fac, '0.00"×"'); r += 1
+        for ttl, items, col in (
+                ("يرفع الرافعة", [f"ارتباطُ الوحداتِ المؤجَّرة r={a['r_leased']:+.3f}"
+                                  f" (R²={a['r2']:.2f}) — أقوى ما قيس في هذا "
+                                  f"الملف",
+                                  f"والعلاقةُ متدرّجة: من {a['buckets'][0][2]:,} "
+                                  f"ل/يوم بلا مستأجرٍ إلى "
+                                  f"{a['buckets'][-1][2]:,} عند أربعةَ عشرَ "
+                                  f"مستأجراً وأكثر"], B.D_GOOD),
+                ("ويهدم سببيّتها",
+                 [f"{len(a['zero_high'])} محطاتٍ بلا مستأجرٍ واحدٍ تبيع فوق "
+                  f"٤٠ ألف ل/يوم: "
+                  + " · ".join(f"{n} {v:,}" for n, v in a["zero_high"])]
+                 + [f"و{len(a['many_low'])} بعشرِ وحداتٍ مؤجَّرةٍ أو أكثرَ تبيع "
+                    f"دون ٢٠ ألف: "
+                    + " · ".join(f"{n} {v:,} ({u} وحدة · {b} علامة)"
+                                 for n, v, u, b in a["many_low"])]
+                 + [f"والعلامةُ الكبرى وحدَها تفسّر {a['r2_brands'] * 100:.0f}٪ "
+                    f"فقط — فالعددُ يفسّر لا الاسم: "
+                    + " · ".join(f"{n} ({b} علامة) {v:,} ل/يوم"
+                                 for n, b, u, v in a["richest"][:3])]
+                 + [f"و{a['max_units']} وحدةً أعلى ما شغّلناه، فما فوقها "
+                    f"استقراءٌ خارجَ البيانات — والسقفُ "
+                    f"{a['cap_rate']:,} ل/يوم يمنع تجاوزَ "
+                    f"{a['cap_name']}"], B.D_BAD)):
+            cc = ws.cell(r, 1, ttl)
+            cc.font = Font(name=B.FONT, size=9, bold=True, color=col)
+            cc.alignment = W.RGT
+            r += 1
+            for it in items:
+                ws.merge_cells(start_row=r, start_column=2, end_row=r,
+                               end_column=NIC)
+                cc = ws.cell(r, 2, "•  " + it)
+                cc.font = Font(name=B.FONT, size=8.5, color=B.INK2)
+                cc.alignment = W.RGT
+                r += 1
+        r += 1
+
     sm = D["profiles"]
     r = W.band(ws, r, NIC, f"أعضاءُ منحنى «صيفيٌّ مقيس» — أعلى "
                            f"{sm['summer_n']} محطاتٍ في نسبةِ (يون–أغس ÷ "
@@ -614,6 +726,13 @@ def sheet_gaps_known(wb, D):
     W.header(ws, 4, ["#", "المُدخَل الناقص", "لماذا يَحسم", "من يملك سدَّه",
                      "أثرُه على هذه الورقة"], h=32)
     ROWS = [
+        ("خطّةُ مستأجري القنفذة ومدينة الملك عبدالله — عدداً وعلامةً وموعداً",
+         "٦٥ وحدةً مبنيّةً في القنفذة و٤١ في مدينة الملك، ومعدّلُهما محسوبٌ "
+         "بإشغالِ ٧٧٫٥٪ (إشغالُ الناضجة مجموعاً). والمحلاتُ وحدَها في الشبكة "
+         "٢٥٫١٪ إشغالاً، فالفرقُ بين الفرضَين يحرّك الموقعَ أكثرَ من أيِّ "
+         "مُدخَلٍ آخر",
+         "إدارةُ العقار",
+         "يصحّح «وحداتٌ مبنيّة» و«إشغالٌ مفترض» فيتحرّك معدّلُ المحطتين"),
         ("أيامُ افتتاحِ الـ٢٢ التي قيس بها التدرّج",
          "تواريخُها غيرُ مسجَّلةٍ في الملف، فكسرُ شهرِها الأولِ مفترضٌ ٠٫٥٠ "
          "(توزُّعٌ منتظمٌ داخلَ الشهر) لا مقيساً",

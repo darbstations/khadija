@@ -39,17 +39,28 @@
              (و‏-I لأنّ الملف مُرفَقٌ غيرُ موثوق)
 """
 import collections
+import csv
 import datetime as dt
+import io
 import json
+import math
 import statistics as st
 import sys
 
 import openpyxl
 
 OUT = "outlets/data/new-stations-2027.json"
+UNITS = "outlets/data/units-registry.csv"      # سجلُّ الوحدات — ١٨٦ محطة
+LEASE = "outlets/data/leasing-own.csv"         # أسماءُ المستأجرين بالمحطة
 DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]   # ٢٠٢٧ — فبراير ٢٨
 NACT = 9          # ينا–سبت: آخرُ شهرٍ فعليٍّ في ملف ٢٠٢٦
 PRODS = ("91", "95", "diesel")
+
+# علاماتٌ كبرى — لاختبارِ هل تُفسّر العلامةُ اللترَ أم عددُ الوحدات
+BRANDS = ["ماكدونالدز", "كرسبي كريم", "تيم هورتنز", "دانكن", "بارنز",
+          "سينابون", "بابا", "هرفي", "كودو", "البيك", "دومينوز", "ستاربكس",
+          "كنتاكي", "شاورمر", "بيتزا هت", "صب واي", "تشيليز", "نستو",
+          "بنده", "كارفور", "العثيم", "فريش واي"]
 
 # كسرُ شهرِ الافتتاح في عيّنةِ القياس — تواريخُ افتتاحِ الـ٢٢ غيرُ مسجَّلةٍ في
 # الملف، فيُفترَض توزُّعُها المنتظمُ داخلَ الشهر ⇒ نصفُ شهرٍ وسطياً. وهو
@@ -62,13 +73,15 @@ CLASSES = [("ممرُّ شاحنات", 0.40, 0.55),
 
 # ما تعرفه الإدارةُ عن الموقعِ ولا يَظهر في الملف — مُدخَلٌ إداريٌّ مُعلَن
 OVERRIDE = {
-    "MK044": dict(cls="ممرُّ شاحنات",
-                  why="مساحةٌ فوق ١٠٠ ألف م² ومسارُ ديزلٍ مخصَّصٌ للشاحنات "
+    "MK044": dict(cls="ممرُّ شاحنات", basis="من عددِ الوحدات",
+                  why="مساحةٌ فوق ١٠٠ ألف م² · مسارُ ديزلٍ مخصَّصٌ للشاحنات · "
+                      "وتجارةٌ كثيفةٌ بعلاماتٍ كبرى تجرّ حركةً للموقع "
                       "— الإدارة التجارية"),
     "MK045": dict(cls="ممرُّ شاحنات", prof="صيفيٌّ مقيس",
-                  why="مساحةٌ فوق ١٠٠ ألف م² ومسارُ ديزلٍ مخصَّصٌ للشاحنات · "
-                      "وموسمُها صيفيٌّ بافتتاحِ ريكسوس ومنتجعاتٍ قبلها "
-                      "— الإدارة التجارية"),
+                  basis="من عددِ الوحدات",
+                  why="مساحةٌ فوق ١٠٠ ألف م² · مسارُ ديزلٍ مخصَّصٌ للشاحنات · "
+                      "تجارةٌ كثيفةٌ بعلاماتٍ كبرى · وموسمٌ صيفيٌّ بافتتاحِ "
+                      "ريكسوس ومنتجعاتٍ قبلها — الإدارة التجارية"),
 }
 
 num = lambda x: float(x) if isinstance(x, (int, float)) else 0.0
@@ -245,6 +258,98 @@ def measure_profiles(vol, new, attr):
                         for c, r, _ in free[:10]])
 
 
+def read_units():
+    """سجلُّ الوحدات وأسماءُ المستأجرين — عددُ الوحداتِ المبنيّةِ والمؤجَّرة"""
+    U, Lz = {}, {}
+    for r in csv.DictReader(io.open(UNITS, encoding="utf-8")):
+        k = (r.get("code") or "").strip()
+        if not k:
+            continue
+        g = lambda f: int(float(r.get(f) or 0))
+        U[k] = dict(built=g("total_n"), leased=g("total_leased"),
+                    vacant=g("total_vacant"), shop=g("shop_n"))
+    for r in csv.DictReader(io.open(LEASE, encoding="utf-8")):
+        k = (r.get("code") or r.get("﻿code") or "").strip()
+        if not k:
+            continue
+        txt = " ".join((r.get(f) or "") for f in
+                       ("restaurants", "cafe", "market", "other", "car_services"))
+        Lz[k] = [b for b in BRANDS if b in txt]
+    return U, Lz
+
+
+def measure_anchor(vol, new, attr, U, Lz):
+    """هل عددُ المستأجرين يفسّر لترَ المحطة؟ — تُقاس الرافعةُ قبل استعمالها
+
+       تُفحَص على الناضجةِ التي لها سجلُّ وحدات، ويُحتفَظ بالنقيض صريحاً:
+       محطاتٌ بلا مستأجرٍ واحدٍ تبيع أكثرَ من محطاتٍ بسبعةَ عشرَ مستأجراً.
+       فالارتباطُ قائم، والسببيّةُ غيرُ مُثبَتة.
+    """
+    pts = []
+    for c, v in vol.items():
+        if c in new or c not in attr or c not in U:
+            continue
+        t = totals(v, 2026)
+        if not all(x > 0 for x in t[:NACT]):
+            continue
+        pts.append(dict(code=c, name=attr[c]["name"], reg=attr[c]["reg"],
+                        city=attr[c]["city"],
+                        rate=st.mean([t[i] / DAYS[i] for i in range(NACT)]),
+                        leased=U[c]["leased"], built=U[c]["built"],
+                        brands=len(Lz.get(c, []))))
+    if len(pts) < 20:
+        return None
+
+    def corr(xs, ys):
+        mx, my = st.mean(xs), st.mean(ys)
+        sx = math.sqrt(sum((x - mx) ** 2 for x in xs))
+        sy = math.sqrt(sum((y - my) ** 2 for y in ys))
+        return sum((x - mx) * (y - my) for x, y in zip(xs, ys)) / (sx * sy) \
+            if sx * sy else 0.0
+
+    xs = [p["leased"] for p in pts]
+    ys = [p["rate"] for p in pts]
+    r_leased = corr(xs, ys)
+    r_brands = corr([p["brands"] for p in pts], ys)
+    mx, my = st.mean(xs), st.mean(ys)
+    slope = sum((x - mx) * (y - my) for x, y in zip(xs, ys)) \
+        / sum((x - mx) ** 2 for x in xs)
+    inter = my - slope * mx
+    # منحنى الفئات — أقوى من الخطِّ أمام الشواذّ، ويُعرَض للمراجعة
+    BK = [(0, 1, "صفر"), (1, 4, "١–٣"), (4, 8, "٤–٧"),
+          (8, 14, "٨–١٣"), (14, 999, "١٤+")]
+    base = st.median(ys)
+    buckets = []
+    for lo, hi, lbl in BK:
+        g = [p["rate"] for p in pts if lo <= p["leased"] < hi]
+        if g:
+            buckets.append([lbl, len(g), round(st.median(g)),
+                            round(st.median(g) / base, 3)])
+    tl = sum(U[p["code"]]["leased"] for p in pts)
+    tn = sum(U[p["code"]]["built"] for p in pts)
+    pu = collections.defaultdict(list)
+    for p in pts:
+        pu["منطقة " + p["reg"]].append(p["leased"])
+        pu["مدينة " + p["city"].strip().title()].append(p["leased"])
+    return dict(
+        n=len(pts), r_leased=round(r_leased, 3), r2=round(r_leased ** 2, 3),
+        r_brands=round(r_brands, 3), r2_brands=round(r_brands ** 2, 3),
+        slope=round(slope), intercept=round(inter),
+        net_units=st.median(xs), buckets=buckets, base=round(base),
+        occ=round(tl / tn, 4) if tn else 0,
+        cap_rate=round(max(ys)),
+        cap_name=max(pts, key=lambda p: p["rate"])["name"],
+        max_units=max(xs),
+        peer_units={k: st.median(v) for k, v in pu.items() if len(v) >= 3},
+        # النقيضُ — يُكتب ولا يُحذَف
+        zero_high=[[p["name"], round(p["rate"])] for p in pts
+                   if p["leased"] == 0 and p["rate"] > 40000],
+        many_low=[[p["name"], round(p["rate"]), p["leased"], p["brands"]]
+                  for p in pts if p["leased"] >= 10 and p["rate"] < 20000],
+        richest=[[p["name"], p["brands"], p["leased"], round(p["rate"])]
+                 for p in sorted(pts, key=lambda x: -x["brands"])[:6]])
+
+
 def measure_mix(vol, new, attr):
     """حصصُ المنتجاتِ الفعليّةُ بالمنطقة — ينا–سبت ٢٠٢٦"""
     reg = collections.defaultdict(collections.Counter)
@@ -275,6 +380,8 @@ def build(path):
     mix, mnet = measure_mix(vol, new, attr)
     cls = measure_classes(vol, new, attr)
     prof = measure_profiles(vol, new, attr)
+    U, Lz = read_units()
+    anc = measure_anchor(vol, new, attr, U, Lz)
     net = st.median(list(rate.values()))
     top_mature = round(max(rate.values()))
     top_name = attr[max(rate, key=rate.get)]["name"]
@@ -292,12 +399,21 @@ def build(path):
         d = dt.date.fromisoformat(s["open"])
         ov = OVERRIDE.get(c, {})
         k = ov.get("cls")
-        if k and k in cls:
-            r, src, n = cls[k]["rate"], "فئة " + k, cls[k]["n"]
-            m = cls[k]["mix"]
+        pr, src, n = peer(s)
+        pm = mix.get(s["reg"], mnet)
+        ub = U.get(c, {}).get("built", 0)
+        ur = 0
+        if anc and ub:
+            ur = min(anc["intercept"] + anc["slope"] * round(ub * anc["occ"]),
+                     anc["cap_rate"])
+        basis = ov.get("basis") or ("فئةٌ مقيسة" if k in cls else "نظيرُ الجوار")
+        if basis == "من عددِ الوحدات" and ur:
+            r = ur
+        elif k and k in cls:
+            r = cls[k]["rate"]
         else:
-            r, src, n = peer(s)
-            m = mix.get(s["reg"], mnet)
+            r = pr
+        m = cls[k]["mix"] if (k and k in cls) else pm
         bu = {p: vol[c][p][2027] if p in vol[c] else [0.0] * 12 for p in PRODS}
         a26 = {p: vol[c][p][2026] if p in vol[c] else [0.0] * 12 for p in PRODS}
         tbu = [sum(bu[p][i] for p in PRODS) for i in range(12)]
@@ -313,6 +429,12 @@ def build(path):
             off=(d.year - 2027) * 12 + d.month - 1,
             day=d.day,                      # يومُ الافتتاح — يُحسب به كسرُ شهرِه
             rate=round(r), src=src, n=n, cls=k or "", prof=pf,
+            peer_rate=round(pr), cls_rate=round(cls[k]["rate"]) if k in cls else 0,
+            basis=basis,
+            units_built=U.get(c, {}).get("built", 0),
+            units_leased=U.get(c, {}).get("leased", 0),
+            brands=len(Lz.get(c, [])),
+            peer_units=(anc or {}).get("peer_units", {}).get(src, 0),
             why=ov.get("why", ""), mix=m, bu=bu, a26=a26,
             has26=any(sum(a26[p]) for p in PRODS),
             # معدّلُ الموازنةِ الضمنيّ، وهل هي رقمٌ واحدٌ مكرَّرٌ في كلِّ شهر
@@ -325,7 +447,7 @@ def build(path):
              peer_reg={k: [round(st.median(v)), len(v)] for k, v in reg.items()},
              peer_net=round(net), n_mature=len(rate), n_ramp=nramp,
              mix_reg=mix, mix_net=mnet, classes=cls, profiles=prof,
-             top_mature=top_mature, top_name=top_name)
+             anchor=anc, top_mature=top_mature, top_name=top_name)
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(D, f, ensure_ascii=False, indent=1)
 
@@ -348,6 +470,19 @@ def build(path):
     for c, o in OVERRIDE.items():
         print(f"  OVERRIDE {c}: {o.get('cls', '')} "
               f"{'· ' + o['prof'] if 'prof' in o else ''}")
+    if anc:
+        print(f"  رافعةُ المستأجرين (ن={anc['n']}): وحداتٌ مؤجَّرة r="
+              f"{anc['r_leased']:+.3f} R²={anc['r2']:.2f} · "
+              f"علاماتٌ كبرى r={anc['r_brands']:+.3f} R²={anc['r2_brands']:.2f}")
+        print(f"    لتر/يوم = {anc['intercept']:,} + {anc['slope']:,} × وحدة "
+              f"· إشغالُ الناضجة {anc['occ'] * 100:.1f}٪ · سقفٌ "
+              f"{anc['cap_rate']:,} ({anc['cap_name']})")
+        print(f"    والنقيض: {len(anc['zero_high'])} بلا مستأجرٍ فوق ٤٠ ألف · "
+              f"{len(anc['many_low'])} بعشرِ وحداتٍ دون ٢٠ ألف")
+        nu = [s for s in out if s["units_built"]]
+        print(f"    وللـ{len(nu)} محطةً من الـ٣٨ سجلُّ وحدات — أكبرها "
+              + " · ".join(f"{x['name'][:12]} {x['units_built']}"
+                           for x in sorted(nu, key=lambda y: -y["units_built"])[:4]))
     return D
 
 
